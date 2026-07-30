@@ -294,6 +294,7 @@ jobs:
 
                   deadline=$(($(date +%s) + 600))
                   attempt=0
+                  last_actual=""
 
                   while [ "$(date +%s)" -lt "$deadline" ]; do
                     attempt=$((attempt + 1))
@@ -315,6 +316,7 @@ jobs:
                         echo "==> Deployed SHA matches: $actual"
                         exit 0
                       fi
+                      last_actual="$actual"
                       echo "SHA mismatch (expected=$expected, actual=$actual)."
                     else
                       echo "Not ready (HTTP $http_code)."
@@ -327,7 +329,10 @@ jobs:
                     sleep "$sleep_for"
                   done
 
-                  echo "::error::Deployed version SHA did not match expected before deadline"
+                  echo "::error::Deployed version SHA did not match expected before deadline (expected=$expected, production=${last_actual:-unknown})"
+                  if [ -n "$last_actual" ] && [ "$last_actual" != "$expected" ]; then
+                    echo "::error::Production is running $last_actual instead of $expected. If the homelab auto-rollback restored service, this red check is a silent rollback, not a flaky probe. See the Notify failure step for details."
+                  fi
                   exit 1
 
             - name: Sentry release — finalize
@@ -360,3 +365,25 @@ jobs:
                   EXPECTED_SHA: ${{ steps.resolve_sha.outputs.sha }}
                   REPO: ${{ github.repository }}
               run: bash scripts/deploy/wait-homelab-status.sh wait
+
+            # Runs only when an earlier step failed. Annotates the run with the
+            # SHA production is actually serving so an auto-rollback to the
+            # last-good image is not indistinguishable from a flaky red check
+            # (#1892). Skipped when no deploy SHA was resolved: that failure
+            # predates the rollout and is handled by the step below.
+            - name: Notify failure
+              if: failure() && steps.resolve_sha.outputs.sha != ''
+              env:
+                  WEBHOOK_URL: ${{ secrets.DEPLOY_WEBHOOK_URL }}
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  EXPECTED_SHA: ${{ steps.resolve_sha.outputs.sha }}
+                  RELEASE_TAG: ${{ github.event.release.tag_name }}
+                  REPO: ${{ github.repository }}
+              run: bash scripts/deploy/notify-deploy-failure.sh
+
+            # A failure with no resolved deploy SHA means the webhook never
+            # fired: there is no rollout (and no rollback) to diagnose, so
+            # skip the SHA comparison and say so plainly.
+            - name: Notify pre-deploy failure
+              if: failure() && steps.resolve_sha.outputs.sha == ''
+              run: echo "::error::Deploy failed before the rollout started (no deploy SHA resolved). This is a pre-deploy failure, not an auto-rollback."
