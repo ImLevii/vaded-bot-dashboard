@@ -26,6 +26,10 @@ const userGrantsUpdateSchema = z
     })
     .strict()
 
+type UserGrantsUpdateInput = z.infer<typeof userGrantsUpdateSchema>
+type UserGrantInput = UserGrantsUpdateInput['grants'][number]
+type PersistedUserGrantInput = Omit<UserGrantInput, 'mode'> & { mode: 'view' | 'manage' }
+
 function p(val: string | string[]): string {
     return typeof val === 'string' ? val : val[0]
 }
@@ -83,13 +87,16 @@ export function setupMembersRoutes(app: Express): void {
             if (!req.user) throw AppError.unauthorized()
             const guildId = p(req.params.guildId)
             const userId = p(req.params.userId)
+            const body = userGrantsUpdateSchema.parse(req.body) as UserGrantsUpdateInput
 
             // Only allow module modes 'view' and 'manage'; 'none' means remove
-            const toSave = req.body.grants
-                .filter((g: { mode: string }) => g.mode !== 'none')
-                .map((g: { module: string; mode: string }) => ({
-                    module: g.module as (typeof RBAC_MODULES)[number],
-                    mode: g.mode as 'view' | 'manage',
+            const toSave = body.grants
+                .filter(
+                    (g): g is PersistedUserGrantInput => g.mode === 'view' || g.mode === 'manage',
+                )
+                .map((g) => ({
+                    module: g.module,
+                    mode: g.mode,
                 }))
 
             await guildRoleAccessService.replaceUserGrants(guildId, userId, toSave)

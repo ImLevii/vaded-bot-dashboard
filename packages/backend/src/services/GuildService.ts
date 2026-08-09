@@ -301,7 +301,6 @@ class GuildService {
         try {
             const guild = client.guilds.cache.get(guildId) ?? await client.guilds.fetch(guildId)
             const members = await guild.members.fetch({ limit: 1000 })
-            const roles = await guild.roles.fetch()
 
             return [...members.values()]
                 .filter((m) => !m.user.bot)

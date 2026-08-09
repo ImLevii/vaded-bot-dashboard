@@ -96,7 +96,7 @@ async function discordFetch(url: string, method: string): Promise<Response> {
             signal: controller.signal,
         })
     } catch (err) {
-        console.error('Discord API request failed:', err)
+        void err
         throw AppError.badGateway('discord request failed')
     } finally {
         clearTimeout(timeout)
@@ -187,9 +187,6 @@ export function setupServiceGuildRoutes(app: Express): void {
             const response = await discordFetch(url, 'GET')
 
             if (!response.ok) {
-                console.error(
-                    `Discord API error: ${response.status} ${response.statusText}`,
-                )
                 throw AppError.badGateway(`discord ${response.status}`)
             }
 
@@ -220,9 +217,6 @@ export function setupServiceGuildRoutes(app: Express): void {
                 throw AppError.notFound('member not found')
             }
             if (!response.ok) {
-                console.error(
-                    `Discord API error: ${response.status} ${response.statusText}`,
-                )
                 throw AppError.badGateway(`discord ${response.status}`)
             }
 
@@ -243,9 +237,6 @@ export function setupServiceGuildRoutes(app: Express): void {
             const response = await discordFetch(url, 'GET')
 
             if (!response.ok) {
-                console.error(
-                    `Discord API error: ${response.status} ${response.statusText}`,
-                )
                 throw AppError.badGateway(`discord ${response.status}`)
             }
 
