@@ -191,7 +191,7 @@ function fmt(seconds: number): string {
 }
 
 function NowPlayingWidget({ guildId }: { guildId: string }) {
-    const { state, commands, pendingAction, isConnected } =
+    const { state, pause, resume, skip, pendingAction, isConnected } =
         useMusicPlayer(guildId)
     const [localMs, setLocalMs] = useState(state.position)
 
@@ -306,7 +306,7 @@ function NowPlayingWidget({ guildId }: { guildId: string }) {
                 <div className='flex items-center gap-2 shrink-0'>
                     <button
                         onClick={() =>
-                            isPaused ? commands.resume() : commands.pause()
+                            isPaused ? resume() : pause()
                         }
                         disabled={!!pendingAction}
                         aria-label={isPaused ? 'Resume' : 'Pause'}
@@ -319,7 +319,7 @@ function NowPlayingWidget({ guildId }: { guildId: string }) {
                         )}
                     </button>
                     <button
-                        onClick={() => commands.skip()}
+                        onClick={() => skip()}
                         disabled={!!pendingAction}
                         aria-label='Skip'
                         className='h-9 w-9 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/10 text-lucky-text-secondary hover:text-white transition-all disabled:opacity-40'

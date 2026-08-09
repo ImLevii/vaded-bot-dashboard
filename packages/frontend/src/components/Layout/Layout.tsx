@@ -2,13 +2,11 @@ import { type MouseEvent, type ReactNode, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Sidebar from './Sidebar'
-import VoteBadge from './VoteBadge'
 import { useGuildSelection } from '@/hooks/useGuildSelection'
 import { useAuthStore } from '@/stores/authStore'
 import { useGuildStore } from '@/stores/guildStore'
 import { getUserAvatarUrl } from '@/lib/discord'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import LanguageSwitcher from '@/components/ui/LanguageSwitcher'
 import { ChevronDown, LogOut } from 'lucide-react'
 
 interface LayoutProps {
