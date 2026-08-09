@@ -101,6 +101,10 @@ export function setupMiddleware(app: Express): void {
             // (replit.dev / repl.co / replit.app) are NOT trusted with
             // credentials — see ADR 2026-06-05-csrf-posture.
             return (
+                host === 'vadedgaming.com' ||
+                host.endsWith('.vadedgaming.com') ||
+                host === 'vaded-bot-dashboard.vercel.app' ||
+                host.endsWith('.vercel.app') ||
                 host === 'lucassantana.tech' ||
                 host.endsWith('.lucassantana.tech') ||
                 host === 'luk-homeserver.com.br' ||

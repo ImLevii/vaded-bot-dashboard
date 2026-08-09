@@ -3,8 +3,10 @@ type ApiLocation = {
     hostname: string
 }
 
-function isLuckyManagedHost(hostname: string): boolean {
+function isManagedFrontendHost(hostname: string): boolean {
     return (
+        hostname === 'vadedgaming.com' ||
+        hostname.endsWith('.vadedgaming.com') ||
         hostname === 'lucassantana.tech' ||
         hostname.endsWith('.lucassantana.tech')
     )
@@ -31,7 +33,7 @@ export function inferApiBase(
         return '/api'
     }
 
-    if (isLuckyManagedHost(hostname)) {
+    if (isManagedFrontendHost(hostname)) {
         return '/api'
     }
 

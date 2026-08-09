@@ -279,15 +279,16 @@ function Hero({ prefersReducedMotion, onOpenDashboard }: HeroProps) {
                             className='group btn-glass inline-flex items-center gap-0 rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lucky-brand focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1117]'
                         >
                             <span className='flex h-full items-center justify-center px-4 py-3 text-[#5865F2]'>
-                                <img
-                                    src='https://cdn.simpleicons.org/discord/5865F2'
-                                    alt=''
+                                <svg
+                                    viewBox='0 0 24 24'
                                     width='16'
                                     height='16'
+                                    aria-hidden='true'
                                     className='h-4 w-4 shrink-0 select-none'
-                                    loading='eager'
-                                    decoding='async'
-                                />
+                                    fill='currentColor'
+                                >
+                                    <path d='M20.32 4.37a19.82 19.82 0 0 0-4.89-1.49.07.07 0 0 0-.08.04c-.21.37-.44.85-.6 1.23a18.7 18.7 0 0 0-5.48 0 12.18 12.18 0 0 0-.62-1.23.08.08 0 0 0-.08-.04 19.7 19.7 0 0 0-4.89 1.49.06.06 0 0 0-.03.03C.52 9 .43 13.45.84 17.86a.08.08 0 0 0 .03.05 19.95 19.95 0 0 0 5.99 2.97.08.08 0 0 0 .08-.03c.46-.62.87-1.27 1.23-1.96a.08.08 0 0 0-.04-.1 13.4 13.4 0 0 1-1.87-.88.08.08 0 0 1 0-.13c.12-.09.25-.19.37-.29a.08.08 0 0 1 .08-.01c3.93 1.75 8.18 1.75 12.06 0a.08.08 0 0 1 .08 0c.12.1.24.2.37.3a.08.08 0 0 1 0 .12c-.6.35-1.23.64-1.88.88a.08.08 0 0 0-.04.1c.35.69.77 1.34 1.23 1.96a.08.08 0 0 0 .08.03 19.9 19.9 0 0 0 6-2.97.08.08 0 0 0 .03-.05c.49-5.08-.84-9.51-3.55-13.43a.06.06 0 0 0-.03-.03ZM8.02 15.28c-1.18 0-2.16-1.07-2.16-2.38 0-1.31.96-2.38 2.16-2.38 1.21 0 2.18 1.07 2.16 2.38 0 1.31-.95 2.38-2.16 2.38Zm7.98 0c-1.18 0-2.16-1.07-2.16-2.38 0-1.31.95-2.38 2.16-2.38 1.2 0 2.18 1.07 2.16 2.38 0 1.31-.95 2.38-2.16 2.38Z' />
+                                </svg>
                             </span>
                             <span className='flex items-center gap-3 px-5 py-3'>
                                 <span className='flex flex-col items-start'>

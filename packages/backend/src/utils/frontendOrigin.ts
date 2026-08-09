@@ -1,13 +1,28 @@
 const DEFAULT_FRONTEND_URL = 'http://localhost:5173'
+const DEFAULT_PRODUCTION_FRONTEND_URLS = [
+    'https://vadedgaming.com',
+    'https://vaded-bot-dashboard.vercel.app',
+]
 
 export function getFrontendOrigins(): string[] {
-    const configured = process.env.WEBAPP_FRONTEND_URL ?? DEFAULT_FRONTEND_URL
+    const configured = process.env.WEBAPP_FRONTEND_URL
+    if (configured === undefined) {
+        if (process.env.NODE_ENV === 'production') {
+            return DEFAULT_PRODUCTION_FRONTEND_URLS
+        }
+        return [DEFAULT_FRONTEND_URL]
+    }
+
     const origins = configured
         .split(',')
         .map((origin) => origin.trim())
         .filter((origin) => origin.length > 0)
 
-    return origins.length > 0 ? origins : [DEFAULT_FRONTEND_URL]
+    if (origins.length > 0) {
+        return origins
+    }
+
+    return [DEFAULT_FRONTEND_URL]
 }
 
 export function getPrimaryFrontendUrl(): string {

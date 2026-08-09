@@ -25,6 +25,20 @@ describe('frontendOrigin', () => {
         expect(getPrimaryFrontendUrl()).toBe(DEFAULT)
     })
 
+    test('uses production defaults when env is unset in production', () => {
+        const originalNodeEnv = process.env.NODE_ENV
+        delete process.env[ENV_KEY]
+        process.env.NODE_ENV = 'production'
+
+        expect(getFrontendOrigins()).toEqual([
+            'https://vadedgaming.com',
+            'https://vaded-bot-dashboard.vercel.app',
+        ])
+        expect(getPrimaryFrontendUrl()).toBe('https://vadedgaming.com')
+
+        process.env.NODE_ENV = originalNodeEnv
+    })
+
     test('returns a single configured origin', () => {
         process.env[ENV_KEY] = 'https://app.example.com'
         expect(getFrontendOrigins()).toEqual(['https://app.example.com'])

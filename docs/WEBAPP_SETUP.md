@@ -77,7 +77,7 @@ VITE_API_BASE_URL=https://api.yourdomain.com/api
 ```
 
 `WEBAPP_FRONTEND_URL` also supports comma-separated origins for CORS
-(for example `https://lucky.lucassantana.tech,https://app.lucassantana.tech`).
+(for example `https://vadedgaming.com,https://vaded-bot-dashboard.vercel.app`).
 
 ### Environment Variable Descriptions
 
@@ -101,7 +101,8 @@ VITE_API_BASE_URL=https://api.yourdomain.com/api
 
 1. In the "Redirects" section, add your callback URL:
     - Development: `http://localhost:5173/api/auth/callback`
-    - Production: `https://your-frontend-domain.com/api/auth/callback`
+    - Production: `https://vadedgaming.com/api/auth/callback`
+    - Secondary frontend / Vercel preview: `https://vaded-bot-dashboard.vercel.app/api/auth/callback`
 2. Save changes
 
 ### Step 3: Get Credentials

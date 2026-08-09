@@ -13,7 +13,7 @@ describe('inferApiBase', () => {
 
     test.each([
         {
-            hostname: 'lucky.lucassantana.tech',
+            hostname: 'vadedgaming.com',
             expected: '/api',
         },
         {
