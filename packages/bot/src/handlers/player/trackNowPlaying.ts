@@ -268,7 +268,8 @@ export async function sendNowPlayingEmbed(
     // Status line matching image: Volume | Mode | Shuffle
     const vol = `${queue.node.volume}%`
     const mode = repeatModeLabel(queue.repeatMode)
-    const shuffle = queue.shuffled ? 'On' : 'Off'
+    // discord-player no longer exposes queue-level shuffle state.
+    const shuffle = 'Off'
 
     const descLines = [
         `[**${track.title}**](${track.url})`,

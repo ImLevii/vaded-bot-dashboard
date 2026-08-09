@@ -34,9 +34,9 @@ describe('sentry test script', () => {
             ...originalEnv,
             SENTRY_ENVIRONMENT: 'production',
             SENTRY_SERVICE_NAME: 'bot',
-            SENTRY_APP_NAME: 'lucky',
+            SENTRY_APP_NAME: 'vaded-gaming',
             SENTRY_SERVER_NAME: 'bot-host',
-            SENTRY_RELEASE: 'lucky-bot@test-sha',
+            SENTRY_RELEASE: 'vaded-gaming-bot@test-sha',
         }
         flushSentryMock.mockResolvedValue(true)
         isSentryEnabledMock.mockReturnValue(true)
@@ -57,9 +57,9 @@ describe('sentry test script', () => {
         await runSentryTest()
 
         expect(initializeSentryMock).toHaveBeenCalledWith({
-            appName: 'lucky',
+            appName: 'vaded-gaming',
             serviceName: 'bot',
-            release: 'lucky-bot@test-sha',
+            release: 'vaded-gaming-bot@test-sha',
             serverName: 'bot-host',
             environment: 'production',
             tags: {
@@ -68,7 +68,7 @@ describe('sentry test script', () => {
             },
         })
         expect(captureMessageMock).toHaveBeenCalledWith(
-            'Lucky bot manual Sentry verification event',
+            'Vaded Gaming manual Sentry verification event',
             'warning',
             expect.objectContaining({
                 eventType: 'manual-sentry-test',

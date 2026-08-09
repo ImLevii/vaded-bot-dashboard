@@ -7,7 +7,7 @@
 
 ## Context
 
-Lucky runs **one Discord bot token, unsharded** (11 guilds). Discord permits only **one gateway IDENTIFY per token+shard**. Two `lucky-bot` containers on the same token cannot both be live; the second IDENTIFY force-disconnects the first. This makes classic true blue/green impossible for the bot.
+Lucky runs **one Discord bot token, unsharded** (11 guilds). Discord permits only **one gateway IDENTIFY per token+shard**. Two `vaded-gaming-bot` containers on the same token cannot both be live; the second IDENTIFY force-disconnects the first. This makes classic true blue/green impossible for the bot.
 
 **Current state:** Single-color deploy: `docker compose up -d` recreates changed containers → ~30s–1m downtime per container (backend/frontend both affected if both ship a change, because they're brought up serially). The bot, backend, and frontend share the same Postgres and are deployed together, so the entire stack is unavailable if any component redeploys.
 
@@ -36,8 +36,8 @@ Implement a **tiered approach**:
 ### Phase 2 — Bot fast-rollover (minimize the unavoidable blip) [DEFERRED]
 
 - Do NOT implement dual bot containers. Single-color fast-rollover only:
-    - `docker compose pull lucky-bot` (no downtime).
-    - `docker compose up -d --no-deps lucky-bot` (triggers IDENTIFY → Discord moves session → old exits; downtime ~2–5s).
+    - `docker compose pull vaded-gaming-bot` (no downtime).
+    - `docker compose up -d --no-deps vaded-gaming-bot` (triggers IDENTIFY → Discord moves session → old exits; downtime ~2–5s).
     - Rely on the existing post-deploy **bot health-gate** (gateway-connected gauge from #1774) as go/no-go; auto-reconnect handles queue backlog.
 - Note: cross-process gateway RESUME (persist session_id+seq to Redis) or sharding rolling-restart are **YAGNI** — only justified at scale. Future option if the blip matters at scale.
 

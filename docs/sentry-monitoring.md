@@ -29,7 +29,7 @@ Example:
 SENTRY_DSN=...
 SENTRY_ENABLED=true
 SENTRY_ENVIRONMENT=production
-SENTRY_RELEASE=lucky-bot@<git-sha>
+SENTRY_RELEASE=vaded-gaming-bot@<git-sha>
 SENTRY_SERVER_NAME=<host-name>
 SENTRY_APP_NAME=lucky
 SENTRY_SERVICE_NAME=bot
@@ -40,11 +40,11 @@ Behavior:
 - **Development**: no events are sent
 - `isSentryEnabled()` short-circuits when `NODE_ENV === 'development'`, so simply forwarding `SENTRY_*` variables into the dev compose stack does not enable local event delivery by itself
 - **Production/staging**: errors, breadcrumbs, and configured performance telemetry are sent when `SENTRY_DSN` is configured
-- **Fatal shutdowns**: Lucky now flushes pending Sentry events before process exit on startup failures and shared fatal error handlers
+- **Fatal shutdowns**: Vaded Gaming now flushes pending Sentry events before process exit on startup failures and shared fatal error handlers
 
 Bot-specific tags:
 
-- `app: lucky`
+- `app: vaded-gaming`
 - `service: bot`
 - `runtime: discord-bot`
 

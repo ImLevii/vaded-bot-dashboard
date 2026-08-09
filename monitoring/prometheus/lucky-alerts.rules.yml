@@ -68,13 +68,13 @@ groups:
             down — the off-box heartbeat (HEALTHCHECK_URL_EXTERNAL) covers that.
 
       - alert: LuckyBotScrapeDown
-        expr: up{job="lucky-bot"} == 0
+        expr: up{job="vaded-gaming-bot"} == 0
         for: 5m
         labels:
           severity: critical
-          service: lucky-bot
+          service: vaded-gaming-bot
         annotations:
-          summary: "Prometheus cannot scrape the Lucky bot /metrics"
+          summary: "Prometheus cannot scrape the Vaded Gaming bot /metrics"
           description: >-
             The bot metrics endpoint (:9091) has been unreachable for 5 minutes.
             Cross-check the bot's Docker HEALTHCHECK (/healthz) and the heartbeat.
@@ -83,15 +83,15 @@ groups:
     rules:
       - alert: LuckyBotHeapHigh
         expr: |
-          container_memory_working_set_bytes{name="lucky-bot"}
-            / (container_spec_memory_limit_bytes{name="lucky-bot"} > 0)
+          container_memory_working_set_bytes{name="vaded-gaming-bot"}
+            / (container_spec_memory_limit_bytes{name="vaded-gaming-bot"} > 0)
             > 0.9
         for: 15m
         labels:
           severity: warning
-          service: lucky-bot
+          service: vaded-gaming-bot
         annotations:
-          summary: "Lucky bot container working set > 90% of its memory limit"
+          summary: "Vaded Gaming bot container working set > 90% of its memory limit"
           description: >-
             The bot container's working set (what the OOM killer acts on) has
             been above 90% of its mem_limit for 15 minutes. Replaces the old
@@ -100,8 +100,8 @@ groups:
 
       - alert: HighMemoryUsage
         expr: |
-          sum by (name) (container_memory_working_set_bytes{name!="lucky-bot"})
-            / sum by (name) (container_spec_memory_limit_bytes{name!="lucky-bot"} > 0)
+          sum by (name) (container_memory_working_set_bytes{name!="vaded-gaming-bot"})
+            / sum by (name) (container_spec_memory_limit_bytes{name!="vaded-gaming-bot"} > 0)
             > 0.85
         for: 15m
         labels:

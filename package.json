@@ -1,5 +1,5 @@
 {
-    "name": "lucky-bot",
+    "name": "vaded-gaming",
     "version": "2.39.1",
     "description": "All-in-one Discord bot platform — music, moderation, auto-mod, custom commands, and web dashboard",
     "type": "module",
@@ -40,7 +40,7 @@
         "audit:high": "node scripts/audit-gate.mjs",
         "lint:secrets": "secretlint \"**/*\"",
         "check:outdated": "npm outdated || true",
-        "db:generate": "DATABASE_URL=${DATABASE_URL:-postgresql://localhost:5432/postgres} prisma generate --config prisma/prisma.config.ts",
+        "db:generate": "node scripts/db-generate.mjs",
         "db:migrate": "./scripts/db-migrate-safe.sh",
         "db:deploy": "prisma migrate deploy --config prisma/prisma.config.ts",
         "db:reset": "prisma migrate reset --config prisma/prisma.config.ts",

@@ -15,7 +15,7 @@ import { getStoredClient } from '../../bot/clientStore'
  */
 export const registry = new Registry()
 
-registry.setDefaultLabels({ service: 'lucky-bot' })
+registry.setDefaultLabels({ service: 'vaded-gaming-bot' })
 collectDefaultMetrics({ register: registry })
 
 /**

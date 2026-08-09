@@ -159,7 +159,7 @@ describe('Landing', () => {
 
     test('renders stack list with all six services', () => {
         render(<Landing />)
-        expect(screen.getByText('lucky-bot')).toBeInTheDocument()
+        expect(screen.getByText('vaded-gaming-bot')).toBeInTheDocument()
         expect(screen.getByText('lucky-backend')).toBeInTheDocument()
         expect(screen.getByText('lucky-frontend')).toBeInTheDocument()
         expect(screen.getByText('postgres')).toBeInTheDocument()

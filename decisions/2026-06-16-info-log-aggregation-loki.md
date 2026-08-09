@@ -30,10 +30,10 @@ The real, verified gaps were two bugs, both now fixed:
    set none — so logs were findable only by ephemeral container-id `filename`. Fixed
    by adding `tag: "{{.Name}}"` to each service's `logging.options`
    (Lucky #1476, merged) → promtail's existing `attrs.tag → container_name`
-   extraction now populates `{container_name="lucky-bot"}` etc.
+  extraction now populates `{container_name="vaded-gaming-bot"}` etc.
 
 Measured volume (with labels working): ~172 MB/day across **all** containers;
-lucky-bot+backend ~5k lines/day idle; Loki's own data dir is ~311 MB. The host disk
+vaded-gaming-bot+backend ~5k lines/day idle; Loki's own data dir is ~311 MB. The host disk
 sits at 88% but **not because of logs** — so 30 d retention is comfortable and going
 to 90 d (≈+15 GB onto an 88% disk) is the wrong move. The "size to disk, don't keep
 forever" reasoning holds; 30 d stays.

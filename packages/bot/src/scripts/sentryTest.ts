@@ -7,7 +7,7 @@ import {
 
 export async function runSentryTest(): Promise<void> {
     initializeSentry({
-        appName: process.env.SENTRY_APP_NAME ?? 'lucky',
+        appName: process.env.SENTRY_APP_NAME ?? 'vaded-gaming',
         serviceName: process.env.SENTRY_SERVICE_NAME ?? 'bot',
         release: process.env.SENTRY_RELEASE,
         serverName: process.env.SENTRY_SERVER_NAME ?? process.env.HOSTNAME,
@@ -24,7 +24,7 @@ export async function runSentryTest(): Promise<void> {
     const timestamp = new Date().toISOString()
     const message =
         process.env.SENTRY_TEST_MESSAGE ??
-        'Lucky bot manual Sentry verification event'
+        'Vaded Gaming manual Sentry verification event'
 
     captureMessage(message, 'warning', {
         eventType: 'manual-sentry-test',

@@ -15,7 +15,7 @@ Root cause: `scripts/deploy.sh` **pulls and starts** `lucky-frontend`
 (`docker compose pull/up … frontend …`) but **never verifies it**:
 
 - `require_running_containers()` listed `lucky-backend lucky-nginx lucky-postgres
-lucky-redis lucky-bot` — **`lucky-frontend` was absent**.
+lucky-redis vaded-gaming-bot` — **`lucky-frontend` was absent**.
 - `run_health_checks()` only probed backend endpoints (`/api/health`,
   `/api/health/auth-config`) — **nothing checked the dashboard**.
 
@@ -28,7 +28,7 @@ only the bot + backend, neither of which reflects the frontend.
 
 This is a **recurrence of "Gap E"** — the same "service in the prod compose but
 missing from `require_running_containers`" defect that
-`decisions/2026-05-24-deploy-lock-contention-signal.md` fixed for `lucky-bot`.
+`decisions/2026-05-24-deploy-lock-contention-signal.md` fixed for `vaded-gaming-bot`.
 
 ## Decision
 

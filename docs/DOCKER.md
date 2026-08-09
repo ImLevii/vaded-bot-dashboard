@@ -9,9 +9,9 @@
 
 | Image                | Command                                                                        |
 | -------------------- | ------------------------------------------------------------------------------ |
-| Bot (production)     | `docker build --target production-bot -t lucky-bot:latest .`                   |
+| Bot (production)     | `docker build --target production-bot -t vaded-gaming-bot:latest .`            |
 | Backend (production) | `docker build --target production-backend -t lucky-backend:latest .`           |
-| Bot (development)    | `docker build --target development --build-arg SERVICE=bot -t lucky-bot:dev .` |
+| Bot (development)    | `docker build --target development --build-arg SERVICE=bot -t vaded-gaming-bot:dev .` |
 | Frontend (production)| `docker build --target production-frontend -t lucky-frontend:latest .`        |
 | Nginx                | `docker build -f Dockerfile.nginx -t lucky-nginx:latest .`                     |
 

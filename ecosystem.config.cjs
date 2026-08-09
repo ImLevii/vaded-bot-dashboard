@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
         {
-            name: "lucky-bot",
+            name: "vaded-gaming-bot",
             script: "./packages/bot/dist/index.js",
             instances: 1,
             autorestart: true,

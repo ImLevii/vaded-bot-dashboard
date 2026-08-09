@@ -372,7 +372,7 @@ jobs:
             - name: Verify native modules load — bot
               if: matrix.service == 'bot'
               run: |
-                  docker run --rm lucky-bot:ci node -e "
+                  docker run --rm vaded-gaming-bot:ci node -e "
                     const { OpusEncoder } = require('@discordjs/opus');
                     const frame = new OpusEncoder(48000, 2).encode(Buffer.alloc(3840));
                     if (!frame.length) throw new Error('opus encoded an empty frame');
@@ -385,7 +385,7 @@ jobs:
             # real image must pass before merge.
             - name: Validate nginx config — nginx
               if: matrix.service == 'nginx'
-              run: docker run --rm lucky-nginx:ci nginx -t
+              run: docker run --rm vaded-gaming-nginx:ci nginx -t
 
     docker-build-check:
         name: Build — Docker images

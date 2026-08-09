@@ -20,7 +20,7 @@ Three-phase, strictly ordered (critic-mandated: never bundle calibration with al
 
 **Phase A — alert calibration (~2h, homelab prometheus rules):**
 
-1. Replace `LuckyBotHeapHigh` with container-level truth: `container_memory_working_set_bytes{name="lucky-bot"} / container_spec_memory_limit_bytes{name="lucky-bot"} > 0.9` (what the OOM killer acts on). The nodejs heap metrics stay for dashboards.
+1. Replace `LuckyBotHeapHigh` with container-level truth: `container_memory_working_set_bytes{name="vaded-gaming-bot"} / container_spec_memory_limit_bytes{name="vaded-gaming-bot"} > 0.9` (what the OOM killer acts on). The nodejs heap metrics stay for dashboards.
 2. Switch `HighMemoryUsage` / `CriticalMemoryUsage` from `container_memory_usage_bytes` to `container_memory_working_set_bytes`.
 3. Raise `healthchecks` `mem_limit` 512MB → 1G (alerting-critical infra deserves headroom, and it is the one genuinely tight container).
 4. **Verification gate:** 24h+ of alert history; success = LuckyBotHeapHigh + HighMemoryUsage firing-minutes drop >90% with no missed real event. Only then Phase C.

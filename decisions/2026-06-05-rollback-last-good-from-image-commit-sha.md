@@ -32,7 +32,7 @@ Only the automatic self-healing rollback was broken.
 ## Decision
 
 Record last-good as the **deployed image's baked `COMMIT_SHA`**, read from
-`docker inspect lucky-bot` `.Config.Env`, instead of `git rev-parse HEAD`.
+`docker inspect vaded-gaming-bot` `.Config.Env`, instead of `git rev-parse HEAD`.
 
 - The baked `COMMIT_SHA` is, by construction, the git SHA of the commit that built
   the running image — which therefore has `:<short>` images in the registry.
@@ -73,7 +73,7 @@ Negative / neutral:
 
 - Depends on `COMMIT_SHA` being baked into the image (true since the Dockerfile ARG→ENV
   was added; pre-baking images would read empty → keep prior last-good, safe).
-- Reads from `lucky-bot` specifically; bot and backend are built from the same commit
+- Reads from `vaded-gaming-bot` specifically; bot and backend are built from the same commit
   in one pipeline matrix, so their `COMMIT_SHA` always match.
 
 ## Revisit when

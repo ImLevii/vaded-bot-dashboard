@@ -82,7 +82,7 @@ git diff --name-only "$PROD_SHA".."<target-sha>" -- prisma/migrations/
 # note them in the GH run comment for traceability.
 
 # (b) Box reachable + current state
-ssh homelab 'docker ps --filter name=lucky-bot --format "{{.Image}} {{.Status}}"'
+ssh homelab 'docker ps --filter name=vaded-gaming-bot --format "{{.Image}} {{.Status}}"'
 
 # (c) Rollback baseline is sane: .deploy-last-good-sha is the last HEALTHY
 # deployed SHA (on-disk on the box, written by deploy.sh from the running image's
@@ -121,7 +121,7 @@ success externally.
 ### 6. Verify live
 
 ```bash
-ssh homelab 'docker ps --filter name=lucky-bot --filter name=lucky-backend \
+ssh homelab 'docker ps --filter name=vaded-gaming-bot --filter name=lucky-backend \
   --format "{{.Names}} {{.Image}} {{.Status}}"   # all on :<target-sha>, healthy
   && cat /home/luk-server/Lucky/.deploy-last-good-sha   # advanced to target'
 ```

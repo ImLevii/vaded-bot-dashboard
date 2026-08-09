@@ -46,7 +46,7 @@ services:
                 max-size: "10m"
                 max-file: "3"
 
-    lucky-bot-dev:
+    vaded-gaming-bot-dev:
         build:
             context: .
             dockerfile: Dockerfile
@@ -54,7 +54,7 @@ services:
             args:
                 SERVICE: bot
                 NODE_ENV: development
-        container_name: lucky-bot-dev
+        container_name: vaded-gaming-bot-dev
         restart: unless-stopped
         depends_on:
             postgres:

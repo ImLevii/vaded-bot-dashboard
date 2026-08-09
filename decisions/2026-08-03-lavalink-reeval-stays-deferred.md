@@ -4,9 +4,9 @@
 **Deciders:** Lucas Santana
 **Closes the loop on:** `decisions/2026-06-18-youtube-extraction-reliability.md` ("Re-evaluate by 2026-08-01 regardless")
 
-## Measurement (prod, run 2026-08-03; Loki `container_name="lucky-bot"` logs)
+## Measurement (prod, run 2026-08-03; Loki `container_name="vaded-gaming-bot"` logs)
 
-Filter is the exact bridge failure message `"all stages exhausted"` — within the same `container_name="lucky-bot"` stream, a bare `"exhausted"` match returns 43 lines/60d vs 39 with the precise filter (4 false positives: Spotify retry-exhaustion warnings). (The earlier draft of this ADR used the `service_name` label, which reads slightly lower — 35/1,021 — because `container_name` also catches pre-restart container logs; the decision is identical under either label.) Retention note: prod Loki runs `enforce_retention_period: false`, so 60-day reads are valid today (the 30-day figure in the repo's Loki ADR is stale); re-verify retention before relying on >30-day windows in future.
+Filter is the exact bridge failure message `"all stages exhausted"` — within the same `container_name="vaded-gaming-bot"` stream, a bare `"exhausted"` match returns 43 lines/60d vs 39 with the precise filter (4 false positives: Spotify retry-exhaustion warnings). (The earlier draft of this ADR used the `service_name` label, which reads slightly lower — 35/1,021 — because `container_name` also catches pre-restart container logs; the decision is identical under either label.) Retention note: prod Loki runs `enforce_retention_period: false`, so 60-day reads are valid today (the 30-day figure in the repo's Loki ADR is stale); re-verify retention before relying on >30-day windows in future.
 
 | Gate condition (2026-06-18) | Threshold | Measured | Fired? |
 |---|---|---|---|
@@ -37,21 +37,21 @@ ssh homelab 'docker exec grafana wget -qO- "http://loki:3100/loki/api/v1/query_r
 LogQL for each number (no inline comments — LogQL has none; strip nothing when pasting):
 
 Exhaustions, last 60 days:
-`sum(count_over_time({container_name="lucky-bot"} |= "all stages exhausted" [60d]))`
+`sum(count_over_time({container_name="vaded-gaming-bot"} |= "all stages exhausted" [60d]))`
 
 Exhaustions, prior 30-day window (trend):
-`sum(count_over_time({container_name="lucky-bot"} |= "all stages exhausted" [30d] offset 30d))`
+`sum(count_over_time({container_name="vaded-gaming-bot"} |= "all stages exhausted" [30d] offset 30d))`
 
 Plays (denominator), same windows — swap the filter:
-`sum(count_over_time({container_name="lucky-bot"} |= "Started playing" [60d]))`
+`sum(count_over_time({container_name="vaded-gaming-bot"} |= "Started playing" [60d]))`
 
 Rolling 30-day exhaustion rate (the revisit trigger below) = exhaustions `[30d]` ÷ plays `[30d]`, both through the same `query_range` call shape.
 
 YouTube velocity blocks:
-`sum(count_over_time({container_name="lucky-bot"} |= "not a bot" [60d]))`
+`sum(count_over_time({container_name="vaded-gaming-bot"} |= "not a bot" [60d]))`
 
 Age-gated videos:
-`sum(count_over_time({container_name="lucky-bot"} |= "Sign in to confirm your age" [60d]))`
+`sum(count_over_time({container_name="vaded-gaming-bot"} |= "Sign in to confirm your age" [60d]))`
 
 ## Consequences
 

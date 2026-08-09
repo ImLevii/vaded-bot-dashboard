@@ -56,7 +56,7 @@ short_sha="${TARGET_SHA:0:7}"
 
 already_deployed() {
     local running
-    running=$(docker ps --filter 'name=lucky-bot' --format '{{.Image}}' 2>/dev/null | head -1)
+    running=$(docker ps --filter 'name=vaded-gaming-bot' --format '{{.Image}}' 2>/dev/null | head -1)
     [[ "$running" == *":${short_sha}" ]]
 }
 

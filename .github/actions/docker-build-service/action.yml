@@ -28,7 +28,7 @@ runs:
               target: ${{ inputs.target }}
               push: false
               load: ${{ inputs.load }}
-              tags: lucky-${{ inputs.service }}:ci
+              tags: vaded-gaming-${{ inputs.service }}:ci
               provenance: false
               sbom: false
               cache-from: type=gha,scope=${{ inputs.service }}

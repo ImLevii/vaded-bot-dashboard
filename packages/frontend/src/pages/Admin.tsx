@@ -24,8 +24,8 @@ export default function AdminPage() {
         handleGlobalToggle,
     } = useFeatures()
     usePageMetadata({
-        title: 'Admin - Lucky',
-        description: 'Admin panel for Lucky bot — global feature management',
+        title: 'Admin - Vaded Gaming',
+        description: 'Admin panel for Vaded Gaming — global feature management',
     })
 
     if (!isAuthenticated) {

@@ -399,7 +399,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * **security:** verify bot authorship before trusting slug marker ([#1599](https://github.com/LucasSantana-Dev/Lucky/issues/1599)) ([23bf73a](https://github.com/LucasSantana-Dev/Lucky/commit/23bf73a3e7db054d63ab7faea60db66124fbbfe9))
 * **shared:** drop buggy token-overlap util + optimize levenshtein ([#1246](https://github.com/LucasSantana-Dev/Lucky/issues/1246)) ([5b65d47](https://github.com/LucasSantana-Dev/Lucky/commit/5b65d4768f0e3bf19ca9e211957ce2fec07ef4f6))
 * **shared:** env-isolate environment.test.ts (no secret dumps) ([#1292](https://github.com/LucasSantana-Dev/Lucky/issues/1292)) ([588037c](https://github.com/LucasSantana-Dev/Lucky/commit/588037cf8b3a7424ad922b15d28aeb8548eb082e))
-* **shared:** export ./utils/monitoring subpath — fixes lucky-bot crash-loop ([#1105](https://github.com/LucasSantana-Dev/Lucky/issues/1105)) ([2c959f3](https://github.com/LucasSantana-Dev/Lucky/commit/2c959f3d9765acdedab969faaaa229869a657ded))
+* **shared:** export ./utils/monitoring subpath — fixes vaded-gaming-bot crash-loop ([#1105](https://github.com/LucasSantana-Dev/Lucky/issues/1105)) ([2c959f3](https://github.com/LucasSantana-Dev/Lucky/commit/2c959f3d9765acdedab969faaaa229869a657ded))
 * **shared:** export config/* subpath for prod esm resolution ([#1250](https://github.com/LucasSantana-Dev/Lucky/issues/1250)) ([f4167a8](https://github.com/LucasSantana-Dev/Lucky/commit/f4167a80f2b78a693e9aacf5744358137e400f17))
 * **shared:** export utils/support subpath for prod esm resolution ([#1248](https://github.com/LucasSantana-Dev/Lucky/issues/1248)) ([8d3c092](https://github.com/LucasSantana-Dev/Lucky/commit/8d3c09265997e360e050d9006b55e12c8320abf3))
 * **shared:** guard JSON.parse on embed data in CustomCommandService ([#1168](https://github.com/LucasSantana-Dev/Lucky/issues/1168)) ([1c46b55](https://github.com/LucasSantana-Dev/Lucky/commit/1c46b557d7bcd5c847aca14c0562cae8a9bb77a0))
@@ -817,7 +817,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - refactor(musicRecommendation): collapse multi-entrypoint engine to a single `recommendTracks` function (#979)
 
 ### Fixed
-- fix(ci): add `lucky-bot` to required containers, remove dead unhealthy-grep before HEALTHCHECK TTL, add bot health poll after API checks (#1054)
+- fix(ci): add `vaded-gaming-bot` to required containers, remove dead unhealthy-grep before HEALTHCHECK TTL, add bot health poll after API checks (#1054)
 - fix(bot): healthcheck now polls the Discord gateway (`/healthz` HTTP 200) instead of the Redis TCP port — catches real bot connectivity loss (#1047)
 - fix(ci): post `error` commit status on deploy lock contention so CI sees the failure instead of timing out silently (#1052)
 - ci(deploy): add "Wait for homelab deploy completion" step on the `docker_rebuilt=true` path — closes the race where CI went green before `deploy.sh` finished the bot health poll (#1056)

@@ -12,21 +12,21 @@
 
 Two gaps existed:
 
-**Crash gap:** If `lucky-bot` crashed immediately after `docker_compose up -d` (OOM, bad env, import error), `require_running_containers` passed (bot not in the list), the unhealthy check passed (an exited container is not "unhealthy"), and deploy.sh reported success while the bot was dead.
+**Crash gap:** If `vaded-gaming-bot` crashed immediately after `docker_compose up -d` (OOM, bad env, import error), `require_running_containers` passed (bot not in the list), the unhealthy check passed (an exited container is not "unhealthy"), and deploy.sh reported success while the bot was dead.
 
 **Timing gap (dead code):** The unhealthy grep ran at T+10s. Every container in the stack has a start-period ≥ 5s and 3 retries — the earliest any container can reach "unhealthy" is T+90s. The check could never catch anything and gave a false sense of coverage.
 
-**Gateway connectivity gap:** `lucky-bot`'s HEALTHCHECK (added in the same series, see `2026-05-24-bot-docker-healthcheck-gateway-signal.md`) marks the container unhealthy when `client.isReady()` is false for 3 consecutive intervals. But the deploy health check ran at T+10s, 35s before the bot's first HEALTHCHECK fires.
+**Gateway connectivity gap:** `vaded-gaming-bot`'s HEALTHCHECK (added in the same series, see `2026-05-24-bot-docker-healthcheck-gateway-signal.md`) marks the container unhealthy when `client.isReady()` is false for 3 consecutive intervals. But the deploy health check ran at T+10s, 35s before the bot's first HEALTHCHECK fires.
 
 ## Decision
 
 Three changes to `deploy.sh`:
 
-1. **Add `lucky-bot` to `require_running_containers`.** Catches crash-on-startup with zero deploy-time overhead.
+1. **Add `vaded-gaming-bot` to `require_running_containers`.** Catches crash-on-startup with zero deploy-time overhead.
 
 2. **Remove the T+10s unhealthy grep.** It was dead code: the timing math makes it impossible for any container in the stack to be "unhealthy" at T+10s. Removing it removes the false sense of coverage.
 
-3. **Add a bot health wait loop after the two `wait_for_http_ready` checks.** By the time the backend API and auth-config health checks pass (~T+40-50s on a rebuild deploy), the bot's 45s start-period has nearly elapsed. The loop polls `docker inspect lucky-bot` for `Health.Status`:
+3. **Add a bot health wait loop after the two `wait_for_http_ready` checks.** By the time the backend API and auth-config health checks pass (~T+40-50s on a rebuild deploy), the bot's 45s start-period has nearly elapsed. The loop polls `docker inspect vaded-gaming-bot` for `Health.Status`:
     - `healthy` → continue immediately.
     - `unhealthy` → fail the deploy.
     - Timeout (90s) → warn and continue (graceful degradation for slow Discord connections or Discord outages).

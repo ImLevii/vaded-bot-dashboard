@@ -34,7 +34,9 @@ function registerWingetFfmpeg(): void {
     const exe = resolveWingetFfmpeg()
     if (!exe) return
     // Prepend the absolute path so it's tried before the generic 'ffmpeg' name.
-    FFmpeg.sources.unshift({ name: exe, module: false })
+    // @discord-player/ffmpeg typings restrict `name` to known literals, but
+    // runtime accepts absolute executable paths as documented in FFmpegSource.
+    FFmpeg.sources.unshift({ name: exe, module: false } as any)
     infoLog({ message: `Registered winget ffmpeg: ${exe}` })
 }
 

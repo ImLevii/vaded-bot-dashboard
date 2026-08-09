@@ -42,7 +42,7 @@ describe('prometheus registry', () => {
             /lucky_bot_guilds_total\{[^}]*state="left"[^}]*\}\s+3/,
         )
         // service default label is applied to all series
-        expect(text).toMatch(/service="lucky-bot"/)
+        expect(text).toMatch(/service="vaded-gaming-bot"/)
     })
 
     it('logs but does not throw when Prisma fails', async () => {

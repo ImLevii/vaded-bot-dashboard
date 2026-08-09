@@ -442,19 +442,19 @@ run_health_checks() {
     local bot_deadline bot_health
     bot_deadline=$(( SECONDS + 90 ))
     while [[ $SECONDS -lt $bot_deadline ]]; do
-        bot_health=$(docker inspect lucky-bot --format '{{.State.Health.Status}}' 2>/dev/null || echo "none")
+        bot_health=$(docker inspect vaded-gaming-bot --format '{{.State.Health.Status}}' 2>/dev/null || echo "none")
         if [[ "$bot_health" == "healthy" ]]; then
             log "Bot gateway healthy"
             break
         fi
         if [[ "$bot_health" == "unhealthy" ]]; then
             log "HEALTH: bot container unhealthy (Discord gateway not connected)"
-            docker logs lucky-bot --tail=40 --no-color 2>/dev/null || true
+            docker logs vaded-gaming-bot --tail=40 --no-color 2>/dev/null || true
             return 1
         fi
         sleep 5
     done
-    bot_health=$(docker inspect lucky-bot --format '{{.State.Health.Status}}' 2>/dev/null || echo "none")
+    bot_health=$(docker inspect vaded-gaming-bot --format '{{.State.Health.Status}}' 2>/dev/null || echo "none")
     if [[ "$bot_health" != "healthy" ]]; then
         log "WARN: bot health status '${bot_health}' after 90s (Discord may be slow — proceeding)"
     fi
@@ -692,7 +692,7 @@ if run_health_checks; then
     # prior last-good rather than clobber a valid target.
     # See decisions/2026-06-05-rollback-last-good-from-image-commit-sha.md
     if [[ -n "$DEPLOYED_SHA" ]]; then
-        _last_good_sha=$(docker inspect lucky-bot \
+        _last_good_sha=$(docker inspect vaded-gaming-bot \
             --format '{{range .Config.Env}}{{println .}}{{end}}' 2>/dev/null \
             | sed -n 's/^COMMIT_SHA=//p' | head -1)
         # Only persist a well-formed git SHA (7-40 hex). A malformed value would
@@ -702,9 +702,9 @@ if run_health_checks; then
             printf '%s\n' "$_last_good_sha" >"$LAST_GOOD_FILE" 2>/dev/null \
                 || log "WARN: could not record last-good SHA to $LAST_GOOD_FILE"
         elif [[ -n "$_last_good_sha" ]]; then
-            log "WARN: malformed COMMIT_SHA '$_last_good_sha' from lucky-bot; keeping prior last-good"
+            log "WARN: malformed COMMIT_SHA '$_last_good_sha' from vaded-gaming-bot; keeping prior last-good"
         else
-            log "WARN: could not read COMMIT_SHA from lucky-bot; keeping prior last-good"
+            log "WARN: could not read COMMIT_SHA from vaded-gaming-bot; keeping prior last-good"
         fi
     fi
 

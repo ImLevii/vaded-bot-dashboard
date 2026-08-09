@@ -7,7 +7,7 @@
     "group-pull-request-title-pattern": "chore: release ${version}",
     "packages": {
         ".": {
-            "package-name": "lucky-bot",
+            "package-name": "vaded-gaming",
             "changelog-path": "CHANGELOG.md"
         }
     }

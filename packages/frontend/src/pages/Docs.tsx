@@ -568,7 +568,7 @@ docker compose up -d
 docker compose ps`}</code>
                 </pre>
                 <p>
-                    You should see <code>lucky-bot</code>,{' '}
+                    You should see <code>vaded-gaming-bot</code>,{' '}
                     <code>lucky-backend</code>, <code>lucky-frontend</code>,{' '}
                     <code>lucky-nginx</code>, <code>lucky-postgres</code>, and{' '}
                     <code>lucky-redis</code> all healthy. Healthchecks take
