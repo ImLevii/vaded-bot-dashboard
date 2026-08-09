@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# Multi-stage Dockerfile for Lucky services
+# Multi-stage Dockerfile for Vaded Gaming services
 # Usage: docker compose --env-file .env.production up -d --build
 
 # Node 24 = Active LTS (since Oct 2025). @discordjs/opus ships no prebuilt for
@@ -226,6 +226,67 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD node -e "require('http').get('http://127.0.0.1:3000/api/toggles/global', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))" || exit 1
 
 CMD ["node", "packages/backend/dist/index.js"]
+
+# Production stage — all-in-one (bot + backend + frontend served by backend).
+FROM node:${NODE_VERSION} AS production-all-in-one
+WORKDIR /app
+
+ARG COMMIT_SHA
+ENV NODE_ENV=production \
+    NPM_CONFIG_LOGLEVEL=silent \
+    COMMIT_SHA=$COMMIT_SHA
+
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    ffmpeg \
+    opus \
+    opus-tools \
+    && python3 -m venv /opt/ytdlp \
+    && /opt/ytdlp/bin/pip install --no-cache-dir --upgrade pip yt-dlp \
+    && ln -s /opt/ytdlp/bin/yt-dlp /usr/local/bin/yt-dlp \
+    && npm install -g npm@latest pm2 \
+    && npm cache clean --force \
+    && rm -rf /var/cache/apk/* /root/.cache
+
+COPY --from=deps-production /app/node_modules ./node_modules
+COPY --from=deps-production /app/package*.json ./
+COPY --from=deps-production /app/packages/shared/package*.json ./packages/shared/
+COPY --from=deps-production /app/packages/bot/package*.json ./packages/bot/
+COPY --from=deps-production /app/packages/backend/package*.json ./packages/backend/
+COPY --from=deps-production /app/packages/shared/node_modules ./packages/shared/node_modules
+COPY --from=deps-production /app/packages/bot/node_modules ./packages/bot/node_modules
+COPY --from=deps-production /app/packages/backend/node_modules ./packages/backend/node_modules
+COPY --from=build /app/packages/shared/dist ./packages/shared/dist
+COPY --from=build /app/packages/shared/src/generated ./packages/shared/src/generated
+COPY --from=build /app/packages/shared/src/generated ./packages/shared/dist/generated
+COPY --from=build /app/packages/bot/dist ./packages/bot/dist
+COPY --from=build /app/packages/backend/dist ./packages/backend/dist
+COPY --from=build-frontend /app/packages/frontend/dist ./packages/backend/dist/frontend/dist
+COPY --from=build /app/prisma ./prisma
+COPY --from=build /app/node_modules/@prisma ./node_modules/@prisma
+COPY ecosystem.config.cjs ./ecosystem.config.cjs
+COPY scripts/start-all-in-one.sh ./scripts/start-all-in-one.sh
+
+RUN mkdir -p downloads logs && \
+    chmod +x ./scripts/start-all-in-one.sh && \
+    addgroup -g 1001 -S nodejs && \
+    adduser -S vaded -u 1001 -G nodejs && \
+    chown -R vaded:nodejs \
+        /app/downloads \
+        /app/logs \
+        /app/node_modules/@prisma \
+        /app/packages/backend/dist \
+        /app/prisma
+
+USER vaded
+
+EXPOSE 3000 9091
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD node -e "const http=require('http');const checks=[['http://127.0.0.1:3000/api/toggles/global',s=>s<500],['http://127.0.0.1:9091/healthz',s=>s===200]];Promise.all(checks.map(([url,ok])=>new Promise((resolve,reject)=>{http.get(url,res=>{res.resume();(ok(res.statusCode||0)?resolve:reject)(new Error(String(res.statusCode||0)));}).on('error',reject);}))).then(()=>process.exit(0)).catch(()=>process.exit(1));" || exit 1
+
+CMD ["./scripts/start-all-in-one.sh"]
 
 # Production stage — frontend (static SPA served by non-root nginx).
 # Replaces the former standalone Dockerfile.frontend.

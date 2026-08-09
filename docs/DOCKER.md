@@ -10,10 +10,10 @@
 | Image                | Command                                                                        |
 | -------------------- | ------------------------------------------------------------------------------ |
 | Bot (production)     | `docker build --target production-bot -t vaded-gaming-bot:latest .`            |
-| Backend (production) | `docker build --target production-backend -t lucky-backend:latest .`           |
+| Backend (production) | `docker build --target production-backend -t vaded-gaming-backend:latest .`    |
 | Bot (development)    | `docker build --target development --build-arg SERVICE=bot -t vaded-gaming-bot:dev .` |
-| Frontend (production)| `docker build --target production-frontend -t lucky-frontend:latest .`        |
-| Nginx                | `docker build -f Dockerfile.nginx -t lucky-nginx:latest .`                     |
+| Frontend (production)| `docker build --target production-frontend -t vaded-gaming-frontend:latest .`  |
+| Nginx                | `docker build -f Dockerfile.nginx -t vaded-gaming-nginx:latest .`              |
 
 Compose builds these when you run `docker compose up -d` or `docker compose -f docker-compose.dev.yml up -d`.
 
@@ -32,6 +32,21 @@ All services use the `json-file` driver with `max-size: "10m"` and `max-file: "3
 - `./scripts/discord-bot.sh start` – Starts compose (prod or dev from `NODE_ENV`).
 - `./scripts/discord-bot.sh stop` – Stops both prod and dev compose stacks.
 - `./scripts/discord-bot.sh logs` – Streams logs for the active stack.
+
+## Single-container image
+
+Use the `production-all-in-one` target when you need one container to run the bot and backend together while serving the built frontend from the backend process.
+
+```bash
+docker build --target production-all-in-one -t vaded-gaming-all-in-one .
+docker run --env-file .env -p 3000:3000 -p 9091:9091 vaded-gaming-all-in-one
+```
+
+Notes:
+
+- The container runs Prisma migrations on startup, then launches PM2 in runtime mode.
+- PM2 supervises the bot and backend processes.
+- The frontend is built into the image and served by Express from the backend process, so there is no third long-lived frontend server inside the container.
 
 ## Nginx configs
 

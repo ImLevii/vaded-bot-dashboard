@@ -9,7 +9,7 @@ import { setupMiddleware } from './middleware'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const WEBAPP_PORT = parseIntEnv('PORT', parseIntEnv('WEBAPP_PORT', 5000))
+const WEBAPP_PORT = parseIntEnv('PORT', parseIntEnv('WEBAPP_PORT', 3000))
 const WEBAPP_HOST = process.env.WEBAPP_HOST ?? '0.0.0.0'
 const isProduction = process.env.NODE_ENV === 'production'
 
