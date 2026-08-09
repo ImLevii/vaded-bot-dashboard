@@ -10,6 +10,7 @@
         "prepare": "husky || true",
         "build": "npm run db:generate && npm run build --workspace=packages/shared && npm run build --workspace=packages/bot && npm run build --workspace=packages/backend && npm run build --workspace=packages/frontend",
         "start": "node scripts/start-stack.mjs",
+        "start:pterodactyl": "npm run start --workspace=packages/bot",
         "build:shared": "npm run build --workspace=packages/shared",
         "build:bot": "npm run build --workspace=packages/bot",
         "build:backend": "npm run build --workspace=packages/backend",
