@@ -50,6 +50,10 @@ const resolveEnvRedirectUri = (): string | undefined => {
     return normalized
 }
 
+const shouldForceEnvRedirectUri = (): boolean => {
+    return process.env.WEBAPP_REDIRECT_URI_FORCE === 'true'
+}
+
 export function getOAuthRedirectUri(
     req: Request,
     sessionRedirectUri?: string,
@@ -59,6 +63,10 @@ export function getOAuthRedirectUri(
 
     if (normalizedSessionRedirectUri) {
         return normalizedSessionRedirectUri
+    }
+
+    if (shouldForceEnvRedirectUri()) {
+        return resolveEnvRedirectUri() ?? buildRequestRedirectUri(req)
     }
 
     // When traffic is proxied (Vercel/Cloudflare), always trust the forwarded

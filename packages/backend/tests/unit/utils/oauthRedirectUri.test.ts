@@ -21,11 +21,13 @@ describe('getOAuthRedirectUri', () => {
     const originalBackendUrl = process.env.WEBAPP_BACKEND_URL
     const originalFrontendUrl = process.env.WEBAPP_FRONTEND_URL
     const originalPort = process.env.WEBAPP_PORT
+    const originalForceRedirectUri = process.env.WEBAPP_REDIRECT_URI_FORCE
 
     beforeEach(() => {
         process.env.NODE_ENV = 'test'
         process.env.WEBAPP_REDIRECT_URI =
             'http://localhost:3000/api/auth/callback'
+        delete process.env.WEBAPP_REDIRECT_URI_FORCE
         delete process.env.WEBAPP_BACKEND_URL
         process.env.WEBAPP_FRONTEND_URL = 'http://localhost:5173'
     })
@@ -60,6 +62,28 @@ describe('getOAuthRedirectUri', () => {
         } else {
             delete process.env.WEBAPP_PORT
         }
+
+        if (originalForceRedirectUri) {
+            process.env.WEBAPP_REDIRECT_URI_FORCE = originalForceRedirectUri
+        } else {
+            delete process.env.WEBAPP_REDIRECT_URI_FORCE
+        }
+    })
+
+    test('should force configured redirect uri when WEBAPP_REDIRECT_URI_FORCE is true', () => {
+        process.env.NODE_ENV = 'production'
+        process.env.WEBAPP_REDIRECT_URI_FORCE = 'true'
+        process.env.WEBAPP_REDIRECT_URI =
+            'http://localhost:5173/api/auth/callback'
+
+        const uri = getOAuthRedirectUri(
+            createRequest({
+                'x-forwarded-proto': 'https',
+                'x-forwarded-host': 'vaded-bot-dashboard.vercel.app',
+            }),
+        )
+
+        expect(uri).toBe('http://localhost:5173/api/auth/callback')
     })
 
     test('should prefer session redirect uri when available', () => {
