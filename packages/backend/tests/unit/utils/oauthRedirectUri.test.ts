@@ -115,7 +115,7 @@ describe('getOAuthRedirectUri', () => {
         expect(uri).toBe('https://lucky.lucassantana.tech/api/auth/callback')
     })
 
-    test('should not override configured callback with forwarded host in production', () => {
+    test('should prefer forwarded host over configured callback in production', () => {
         process.env.NODE_ENV = 'production'
         process.env.WEBAPP_REDIRECT_URI =
             'https://lucky.lucassantana.tech/api/auth/callback'
@@ -124,11 +124,13 @@ describe('getOAuthRedirectUri', () => {
         const uri = getOAuthRedirectUri(
             createRequest({
                 'x-forwarded-proto': 'https',
-                'x-forwarded-host': 'lucky-api.lucassantana.tech',
+                'x-forwarded-host': 'vaded-bot-dashboard.vercel.app',
             }),
         )
 
-        expect(uri).toBe('https://lucky.lucassantana.tech/api/auth/callback')
+        expect(uri).toBe(
+            'https://vaded-bot-dashboard.vercel.app/api/auth/callback',
+        )
     })
 
     test('should keep configured callback when frontend origins do not match redirect origin', () => {

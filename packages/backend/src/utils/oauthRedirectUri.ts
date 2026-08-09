@@ -39,6 +39,10 @@ const buildRequestRedirectUri = (req: Request): string => {
     return `${protocol}://${host}/api/auth/callback`
 }
 
+const hasForwardedHost = (req: Request): boolean => {
+    return getForwardedHeader(req, 'x-forwarded-host') !== undefined
+}
+
 const resolveEnvRedirectUri = (): string | undefined => {
     const normalized = normalizeCallbackPath(process.env.WEBAPP_REDIRECT_URI)
     if (!normalized) return undefined
@@ -55,6 +59,13 @@ export function getOAuthRedirectUri(
 
     if (normalizedSessionRedirectUri) {
         return normalizedSessionRedirectUri
+    }
+
+    // When traffic is proxied (Vercel/Cloudflare), always trust the forwarded
+    // host for callback origin so stale env values cannot pin OAuth to an old
+    // public domain.
+    if (hasForwardedHost(req)) {
+        return buildRequestRedirectUri(req)
     }
 
     return resolveEnvRedirectUri() ?? buildRequestRedirectUri(req)
