@@ -31,10 +31,12 @@ describe('frontendOrigin', () => {
         process.env.NODE_ENV = 'production'
 
         expect(getFrontendOrigins()).toEqual([
-            'https://vadedgaming.com',
             'https://vaded-bot-dashboard.vercel.app',
+            'https://vadedgaming.com',
         ])
-        expect(getPrimaryFrontendUrl()).toBe('https://vadedgaming.com')
+        expect(getPrimaryFrontendUrl()).toBe(
+            'https://vaded-bot-dashboard.vercel.app',
+        )
 
         process.env.NODE_ENV = originalNodeEnv
     })

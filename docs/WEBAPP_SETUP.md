@@ -73,11 +73,11 @@ DEVELOPER_USER_IDS=user_id_1,user_id_2
 For hosted frontend builds (Vercel/Netlify), set frontend env:
 
 ```env
-VITE_API_BASE_URL=https://api.yourdomain.com/api
+VITE_API_BASE_URL=/api
 ```
 
 `WEBAPP_FRONTEND_URL` also supports comma-separated origins for CORS
-(for example `https://vadedgaming.com,https://vaded-bot-dashboard.vercel.app`).
+(for example `https://vaded-bot-dashboard.vercel.app`).
 
 ### Environment Variable Descriptions
 
@@ -101,8 +101,7 @@ VITE_API_BASE_URL=https://api.yourdomain.com/api
 
 1. In the "Redirects" section, add your callback URL:
     - Development: `http://localhost:5173/api/auth/callback`
-    - Production: `https://vadedgaming.com/api/auth/callback`
-    - Secondary frontend / Vercel preview: `https://vaded-bot-dashboard.vercel.app/api/auth/callback`
+    - Production: `https://vaded-bot-dashboard.vercel.app/api/auth/callback`
 2. Save changes
 
 ### Step 3: Get Credentials
