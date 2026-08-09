@@ -1,6 +1,8 @@
 import { getPrismaClient } from '../utils/database/prismaClient.js'
 
-const prisma = getPrismaClient()
+function prisma() {
+    return getPrismaClient()
+}
 
 /** Represents an AFK status entry. */
 export type AfkStatusEntry = {
@@ -21,7 +23,7 @@ export class AfkService {
         userId: string,
         reason?: string,
     ): Promise<AfkStatusEntry> {
-        return await prisma.afkStatus.upsert({
+        return await prisma().afkStatus.upsert({
             where: { guildId_userId: { guildId, userId } },
             create: { guildId, userId, reason: reason || null },
             update: { reason: reason || null, since: new Date() },
@@ -30,14 +32,14 @@ export class AfkService {
 
     /** Retrieves AFK status for a user in a guild, or null if not AFK. */
     async get(guildId: string, userId: string): Promise<AfkStatusEntry | null> {
-        return await prisma.afkStatus.findUnique({
+        return await prisma().afkStatus.findUnique({
             where: { guildId_userId: { guildId, userId } },
         })
     }
 
     /** Clears AFK status for a user in a guild. */
     async clear(guildId: string, userId: string): Promise<void> {
-        await prisma.afkStatus.deleteMany({
+        await prisma().afkStatus.deleteMany({
             where: { guildId, userId },
         })
     }
@@ -48,7 +50,7 @@ export class AfkService {
         userIds: string[],
     ): Promise<AfkStatusEntry[]> {
         if (userIds.length === 0) return []
-        return await prisma.afkStatus.findMany({
+        return await prisma().afkStatus.findMany({
             where: {
                 guildId,
                 userId: { in: userIds.slice(0, 10) }, // limit to 10
