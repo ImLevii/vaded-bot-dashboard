@@ -20,9 +20,11 @@ export function getPrismaClient(): PrismaClient {
         ) as {
             PrismaClient: new (options?: unknown) => PrismaClient
         }
-        const databaseUrl = process.env.DATABASE_URL
+        const databaseUrl = process.env.DATABASE_URL ?? process.env.DIRECT_URL
         if (!databaseUrl) {
-            throw new Error('DATABASE_URL environment variable is required')
+            throw new Error(
+                'DATABASE_URL or DIRECT_URL environment variable is required',
+            )
         }
         const adapter = new PrismaPg({
             connectionString: databaseUrl,
