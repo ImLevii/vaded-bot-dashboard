@@ -2,6 +2,9 @@ node_modules
 packages/*/package-lock.json
 packages/*/pnpm-lock.yaml
 
+# Repo archives/snapshots (can exceed GitHub's 100MB file size limit)
+*.zip
+
 # Environment files
 .env
 .env.local
