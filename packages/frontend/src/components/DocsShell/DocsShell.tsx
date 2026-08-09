@@ -40,7 +40,7 @@ export default function DocsShell({ nav, toc, breadcrumb, title, lastUpdated, ch
     }, [location.pathname])
 
     return (
-        <div className='min-h-screen bg-lucky-surface-canvas text-white'>
+        <div className='min-h-screen bg-vaded-surface-canvas text-white'>
             <PublicHeader
                 breadcrumb={breadcrumb}
                 sidebarOpen={sidebarOpen}
@@ -52,13 +52,13 @@ export default function DocsShell({ nav, toc, breadcrumb, title, lastUpdated, ch
 
                 <main className='min-w-0 px-4 py-10 md:px-8 md:py-14 lg:px-10'>
                     <article className='mx-auto max-w-2xl'>
-                        <header className='mb-10 border-b border-lucky-border-soft pb-6'>
-                            <p className='mb-3 font-mono text-[11px] uppercase tracking-[0.22em] text-lucky-text-muted'>
+                        <header className='mb-10 border-b border-vaded-border-soft pb-6'>
+                            <p className='mb-3 font-mono text-[11px] uppercase tracking-[0.22em] text-vaded-text-muted'>
                                 {breadcrumb}
                             </p>
-                            <h1 className='text-3xl font-bold tracking-tight text-lucky-text-strong md:text-4xl'>{title}</h1>
+                            <h1 className='text-3xl font-bold tracking-tight text-vaded-text-strong md:text-4xl'>{title}</h1>
                             {lastUpdated ? (
-                                <p className='mt-3 font-mono text-xs text-lucky-text-muted'>
+                                <p className='mt-3 font-mono text-xs text-vaded-text-muted'>
                                     last updated: {lastUpdated}
                                 </p>
                             ) : null}
@@ -78,14 +78,14 @@ function DocsSidebar({ nav, open }: { nav: DocsNavGroup[]; open: boolean }) {
 
     return (
         <aside
-            className={`${open ? 'block' : 'hidden'} lg:block border-r border-lucky-border-soft bg-lucky-surface-canvas`}
+            className={`${open ? 'block' : 'hidden'} lg:block border-r border-vaded-border-soft bg-vaded-surface-canvas`}
             aria-label='Documentation navigation'
         >
             <div className='sticky top-14 max-h-[calc(100vh-3.5rem)] overflow-y-auto px-4 py-8 md:px-6'>
                 <nav className='space-y-7'>
                     {nav.map((group) => (
                         <div key={group.heading}>
-                            <h4 className='mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-lucky-text-muted'>
+                            <h4 className='mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-vaded-text-muted'>
                                 {group.heading}
                             </h4>
                             <ul className='space-y-0.5'>
@@ -93,8 +93,8 @@ function DocsSidebar({ nav, open }: { nav: DocsNavGroup[]; open: boolean }) {
                                     const isActive = !item.external && pathname === item.href
                                     const base =
                                         'group inline-flex w-full items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-sm transition-colors'
-                                    const inactiveCls = `${base} text-lucky-text-body hover:bg-lucky-surface-panel hover:text-lucky-text-strong`
-                                    const activeCls = `${base} bg-lucky-surface-panel text-lucky-text-strong shadow-[inset_2px_0_0_var(--color-lucky-brand)]`
+                                    const inactiveCls = `${base} text-vaded-text-body hover:bg-vaded-surface-panel hover:text-vaded-text-strong`
+                                    const activeCls = `${base} bg-vaded-surface-panel text-vaded-text-strong shadow-[inset_2px_0_0_var(--color-vaded-brand)]`
                                     if (item.external) {
                                         return (
                                             <li key={item.href}>
@@ -105,7 +105,7 @@ function DocsSidebar({ nav, open }: { nav: DocsNavGroup[]; open: boolean }) {
                                                     className={inactiveCls}
                                                 >
                                                     <span>{item.label}</span>
-                                                    <ArrowUpRight size={11} aria-hidden className='text-lucky-text-muted' />
+                                                    <ArrowUpRight size={11} aria-hidden className='text-vaded-text-muted' />
                                                 </a>
                                             </li>
                                         )
@@ -131,10 +131,10 @@ function DocsToc({ toc, activeId }: { toc: DocsTocItem[]; activeId: string | nul
     return (
         <aside className='hidden lg:block' aria-label='On this page'>
             <div className='sticky top-14 max-h-[calc(100vh-3.5rem)] overflow-y-auto px-6 py-10'>
-                <h4 className='mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-lucky-text-muted'>
+                <h4 className='mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-vaded-text-muted'>
                     On this page
                 </h4>
-                <ul className='space-y-1.5 border-l border-lucky-border-soft pl-3'>
+                <ul className='space-y-1.5 border-l border-vaded-border-soft pl-3'>
                     {toc.map((item) => {
                         const isActive = activeId === item.id
                         return (
@@ -143,8 +143,8 @@ function DocsToc({ toc, activeId }: { toc: DocsTocItem[]; activeId: string | nul
                                     href={`#${item.id}`}
                                     className={`inline-block text-xs leading-snug transition-colors ${
                                         isActive
-                                            ? 'text-lucky-brand font-medium'
-                                            : 'text-lucky-text-muted hover:text-lucky-text-strong'
+                                            ? 'text-vaded-brand font-medium'
+                                            : 'text-vaded-text-muted hover:text-vaded-text-strong'
                                     }`}
                                 >
                                     {item.label}

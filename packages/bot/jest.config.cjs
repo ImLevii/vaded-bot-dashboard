@@ -60,7 +60,7 @@ module.exports = {
             },
         ],
     },
-    transformIgnorePatterns: ['node_modules/(?!(?:@lucky)/)'],
+    transformIgnorePatterns: ['node_modules/(?!(?:@vaded)/)'],
     moduleFileExtensions: ['ts', 'js', 'json'],
     testPathIgnorePatterns: ['/node_modules/', '/dist/'],
     verbose: true,

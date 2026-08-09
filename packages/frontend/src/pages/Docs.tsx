@@ -38,7 +38,7 @@ const NAV: DocsNavGroup[] = [
         ],
     },
     {
-        heading: 'Using Lucky',
+        heading: 'Using Vaded Gaming',
         items: [
             { label: 'Music & autoplay', href: '/docs?page=music' },
             { label: 'Moderation', href: '/docs?page=moderation' },
@@ -77,7 +77,7 @@ const PAGES: DocsPage[] = [
         title: 'Overview',
         breadcrumb: 'Docs / Overview',
         toc: [
-            { id: 'what-is-lucky', label: 'What is vadedgaming' },
+            { id: 'what-is-vaded', label: 'What is vadedgaming' },
             { id: 'two-ways-to-run-it', label: 'Two ways to run it' },
             { id: 'whats-included', label: "What's included" },
             { id: 'project-status', label: 'Project status' },
@@ -90,7 +90,7 @@ const PAGES: DocsPage[] = [
                     custom commands, automation, and a web dashboard. Free
                     forever, with no premium tier paywalling the good parts.
                 </p>
-                <h2 id='what-is-lucky'>What is vadedgaming</h2>
+                <h2 id='what-is-vaded'>What is vadedgaming</h2>
                 <p>
                     vadedgaming started as a music bot for a friend's server. It now
                     also handles moderation, custom commands, leveling, reaction
@@ -182,7 +182,7 @@ const PAGES: DocsPage[] = [
                 </ul>
                 <h2 id='project-status'>Project status</h2>
                 <p>
-                    Lucky is under active development. The current line is the{' '}
+                    Vaded Gaming is under active development. The current line is the{' '}
                     <code>2.x</code> release train. Releases follow{' '}
                     <a
                         href='https://semver.org/spec/v2.0.0.html'
@@ -203,7 +203,7 @@ const PAGES: DocsPage[] = [
                 </p>
                 <h2 id='how-this-is-built'>How this is built</h2>
                 <p>
-                    Lucky is six services: <code>bot</code> (discord.js v14),{' '}
+                    Vaded Gaming is six services: <code>bot</code> (discord.js v14),{' '}
                     <code>backend</code> (Express + Prisma),{' '}
                     <code>frontend</code> (React 19 + Vite + Tailwind v4),{' '}
                     <code>postgres</code>, <code>redis</code>, and{' '}
@@ -229,7 +229,7 @@ const PAGES: DocsPage[] = [
         content: () => (
             <>
                 <p>
-                    You'll be running Lucky in your server in under two minutes.
+                    You'll be running Vaded Gaming in your server in under two minutes.
                     No account creation, no payment, no email.
                 </p>
                 <h2 id='add-the-bot'>Add the bot</h2>
@@ -250,7 +250,7 @@ const PAGES: DocsPage[] = [
                         it.
                     </li>
                     <li>
-                        Accept the requested permissions. Lucky uses{' '}
+                        Accept the requested permissions. Vaded Gaming uses{' '}
                         <a href='/docs?page=permissions'>only what it needs</a>{' '}
                         — you can deny anything you'd rather configure later.
                         Re-invite changes the grant.
@@ -264,14 +264,14 @@ const PAGES: DocsPage[] = [
                 <p>
                     Go to the homepage and click <strong>Dashboard</strong> in
                     the top right, or go directly to <code>/login</code>.
-                    Authorize with Discord OAuth — Lucky only requests{' '}
+                    Authorize with Discord OAuth — Vaded Gaming only requests{' '}
                     <code>identify</code> and <code>guilds</code> scopes. You'll
                     see the server you just added the bot to.
                 </p>
                 <p>
                     If you don't see your server, refresh the guild cache from{' '}
                     <strong>Profile menu / Refresh servers</strong>. Discord
-                    doesn't push membership changes — Lucky re-fetches on login
+                    doesn't push membership changes — Vaded Gaming re-fetches on login
                     and on demand.
                 </p>
                 <h2 id='first-commands'>First commands to try</h2>
@@ -283,7 +283,7 @@ const PAGES: DocsPage[] = [
                     </li>
                     <li>
                         <code>/autoplay on</code> — keep music going when the
-                        queue ends. Lucky pulls recommendations from what you've
+                        queue ends. Vaded Gaming pulls recommendations from what you've
                         been queuing.
                     </li>
                     <li>
@@ -355,7 +355,7 @@ const PAGES: DocsPage[] = [
         content: () => (
             <>
                 <p>
-                    Lucky is a TypeScript monorepo with six services
+                    Vaded Gaming is a TypeScript monorepo with six services
                     orchestrated by a single Docker Compose stack. Same
                     composition runs locally, in CI, and in production.
                 </p>
@@ -464,7 +464,7 @@ const PAGES: DocsPage[] = [
         content: () => (
             <>
                 <p>
-                    Self-hosting means you run Lucky on your own hardware. Your
+                    Self-hosting means you run Vaded Gaming on your own hardware. Your
                     guild data, autoplay history, custom commands, and
                     moderation log stay on your box. No third-party ToS over
                     your community, no rate-limited tier.
@@ -515,7 +515,7 @@ const PAGES: DocsPage[] = [
                     <li>
                         Under <strong>Bot / Privileged Gateway Intents</strong>,
                         enable <code>Server Members Intent</code> and{' '}
-                        <code>Message Content Intent</code>. Lucky needs both
+                        <code>Message Content Intent</code>. Vaded Gaming needs both
                         for moderation and custom-command triggers.
                     </li>
                     <li>
@@ -534,8 +534,8 @@ const PAGES: DocsPage[] = [
                 </ol>
                 <h2 id='clone-and-configure'>Clone and configure</h2>
                 <pre>
-                    <code>{`git clone ${REPO}.git lucky
-cd lucky
+                    <code>{`git clone ${REPO}.git vaded
+cd vaded
 cp .env.example .env
 # required for compose — empty placeholder fails the guard on purpose
 openssl rand -hex 24   # paste into POSTGRES_PASSWORD
@@ -569,9 +569,9 @@ docker compose ps`}</code>
                 </pre>
                 <p>
                     You should see <code>vaded-gaming-bot</code>,{' '}
-                    <code>lucky-backend</code>, <code>lucky-frontend</code>,{' '}
-                    <code>lucky-nginx</code>, <code>lucky-postgres</code>, and{' '}
-                    <code>lucky-redis</code> all healthy. Healthchecks take
+                    <code>vaded-backend</code>, <code>vaded-frontend</code>,{' '}
+                    <code>vaded-nginx</code>, <code>vaded-postgres</code>, and{' '}
+                    <code>vaded-redis</code> all healthy. Healthchecks take
                     10–30 seconds on first boot while postgres applies
                     migrations.
                 </p>
@@ -678,7 +678,7 @@ docker compose ps`}</code>
                 <p>
                     Settings inherit a sane default and are upserted on first
                     write. You don't have to seed defaults — the first time you
-                    save anything on a fresh guild, Lucky creates the row and
+                    save anything on a fresh guild, Vaded Gaming creates the row and
                     merges your change in.
                 </p>
                 <h2 id='global-admin'>Global admin controls</h2>
@@ -718,7 +718,7 @@ docker compose up -d`}</code>
                 </p>
                 <h2 id='webhook'>Webhook deploy</h2>
                 <p>
-                    Lucky ships a webhook receiver that pulls and restarts on a
+                    Vaded Gaming ships a webhook receiver that pulls and restarts on a
                     GitHub Actions ping. The recipe lives in{' '}
                     <code>deploy/</code>. Wire it once, then every push to{' '}
                     <code>main</code> deploys automatically:
@@ -817,7 +817,7 @@ docker compose up -d <service>`}</code>
                 </ul>
                 <h2 id='postgres-dump'>Postgres dumps</h2>
                 <pre>
-                    <code>{`docker compose exec postgres pg_dump -U lucky -Fc lucky > backup-$(date +%F).dump`}</code>
+                    <code>{`docker compose exec postgres pg_dump -U vaded -Fc vaded > backup-$(date +%F).dump`}</code>
                 </pre>
                 <p>
                     Run from cron or a Healthchecks-pinged script. The custom
@@ -833,7 +833,7 @@ docker compose up -d <service>`}</code>
                 </p>
                 <h2 id='restore'>Restore</h2>
                 <pre>
-                    <code>{`docker compose exec -T postgres pg_restore -U lucky -d lucky --clean < backup-2026-05-15.dump`}</code>
+                    <code>{`docker compose exec -T postgres pg_restore -U vaded -d vaded --clean < backup-2026-05-15.dump`}</code>
                 </pre>
                 <p>
                     Restart the bot and backend after a restore so they
@@ -884,7 +884,7 @@ docker compose up -d <service>`}</code>
                         <code>
                             docker compose exec bot pip install -U yt-dlp
                         </code>
-                        . Lucky now retries failed extractions with exponential
+                        . Vaded Gaming now retries failed extractions with exponential
                         backoff, but a multi-month-old yt-dlp still hits walls.
                     </li>
                     <li>
@@ -965,7 +965,7 @@ docker compose up -d <service>`}</code>
         content: () => (
             <>
                 <p>
-                    Lucky plays from Spotify, YouTube, and SoundCloud. It uses{' '}
+                    Vaded Gaming plays from Spotify, YouTube, and SoundCloud. It uses{' '}
                     <code>yt-dlp</code> for extraction and bundles its own Opus
                     encoder, so no Lavalink server or external audio service is
                     required.
@@ -974,7 +974,7 @@ docker compose up -d <service>`}</code>
                 <ul>
                     <li>
                         <strong>Spotify.</strong> Paste a track, album, or
-                        playlist URL. Lucky resolves the metadata through the
+                        playlist URL. Vaded Gaming resolves the metadata through the
                         Spotify API, then streams audio from a matched source.
                     </li>
                     <li>
@@ -1067,14 +1067,14 @@ docker compose up -d <service>`}</code>
                 <h2 id='last-fm'>Last.fm scrobbling</h2>
                 <p>
                     Connect a Last.fm account from the dashboard under{' '}
-                    <strong>Integrations / Last.fm</strong>. Lucky scrobbles
+                    <strong>Integrations / Last.fm</strong>. Vaded Gaming scrobbles
                     everything that plays, so your listening history follows you
                     across servers and devices. Per-user, not per-server — each
                     Discord user links their own Last.fm.
                 </p>
                 <h2 id='spotify-link'>Linking Spotify</h2>
                 <p>
-                    Linking Spotify unlocks personalized autoplay: Lucky pulls
+                    Linking Spotify unlocks personalized autoplay: Vaded Gaming pulls
                     your top tracks and recent saves as additional seeds. Auth
                     is per-user via OAuth; the bot only requests{' '}
                     <code>user-top-read</code> and{' '}
@@ -1175,7 +1175,7 @@ docker compose up -d <service>`}</code>
                 <h2 id='logging'>Logging channel</h2>
                 <p>
                     Set a logging channel under{' '}
-                    <strong>Server settings / Logging</strong> and Lucky mirrors
+                    <strong>Server settings / Logging</strong> and Vaded Gaming mirrors
                     every moderation action and auto-mod hit into it. Useful for
                     transparency. Granular toggles let you log only deletions,
                     only bans, or everything.
@@ -1314,7 +1314,7 @@ docker compose up -d <service>`}</code>
                 <p>
                     Pin a message and let users self-assign roles by reacting.
                     Configure under <strong>Reaction roles / New</strong>. Each
-                    row maps an emoji to a role. Lucky watches the reaction
+                    row maps an emoji to a role. Vaded Gaming watches the reaction
                     add/remove events and updates membership.
                 </p>
                 <h2 id='self-roles'>Self-role panels</h2>
@@ -1325,7 +1325,7 @@ docker compose up -d <service>`}</code>
                 </p>
                 <h2 id='levels'>Leveling</h2>
                 <p>
-                    Lucky awards XP for messages and voice activity, with
+                    Vaded Gaming awards XP for messages and voice activity, with
                     anti-spam dampening (one bucket per minute per user). Check
                     your level with <code>/level</code> or the top scorers with{' '}
                     <code>/leaderboard</code>.
@@ -1371,7 +1371,7 @@ docker compose up -d <service>`}</code>
                 <p>
                     Sign in with Discord OAuth at <code>/login</code>. You see
                     every server where you have <code>Manage Server</code> and
-                    where Lucky is present. Sessions last 30 days, signed with
+                    where Vaded Gaming is present. Sessions last 30 days, signed with
                     the server's <code>SESSION_SECRET</code>.
                 </p>
                 <h2 id='modules'>Modules</h2>
@@ -1431,7 +1431,7 @@ docker compose up -d <service>`}</code>
                     Build Discord embeds visually. Title, description, color, up
                     to 25 fields, images, footer, timestamp. Templates are saved
                     per-server and re-sendable with one click. The send target
-                    can be any channel Lucky has post access in.
+                    can be any channel Vaded Gaming has post access in.
                 </p>
                 <h2 id='audit-views'>Audit & history views</h2>
                 <p>Three views worth knowing:</p>
@@ -1756,14 +1756,14 @@ docker compose up -d <service>`}</code>
         title: 'Permissions',
         breadcrumb: 'Docs / Permissions',
         toc: [
-            { id: 'discord-perms', label: 'Discord permissions Lucky needs' },
+            { id: 'discord-perms', label: 'Discord permissions Vaded Gaming needs' },
             { id: 'principle', label: 'Principle of least privilege' },
             { id: 'dashboard-rbac', label: 'Dashboard RBAC' },
             { id: 'admin-tier', label: 'Admin tier' },
         ],
         content: () => (
             <>
-                <h2 id='discord-perms'>Discord permissions Lucky needs</h2>
+                <h2 id='discord-perms'>Discord permissions Vaded Gaming needs</h2>
                 <ul>
                     <li>
                         <strong>Read Messages / Send Messages.</strong> For
@@ -1794,7 +1794,7 @@ docker compose up -d <service>`}</code>
                     </li>
                     <li>
                         <strong>Manage Roles.</strong> For reaction roles and
-                        role-rewards on level-up. Lucky's role must be above any
+                        role-rewards on level-up. Vaded Gaming's role must be above any
                         role it manages.
                     </li>
                     <li>
@@ -1808,7 +1808,7 @@ docker compose up -d <service>`}</code>
                 </ul>
                 <h2 id='principle'>Principle of least privilege</h2>
                 <p>
-                    The OAuth invite asks for what Lucky <em>can</em> use, not
+                    The OAuth invite asks for what Vaded Gaming <em>can</em> use, not
                     what it <em>requires</em>. If you don't use moderation, deny{' '}
                     <code>Kick / Ban</code>. If you don't use reaction roles,
                     deny <code>Manage Roles</code>. Re-invite at any time to
@@ -1842,7 +1842,7 @@ docker compose up -d <service>`}</code>
                 <p>
                     Self-hosters can mark Discord user IDs as global admins via{' '}
                     <code>ADMIN_USER_IDS</code>. Admins bypass per-guild RBAC
-                    and see global feature toggles. The hosted Lucky has zero
+                    and see global feature toggles. The hosted Vaded Gaming has zero
                     admin user IDs in production — there is no behind-the-scenes
                     peek into your server.
                 </p>
@@ -1862,7 +1862,7 @@ docker compose up -d <service>`}</code>
         content: () => (
             <>
                 <p>
-                    Used only when self-hosting. The hosted Lucky is
+                    Used only when self-hosting. The hosted Vaded Gaming is
                     preconfigured.
                 </p>
                 <h2 id='required'>Required</h2>
@@ -2088,7 +2088,7 @@ docker compose up -d <service>`}</code>
                 </p>
                 <h2 id='lastfm'>Last.fm</h2>
                 <p>
-                    Last.fm scrobbles every track Lucky plays for users who've
+                    Last.fm scrobbles every track Vaded Gaming plays for users who've
                     linked their account. Get an API key from{' '}
                     <a
                         href='https://www.last.fm/api/account/create'
@@ -2136,16 +2136,16 @@ docker compose up -d <service>`}</code>
         title: 'FAQ',
         breadcrumb: 'Docs / FAQ',
         toc: [
-            { id: 'cost', label: 'Is Lucky really free?' },
+            { id: 'cost', label: 'Is Vaded Gaming really free?' },
             { id: 'limits', label: 'Are there server-size limits?' },
-            { id: 'data', label: 'What data does Lucky collect?' },
+            { id: 'data', label: 'What data does Vaded Gaming collect?' },
             { id: 'voice-quality', label: 'Why does my voice quality differ?' },
             { id: 'lavalink', label: 'Do I need Lavalink?' },
             { id: 'contribute', label: 'Can I contribute?' },
         ],
         content: () => (
             <>
-                <h2 id='cost'>Is Lucky really free?</h2>
+                <h2 id='cost'>Is Vaded Gaming really free?</h2>
                 <p>
                     Yes. ISC source. No premium tier on the hosted instance, no
                     paywalled features, no "supporter" perks. If you self-host,
@@ -2153,11 +2153,11 @@ docker compose up -d <service>`}</code>
                 </p>
                 <h2 id='limits'>Are there server-size limits?</h2>
                 <p>
-                    No hard limits. The hosted Lucky has been tested on servers
+                    No hard limits. The hosted Vaded Gaming has been tested on servers
                     up to ~50k members. Beyond that, you'll want to self-host
                     with sharding (<code>BOT_SHARDS</code>) for headroom.
                 </p>
-                <h2 id='data'>What data does Lucky collect?</h2>
+                <h2 id='data'>What data does Vaded Gaming collect?</h2>
                 <p>
                     The minimum needed to function — see the{' '}
                     <a href='/privacy'>Privacy Policy</a>. On the hosted
@@ -2169,13 +2169,13 @@ docker compose up -d <service>`}</code>
                 <h2 id='voice-quality'>Why does my voice quality differ?</h2>
                 <p>
                     Voice quality follows Discord's per-channel bitrate setting.
-                    Lucky encodes at the channel bitrate up to 96 kbps. Boost
+                    Vaded Gaming encodes at the channel bitrate up to 96 kbps. Boost
                     the channel's bitrate (Channel settings / Bitrate) for
                     higher fidelity.
                 </p>
                 <h2 id='lavalink'>Do I need Lavalink?</h2>
                 <p>
-                    No. Lucky ships its own Opus encoder via prebuilt binaries,
+                    No. Vaded Gaming ships its own Opus encoder via prebuilt binaries,
                     so there's no Java sidecar to run. That means a smaller
                     stack, less to monitor, and faster local dev.
                 </p>
@@ -2205,8 +2205,8 @@ export default function Docs() {
     )
 
     usePageMetadata({
-        title: `${page.title} — Lucky docs`,
-        description: `${page.title} documentation for Lucky, the open-source self-hostable Discord bot.`,
+        title: `${page.title} — Vaded Gaming docs`,
+        description: `${page.title} documentation for Vaded Gaming, the open-source self-hostable Discord bot.`,
     })
 
     const Content = page.content

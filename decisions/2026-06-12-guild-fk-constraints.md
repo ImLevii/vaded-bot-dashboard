@@ -5,7 +5,7 @@
 
 ## Context
 
-The Lucky schema has 40+ models that store a `guildId` column referencing Discord guild snowflakes (a 64-bit unsigned integer). However, prior to this ADR, most of these models had no FK constraint at all, or (in 5 cases) had constraints targeting the wrong column:
+The Vaded Gaming schema has 40+ models that store a `guildId` column referencing Discord guild snowflakes (a 64-bit unsigned integer). However, prior to this ADR, most of these models had no FK constraint at all, or (in 5 cases) had constraints targeting the wrong column:
 - **Wrong target:** guilds.id (CUID — a client-generated unique identifier, never what writers store)
 - **Correct target:** guilds.discordId (Discord snowflake, @unique, what all Discord event payloads and writers actually use)
 

@@ -97,79 +97,79 @@
   --color-sidebar-ring: hsl(var(--sidebar-ring));
 
   /* VadedHosting brand palette (red) */
-  --color-lucky-neon-pink: #ef4444;
-  --color-lucky-neon-orange: #b91c1c;
-  --color-lucky-neon-purple: #8b5cf6;
+  --color-vaded-neon-pink: #ef4444;
+  --color-vaded-neon-orange: #b91c1c;
+  --color-vaded-neon-purple: #8b5cf6;
 
   /* Discord blurple accent palette (legacy) */
-  --color-lucky-blurple-700: #4752c4;
-  --color-lucky-blurple-600: #5865f2;
-  --color-lucky-blurple-500: #6d7af4;
-  --color-lucky-blurple-400: #8891f6;
-  --color-lucky-blurple-200: #c0c5fb;
+  --color-vaded-blurple-700: #4752c4;
+  --color-vaded-blurple-600: #5865f2;
+  --color-vaded-blurple-500: #6d7af4;
+  --color-vaded-blurple-400: #8891f6;
+  --color-vaded-blurple-200: #c0c5fb;
 
   /* Semantic brand tokens (VadedHosting red) */
-  --color-lucky-brand: #dc2626;
-  --color-lucky-brand-strong: #b91c1c;
-  --color-lucky-accent: #ef4444;
-  --color-lucky-accent-soft: #f87171;
+  --color-vaded-brand: #dc2626;
+  --color-vaded-brand-strong: #b91c1c;
+  --color-vaded-accent: #ef4444;
+  --color-vaded-accent-soft: #f87171;
 
   /* Status colors */
-  --color-lucky-success: #23a55a;
-  --color-lucky-error: #f23f42;
-  --color-lucky-warning: #f0b232;
-  --color-lucky-info: #00aafc;
+  --color-vaded-success: #23a55a;
+  --color-vaded-error: #f23f42;
+  --color-vaded-warning: #f0b232;
+  --color-vaded-info: #00aafc;
 
   /* Neutral dark surfaces */
-  --color-lucky-surface-canvas: #0f1117;
-  --color-lucky-surface-sidebar: #161b22;
-  --color-lucky-surface-panel: #1c2129;
-  --color-lucky-surface-elevated: #222831;
-  --color-lucky-surface-highlight: #2a3140;
+  --color-vaded-surface-canvas: #0f1117;
+  --color-vaded-surface-sidebar: #161b22;
+  --color-vaded-surface-panel: #1c2129;
+  --color-vaded-surface-elevated: #222831;
+  --color-vaded-surface-highlight: #2a3140;
 
-  /* Tailwind-compatible bg-lucky-* aliases */
-  --color-lucky-bg-primary: #0f1117;
-  --color-lucky-bg-secondary: #161b22;
-  --color-lucky-bg-tertiary: #1c2129;
-  --color-lucky-bg-active: #2a3140;
+  /* Tailwind-compatible bg-vaded-* aliases */
+  --color-vaded-bg-primary: #0f1117;
+  --color-vaded-bg-secondary: #161b22;
+  --color-vaded-bg-tertiary: #1c2129;
+  --color-vaded-bg-active: #2a3140;
 
   /* Borders */
-  --color-lucky-border-soft: #2d333b;
-  --color-lucky-border-strong: #444c56;
-  --color-lucky-border: #2d333b;
+  --color-vaded-border-soft: #2d333b;
+  --color-vaded-border-strong: #444c56;
+  --color-vaded-border: #2d333b;
 
   /* Text */
-  --color-lucky-text-strong: #e6edf3;
-  --color-lucky-text-body: #adbac7;
-  --color-lucky-text-muted: #768390;
-  --color-lucky-text-subtle: #545d68;
+  --color-vaded-text-strong: #e6edf3;
+  --color-vaded-text-body: #adbac7;
+  --color-vaded-text-muted: #768390;
+  --color-vaded-text-subtle: #545d68;
 
-  /* Tailwind-compatible text-lucky-* aliases */
-  --color-lucky-text-primary: #e6edf3;
-  --color-lucky-text-secondary: #adbac7;
-  --color-lucky-text-tertiary: #768390;
-  --color-lucky-text-disabled: #545d68;
+  /* Tailwind-compatible text-vaded-* aliases */
+  --color-vaded-text-primary: #e6edf3;
+  --color-vaded-text-secondary: #adbac7;
+  --color-vaded-text-tertiary: #768390;
+  --color-vaded-text-disabled: #545d68;
 
   /* Shadows */
-  --color-lucky-shadow-soft: 0 4px 16px rgb(0 0 0 / 0.3);
-  --color-lucky-shadow-panel: 0 8px 32px rgb(0 0 0 / 0.4);
-  --color-lucky-shadow-focus: 0 0 0 3px rgb(220 38 38 / 0.4);
+  --color-vaded-shadow-soft: 0 4px 16px rgb(0 0 0 / 0.3);
+  --color-vaded-shadow-panel: 0 8px 32px rgb(0 0 0 / 0.4);
+  --color-vaded-shadow-focus: 0 0 0 3px rgb(220 38 38 / 0.4);
 
   /* Legacy aliases for backward compat — re-pointed to brand red so
-     the old --lucky-red / --lucky-blue / --lucky-purple classes no longer
-     render Discord blurple. Direct usages should migrate to --color-lucky-brand. */
-  --color-lucky-purple-400: #dc2626;
-  --color-lucky-purple-500: #b91c1c;
-  --color-lucky-gold-500: #dc2626;
-  --color-lucky-gold-400: #ef4444;
-  --color-lucky-gold-300: #f87171;
-  --color-lucky-red: #dc2626;
-  --color-lucky-blue: #dc2626;
-  --color-lucky-purple: #dc2626;
+     the old --vaded-red / --vaded-blue / --vaded-purple classes no longer
+     render Discord blurple. Direct usages should migrate to --color-vaded-brand. */
+  --color-vaded-purple-400: #dc2626;
+  --color-vaded-purple-500: #b91c1c;
+  --color-vaded-gold-500: #dc2626;
+  --color-vaded-gold-400: #ef4444;
+  --color-vaded-gold-300: #f87171;
+  --color-vaded-red: #dc2626;
+  --color-vaded-blue: #dc2626;
+  --color-vaded-purple: #dc2626;
 
   /* Short-form aliases for the 2026-04-21 redesign port.
-     Values match the existing --color-lucky-* tokens. Keep both during
-     migration; the --lucky-* aliases will be dropped in a later cleanup PR
+     Values match the existing --color-vaded-* tokens. Keep both during
+     migration; the --vaded-* aliases will be dropped in a later cleanup PR
      after every page has been ported. Decision: decisions/2026-04-21-redesign-port-target.md */
   --color-canvas: #0f1117;
   --color-sidebar: #161b22;
@@ -185,12 +185,12 @@
   --shadow-soft: 0 4px 16px rgb(0 0 0 / 0.3);
   --shadow-panel: 0 8px 32px rgb(0 0 0 / 0.4);
 
-  --font-lucky-display: 'Sora', 'Segoe UI', system-ui, sans-serif;
-  --font-lucky-body: 'Manrope', 'Segoe UI', system-ui, sans-serif;
-  --font-lucky-mono: 'JetBrains Mono', 'SFMono-Regular', Menlo, Monaco, Consolas,
+  --font-vaded-display: 'Sora', 'Segoe UI', system-ui, sans-serif;
+  --font-vaded-body: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+  --font-vaded-mono: 'JetBrains Mono', 'SFMono-Regular', Menlo, Monaco, Consolas,
     'Liberation Mono', 'Courier New', monospace;
-  --font-sans: var(--font-lucky-body);
-  --font-mono: var(--font-lucky-mono);
+  --font-sans: var(--font-vaded-body);
+  --font-mono: var(--font-vaded-mono);
 
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
@@ -279,7 +279,7 @@
 
 @utility scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: var(--lucky-border) transparent;
+  scrollbar-color: var(--vaded-border) transparent;
 
   &::-webkit-scrollbar {
     width: 6px;
@@ -291,13 +291,13 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: var(--lucky-border);
+    background-color: var(--vaded-border);
     border-radius: 3px;
   }
 }
 
 @utility type-display {
-  font-family: var(--font-lucky-display);
+  font-family: var(--font-vaded-display);
   font-size: clamp(2rem, 3.5vw, 3rem);
   line-height: 1.1;
   letter-spacing: -0.02em;
@@ -305,7 +305,7 @@
 }
 
 @utility type-h1 {
-  font-family: var(--font-lucky-display);
+  font-family: var(--font-vaded-display);
   font-size: clamp(1.6rem, 2.5vw, 2.25rem);
   line-height: 1.15;
   letter-spacing: -0.015em;
@@ -313,7 +313,7 @@
 }
 
 @utility type-h2 {
-  font-family: var(--font-lucky-display);
+  font-family: var(--font-vaded-display);
   font-size: clamp(1.25rem, 2vw, 1.75rem);
   line-height: 1.25;
   letter-spacing: -0.01em;
@@ -321,7 +321,7 @@
 }
 
 @utility type-title {
-  font-family: var(--font-lucky-display);
+  font-family: var(--font-vaded-display);
   font-size: 1rem;
   line-height: 1.4;
   letter-spacing: -0.005em;
@@ -329,28 +329,28 @@
 }
 
 @utility type-body-lg {
-  font-family: var(--font-lucky-body);
+  font-family: var(--font-vaded-body);
   font-size: 1rem;
   line-height: 1.6;
   font-weight: 400;
 }
 
 @utility type-body {
-  font-family: var(--font-lucky-body);
+  font-family: var(--font-vaded-body);
   font-size: 0.9375rem;
   line-height: 1.55;
   font-weight: 400;
 }
 
 @utility type-body-sm {
-  font-family: var(--font-lucky-body);
+  font-family: var(--font-vaded-body);
   font-size: 0.875rem;
   line-height: 1.45;
   font-weight: 400;
 }
 
 @utility type-meta {
-  font-family: var(--font-lucky-body);
+  font-family: var(--font-vaded-body);
   font-size: 0.6875rem;
   line-height: 1.35;
   letter-spacing: 0.07em;
@@ -390,10 +390,10 @@
 }
 
 @utility surface-elevated {
-  border: 1px solid var(--lucky-border-strong);
+  border: 1px solid var(--vaded-border-strong);
   border-radius: var(--radius-lg);
-  background-color: var(--lucky-surface-elevated);
-  box-shadow: var(--lucky-shadow-panel);
+  background-color: var(--vaded-surface-elevated);
+  box-shadow: var(--vaded-shadow-panel);
 }
 
 @utility surface-glass {
@@ -501,7 +501,7 @@
   }
 }
 
-@utility lucky-focus-ring {
+@utility vaded-focus-ring {
   &:focus-visible {
     outline: none;
     box-shadow: 0 0 0 3px rgb(220 38 38 / 0.4);
@@ -549,48 +549,48 @@
     --sidebar-border: 216 12% 18%;
     --sidebar-ring: 0 72% 51%;
 
-    --lucky-surface-canvas: var(--color-lucky-surface-canvas);
-    --lucky-surface-sidebar: var(--color-lucky-surface-sidebar);
-    --lucky-surface-panel: var(--color-lucky-surface-panel);
-    --lucky-surface-elevated: var(--color-lucky-surface-elevated);
-    --lucky-surface-highlight: var(--color-lucky-surface-highlight);
-    --lucky-border-soft: var(--color-lucky-border-soft);
-    --lucky-border-strong: var(--color-lucky-border-strong);
-    --lucky-text-strong: var(--color-lucky-text-strong);
-    --lucky-text-body: var(--color-lucky-text-body);
-    --lucky-text-muted: var(--color-lucky-text-muted);
-    --lucky-text-subtle: var(--color-lucky-text-subtle);
-    --lucky-shadow-soft: var(--color-lucky-shadow-soft);
-    --lucky-shadow-panel: var(--color-lucky-shadow-panel);
-    --lucky-shadow-focus: var(--color-lucky-shadow-focus);
-    --lucky-motion-fast: 120ms;
-    --lucky-motion-standard: 180ms;
-    --lucky-motion-slow: 280ms;
+    --vaded-surface-canvas: var(--color-vaded-surface-canvas);
+    --vaded-surface-sidebar: var(--color-vaded-surface-sidebar);
+    --vaded-surface-panel: var(--color-vaded-surface-panel);
+    --vaded-surface-elevated: var(--color-vaded-surface-elevated);
+    --vaded-surface-highlight: var(--color-vaded-surface-highlight);
+    --vaded-border-soft: var(--color-vaded-border-soft);
+    --vaded-border-strong: var(--color-vaded-border-strong);
+    --vaded-text-strong: var(--color-vaded-text-strong);
+    --vaded-text-body: var(--color-vaded-text-body);
+    --vaded-text-muted: var(--color-vaded-text-muted);
+    --vaded-text-subtle: var(--color-vaded-text-subtle);
+    --vaded-shadow-soft: var(--color-vaded-shadow-soft);
+    --vaded-shadow-panel: var(--color-vaded-shadow-panel);
+    --vaded-shadow-focus: var(--color-vaded-shadow-focus);
+    --vaded-motion-fast: 120ms;
+    --vaded-motion-standard: 180ms;
+    --vaded-motion-slow: 280ms;
 
-    --lucky-brand: var(--color-lucky-brand);
-    --lucky-brand-strong: var(--color-lucky-brand-strong);
-    --lucky-accent: var(--color-lucky-accent);
-    --lucky-accent-soft: var(--color-lucky-accent-soft);
-    --lucky-success: var(--color-lucky-success);
-    --lucky-error: var(--color-lucky-error);
-    --lucky-warning: var(--color-lucky-warning);
-    --lucky-info: var(--color-lucky-info);
+    --vaded-brand: var(--color-vaded-brand);
+    --vaded-brand-strong: var(--color-vaded-brand-strong);
+    --vaded-accent: var(--color-vaded-accent);
+    --vaded-accent-soft: var(--color-vaded-accent-soft);
+    --vaded-success: var(--color-vaded-success);
+    --vaded-error: var(--color-vaded-error);
+    --vaded-warning: var(--color-vaded-warning);
+    --vaded-info: var(--color-vaded-info);
 
-    --lucky-gradient-brand: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-    --lucky-gradient-brand-soft: linear-gradient(135deg, rgb(220 38 38 / 0.15) 0%, rgb(185 28 28 / 0.05) 100%);
+    --vaded-gradient-brand: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    --vaded-gradient-brand-soft: linear-gradient(135deg, rgb(220 38 38 / 0.15) 0%, rgb(185 28 28 / 0.05) 100%);
 
-    --lucky-red: var(--lucky-brand);
-    --lucky-bg-primary: var(--lucky-surface-canvas);
-    --lucky-bg-secondary: var(--lucky-surface-sidebar);
-    --lucky-bg-tertiary: var(--lucky-surface-panel);
-    --lucky-bg-active: var(--lucky-surface-highlight);
-    --lucky-border: var(--lucky-border-soft);
-    --lucky-text-primary: var(--lucky-text-strong);
-    --lucky-text-secondary: var(--lucky-text-body);
-    --lucky-text-tertiary: var(--lucky-text-muted);
-    --lucky-text-disabled: var(--lucky-text-subtle);
-    --lucky-blue: var(--lucky-brand);
-    --lucky-purple: var(--lucky-brand);
+    --vaded-red: var(--vaded-brand);
+    --vaded-bg-primary: var(--vaded-surface-canvas);
+    --vaded-bg-secondary: var(--vaded-surface-sidebar);
+    --vaded-bg-tertiary: var(--vaded-surface-panel);
+    --vaded-bg-active: var(--vaded-surface-highlight);
+    --vaded-border: var(--vaded-border-soft);
+    --vaded-text-primary: var(--vaded-text-strong);
+    --vaded-text-secondary: var(--vaded-text-body);
+    --vaded-text-tertiary: var(--vaded-text-muted);
+    --vaded-text-disabled: var(--vaded-text-subtle);
+    --vaded-blue: var(--vaded-brand);
+    --vaded-purple: var(--vaded-brand);
   }
 
   .dark {
@@ -640,8 +640,8 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: var(--font-lucky-body);
-    background-color: var(--lucky-surface-canvas);
+    font-family: var(--font-vaded-body);
+    background-color: var(--vaded-surface-canvas);
   }
 
   h1,
@@ -649,45 +649,45 @@
   h3,
   h4,
   .font-display {
-    font-family: var(--font-lucky-display);
+    font-family: var(--font-vaded-display);
     letter-spacing: -0.01em;
   }
 
   code,
   pre,
   .font-mono {
-    font-family: var(--font-lucky-mono);
+    font-family: var(--font-vaded-mono);
   }
 
   ::selection {
     background-color: rgb(220 38 38 / 0.3);
-    color: var(--lucky-text-primary);
+    color: var(--vaded-text-primary);
   }
 }
 
 @layer components {
-  .lucky-shell {
+  .vaded-shell {
     position: relative;
     min-height: 100vh;
-    color: var(--lucky-text-primary);
+    color: var(--vaded-text-primary);
     isolation: isolate;
     overflow-x: clip;
-    background-color: var(--lucky-surface-canvas);
+    background-color: var(--vaded-surface-canvas);
     background-image:
       radial-gradient(circle at 20% 0%, rgb(220 38 38 / 0.1), transparent 34%),
       radial-gradient(circle at 85% 10%, rgb(185 28 28 / 0.07), transparent 28%),
       linear-gradient(180deg, rgb(255 255 255 / 0.025), transparent 18%),
-      linear-gradient(180deg, var(--lucky-surface-canvas), var(--lucky-surface-canvas));
+      linear-gradient(180deg, var(--vaded-surface-canvas), var(--vaded-surface-canvas));
   }
 
-  .lucky-shell-authenticated {
+  .vaded-shell-authenticated {
     background-image:
       linear-gradient(180deg, rgb(255 255 255 / 0.02), transparent 14%),
       linear-gradient(135deg, rgb(220 38 38 / 0.06), rgb(185 28 28 / 0.02) 42%, transparent 72%),
-      linear-gradient(180deg, var(--lucky-surface-canvas), var(--lucky-surface-canvas));
+      linear-gradient(180deg, var(--vaded-surface-canvas), var(--vaded-surface-canvas));
   }
 
-  .lucky-shell-authenticated .lucky-shell-header {
+  .vaded-shell-authenticated .vaded-shell-header {
     background-color: rgba(15, 17, 23, 0.75);
     backdrop-filter: blur(20px) saturate(1.6);
     -webkit-backdrop-filter: blur(20px) saturate(1.6);
@@ -695,20 +695,20 @@
     box-shadow: 0 1px 0 rgba(220, 38, 38, 0.08), 0 4px 24px rgba(0, 0, 0, 0.25);
   }
 
-  .lucky-skip-link {
+  .vaded-skip-link {
     position: absolute;
     top: 1rem;
     left: 1rem;
     z-index: 50;
-    border: 1px solid var(--lucky-border-strong);
+    border: 1px solid var(--vaded-border-strong);
     border-radius: 9999px;
-    background: var(--lucky-bg-secondary);
+    background: var(--vaded-bg-secondary);
     padding: 0.75rem 1rem;
-    font-family: var(--font-lucky-body);
+    font-family: var(--font-vaded-body);
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--lucky-text-primary);
-    box-shadow: var(--lucky-shadow-panel);
+    color: var(--vaded-text-primary);
+    box-shadow: var(--vaded-shadow-panel);
     opacity: 0;
     pointer-events: none;
     transform: translateY(-180%);
@@ -721,31 +721,31 @@
       outline: none;
       transform: translateY(0);
       border-color: rgb(220 38 38 / 0.55);
-      box-shadow: 0 0 0 3px rgb(220 38 38 / 0.25), var(--lucky-shadow-panel);
+      box-shadow: 0 0 0 3px rgb(220 38 38 / 0.25), var(--vaded-shadow-panel);
     }
   }
 
-  .lucky-focus-visible:focus-visible {
+  .vaded-focus-visible:focus-visible {
     outline: none;
-    box-shadow: var(--lucky-shadow-focus);
+    box-shadow: var(--vaded-shadow-focus);
   }
 
-  .lucky-gradient-text {
-    color: var(--lucky-brand);
+  .vaded-gradient-text {
+    color: var(--vaded-brand);
   }
 
-  .lucky-header-accent-line {
+  .vaded-header-accent-line {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
     height: 1px;
-    background-color: var(--lucky-border-soft);
+    background-color: var(--vaded-border-soft);
   }
 
   .docs-prose {
-    color: var(--color-lucky-text-body);
-    font-family: var(--font-lucky-body);
+    color: var(--color-vaded-text-body);
+    font-family: var(--font-vaded-body);
     font-size: 0.9375rem;
     line-height: 1.7;
   }
@@ -753,8 +753,8 @@
     margin-top: 1.25rem;
   }
   .docs-prose h2 {
-    color: var(--color-lucky-text-strong);
-    font-family: var(--font-lucky-display);
+    color: var(--color-vaded-text-strong);
+    font-family: var(--font-vaded-display);
     font-size: 1.5rem;
     font-weight: 600;
     line-height: 1.25;
@@ -764,8 +764,8 @@
     scroll-margin-top: 4.5rem;
   }
   .docs-prose h3 {
-    color: var(--color-lucky-text-strong);
-    font-family: var(--font-lucky-display);
+    color: var(--color-vaded-text-strong);
+    font-family: var(--font-vaded-display);
     font-size: 1.125rem;
     font-weight: 600;
     line-height: 1.3;
@@ -774,17 +774,17 @@
     scroll-margin-top: 4.5rem;
   }
   .docs-prose p {
-    color: var(--color-lucky-text-body);
+    color: var(--color-vaded-text-body);
   }
   .docs-prose a {
-    color: var(--color-lucky-brand);
+    color: var(--color-vaded-brand);
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 3px;
     transition: color 150ms ease;
   }
   .docs-prose a:hover {
-    color: var(--color-lucky-brand-strong);
+    color: var(--color-vaded-brand-strong);
   }
   .docs-prose ul,
   .docs-prose ol {
@@ -801,24 +801,24 @@
     padding-left: 0.25rem;
   }
   .docs-prose li::marker {
-    color: var(--color-lucky-text-muted);
+    color: var(--color-vaded-text-muted);
   }
   .docs-prose code {
-    background: var(--color-lucky-surface-elevated);
-    color: var(--color-lucky-text-strong);
-    border: 1px solid var(--color-lucky-border-soft);
+    background: var(--color-vaded-surface-elevated);
+    color: var(--color-vaded-text-strong);
+    border: 1px solid var(--color-vaded-border-soft);
     border-radius: 0.25rem;
     padding: 0.1rem 0.4rem;
-    font-family: var(--font-lucky-mono);
+    font-family: var(--font-vaded-mono);
     font-size: 0.86em;
   }
   .docs-prose pre {
-    background: var(--color-lucky-surface-sidebar);
-    border: 1px solid var(--color-lucky-border-soft);
+    background: var(--color-vaded-surface-sidebar);
+    border: 1px solid var(--color-vaded-border-soft);
     border-radius: 0.5rem;
     padding: 1rem 1.25rem;
     overflow-x: auto;
-    font-family: var(--font-lucky-mono);
+    font-family: var(--font-vaded-mono);
     font-size: 0.82rem;
     line-height: 1.6;
   }
@@ -826,21 +826,21 @@
     background: transparent;
     border: 0;
     padding: 0;
-    color: var(--color-lucky-text-body);
+    color: var(--color-vaded-text-body);
   }
   .docs-prose blockquote {
-    border-left: 2px solid var(--color-lucky-brand);
+    border-left: 2px solid var(--color-vaded-brand);
     padding: 0.25rem 0 0.25rem 1rem;
-    color: var(--color-lucky-text-muted);
+    color: var(--color-vaded-text-muted);
     font-style: normal;
   }
   .docs-prose strong {
-    color: var(--color-lucky-text-strong);
+    color: var(--color-vaded-text-strong);
     font-weight: 600;
   }
   .docs-prose hr {
     border: 0;
-    border-top: 1px solid var(--color-lucky-border-soft);
+    border-top: 1px solid var(--color-vaded-border-soft);
     margin: 2.5rem 0;
   }
   .docs-prose table {
@@ -850,13 +850,13 @@
   }
   .docs-prose th,
   .docs-prose td {
-    border-bottom: 1px solid var(--color-lucky-border-soft);
+    border-bottom: 1px solid var(--color-vaded-border-soft);
     padding: 0.6rem 0.75rem;
     text-align: left;
   }
   .docs-prose th {
-    color: var(--color-lucky-text-muted);
-    font-family: var(--font-lucky-mono);
+    color: var(--color-vaded-text-muted);
+    font-family: var(--font-vaded-mono);
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;

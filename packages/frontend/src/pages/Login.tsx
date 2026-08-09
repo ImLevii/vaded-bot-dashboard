@@ -38,7 +38,7 @@ export default function LoginPage() {
     ] as const
 
     return (
-        <div className='min-h-screen bg-lucky-bg-primary flex flex-col relative'>
+        <div className='min-h-screen bg-vaded-bg-primary flex flex-col relative'>
             <div className='absolute top-6 right-6 z-20'>
                 <LanguageSwitcher />
             </div>
@@ -48,14 +48,14 @@ export default function LoginPage() {
                     <div className={sectionClass} style={sectionStyle}>
                         <div className='flex items-center gap-3 mb-8'>
                             <img
-                                src='/lucky-logo.png'
+                                src='/vaded-logo.png'
                                 alt='Vaded Gaming'
-                                className='h-12 w-12 rounded-lg object-cover border border-lucky-border'
+                                className='h-12 w-12 rounded-lg object-cover border border-vaded-border'
                             />
                             <h1
-                                className='text-2xl font-bold text-lucky-text-primary'
+                                className='text-2xl font-bold text-vaded-text-primary'
                                 style={{
-                                    fontFamily: 'var(--font-lucky-display)',
+                                    fontFamily: 'var(--font-vaded-display)',
                                 }}
                             >
                                 Vaded Gaming
@@ -63,10 +63,10 @@ export default function LoginPage() {
                         </div>
 
                         <div className='space-y-3'>
-                            <h2 className='text-2xl font-bold text-lucky-text-primary'>
+                            <h2 className='text-2xl font-bold text-vaded-text-primary'>
                                 {t('login.headline')}
                             </h2>
-                            <p className='text-sm text-lucky-text-secondary'>
+                            <p className='text-sm text-vaded-text-secondary'>
                                 {t('login.description')}
                             </p>
                         </div>
@@ -77,31 +77,31 @@ export default function LoginPage() {
                         style={cardStyle}
                     >
                         <div className='space-y-4'>
-                            <h3 className='text-lg font-semibold text-lucky-text-primary'>
+                            <h3 className='text-lg font-semibold text-vaded-text-primary'>
                                 Discord Bot Dashboard
                             </h3>
                             <div className='grid grid-cols-3 gap-4'>
                                 <div className='text-center'>
-                                    <p className='text-2xl font-bold text-lucky-brand'>
+                                    <p className='text-2xl font-bold text-vaded-brand'>
                                         32+
                                     </p>
-                                    <p className='text-xs text-lucky-text-tertiary mt-1'>
+                                    <p className='text-xs text-vaded-text-tertiary mt-1'>
                                         Modules
                                     </p>
                                 </div>
                                 <div className='text-center'>
-                                    <p className='text-2xl font-bold text-lucky-brand'>
+                                    <p className='text-2xl font-bold text-vaded-brand'>
                                         100+
                                     </p>
-                                    <p className='text-xs text-lucky-text-tertiary mt-1'>
+                                    <p className='text-xs text-vaded-text-tertiary mt-1'>
                                         Commands
                                     </p>
                                 </div>
                                 <div className='text-center'>
-                                    <p className='text-2xl font-bold text-lucky-brand'>
+                                    <p className='text-2xl font-bold text-vaded-brand'>
                                         24/7
                                     </p>
-                                    <p className='text-xs text-lucky-text-tertiary mt-1'>
+                                    <p className='text-xs text-vaded-text-tertiary mt-1'>
                                         Uptime
                                     </p>
                                 </div>
@@ -109,13 +109,13 @@ export default function LoginPage() {
                         </div>
 
                         <div className='space-y-2'>
-                            <p className='text-xs uppercase tracking-wider text-lucky-text-tertiary'>
+                            <p className='text-xs uppercase tracking-wider text-vaded-text-tertiary'>
                                 {t('login.authentication')}
                             </p>
-                            <h3 className='text-xl font-semibold text-lucky-text-primary'>
+                            <h3 className='text-xl font-semibold text-vaded-text-primary'>
                                 {t('login.signInWithDiscord')}
                             </h3>
-                            <p className='text-xs text-lucky-text-secondary'>
+                            <p className='text-xs text-vaded-text-secondary'>
                                 {t('login.permissionsNote')}
                             </p>
                         </div>
@@ -124,7 +124,7 @@ export default function LoginPage() {
                             onClick={login}
                             disabled={isLoading}
                             variant='primary'
-                            className='lucky-focus-visible h-12 w-full rounded-lg font-medium'
+                            className='vaded-focus-visible h-12 w-full rounded-lg font-medium'
                         >
                             {isLoading ? (
                                 <>
@@ -149,10 +149,10 @@ export default function LoginPage() {
                             {badges.map(({ icon: Icon, labelKey }) => (
                                 <div
                                     key={labelKey}
-                                    className='flex items-center gap-3 p-3 rounded-lg border border-lucky-border bg-lucky-bg-primary/40'
+                                    className='flex items-center gap-3 p-3 rounded-lg border border-vaded-border bg-vaded-bg-primary/40'
                                 >
-                                    <Icon className='h-4 w-4 text-lucky-brand flex-shrink-0' />
-                                    <p className='text-xs text-lucky-text-secondary'>
+                                    <Icon className='h-4 w-4 text-vaded-brand flex-shrink-0' />
+                                    <p className='text-xs text-vaded-text-secondary'>
                                         {t(labelKey)}
                                     </p>
                                 </div>
@@ -167,24 +167,24 @@ export default function LoginPage() {
                         >
                             <a
                                 href='/terms'
-                                className='text-xs text-lucky-text-tertiary underline-offset-2 hover:underline hover:text-lucky-text-secondary transition-colors'
+                                className='text-xs text-vaded-text-tertiary underline-offset-2 hover:underline hover:text-vaded-text-secondary transition-colors'
                             >
                                 {t('landing.footer.terms')}
                             </a>
                             <span
-                                className='text-lucky-border'
+                                className='text-vaded-border'
                                 aria-hidden='true'
                             >
                                 ·
                             </span>
                             <a
                                 href='/privacy'
-                                className='text-xs text-lucky-text-tertiary underline-offset-2 hover:underline hover:text-lucky-text-secondary transition-colors'
+                                className='text-xs text-vaded-text-tertiary underline-offset-2 hover:underline hover:text-vaded-text-secondary transition-colors'
                             >
                                 {t('landing.footer.privacy')}
                             </a>
                         </nav>
-                        <p className='text-xs text-lucky-text-disabled'>
+                        <p className='text-xs text-vaded-text-disabled'>
                             {t('login.copyright')}
                         </p>
                     </div>

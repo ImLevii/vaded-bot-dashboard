@@ -1,6 +1,6 @@
 # Dependency update plan
 
-Phased plan for updating Lucky dependencies. Run each phase on a branch; verify
+Phased plan for updating Vaded Gaming dependencies. Run each phase on a branch; verify
 with `npm run verify` before merging.
 
 **Plan status:** Security remediation cycle is complete on `main`

@@ -54,7 +54,7 @@ function FeatureCard({
     const featureName = formatFeatureName(feature.name)
 
     return (
-        <article className='bg-lucky-bg-secondary rounded-xl p-5 border border-lucky-border'>
+        <article className='bg-vaded-bg-secondary rounded-xl p-5 border border-vaded-border'>
             <div className='flex items-start justify-between gap-4'>
                 <div className='flex-1'>
                     <div className='flex items-center gap-2 mb-1'>
@@ -65,10 +65,10 @@ function FeatureCard({
                             className={cn(
                                 'text-xs',
                                 isGlobal && !readOnly
-                                    ? 'bg-lucky-purple/20 text-lucky-purple'
+                                    ? 'bg-vaded-purple/20 text-vaded-purple'
                                     : isGlobal
-                                      ? 'bg-lucky-bg-tertiary text-lucky-text-secondary'
-                                      : 'bg-lucky-blue/20 text-lucky-blue',
+                                      ? 'bg-vaded-bg-tertiary text-vaded-text-secondary'
+                                      : 'bg-vaded-blue/20 text-vaded-blue',
                             )}
                             aria-label={
                                 isGlobal
@@ -83,7 +83,7 @@ function FeatureCard({
                                   : 'Per-Server'}
                         </Badge>
                     </div>
-                    <p className='text-sm text-lucky-text-secondary'>
+                    <p className='text-sm text-vaded-text-secondary'>
                         {feature.description}
                     </p>
                 </div>
@@ -92,8 +92,8 @@ function FeatureCard({
                         className={cn(
                             'text-sm',
                             enabled
-                                ? 'text-lucky-success'
-                                : 'text-lucky-text-tertiary',
+                                ? 'text-vaded-success'
+                                : 'text-vaded-text-tertiary',
                         )}
                         aria-live='polite'
                     >

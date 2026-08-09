@@ -55,8 +55,8 @@ export default function ServerGrid() {
                                 className={cn(
                                     'px-4 py-1.5 rounded-lg transition-all duration-150 type-body-sm font-medium',
                                     filter === filterType
-                                        ? 'bg-lucky-brand text-white shadow-sm'
-                                        : 'bg-lucky-bg-secondary text-lucky-text-secondary border border-lucky-border hover:border-lucky-border-strong hover:text-lucky-text-primary',
+                                        ? 'bg-vaded-brand text-white shadow-sm'
+                                        : 'bg-vaded-bg-secondary text-vaded-text-secondary border border-vaded-border hover:border-vaded-border-strong hover:text-vaded-text-primary',
                                 )}
                                 aria-pressed={filter === filterType}
                             >
@@ -77,7 +77,7 @@ export default function ServerGrid() {
             </div>
             {filteredGuilds.length === 0 && (
                 <div
-                    className='type-body text-lucky-text-secondary text-center py-12'
+                    className='type-body text-vaded-text-secondary text-center py-12'
                     role='status'
                 >
                     No servers found matching the filter.

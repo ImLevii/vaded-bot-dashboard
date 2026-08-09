@@ -21,7 +21,7 @@ jest.mock('@lucky/shared/utils', () => ({
     computeNextOccurrence: computeNextOccurrenceMock,
     DEFAULT_TIMEZONE: 'America/Sao_Paulo',
 }))
-jest.mock('@lucky/shared/constants', () => ({ COLOR: { LUCKY_PURPLE: 0 } }))
+jest.mock('@lucky/shared/constants', () => ({ COLOR: { VADED_PURPLE: 0 } }))
 
 import { ReminderScheduler } from './reminderScheduler'
 

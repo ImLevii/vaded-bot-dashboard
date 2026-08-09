@@ -7,15 +7,15 @@
 
 ## Context
 
-Lucky's original goal was "more presence." The GitHub README is text/table-strong (positioning,
+Vaded Gaming's original goal was "more presence." The GitHub README is text/table-strong (positioning,
 badges, feature/comparison/command tables, quickstart) but has **zero product visuals** — a wall
 of text. The mascot + logo threads already closed (see
 `decisions/2026-07-12-brand-asset-regen-tooling.md`); this decides where presence effort goes next.
 
 **Verified in a real browser (the critic demanded this; a fetcher had returned 403/404):**
 
-- `https://lucky.lucassantana.tech` is **UP** and **genuinely polished** — dark theme, neon-cat
-  logo, hero + CTAs, a "What Lucky does" 6-card feature grid, "A real web dashboard" section,
+- `https://vaded.lucassantana.tech` is **UP** and **genuinely polished** — dark theme, neon-cat
+  logo, hero + CTAs, a "What Vaded Gaming does" 6-card feature grid, "A real web dashboard" section,
   a dev/self-host architecture-card section, Apache-2.0 footer. Fully public (no auth).
 - The top.gg listing **exists** at bot id `962198089161134131` (the `839686019796811776` ref that
   404'd is a **wrong/stale bot id**).
@@ -26,14 +26,14 @@ of text. The mascot + logo threads already closed (see
 
 **Ship visual proof from the polished PUBLIC LANDING, now, assistant-driven.** Concretely:
 
-1. Capture clean screenshots of the live landing (hero, "What Lucky does" grid, the
+1. Capture clean screenshots of the live landing (hero, "What Vaded Gaming does" grid, the
    dashboard/feature section) and add them to the README with short captions. No auth, no operator
    dependency, no design work.
    **Delivered scope (this PR):** shipped `assets/screenshots/landing-features.png` (the
    feature grid). The hero shot is deferred pending #1818 (landing still renders "Apache 2.0"
    while the project is ISC) so the README doesn't advertise the wrong license.
 2. Fix the two verified plumbing bugs (trivial, not a blocker): the README live-demo link
-   (`href="https://lucassantana.tech"` → `https://lucky.lucassantana.tech`) and the wrong top.gg
+   (`href="https://lucassantana.tech"` → `https://vaded.lucassantana.tech`) and the wrong top.gg
    bot id (`839686019796811776` → `962198089161134131`); add a top.gg badge/link.
 3. **Optional operator follow-up (not a blocker):** a real authed-dashboard screenshot or a short
    Loom, if wanted — the landing already _claims_ "a real web dashboard"; a real shot would _prove_
@@ -60,7 +60,7 @@ Framed honestly: this is **cheap, obvious polish** (empty README + polished land
   links fixed; the polished landing (already built, currently under-leveraged) starts working for
   the project. Reversible (README edit).
 - **Negative / risk:** landing-UI changes will stale the screenshots (low maintenance cost — re-snap).
-  Presence may not be Lucky's actual growth bottleneck (discovery/community could matter more) — so
+  Presence may not be Vaded Gaming's actual growth bottleneck (discovery/community could matter more) — so
   this is bounded polish, not a growth bet.
 - **Neutral:** authed-dashboard proof remains an open optional follow-up on the operator.
 

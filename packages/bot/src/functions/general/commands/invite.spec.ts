@@ -58,7 +58,7 @@ describe('/invite', () => {
         expect(embeds).toHaveLength(1)
         const embed = embeds![0]
 
-        expect(embed.title).toBe('🔗 Add Lucky to Your Server')
+        expect(embed.title).toBe('🔗 Add Vaded Gaming to Your Server')
         expect(typeof embed.description).toBe('string')
         expect(embed.description as string).toContain(
             'https://discord.com/oauth2/authorize?',

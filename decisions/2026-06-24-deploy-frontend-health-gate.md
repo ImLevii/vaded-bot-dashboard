@@ -1,4 +1,4 @@
-# Deploy: gate on lucky-frontend + verify the served dashboard SPA
+# Deploy: gate on vaded-frontend + verify the served dashboard SPA
 
 - Status: accepted
 - Date: 2026-06-24
@@ -11,17 +11,17 @@ workflow's `Validate deployed version` (backend SHA via `/api/health/version`),
 auth-config + OAuth-redirect smoke checks all passed, and the bot's `/version`
 reported v2.23.0 — yet the deploy was observably "not done" (the dashboard surface).
 
-Root cause: `scripts/deploy.sh` **pulls and starts** `lucky-frontend`
+Root cause: `scripts/deploy.sh` **pulls and starts** `vaded-frontend`
 (`docker compose pull/up … frontend …`) but **never verifies it**:
 
-- `require_running_containers()` listed `lucky-backend lucky-nginx lucky-postgres
-lucky-redis vaded-gaming-bot` — **`lucky-frontend` was absent**.
+- `require_running_containers()` listed `vaded-backend vaded-nginx vaded-postgres
+vaded-redis vaded-gaming-bot` — **`vaded-frontend` was absent**.
 - `run_health_checks()` only probed backend endpoints (`/api/health`,
   `/api/health/auth-config`) — **nothing checked the dashboard**.
 
-`lucky-frontend` is a long-running nginx (`Dockerfile` target `production-frontend`:
+`vaded-frontend` is a long-running nginx (`Dockerfile` target `production-frontend`:
 `CMD ["nginx","-g","daemon off;"]`, `restart: unless-stopped`) that serves the built
-SPA from its image; the main `lucky-nginx` reverse-proxies `/` to it. So a frontend
+SPA from its image; the main `vaded-nginx` reverse-proxies `/` to it. So a frontend
 that was down, crashed, or pulled a stale image would leave the dashboard broken
 (502 / old assets) while the deploy reported full success — and the deploy verifies
 only the bot + backend, neither of which reflects the frontend.
@@ -34,13 +34,13 @@ missing from `require_running_containers`" defect that
 
 In `scripts/deploy.sh`:
 
-1. Add `lucky-frontend` to `require_running_containers()` (safe: it's long-running
+1. Add `vaded-frontend` to `require_running_containers()` (safe: it's long-running
    with `restart: unless-stopped`, so requiring `State.Running` cannot false-fail a
    healthy deploy).
 2. Add an HTTP readiness check in `run_health_checks()` that fetches `http://nginx:8080/`
    (the dashboard, via the reverse proxy) and matches the React mount point
    `id="root"` — confirming the SPA actually renders end-to-end (main nginx →
-   lucky-frontend → index.html), not just that a container is up.
+   vaded-frontend → index.html), not just that a container is up.
 
 Both run before the success signal, so a broken frontend now fails health checks and
 triggers the existing auto-rollback path.

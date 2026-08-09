@@ -540,7 +540,7 @@ class GuildService {
         }
 
         const scopes = ['bot', 'applications.commands']
-        // Was a hardcoded '8' — Administrator. The dashboard's "add Lucky to
+        // Was a hardcoded '8' — Administrator. The dashboard's "add Vaded Gaming to
         // this server" flow asked every owner for full admin, contradicting
         // both the ADR and the public listings (#1923). Shares the curated set
         // with the landing page and the /invite redirect.

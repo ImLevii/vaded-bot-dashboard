@@ -32,7 +32,7 @@ export default function GlobalTogglesSection({
         <div className='space-y-4'>
             <div className='flex items-center gap-2 mb-4'>
                 <Globe
-                    className='w-5 h-5 text-lucky-purple'
+                    className='w-5 h-5 text-vaded-purple'
                     aria-hidden='true'
                 />
                 <h2
@@ -41,14 +41,14 @@ export default function GlobalTogglesSection({
                 >
                     Global Feature Toggles
                 </h2>
-                <Badge className='bg-lucky-purple/20 text-lucky-purple text-xs'>
+                <Badge className='bg-vaded-purple/20 text-vaded-purple text-xs'>
                     Admin Only
                 </Badge>
-                <Badge className='bg-lucky-bg-tertiary text-lucky-text-secondary text-xs'>
+                <Badge className='bg-vaded-bg-tertiary text-vaded-text-secondary text-xs'>
                     {providerLabel[provider]}
                 </Badge>
             </div>
-            <p className='text-sm text-lucky-text-secondary mb-4'>
+            <p className='text-sm text-vaded-text-secondary mb-4'>
                 {writable
                     ? 'Toggle features on or off globally. Changes take effect immediately for all servers.'
                     : 'These toggles are managed externally and cannot be changed here.'}

@@ -28,7 +28,7 @@ export default function PrivacyPolicyPage() {
             lastUpdated='March 18, 2026'
         >
             <p>
-                This policy explains how Lucky collects, uses, and protects data
+                This policy explains how Vaded Gaming collects, uses, and protects data
                 when you use the Discord bot and web dashboard.
             </p>
 
@@ -36,7 +36,7 @@ export default function PrivacyPolicyPage() {
             <p>
                 It applies to authentication, server configuration, moderation
                 features, music and integrations, and operational security. The
-                maintainers of the hosted Lucky instance act as the data
+                maintainers of the hosted Vaded Gaming instance act as the data
                 controller for that deployment. Self-hosted operators are
                 controllers for their own deployments.
             </p>
@@ -62,11 +62,11 @@ export default function PrivacyPolicyPage() {
                 dashboard features, and protect platform reliability and
                 security.
             </p>
-            <p>Lucky does not sell personal data.</p>
+            <p>Vaded Gaming does not sell personal data.</p>
 
             <h2 id='self-host'>Self-hosted instances</h2>
             <p>
-                Lucky is open source. If you run your own instance, the project
+                Vaded Gaming is open source. If you run your own instance, the project
                 maintainers do not receive any of your guild or user data — it
                 stays in your Postgres and Redis. This policy applies to the
                 hosted bot only; your self-hosted privacy terms are whatever you
@@ -75,7 +75,7 @@ export default function PrivacyPolicyPage() {
 
             <h2 id='third-party'>Third-party services</h2>
             <p>
-                Lucky depends on third-party platforms to function, including
+                Vaded Gaming depends on third-party platforms to function, including
                 Discord (identity and guild context), and optionally Last.fm,
                 Spotify, and Twitch when you enable those integrations. These
                 providers operate under their own terms and privacy policies.
@@ -84,7 +84,7 @@ export default function PrivacyPolicyPage() {
             <h2 id='retention'>Retention and deletion</h2>
             <p>
                 We retain data only as long as needed for operational, security,
-                and legal purposes. You can remove Lucky from your server and
+                and legal purposes. You can remove Vaded Gaming from your server and
                 disable integrations at any time. Requests to delete personal
                 data can be made through the support channel below.
             </p>
@@ -115,11 +115,11 @@ export default function PrivacyPolicyPage() {
             <p>
                 For privacy requests, open an issue at{' '}
                 <a
-                    href='https://github.com/LucasSantana-Dev/Lucky/issues'
+                    href='https://github.com/LucasSantana-Dev/vaded-gaming/issues'
                     target='_blank'
                     rel='noreferrer'
                 >
-                    github.com/LucasSantana-Dev/Lucky/issues
+                    github.com/LucasSantana-Dev/vaded-gaming/issues
                 </a>
                 .
             </p>

@@ -26,7 +26,7 @@ describe('VoteBadge', () => {
                 streak: 0,
                 nextVoteInSeconds: 3600,
                 tier: null,
-                nextTier: { label: 'Lucky Supporter', threshold: 1 },
+                nextTier: { label: 'Vaded Gaming Supporter', threshold: 1 },
                 voteUrl: 'https://top.gg/bot/abc/vote',
             },
         })
@@ -42,19 +42,19 @@ describe('VoteBadge', () => {
         expect(link).toHaveAttribute('rel', 'noreferrer')
         expect(link).toHaveAttribute(
             'title',
-            'Vote for Lucky on top.gg to unlock perks',
+            'Vote for Vaded Gaming on top.gg to unlock perks',
         )
         expect(screen.getByText('Vote')).toBeInTheDocument()
     })
 
-    test('renders tier badge when user has Lucky Supporter tier', () => {
+    test('renders tier badge when user has Vaded Gaming Supporter tier', () => {
         vi.mocked(useVoteStatus).mockReturnValue({
             status: {
                 hasVoted: true,
                 streak: 1,
                 nextVoteInSeconds: 0,
-                tier: { label: 'Lucky Supporter', threshold: 1 },
-                nextTier: { label: 'Lucky Fan', threshold: 7 },
+                tier: { label: 'Vaded Gaming Supporter', threshold: 1 },
+                nextTier: { label: 'Vaded Gaming Fan', threshold: 7 },
                 voteUrl: 'https://top.gg/bot/abc/vote',
             },
         })
@@ -63,7 +63,7 @@ describe('VoteBadge', () => {
 
         const link = screen.getByRole('link')
         expect(link).toBeInTheDocument()
-        expect(screen.getByText('Lucky Supporter')).toBeInTheDocument()
+        expect(screen.getByText('Vaded Gaming Supporter')).toBeInTheDocument()
         expect(screen.getByText('· 1')).toBeInTheDocument()
     })
 
@@ -73,8 +73,8 @@ describe('VoteBadge', () => {
                 hasVoted: true,
                 streak: 7,
                 nextVoteInSeconds: 0,
-                tier: { label: 'Lucky Fan', threshold: 7 },
-                nextTier: { label: 'Lucky Regular', threshold: 14 },
+                tier: { label: 'Vaded Gaming Fan', threshold: 7 },
+                nextTier: { label: 'Vaded Gaming Regular', threshold: 14 },
                 voteUrl: 'https://top.gg/bot/abc/vote',
             },
         })
@@ -84,7 +84,7 @@ describe('VoteBadge', () => {
         const link = screen.getByRole('link')
         expect(link).toHaveAttribute(
             'title',
-            'Lucky Fan — 7-vote streak. Click to vote again.',
+            'Vaded Gaming Fan — 7-vote streak. Click to vote again.',
         )
     })
 
@@ -103,8 +103,8 @@ describe('VoteBadge', () => {
         render(<VoteBadge />)
 
         const link = screen.getByRole('link')
-        // Should use 'Lucky Supporter' fallback styling
-        expect(link).toHaveClass('bg-lucky-bg-secondary')
+        // Should use 'Vaded Gaming Supporter' fallback styling
+        expect(link).toHaveClass('bg-vaded-bg-secondary')
         expect(screen.getByText('Unknown Tier')).toBeInTheDocument()
     })
 
@@ -114,8 +114,8 @@ describe('VoteBadge', () => {
                 hasVoted: true,
                 streak: 7,
                 nextVoteInSeconds: 0,
-                tier: { label: 'Lucky Fan', threshold: 7 },
-                nextTier: { label: 'Lucky Regular', threshold: 14 },
+                tier: { label: 'Vaded Gaming Fan', threshold: 7 },
+                nextTier: { label: 'Vaded Gaming Regular', threshold: 14 },
                 voteUrl: 'https://top.gg/bot/abc/vote',
             },
         })
@@ -123,7 +123,7 @@ describe('VoteBadge', () => {
         render(<VoteBadge />)
 
         const link = screen.getByRole('link')
-        expect(link).toHaveClass('lucky-focus-visible')
+        expect(link).toHaveClass('vaded-focus-visible')
         // The leading icon should be decorative (aria-hidden)
         expect(link.querySelector('svg')).toHaveAttribute('aria-hidden', 'true')
     })
@@ -135,7 +135,7 @@ describe('VoteBadge', () => {
                 streak: 0,
                 nextVoteInSeconds: 3600,
                 tier: null,
-                nextTier: { label: 'Lucky Supporter', threshold: 1 },
+                nextTier: { label: 'Vaded Gaming Supporter', threshold: 1 },
                 voteUrl: 'https://top.gg/bot/abc/vote',
             },
         })
@@ -143,7 +143,7 @@ describe('VoteBadge', () => {
         render(<VoteBadge />)
 
         const link = screen.getByRole('link')
-        expect(link).toHaveClass('lucky-focus-visible')
+        expect(link).toHaveClass('vaded-focus-visible')
         expect(link.querySelector('svg')).toHaveAttribute('aria-hidden', 'true')
     })
 
@@ -153,8 +153,8 @@ describe('VoteBadge', () => {
                 hasVoted: true,
                 streak: 7,
                 nextVoteInSeconds: 0,
-                tier: { label: 'Lucky Fan', threshold: 7 },
-                nextTier: { label: 'Lucky Regular', threshold: 14 },
+                tier: { label: 'Vaded Gaming Fan', threshold: 7 },
+                nextTier: { label: 'Vaded Gaming Regular', threshold: 14 },
                 voteUrl: 'https://top.gg/bot/abc/vote',
             },
         })

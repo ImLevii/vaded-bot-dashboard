@@ -439,9 +439,9 @@ export class WeeklyDigestService {
         newGuides: Array<{ title: string; link: string }>,
     ): EmbedBuilder {
         const embed = new EmbedBuilder()
-            .setColor(COLOR.LUCKY_PURPLE)
+            .setColor(COLOR.VADED_PURPLE)
             .setTitle(process.env.DIGEST_TITLE ?? '📅 Resumo da semana')
-            .setFooter({ text: process.env.DIGEST_FOOTER ?? 'lucky.bot' })
+            .setFooter({ text: process.env.DIGEST_FOOTER ?? 'vaded.bot' })
             .setTimestamp()
 
         // Member count field

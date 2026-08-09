@@ -13,7 +13,7 @@ const sentryPlugins: PluginOption[] = process.env.SENTRY_AUTH_TOKEN
   ? [
       sentryVitePlugin({
         org: process.env.SENTRY_ORG ?? 'lucas-santana-gm',
-        project: process.env.SENTRY_PROJECT ?? 'lucky',
+        project: process.env.SENTRY_PROJECT ?? 'vaded',
         authToken: process.env.SENTRY_AUTH_TOKEN,
         telemetry: false,
         release: {
@@ -75,7 +75,7 @@ export default defineConfig({
     visualizer({
       open: false,
       filename: 'dist/bundle-analysis.html',
-      title: 'Lucky Frontend Bundle Analysis',
+      title: 'Vaded Gaming Frontend Bundle Analysis',
     }),
   ],
   resolve: {

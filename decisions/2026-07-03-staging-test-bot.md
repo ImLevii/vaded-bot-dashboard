@@ -9,7 +9,7 @@ The staging stack (`docker-compose.staging.yml`) was deliberately **bot-less**:
 the dashboard reads guild data via Discord REST, so it needs no gateway bot, and
 "two bots cannot share one token."
 
-That left a gap. Lucky is mostly a **bot** — commands, message handlers,
+That left a gap. Vaded Gaming is mostly a **bot** — commands, message handlers,
 schedulers. None of it could be verified on a real guild before merge; only unit
 mocks. The gap bit when the destructive-interaction merge gate
 (`decisions/2026-06-21-destructive-interaction-merge-gate.md`) required a live
@@ -31,17 +31,17 @@ Add an **opt-in, test-only** bot service to the staging stack.
   `bot` in the build/up set only when `STAGING_DISCORD_TOKEN` is set in
   `.env.staging`. Merging this change with no token configured is a no-op — the
   stack does not crash-loop.
-- It shares the isolated `lucky-staging-postgres` / `lucky-staging` network, so
+- It shares the isolated `vaded-staging-postgres` / `vaded-staging` network, so
   its data never touches production.
 
 ## One-time setup (operator)
 
 1. Create a **new** Discord application + bot at
-   <https://discord.com/developers/applications> (e.g. "Lucky Staging").
+   <https://discord.com/developers/applications> (e.g. "Vaded Gaming Staging").
 2. Create or pick a **test guild** and invite the new bot to it (needs the
    permissions the feature under test uses, e.g. Manage Messages for cleanup).
 3. On the homelab, add the token to the staging env file
-   (`/home/luk-server/lucky-staging/.env.staging`):
+   (`/home/luk-server/vaded-staging/.env.staging`):
    `STAGING_DISCORD_TOKEN=<the test app's token>`
 4. Re-deploy staging (label a PR `staging`, or run the deploy script). The bot
    now comes up automatically.

@@ -28,9 +28,9 @@ const MODE_LABELS: Record<AccessMode, string> = {
 }
 
 const MODE_COLORS: Record<AccessMode, string> = {
-    none: 'text-lucky-text-tertiary border-lucky-border bg-transparent',
+    none: 'text-vaded-text-tertiary border-vaded-border bg-transparent',
     view: 'text-blue-400 border-blue-500/30 bg-blue-500/10',
-    manage: 'text-lucky-brand border-lucky-brand/30 bg-lucky-brand/10',
+    manage: 'text-vaded-brand border-vaded-brand/30 bg-vaded-brand/10',
 }
 
 function roleColor(color: number): string {
@@ -91,9 +91,9 @@ function MemberRow({
     const hasCustomGrants = member.userGrants.length > 0
 
     return (
-        <div className='border border-lucky-border rounded-lg overflow-hidden'>
+        <div className='border border-vaded-border rounded-lg overflow-hidden'>
             <button
-                className='w-full flex items-center gap-3 p-3 sm:p-4 hover:bg-lucky-bg-active/30 transition-colors text-left'
+                className='w-full flex items-center gap-3 p-3 sm:p-4 hover:bg-vaded-bg-active/30 transition-colors text-left'
                 onClick={() => setExpanded((e) => !e)}
                 aria-expanded={expanded}
             >
@@ -105,7 +105,7 @@ function MemberRow({
                         className='h-9 w-9 rounded-full object-cover shrink-0'
                     />
                 ) : (
-                    <div className='h-9 w-9 rounded-full bg-lucky-brand/20 text-lucky-brand flex items-center justify-center text-sm font-bold shrink-0'>
+                    <div className='h-9 w-9 rounded-full bg-vaded-brand/20 text-vaded-brand flex items-center justify-center text-sm font-bold shrink-0'>
                         {avatarFallback(member.displayName)}
                     </div>
                 )}
@@ -113,16 +113,16 @@ function MemberRow({
                 {/* Name + roles */}
                 <div className='flex-1 min-w-0'>
                     <div className='flex items-center gap-2'>
-                        <p className='type-body font-semibold text-lucky-text-primary truncate'>
+                        <p className='type-body font-semibold text-vaded-text-primary truncate'>
                             {member.displayName}
                         </p>
                         {member.displayName !== member.username && (
-                            <span className='type-meta text-lucky-text-tertiary truncate'>
+                            <span className='type-meta text-vaded-text-tertiary truncate'>
                                 @{member.username}
                             </span>
                         )}
                         {hasCustomGrants && (
-                            <span className='inline-flex items-center gap-1 rounded-full bg-lucky-brand/15 border border-lucky-brand/25 px-2 py-0.5 text-[10px] font-bold text-lucky-brand shrink-0'>
+                            <span className='inline-flex items-center gap-1 rounded-full bg-vaded-brand/15 border border-vaded-brand/25 px-2 py-0.5 text-[10px] font-bold text-vaded-brand shrink-0'>
                                 <Shield className='h-2.5 w-2.5' />
                                 Custom
                             </span>
@@ -145,7 +145,7 @@ function MemberRow({
                                 </span>
                             ))}
                             {member.roles.length > 4 && (
-                                <span className='type-meta text-lucky-text-tertiary'>
+                                <span className='type-meta text-vaded-text-tertiary'>
                                     +{member.roles.length - 4}
                                 </span>
                             )}
@@ -154,15 +154,15 @@ function MemberRow({
                 </div>
 
                 {expanded ? (
-                    <ChevronUp className='h-4 w-4 text-lucky-text-tertiary shrink-0' />
+                    <ChevronUp className='h-4 w-4 text-vaded-text-tertiary shrink-0' />
                 ) : (
-                    <ChevronDown className='h-4 w-4 text-lucky-text-tertiary shrink-0' />
+                    <ChevronDown className='h-4 w-4 text-vaded-text-tertiary shrink-0' />
                 )}
             </button>
 
             {expanded && (
-                <div className='border-t border-lucky-border p-3 sm:p-4 space-y-3 bg-lucky-bg-secondary/40'>
-                    <p className='type-meta text-lucky-text-tertiary'>
+                <div className='border-t border-vaded-border p-3 sm:p-4 space-y-3 bg-vaded-bg-secondary/40'>
+                    <p className='type-meta text-vaded-text-tertiary'>
                         Individual permission overrides — these take precedence over role-based access.
                         Set a module to "No access" to use default role permissions.
                     </p>
@@ -170,7 +170,7 @@ function MemberRow({
                     <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2'>
                         {RBAC_MODULES.map((mod) => (
                             <div key={mod} className='flex flex-col gap-1'>
-                                <span className='type-meta font-semibold text-lucky-text-secondary uppercase tracking-wide text-[10px]'>
+                                <span className='type-meta font-semibold text-vaded-text-secondary uppercase tracking-wide text-[10px]'>
                                     {MODULE_LABELS[mod]}
                                 </span>
                                 <div className='flex gap-1'>
@@ -182,7 +182,7 @@ function MemberRow({
                                                 'flex-1 px-2 py-1.5 rounded border text-[11px] font-medium transition-all',
                                                 grants[mod] === mode
                                                     ? MODE_COLORS[mode]
-                                                    : 'text-lucky-text-tertiary border-lucky-border/50 bg-transparent hover:border-lucky-border hover:text-lucky-text-secondary',
+                                                    : 'text-vaded-text-tertiary border-vaded-border/50 bg-transparent hover:border-vaded-border hover:text-vaded-text-secondary',
                                             )}
                                         >
                                             {mode === 'none' ? 'Default' : MODE_LABELS[mode]}
@@ -202,7 +202,7 @@ function MemberRow({
                                 setGrants(reset)
                                 setDirty(true)
                             }}
-                            className='type-body-sm text-lucky-text-tertiary hover:text-red-400 transition-colors flex items-center gap-1'
+                            className='type-body-sm text-vaded-text-tertiary hover:text-red-400 transition-colors flex items-center gap-1'
                         >
                             <X className='h-3.5 w-3.5' />
                             Clear all overrides
@@ -260,13 +260,13 @@ export default function MembersPage() {
     return (
         <div className='space-y-6'>
             <header>
-                <p className='type-meta text-lucky-text-tertiary uppercase tracking-widest mb-1'>
+                <p className='type-meta text-vaded-text-tertiary uppercase tracking-widest mb-1'>
                     Settings
                 </p>
-                <h1 className='type-h1 text-lucky-text-primary'>Members</h1>
-                <p className='type-body text-lucky-text-secondary mt-1'>
+                <h1 className='type-h1 text-vaded-text-primary'>Members</h1>
+                <p className='type-body text-vaded-text-secondary mt-1'>
                     Configure individual dashboard permissions for members of{' '}
-                    <span className='text-lucky-text-primary font-semibold'>
+                    <span className='text-vaded-text-primary font-semibold'>
                         {selectedGuild.name}
                     </span>
                     .
@@ -274,22 +274,22 @@ export default function MembersPage() {
             </header>
 
             <div className='relative'>
-                <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-lucky-text-tertiary pointer-events-none' />
+                <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-vaded-text-tertiary pointer-events-none' />
                 <input
                     type='search'
                     placeholder='Search members…'
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className='w-full pl-9 pr-4 h-10 rounded-lg border border-lucky-border bg-lucky-bg-secondary text-lucky-text-primary placeholder:text-lucky-text-tertiary focus:outline-none focus:ring-2 focus:ring-lucky-brand/40 focus:border-lucky-brand/60 transition-colors type-body-sm'
+                    className='w-full pl-9 pr-4 h-10 rounded-lg border border-vaded-border bg-vaded-bg-secondary text-vaded-text-primary placeholder:text-vaded-text-tertiary focus:outline-none focus:ring-2 focus:ring-vaded-brand/40 focus:border-vaded-brand/60 transition-colors type-body-sm'
                 />
             </div>
 
             <div className='flex items-center justify-between'>
-                <p className='type-meta text-lucky-text-tertiary'>
+                <p className='type-meta text-vaded-text-tertiary'>
                     {isLoading ? 'Loading…' : `${filtered.length} member${filtered.length !== 1 ? 's' : ''}`}
                 </p>
                 {filtered.some((m) => m.userGrants.length > 0) && (
-                    <span className='type-meta text-lucky-brand flex items-center gap-1'>
+                    <span className='type-meta text-vaded-brand flex items-center gap-1'>
                         <Shield className='h-3 w-3' />
                         Custom overrides active
                     </span>
@@ -299,7 +299,7 @@ export default function MembersPage() {
             {isLoading ? (
                 <div className='space-y-2'>
                     {Array.from({ length: 6 }).map((_, i) => (
-                        <div key={i} className='flex items-center gap-3 p-4 border border-lucky-border rounded-lg'>
+                        <div key={i} className='flex items-center gap-3 p-4 border border-vaded-border rounded-lg'>
                             <Skeleton className='h-9 w-9 rounded-full shrink-0' />
                             <div className='flex-1 space-y-2'>
                                 <Skeleton className='h-4 w-32' />

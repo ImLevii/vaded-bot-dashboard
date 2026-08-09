@@ -138,7 +138,7 @@ This ADR fixes both: AutoMessages joins the rest of the system's `allowProtected
     - ≥2 support tickets per quarter about "my welcome message disappeared after a manifest update" where the operator did not intend to disable. Investigate: was `allowProtected: true` set unintentionally?
     - Operator UX research shows the `allowProtected: true` runtype is being triggered without operator understanding (e.g. a default scheduled reconcile uses it).
 - **Any of the 6 remaining executors discover that `protected: boolean` per op is the wrong granularity.** Plausible: an executor with both per-op and module-level protection (e.g. "this whole module is destructive, gate at module level not per op"). Would shift back toward `shouldApplyModule`-style module-level gating.
-- **Lucky redesigns the manifest schema to use explicit `null` for "delete" vs `undefined` for "preserve".** Would deprecate this ADR's "absence = disable under protected" mapping in favor of explicit operator intent.
+- **Vaded Gaming redesigns the manifest schema to use explicit `null` for "delete" vs `undefined` for "preserve".** Would deprecate this ADR's "absence = disable under protected" mapping in favor of explicit operator intent.
 - **A new manifest module type emerges where "absent = preserve" is genuinely required regardless of `allowProtected`** (e.g. operator-authored content that must never be auto-disabled). Would require a per-module opt-out from the convention.
 
 ## Cross-references

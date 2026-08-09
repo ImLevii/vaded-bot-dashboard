@@ -2,7 +2,7 @@
 
 ## Context
 
-The Lucky Discord bot uses `discord-player-youtubei` (currently pinned to `3.0.0-beta.4` — use exact version, not `^3.0.0-beta.4`) as the primary YouTube audio extractor for music playback. This is a **beta release** — it can break silently when YouTube changes its API or client detection mechanisms.
+The Vaded Gaming Discord bot uses `discord-player-youtubei` (currently pinned to `3.0.0-beta.4` — use exact version, not `^3.0.0-beta.4`) as the primary YouTube audio extractor for music playback. This is a **beta release** — it can break silently when YouTube changes its API or client detection mechanisms.
 
 A stable release of `discord-player-youtubei` does not yet exist. Until one is available, the bot must:
 

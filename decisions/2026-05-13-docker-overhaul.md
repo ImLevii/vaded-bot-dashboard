@@ -7,7 +7,7 @@
 
 ## Context
 
-The Lucky container surface accumulated friction:
+The Vaded Gaming container surface accumulated friction:
 
 - `0eb13d0f` (PR #846) reverted the frontend image to `node:22-alpine`, signalling
   Docker drift between dev and prod was already biting.
@@ -61,7 +61,7 @@ Single PR (`chore/docker-overhaul`) ships eight focused commits:
 
 **Negative / Required follow-ups**
 
-- The homelab `cloudflared/config-lucky.yml` ingress entry must be edited
+- The homelab `cloudflared/config-vaded.yml` ingress entry must be edited
   from `http://nginx:80` to `http://nginx:8080` BEFORE merging this PR.
 - `env_file: .env` introduces a precedence layer; verified explicit
   `environment:` still wins, so behavior is preserved.
@@ -87,5 +87,5 @@ Single PR (`chore/docker-overhaul`) ships eight focused commits:
 ## References
 
 - PR #846 (`fix(docker): revert frontend image to node:22-alpine`)
-- Audit memory: `audit_deep_lucky_2026-05-13`
+- Audit memory: `audit_deep_vaded_2026-05-13`
 - TBD policy memory: `feedback_tbd_release_branches`

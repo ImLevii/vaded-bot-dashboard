@@ -7,7 +7,7 @@
 
 ## Context
 
-Lucky runs **one Discord bot token, unsharded** (11 guilds). Discord permits only **one gateway IDENTIFY per token+shard**. Two `vaded-gaming-bot` containers on the same token cannot both be live; the second IDENTIFY force-disconnects the first. This makes classic true blue/green impossible for the bot.
+Vaded Gaming runs **one Discord bot token, unsharded** (11 guilds). Discord permits only **one gateway IDENTIFY per token+shard**. Two `vaded-gaming-bot` containers on the same token cannot both be live; the second IDENTIFY force-disconnects the first. This makes classic true blue/green impossible for the bot.
 
 **Current state:** Single-color deploy: `docker compose up -d` recreates changed containers → ~30s–1m downtime per container (backend/frontend both affected if both ship a change, because they're brought up serially). The bot, backend, and frontend share the same Postgres and are deployed together, so the entire stack is unavailable if any component redeploys.
 
@@ -109,10 +109,10 @@ The first production deploy shipping this change failed twice and auto-rolled ba
 Validation rule that follows: `nginx -t` against the real base image with the real files must pass before merge for any nginx config change. This was added to the blue/green test plan after the fact; it would have caught both failures pre-merge. The executable gate, run from the repo root against the PR tree:
 
 ```sh
-docker build -f Dockerfile.nginx -t lucky-nginx:pr . && docker run --rm lucky-nginx:pr nginx -t
+docker build -f Dockerfile.nginx -t vaded-nginx:pr . && docker run --rm vaded-nginx:pr nginx -t
 ```
 
-Wired into CI: the `docker-build` nginx leg in `.github/workflows/ci.yml` loads the image and runs `docker run --rm lucky-nginx:ci nginx -t`, and `Build — Docker images` (a required check) fails if it does not pass.
+Wired into CI: the `docker-build` nginx leg in `.github/workflows/ci.yml` loads the image and runs `docker run --rm vaded-nginx:ci nginx -t`, and `Build — Docker images` (a required check) fails if it does not pass.
 
 ## Revisit when
 

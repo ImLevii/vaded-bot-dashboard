@@ -91,7 +91,7 @@ function buildEmbed(
     return new EmbedBuilder()
         .setDescription(phrase)
         .setImage(pickGif(action, seed))
-        .setColor(COLOR.LUCKY_PURPLE)
+        .setColor(COLOR.VADED_PURPLE)
 }
 
 export default new Command({

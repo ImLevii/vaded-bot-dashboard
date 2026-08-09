@@ -25,11 +25,11 @@ done
 
 verify_local() {
   cd "$repo_root"
-  node --check .opencode/plugins/lucky-policy-lib.mjs
-  node --check .opencode/plugins/lucky-policy.mjs
-  node --check .opencode/plugins/lucky-context.mjs
-  node --check .opencode/plugins/lucky-doc-reminders.mjs
-  node --test .opencode/tests/lucky-policy.test.mjs
+  node --check .opencode/plugins/vaded-policy-lib.mjs
+  node --check .opencode/plugins/vaded-policy.mjs
+  node --check .opencode/plugins/vaded-context.mjs
+  node --check .opencode/plugins/vaded-doc-reminders.mjs
+  node --test .opencode/tests/vaded-policy.test.mjs
   opencode debug config >/dev/null
   opencode debug skill >/dev/null
   opencode mcp list >/dev/null
@@ -37,7 +37,7 @@ verify_local() {
 }
 
 verify_remote() {
-  local remote_dir="${OPENCODE_REMOTE_DIR:-/home/luk-server/Lucky}"
+  local remote_dir="${OPENCODE_REMOTE_DIR:-/home/luk-server/vaded-gaming}"
   ssh "$remote_host" "cd '$remote_dir' && ~/.opencode/bin/opencode debug config >/dev/null && ~/.opencode/bin/opencode debug skill >/dev/null && ~/.opencode/bin/opencode mcp list >/dev/null && ~/.opencode/bin/opencode run --format json 'Say only OK' >/dev/null"
 }
 

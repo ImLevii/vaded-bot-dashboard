@@ -30,23 +30,23 @@ export default function AdminPage() {
 
     if (!isAuthenticated) {
         return (
-            <main className='flex flex-col items-center justify-center min-h-[64vh] gap-8 bg-lucky-bg-primary px-4'>
+            <main className='flex flex-col items-center justify-center min-h-[64vh] gap-8 bg-vaded-bg-primary px-4'>
                 <div className='flex flex-col items-center gap-4 text-center max-w-sm'>
-                    <div className='p-3 rounded-lg bg-lucky-surface-elevated'>
+                    <div className='p-3 rounded-lg bg-vaded-surface-elevated'>
                         <ShieldCheck
-                            className='w-8 h-8 text-lucky-brand'
+                            className='w-8 h-8 text-vaded-brand'
                             aria-hidden='true'
                         />
                     </div>
                     <div className='space-y-2'>
                         <h1
-                            className='text-xl font-semibold text-lucky-text-primary'
+                            className='text-xl font-semibold text-vaded-text-primary'
                             style={{ fontFamily: 'Sora' }}
                         >
                             {t('admin.adminPanel')}
                         </h1>
                         <p
-                            className='text-sm text-lucky-text-secondary'
+                            className='text-sm text-vaded-text-secondary'
                             style={{ fontFamily: 'Manrope' }}
                         >
                             {t('admin.signInWithDiscord')}
@@ -62,23 +62,23 @@ export default function AdminPage() {
 
     if (!isDeveloper) {
         return (
-            <main className='flex flex-col items-center justify-center min-h-[64vh] gap-6 bg-lucky-bg-primary px-4'>
+            <main className='flex flex-col items-center justify-center min-h-[64vh] gap-6 bg-vaded-bg-primary px-4'>
                 <div className='flex flex-col items-center gap-4 text-center max-w-sm'>
-                    <div className='p-3 rounded-lg bg-lucky-surface-elevated'>
+                    <div className='p-3 rounded-lg bg-vaded-surface-elevated'>
                         <ShieldCheck
-                            className='w-8 h-8 text-lucky-error'
+                            className='w-8 h-8 text-vaded-error'
                             aria-hidden='true'
                         />
                     </div>
                     <div className='space-y-2'>
                         <h1
-                            className='text-xl font-semibold text-lucky-text-primary'
+                            className='text-xl font-semibold text-vaded-text-primary'
                             style={{ fontFamily: 'Sora' }}
                         >
                             {t('admin.accessDenied')}
                         </h1>
                         <p
-                            className='text-sm text-lucky-text-secondary'
+                            className='text-sm text-vaded-text-secondary'
                             style={{ fontFamily: 'Manrope' }}
                         >
                             {t('admin.accessDeniedDesc')}
@@ -91,7 +91,7 @@ export default function AdminPage() {
 
     if (isLoading) {
         return (
-            <main className='p-4 md:p-6 bg-lucky-bg-primary space-y-6 min-h-screen'>
+            <main className='p-4 md:p-6 bg-vaded-bg-primary space-y-6 min-h-screen'>
                 <div className='space-y-4'>
                     <Skeleton className='h-8 w-48' />
                     <div className='space-y-3'>
@@ -105,17 +105,17 @@ export default function AdminPage() {
     }
 
     return (
-        <main className='bg-lucky-bg-primary min-h-screen'>
+        <main className='bg-vaded-bg-primary min-h-screen'>
             {/* Header — compact, density-first */}
-            <header className='border-b border-lucky-border bg-lucky-surface-sidebar px-4 md:px-6 py-4'>
+            <header className='border-b border-vaded-border bg-vaded-surface-sidebar px-4 md:px-6 py-4'>
                 <div className='flex items-center justify-between gap-3'>
                     <div className='flex items-center gap-3'>
                         <ShieldCheck
-                            className='w-6 h-6 text-lucky-brand flex-shrink-0'
+                            className='w-6 h-6 text-vaded-brand flex-shrink-0'
                             aria-hidden='true'
                         />
                         <h1
-                            className='text-lg font-semibold text-lucky-text-primary'
+                            className='text-lg font-semibold text-vaded-text-primary'
                             style={{ fontFamily: 'Sora' }}
                         >
                             {t('admin.adminPanel')}
@@ -126,7 +126,7 @@ export default function AdminPage() {
                             variant='ghost'
                             size='sm'
                             onClick={retryLoad}
-                            className='text-lucky-text-secondary hover:text-lucky-text-primary'
+                            className='text-vaded-text-secondary hover:text-vaded-text-primary'
                             aria-label='Retry loading features'
                         >
                             <RotateCcw className='w-4 h-4' />
@@ -152,13 +152,13 @@ export default function AdminPage() {
                     <div className='space-y-1'>
                         <h2
                             id='global-toggles-heading'
-                            className='text-base font-semibold text-lucky-text-primary uppercase tracking-wide'
+                            className='text-base font-semibold text-vaded-text-primary uppercase tracking-wide'
                             style={{ fontFamily: 'Sora' }}
                         >
                             {t('admin.globalFeatureToggles')}
                         </h2>
                         <p
-                            className='text-xs text-lucky-text-tertiary'
+                            className='text-xs text-vaded-text-tertiary'
                             style={{ fontFamily: 'Manrope' }}
                         >
                             {t('admin.manageFeatureFlags')}
@@ -180,13 +180,13 @@ export default function AdminPage() {
                     <div className='space-y-1'>
                         <h2
                             id='bot-guilds-heading'
-                            className='text-base font-semibold text-lucky-text-primary uppercase tracking-wide'
+                            className='text-base font-semibold text-vaded-text-primary uppercase tracking-wide'
                             style={{ fontFamily: 'Sora' }}
                         >
                             {t('admin.serverManagement')}
                         </h2>
                         <p
-                            className='text-xs text-lucky-text-tertiary'
+                            className='text-xs text-vaded-text-tertiary'
                             style={{ fontFamily: 'Manrope' }}
                         >
                             {t('admin.viewAndManageBotActivity')}

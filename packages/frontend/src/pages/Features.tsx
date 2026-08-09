@@ -15,7 +15,7 @@ export default function FeaturesPage() {
         retryLoad,
     } = useFeatures()
     usePageMetadata({
-        title: 'Features - Lucky',
+        title: 'Features - Vaded Gaming',
         description: 'View available bot features and their current status',
     })
 
@@ -35,8 +35,8 @@ export default function FeaturesPage() {
     return (
         <main className='p-4 md:p-6 space-y-8'>
             <header className='flex items-center gap-3'>
-                <Shield className='w-7 h-7 text-lucky-red' aria-hidden='true' />
-                <h1 className='type-h1 text-lucky-text-primary'>Features</h1>
+                <Shield className='w-7 h-7 text-vaded-red' aria-hidden='true' />
+                <h1 className='type-h1 text-vaded-text-primary'>Features</h1>
             </header>
 
             {loadError && <FeatureErrorBanner loadError={loadError} retryLoad={retryLoad} />}
@@ -45,7 +45,7 @@ export default function FeaturesPage() {
                 <h2 className='text-lg font-semibold text-white mb-2'>
                     Available Features
                 </h2>
-                <p className='text-sm text-lucky-text-secondary mb-6'>
+                <p className='text-sm text-vaded-text-secondary mb-6'>
                     Features currently available on this bot. Contact an admin if a
                     feature you need is disabled.
                 </p>

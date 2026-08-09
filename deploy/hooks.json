@@ -1,8 +1,8 @@
 [
     {
         "id": "deploy",
-        "execute-command": "/home/luk-server/Lucky/scripts/deploy-wrapper.sh",
-        "command-working-directory": "/home/luk-server/Lucky",
+        "execute-command": "/home/luk-server/vaded-gaming/scripts/deploy-wrapper.sh",
+        "command-working-directory": "/home/luk-server/Vaded Gaming",
         "response-message": "Deploy triggered",
         "include-command-output-in-response": true,
         "include-command-output-in-response-on-error": true,
@@ -13,8 +13,8 @@
     },
     {
         "id": "deploy-staging",
-        "execute-command": "/home/luk-server/Lucky/scripts/deploy-staging-wrapper.sh",
-        "command-working-directory": "/home/luk-server/Lucky",
+        "execute-command": "/home/luk-server/vaded-gaming/scripts/deploy-staging-wrapper.sh",
+        "command-working-directory": "/home/luk-server/Vaded Gaming",
         "response-message": "Staging deploy triggered",
         "include-command-output-in-response": true,
         "include-command-output-in-response-on-error": true,

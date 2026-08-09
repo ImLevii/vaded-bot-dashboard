@@ -6,16 +6,16 @@
 
 ## Context
 
-"How do we get more users?" for Lucky (a single-operator, self-hosted homelab Discord
+"How do we get more users?" for Vaded Gaming (a single-operator, self-hosted homelab Discord
 music bot; public GitHub repo; YouTube/SoundCloud playback; autoplay; web dashboard).
-Lucky already ships a top.gg vote-rewards command (so it is already listed on top.gg)
+Vaded Gaming already ships a top.gg vote-rewards command (so it is already listed on top.gg)
 and a landing page with build-time SEO prerender, and just gained `/invite` + an
 "Add to Discord" CTA + guild join/leave telemetry (#1494/#1495).
 
 Acquisition channels evaluated (Phase 1 research, current-2026, web-verified where
 possible; precise figures treated as soft):
 
-- **top.gg** — dominant bot directory, #1 SERP for "discord music bot"; Lucky already
+- **top.gg** — dominant bot directory, #1 SERP for "discord music bot"; Vaded Gaming already
   listed. Lever = ranking (votes) + breadth. Low–med effort.
 - **BotBlock multi-directory sync** — one API pushes guild-count to ~16 directories
   (discordbotlist, discord.bots.gg, …). Low effort, parallel to top.gg. Secondary
@@ -50,7 +50,7 @@ behind a cheap measurement sprint first** (the decision-critic's revision — av
 3. **Phase 2 — directories (primary acquisition).** Climb top.gg (votes) + add **BotBlock**
    sync, but **dry-run on 2–3 directories before the full 16** (sync-desync /
    stale-guild-count is a reputation risk for a single operator). Parallelizable.
-4. **Phase 3 — Discord App Directory.** Pursue the verification work only once Lucky
+4. **Phase 3 — Discord App Directory.** Pursue the verification work only once Vaded Gaming
    clears the server/user threshold; sequence after directory-driven growth.
 5. **Phase 4 — SEO.** Slow niche play (low-difficulty technical keywords) on the existing
    landing/prerender over months; not a near-term lever.
@@ -64,7 +64,7 @@ total join-rate + before/after correlation when a listing changes.
 
 - **SEO-first** — rejected: 6–18 month time-to-rank, new-domain sandbox, aggregator SERP
   moat. Not a near-term lever.
-- **App-Directory-first** — rejected: gated behind a verification threshold Lucky must
+- **App-Directory-first** — rejected: gated behind a verification threshold Vaded Gaming must
   reach via other channels first.
 - **Acquisition-first (skip the measurement gate), reliability later** — rejected: if
   playback is the leak, acquisition pours into a leaky bucket. But see the gate — we do
@@ -97,7 +97,7 @@ total join-rate + before/after correlation when a listing changes.
 - **App Directory threshold reached** (server/user bar) → start the verification work.
 - **Operator capacity changes** (second maintainer, or <10 h/week) → re-scope the
   parallel work; a solo operator at capacity should hold stability over new channels.
-- **YouTube enforcement escalates** or Lucky approaches large scale (≫ thousands of
+- **YouTube enforcement escalates** or Vaded Gaming approaches large scale (≫ thousands of
   servers) → licensing becomes a hard gate; revisit before scaling.
 - **top.gg referral traffic proves marginal** (data shows ranking ≠ install lift) →
   shift weight to App Directory / SEO.

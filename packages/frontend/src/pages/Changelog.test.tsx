@@ -45,7 +45,7 @@ describe('Changelog', () => {
         expect(prLinks[0]).toHaveAttribute(
             'href',
             expect.stringMatching(
-                /^https:\/\/github\.com\/LucasSantana-Dev\/Lucky\/pull\/\d+$/,
+                /^https:\/\/github\.com\/LucasSantana-Dev\/vaded-gaming\/pull\/\d+$/,
             ),
         )
     })

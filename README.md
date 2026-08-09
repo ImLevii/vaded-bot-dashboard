@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source srcset="assets/lucky-social-preview.webp" type="image/webp" />
-    <img src="assets/lucky-social-preview.png" alt="Lucky — Verified Discord Bot" width="720" />
+    <source srcset="assets/vaded-social-preview.webp" type="image/webp" />
+    <img src="assets/vaded-social-preview.png" alt="Vaded Gaming — Verified Discord Bot" width="720" />
   </picture>
 </p>
 
@@ -11,16 +11,16 @@
 </p>
 
 <p align="center">
-  <a href="https://lucky.lucassantana.tech/invite?utm_source=github&utm_medium=readme&utm_campaign=readme-badge"><strong>→ Invite Lucky to Your Server</strong></a> · 
-  <a href="https://lucky.lucassantana.tech"><strong>Dashboard</strong></a> · 
+  <a href="https://vaded.lucassantana.tech/invite?utm_source=github&utm_medium=readme&utm_campaign=readme-badge"><strong>→ Invite Vaded Gaming to Your Server</strong></a> · 
+  <a href="https://vaded.lucassantana.tech"><strong>Dashboard</strong></a> · 
   <a href="./docs/ARCHITECTURE.md"><strong>Architecture</strong></a> · 
   <a href="./CHANGELOG.md"><strong>Changelog</strong></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/LucasSantana-Dev/Lucky/actions/workflows/ci.yml"><img src="https://github.com/LucasSantana-Dev/Lucky/actions/workflows/ci.yml/badge.svg" alt="CI Status" /></a>
-  <a href="https://lucky.lucassantana.tech/invite?utm_source=github&utm_medium=readme&utm_campaign=readme-badge"><img src="https://img.shields.io/badge/Invite-Lucky%20Bot-5865F2?logo=discord&logoColor=white" alt="Invite Lucky" /></a>
-  <a href="https://top.gg/bot/962198089161134131"><img src="https://img.shields.io/badge/top.gg-Lucky-FF3366?logo=topdotgg&logoColor=white" alt="Lucky on top.gg" /></a>
+  <a href="https://github.com/LucasSantana-Dev/vaded-gaming/actions/workflows/ci.yml"><img src="https://github.com/LucasSantana-Dev/vaded-gaming/actions/workflows/ci.yml/badge.svg" alt="CI Status" /></a>
+  <a href="https://vaded.lucassantana.tech/invite?utm_source=github&utm_medium=readme&utm_campaign=readme-badge"><img src="https://img.shields.io/badge/Invite-Vaded Gaming%20Bot-5865F2?logo=discord&logoColor=white" alt="Invite Vaded Gaming" /></a>
+  <a href="https://top.gg/bot/962198089161134131"><img src="https://img.shields.io/badge/top.gg-Vaded Gaming-FF3366?logo=topdotgg&logoColor=white" alt="Vaded Gaming on top.gg" /></a>
   <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-24.x-green.svg" alt="Node.js 24" /></a>
   <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.9-blue.svg" alt="TypeScript 5.9" /></a>
   <a href="https://discord.js.org/"><img src="https://img.shields.io/badge/Discord.js-14-purple.svg" alt="Discord.js 14" /></a>
@@ -29,22 +29,22 @@
 
 ---
 
-## 🎯 What is Lucky?
+## 🎯 What is Vaded Gaming?
 
-Lucky is a **production-grade, self-hosted Discord music bot** — built as a TypeScript monorepo with a React 19 dashboard, full moderation suite, and a leveling system. Supports **YouTube, Spotify, and SoundCloud** with smart autoplay powered by listening history recommendations.
+Vaded Gaming is a **production-grade, self-hosted Discord music bot** — built as a TypeScript monorepo with a React 19 dashboard, full moderation suite, and a leveling system. Supports **YouTube, Spotify, and SoundCloud** with smart autoplay powered by listening history recommendations.
 
-Unlike Groovy, Rythm, or Hydra (all shut down by third-party enforcement), Lucky can't be taken offline because **you host it.** Every feature is included — no paywall, no premium tier.
+Unlike Groovy, Rythm, or Hydra (all shut down by third-party enforcement), Vaded Gaming can't be taken offline because **you host it.** Every feature is included — no paywall, no premium tier.
 
-- **Live demo**: [lucky.lucassantana.tech](https://lucky.lucassantana.tech)  
-- **Invite to your server**: [Add Lucky now](https://lucky.lucassantana.tech/invite?utm_source=github&utm_medium=readme&utm_campaign=readme-badge)
+- **Live demo**: [vaded.lucassantana.tech](https://vaded.lucassantana.tech)  
+- **Invite to your server**: [Add Vaded Gaming now](https://vaded.lucassantana.tech/invite?utm_source=github&utm_medium=readme&utm_campaign=readme-badge)
 
 ---
 
 ## ✨ Features
 
 <p align="center">
-  <a href="https://lucky.lucassantana.tech"><img src="assets/screenshots/landing-features.png" alt="What Lucky does — feature overview" width="820" /></a>
-  <br /><sub><i>Everything most servers need, in one bot — <a href="https://lucky.lucassantana.tech">see it live</a>.</i></sub>
+  <a href="https://vaded.lucassantana.tech"><img src="assets/screenshots/landing-features.png" alt="What Vaded Gaming does — feature overview" width="820" /></a>
+  <br /><sub><i>Everything most servers need, in one bot — <a href="https://vaded.lucassantana.tech">see it live</a>.</i></sub>
 </p>
 
 ### 🎵 Music Player
@@ -88,9 +88,9 @@ Unlike Groovy, Rythm, or Hydra (all shut down by third-party enforcement), Lucky
 
 **Groovy, Rythm, and Hydra were all killed by YouTube API enforcement.** Cloud-only bots have a single point of failure — if the hosting service shuts down, so does your bot.
 
-Lucky solves this:
+Vaded Gaming solves this:
 
-| Feature | Lucky | Cloud Bots |
+| Feature | Vaded Gaming | Cloud Bots |
 |---------|-------|-----------|
 | **Uptime** | Your control | Service-dependent |
 | **Feature parity** | Full suite included | Pay-to-unlock model |
@@ -130,8 +130,8 @@ Lucky solves this:
 One command gets you running:
 
 ```bash
-git clone https://github.com/LucasSantana-Dev/Lucky.git
-cd Lucky
+git clone https://github.com/LucasSantana-Dev/vaded-gaming.git
+cd Vaded Gaming
 
 # Configure environment
 cp .env.example .env
@@ -184,7 +184,7 @@ DISCORD_TOKEN=your_bot_token_here
 CLIENT_ID=your_client_id
 
 # Database
-DATABASE_URL=postgres://user:pass@localhost:5432/lucky
+DATABASE_URL=postgres://user:pass@localhost:5432/vaded
 REDIS_URL=redis://localhost:6379
 
 # Spotify (optional)
@@ -246,7 +246,7 @@ SENTRY_DSN=...
 | `/ping` | Check latency |
 | `/help` | Command list and syntax |
 | `/version` | Current bot version |
-| `/download` | Get Lucky for your own server |
+| `/download` | Get Vaded Gaming for your own server |
 
 ---
 
@@ -349,12 +349,12 @@ Multiple admin IDs can be comma-separated: `DEVELOPER_USER_IDS=id1,id2,id3`
 
 ## 🤝 Contributing
 
-**Contributions are welcome.** Lucky runs in production and is small enough that a single PR can visibly change how it behaves — bug fixes, features, docs, and tests are all fair game.
+**Contributions are welcome.** Vaded Gaming runs in production and is small enough that a single PR can visibly change how it behaves — bug fixes, features, docs, and tests are all fair game.
 
 **Where to start**
 
-- [`good first issue`](https://github.com/LucasSantana-Dev/Lucky/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) — self-contained, scoped, and written so you can start without asking anything first.
-- [`ready-for-human`](https://github.com/LucasSantana-Dev/Lucky/issues?q=is%3Aissue+is%3Aopen+label%3Aready-for-human) — specified and unclaimed, but assumes more repo context.
+- [`good first issue`](https://github.com/LucasSantana-Dev/vaded-gaming/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) — self-contained, scoped, and written so you can start without asking anything first.
+- [`ready-for-human`](https://github.com/LucasSantana-Dev/vaded-gaming/issues?q=is%3Aissue+is%3Aopen+label%3Aready-for-human) — specified and unclaimed, but assumes more repo context.
 - Found something broken? Open an issue. A reproduction case is a genuinely useful contribution on its own.
 - Not sure whether an idea fits? Open an issue before building it and we will figure it out together, rather than after you have spent a weekend on it.
 

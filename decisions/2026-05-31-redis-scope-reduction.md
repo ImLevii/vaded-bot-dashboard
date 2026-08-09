@@ -15,7 +15,7 @@ entirely"), and the decision below reflects the revised, evidence-backed scope.
 
 ## Context
 
-Lucky is a single-operator, single-instance Discord music bot (`packages: bot, backend, frontend,
+Vaded Gaming is a single-operator, single-instance Discord music bot (`packages: bot, backend, frontend,
 shared`). `ioredis` lives only in `@lucky/shared`; ~22 modules consume Redis across bot/backend/shared.
 
 Verified usage (commands, occurrences): `.keys` ×154, `.subscribe` ×35, `.publish` ×7, `.setex` ×32,

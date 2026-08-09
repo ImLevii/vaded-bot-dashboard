@@ -86,14 +86,14 @@ export default function CommandsConfig({ guildId }: CommandsConfigProps) {
                     Commands Configuration
                 </h2>
             </div>
-            <p className='text-lucky-text-secondary mb-6'>
+            <p className='text-vaded-text-secondary mb-6'>
                 Enable or disable bot commands
             </p>
 
             <div className='space-y-4'>
                 <div className='relative'>
                     <Search
-                        className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-lucky-text-secondary'
+                        className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-vaded-text-secondary'
                         aria-hidden='true'
                     />
                     <Input
@@ -144,10 +144,10 @@ export default function CommandsConfig({ guildId }: CommandsConfigProps) {
                     ))}
                 </div>
 
-                <ScrollArea className='h-[400px] rounded-lg border border-lucky-border bg-lucky-bg-tertiary'>
+                <ScrollArea className='h-[400px] rounded-lg border border-vaded-border bg-vaded-bg-tertiary'>
                     <div className='space-y-1 p-4'>
                         {filteredCommands.length === 0 ? (
-                            <div className='flex h-32 items-center justify-center text-sm text-lucky-text-secondary'>
+                            <div className='flex h-32 items-center justify-center text-sm text-vaded-text-secondary'>
                                 No commands found
                             </div>
                         ) : (
@@ -155,7 +155,7 @@ export default function CommandsConfig({ guildId }: CommandsConfigProps) {
                                 <div
                                     key={command.id}
                                     className={cn(
-                                        'flex flex-row items-center justify-between rounded-lg border border-lucky-border bg-lucky-bg-secondary p-4 transition-colors hover:bg-lucky-bg-tertiary',
+                                        'flex flex-row items-center justify-between rounded-lg border border-vaded-border bg-vaded-bg-secondary p-4 transition-colors hover:bg-vaded-bg-tertiary',
                                     )}
                                 >
                                     <div className='flex-1 space-y-1'>
@@ -170,7 +170,7 @@ export default function CommandsConfig({ guildId }: CommandsConfigProps) {
                                                 {command.category}
                                             </Badge>
                                         </div>
-                                        <p className='text-sm text-lucky-text-secondary'>
+                                        <p className='text-sm text-vaded-text-secondary'>
                                             {command.description}
                                         </p>
                                     </div>
@@ -188,7 +188,7 @@ export default function CommandsConfig({ guildId }: CommandsConfigProps) {
                 </ScrollArea>
 
                 <div
-                    className='text-sm text-lucky-text-secondary'
+                    className='text-sm text-vaded-text-secondary'
                     role='status'
                     aria-live='polite'
                 >

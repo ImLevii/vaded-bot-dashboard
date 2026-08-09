@@ -8,7 +8,7 @@
 
 Measured 2026-08-03 against prod, ~8 weeks after instrumentation shipped:
 
-- **Web/backend path:** `guild_automation_runs` table — **2 runs ever, latest 2026-05-01**; 0 runs and 0 manifest touches in the last 60 days. The Prometheus counter (`lucky_guild_automation_usage_total`) has **no series at all** — zero plan/apply/reconcile attempts since instrumentation deployed (labeled counters only appear after the first increment).
+- **Web/backend path:** `guild_automation_runs` table — **2 runs ever, latest 2026-05-01**; 0 runs and 0 manifest touches in the last 60 days. The Prometheus counter (`vaded_guild_automation_usage_total`) has **no series at all** — zero plan/apply/reconcile attempts since instrumentation deployed (labeled counters only appear after the first increment).
 - **Bot path (`/guildconfig apply`):** same counter, bot side — **no series**; zero uses since instrumentation.
 - **Active guilds:** 29. Usage gate (>5% of active guilds in any 7-day window) is not close: it is zero.
 

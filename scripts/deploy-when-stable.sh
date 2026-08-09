@@ -38,9 +38,9 @@ PROBE_HOSTS=(github.com ghcr.io discord.com)
 REQUIRED_GREEN_ROUNDS=6
 ROUND_INTERVAL_S=10
 
-WEBHOOK_CONTAINER="lucky-webhook"
-DEPLOY_WRAPPER="/home/luk-server/Lucky/scripts/deploy-wrapper.sh"
-DEPLOY_LOG="/tmp/lucky-deploy.log"
+WEBHOOK_CONTAINER="vaded-webhook"
+DEPLOY_WRAPPER="/home/luk-server/vaded-gaming/scripts/deploy-wrapper.sh"
+DEPLOY_LOG="/tmp/vaded-deploy.log"
 LOCK_FILE="/tmp/deploy-when-stable.lock"
 
 log() { echo "[watchdog] $(date '+%H:%M:%S') $*"; }

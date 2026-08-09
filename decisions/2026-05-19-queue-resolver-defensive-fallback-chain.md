@@ -40,7 +40,7 @@ Stay on **Option A**, **and** ship observability + gap-fixes immediately so the 
 **Negative:**
 
 - Six paths and 257 LOC of tests remain on the maintenance ledger for at least 14 more days.
-- The instrumentation adds one tag per `resolveGuildQueue` call (~34 sites × call frequency); negligible Sentry/Langfuse volume impact for a bot of Lucky's scale.
+- The instrumentation adds one tag per `resolveGuildQueue` call (~34 sites × call frequency); negligible Sentry/Langfuse volume impact for a bot of Vaded Gaming's scale.
 
 **Neutral:**
 

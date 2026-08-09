@@ -1,4 +1,4 @@
-# Lucky — monitoring
+# Vaded Gaming — monitoring
 
 Observability remediation, Layers 1–3 (see
 [`decisions/2026-05-30-observability-remediation-strategy.md`](../decisions/2026-05-30-observability-remediation-strategy.md)).
@@ -16,14 +16,14 @@ deployed commit SHA (the same value the app already tags via `SENTRY_RELEASE`/`C
 **Manual steps (one-time):**
 
 1. Create a Sentry **internal integration / auth token** with `project:releases` +
-   `org:read` scope (org `lucas-santana-gm`, project `lucky`).
+   `org:read` scope (org `lucas-santana-gm`, project `vaded`).
 2. Add it as a secret named `SENTRY_AUTH_TOKEN`:
    - **GitHub Actions** → repo Settings ▸ Secrets and variables ▸ Actions (drives the
      `deploy.yml` release markers).
    - **Vercel** → project env, Production scope (drives frontend source-map upload at
      `vite build`).
 3. (Optional) Override org/project via repo **variables** `SENTRY_ORG` / `SENTRY_PROJECT`;
-   defaults are `lucas-santana-gm` / `lucky`.
+   defaults are `lucas-santana-gm` / `vaded`.
 
 Until the token exists, the `Sentry release — create/finalize` steps are skipped
 (`if: env.SENTRY_AUTH_TOKEN != ''`) and the Vite plugin is not added — builds are
@@ -58,7 +58,7 @@ edited here as it is treated as secret-bearing):
 
 ## Layer 3 — symptom alerts on metrics
 
-**Provided in this repo:** [`prometheus/lucky-alerts.rules.yml`](prometheus/lucky-alerts.rules.yml)
+**Provided in this repo:** [`prometheus/vaded-alerts.rules.yml`](prometheus/vaded-alerts.rules.yml)
 — portable PromQL alert definitions (backend 5xx error-ratio warning + fast-burn
 critical; backend/bot scrape-down). These are **definitions only**; the homelab owns
 the Prometheus/Grafana config, so they are not auto-loaded.

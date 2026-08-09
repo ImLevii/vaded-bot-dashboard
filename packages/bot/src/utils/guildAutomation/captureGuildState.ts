@@ -71,7 +71,7 @@ async function captureParity(guild: Guild, botUserId?: string) {
         checklist: [
             {
                 key: 'onboarding-native',
-                label: 'Native onboarding is configured in Lucky manifest',
+                label: 'Native onboarding is configured in Vaded Gaming manifest',
                 done: false,
             },
             {

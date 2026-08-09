@@ -20,7 +20,7 @@ keep it internal to `@lucky/shared`?
 
 Rationale (the operator is solo):
 
-- **Internal value is already captured** — it's a shared util used by 4 call sites; publishing adds zero value to Lucky's operation, only obligations.
+- **Internal value is already captured** — it's a shared util used by 4 call sites; publishing adds zero value to Vaded Gaming's operation, only obligations.
 - **Zero demonstrated external demand.** No second project asks for it. Publishing without external pull is tax-on-future-maintenance (semver discipline, security response, issue triage) against ~zero guaranteed upside.
 - **The "2M downloads on the deprecated incumbent" is a vanity metric.** That inertia does not transfer to an unknown successor without marketing/SEO a solo operator won't do.
 - **The public API isn't ready.** `tokenOverlapRatio` is a near-duplicate of `jaccardSimilarity` (the spec even asserts they're equal), and `levenshteinDistance` uses a full O(n·m) matrix (not the two-row O(min(n,m)) variant). Shipping these bakes smells into a forever-public surface.
@@ -35,11 +35,11 @@ Rationale (the operator is solo):
 
 ## Consequences
 
-- **Positive:** no new maintenance surface; Lucky keeps full freedom to evolve the similarity API; the code stays where it's already deployed and tested.
+- **Positive:** no new maintenance surface; Vaded Gaming keeps full freedom to evolve the similarity API; the code stays where it's already deployed and tested.
 - **Negative / watch:** the npm gap stays unfilled (acceptable — not the operator's problem to solve); if external interest ever appears it's reactive, not proactive.
 - **Independent follow-up (not gated on this decision):** the internal API has a redundant `tokenOverlapRatio` (≡ `jaccardSimilarity`) and an unoptimized Levenshtein. Worth a small internal cleanup regardless of publishing — tracked separately, optional.
 
 ## Revisit when
 
 - **A concrete second consumer materializes** — another project (yours or someone else's) explicitly needs this as a standalone dependency. Then publish under a personal scope (Option 2), but FIRST make it publish-ready: consolidate `tokenOverlapRatio` into `jaccardSimilarity`, optimize Levenshtein to two-row space, add a README + CHANGELOG, and commit to a bounded (e.g. 6-month) maintenance window before reassessing.
-- Or if the operator deliberately wants a portfolio/OSS artifact and accepts the maintenance cost as a personal goal (different objective function than "ship Lucky").
+- Or if the operator deliberately wants a portfolio/OSS artifact and accepts the maintenance cost as a personal goal (different objective function than "ship Vaded Gaming").

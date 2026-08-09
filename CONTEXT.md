@@ -1,4 +1,4 @@
-# Lucky
+# Vaded Gaming
 
 Self-hosted Discord music + moderation bot with a React dashboard. TypeScript monorepo (`packages/bot`, `packages/backend`, `packages/frontend`, `packages/shared`). This glossary defines the canonical vocabulary used across code, issues, PRs, and ADRs.
 
@@ -55,7 +55,7 @@ A Track proposed for Autoplay selection. Flows through the pipeline: collected f
 _Avoid_: Suggestion, next-up.
 
 **Candidate Source**:
-Where Autoplay Candidates come from — the _recommender_ dimension, distinct from the audio Source. Lucky has these: **Recommendation Engine** (vector-similarity over TrackHistory), **Last.fm Seeder** (`lastfm-similar`, `lastfm-genre-fallback`, `lastfm`), **Spotify Recommender** (`spotify-rec`), and fallbacks (`artist-fallback`, `genre`, preference-based `virtual` tracks). Carried on `RecommendationBasis.source` — see "Flagged ambiguities".
+Where Autoplay Candidates come from — the _recommender_ dimension, distinct from the audio Source. Vaded Gaming has these: **Recommendation Engine** (vector-similarity over TrackHistory), **Last.fm Seeder** (`lastfm-similar`, `lastfm-genre-fallback`, `lastfm`), **Spotify Recommender** (`spotify-rec`), and fallbacks (`artist-fallback`, `genre`, preference-based `virtual` tracks). Carried on `RecommendationBasis.source` — see "Flagged ambiguities".
 _Avoid_: Provider, supplier, "source" without the "Candidate" qualifier.
 
 **Recommendation Engine**:
@@ -161,7 +161,7 @@ _Avoid_: Mutual exclusion (use the term, but bind it to roles), conflict.
 ### Integrations
 
 **Integration**:
-The umbrella concept for any binding between Lucky and an external service. Two sub-patterns: Account Link (User-scoped credentials) and Event Subscription (Guild-scoped external watcher). Does _not_ include operational dependencies like Sentry, Cloudflare Tunnel, or the Discord API itself — those are infrastructure.
+The umbrella concept for any binding between Vaded Gaming and an external service. Two sub-patterns: Account Link (User-scoped credentials) and Event Subscription (Guild-scoped external watcher). Does _not_ include operational dependencies like Sentry, Cloudflare Tunnel, or the Discord API itself — those are infrastructure.
 _Avoid_: Connection, plugin, extension.
 
 **Account Link**:

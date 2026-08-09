@@ -135,7 +135,7 @@ export class ReminderScheduler extends IntervalScheduler {
         const embed = new EmbedBuilder()
             .setTitle('⏰ Reminder')
             .setDescription(reminder.message)
-            .setColor(COLOR.LUCKY_PURPLE)
+            .setColor(COLOR.VADED_PURPLE)
             .setFooter({ text: `Set for: ${reminder.remindAt.toISOString()}` })
             .setTimestamp()
 
@@ -214,7 +214,7 @@ export class ReminderScheduler extends IntervalScheduler {
         const embed = new EmbedBuilder()
             .setTitle('⏰ Reminder')
             .setDescription(reminder.message)
-            .setColor(COLOR.LUCKY_PURPLE)
+            .setColor(COLOR.VADED_PURPLE)
             .setTimestamp()
 
         const isRolePing =

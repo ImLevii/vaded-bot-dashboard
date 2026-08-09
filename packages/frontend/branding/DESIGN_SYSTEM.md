@@ -10,53 +10,53 @@ Vaded Gaming uses a clean, neutral dark design system inspired by professional d
 
 | Token                       | Hex       | Usage                         |
 | --------------------------- | --------- | ----------------------------- |
-| `--lucky-surface-canvas`    | `#0f1117` | Page background               |
-| `--lucky-surface-sidebar`   | `#161b22` | Sidebar background            |
-| `--lucky-surface-panel`     | `#1c2129` | Content panels                |
-| `--lucky-surface-elevated`  | `#222831` | Elevated panels               |
-| `--lucky-surface-highlight` | `#2a3140` | Active states, selected items |
+| `--vaded-surface-canvas`    | `#0f1117` | Page background               |
+| `--vaded-surface-sidebar`   | `#161b22` | Sidebar background            |
+| `--vaded-surface-panel`     | `#1c2129` | Content panels                |
+| `--vaded-surface-elevated`  | `#222831` | Elevated panels               |
+| `--vaded-surface-highlight` | `#2a3140` | Active states, selected items |
 
 ### Borders
 
 | Token                   | Hex       | Usage                |
 | ----------------------- | --------- | -------------------- |
-| `--lucky-border-soft`   | `#2d333b` | Default borders      |
-| `--lucky-border-strong` | `#444c56` | Hover/active borders |
+| `--vaded-border-soft`   | `#2d333b` | Default borders      |
+| `--vaded-border-strong` | `#444c56` | Hover/active borders |
 
 ### Text
 
 | Token                 | Hex       | Usage            |
 | --------------------- | --------- | ---------------- |
-| `--lucky-text-strong` | `#e6edf3` | Primary text     |
-| `--lucky-text-body`   | `#adbac7` | Body text        |
-| `--lucky-text-muted`  | `#768390` | Secondary labels |
-| `--lucky-text-subtle` | `#545d68` | Disabled / meta  |
+| `--vaded-text-strong` | `#e6edf3` | Primary text     |
+| `--vaded-text-body`   | `#adbac7` | Body text        |
+| `--vaded-text-muted`  | `#768390` | Secondary labels |
+| `--vaded-text-subtle` | `#545d68` | Disabled / meta  |
 
 ### Accent (dual accent — Discord Blurple + Neon Pink)
 
 | Token                     | Hex       | Usage                                                       |
 | ------------------------- | --------- | ----------------------------------------------------------- |
-| `--color-lucky-brand`     | `#dc2626` | Primary CTA, active nav, focus rings, logo                  |
-| `--color-lucky-brand-strong` | `#b91c1c` | Primary hover                                            |
+| `--color-vaded-brand`     | `#dc2626` | Primary CTA, active nav, focus rings, logo                  |
+| `--color-vaded-brand-strong` | `#b91c1c` | Primary hover                                            |
 | `--color-brand-accent`    | `#ef4444` | Secondary accent, live pings, gradient highlights           |
-| `--color-lucky-neon-pink` | `#ef4444` | Alias for the secondary accent (used in token-bridge layer) |
+| `--color-vaded-neon-pink` | `#ef4444` | Alias for the secondary accent (used in token-bridge layer) |
 
-Short-form `--color-*` aliases are added alongside the long-form `--lucky-*` tokens during the redesign migration; both names resolve to the same value, see `index.css`. Cleanup PR removing the duplicates is queued for after all page ports land.
+Short-form `--color-*` aliases are added alongside the long-form `--vaded-*` tokens during the redesign migration; both names resolve to the same value, see `index.css`. Cleanup PR removing the duplicates is queued for after all page ports land.
 
 ### Status
 
 | Token             | Hex       |
 | ----------------- | --------- |
-| `--lucky-success` | `#23a55a` |
-| `--lucky-error`   | `#f23f42` |
-| `--lucky-warning` | `#f0b232` |
-| `--lucky-info`    | `#00aafc` |
+| `--vaded-success` | `#23a55a` |
+| `--vaded-error`   | `#f23f42` |
+| `--vaded-warning` | `#f0b232` |
+| `--vaded-info`    | `#00aafc` |
 
 ## Typography
 
-- **Display** (`h1`–`h4`, `type-display`, `type-title`): `Sora` (`--font-lucky-display`) — fallback Segoe UI, system-ui, sans-serif.
-- **Body** (body copy, UI labels, controls): `Manrope` (`--font-lucky-body`) — same fallbacks.
-- **Mono** (command snippets, IDs, case numbers, technical metadata): `JetBrains Mono` (`--font-lucky-mono`) — fallback SFMono-Regular, Menlo, Monaco, Consolas.
+- **Display** (`h1`–`h4`, `type-display`, `type-title`): `Sora` (`--font-vaded-display`) — fallback Segoe UI, system-ui, sans-serif.
+- **Body** (body copy, UI labels, controls): `Manrope` (`--font-vaded-body`) — same fallbacks.
+- **Mono** (command snippets, IDs, case numbers, technical metadata): `JetBrains Mono` (`--font-vaded-mono`) — fallback SFMono-Regular, Menlo, Monaco, Consolas.
 
 All four fonts are loaded at the top of `packages/frontend/src/index.css`; Inter remains in the import list as a transitional fallback while pages port from the legacy single-font system.
 
@@ -84,7 +84,7 @@ All four fonts are loaded at the top of `packages/frontend/src/index.css`; Inter
 
 ## Interaction & Motion
 
-- Focus ring: 3px red ring (`--lucky-shadow-focus: 0 0 0 3px rgb(220 38 38 / 0.4)`)
+- Focus ring: 3px red ring (`--vaded-shadow-focus: 0 0 0 3px rgb(220 38 38 / 0.4)`)
 - Hover borders: upgrade from `border-soft` to `border-strong`
 - Active nav items: red left-accent bar (2px) + `surface-highlight` background
 - Allowed animations: `fade-up`, `fade-in`, `accordion-down/up`, `animate-spin` (loaders)

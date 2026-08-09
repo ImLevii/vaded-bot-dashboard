@@ -1,21 +1,21 @@
-# Contributing to Lucky
+# Contributing to Vaded Gaming
 
-Thanks for working on Lucky. This file documents the small repo-specific rules that are easy to miss; everything else (style, tests, formatting) is enforced by CI and lives in code.
+Thanks for working on Vaded Gaming. This file documents the small repo-specific rules that are easy to miss; everything else (style, tests, formatting) is enforced by CI and lives in code.
 
 ## Reporting bugs and requesting features
 
-Use the GitHub issue tracker: https://github.com/LucasSantana-Dev/Lucky/issues
+Use the GitHub issue tracker: https://github.com/LucasSantana-Dev/vaded-gaming/issues
 
 Issue templates guide you through the required information:
 
-- **Bug report** — steps to reproduce, expected vs actual behaviour, Lucky version, deployment type
+- **Bug report** — steps to reproduce, expected vs actual behaviour, Vaded Gaming version, deployment type
 - **Feature request** — problem statement and proposed solution
 
 ## Getting started
 
 ```bash
-git clone https://github.com/LucasSantana-Dev/Lucky.git
-cd Lucky
+git clone https://github.com/LucasSantana-Dev/vaded-gaming.git
+cd Vaded Gaming
 pnpm install
 pnpm --filter @lucky/bot exec jest --testPathPatterns='your-area'
 ```
@@ -60,7 +60,7 @@ If your PR shows `mergeStateStatus: BLOCKED` while:
 ```bash
 gh api graphql -f query='
   query {
-    repository(owner:"LucasSantana-Dev", name:"Lucky") {
+    repository(owner:"LucasSantana-Dev", name:"Vaded Gaming") {
       pullRequest(number: <PR>) {
         reviewThreads(first: 50) {
           nodes { id isResolved comments(first: 1) { nodes { path body } } }
@@ -107,8 +107,8 @@ cubic is low-false-positive by design and does **not** flip PRs to `CHANGES_REQU
 - Never `--admin`, `--no-verify`, `--no-gpg-sign`, or force-push to `main`.
 - Never delete `pnpm-lock.yaml` or per-package lockfiles to "fix" install issues.
 - Never commit `.env`, `*.key`, or anything matched by GitGuardian's secret patterns.
-- Worktrees go under `/Volumes/External HD/Desenvolvimento/.worktrees/` if you're developing on the maintainer's machine; otherwise `~/.worktrees/lucky-*` is fine.
+- Worktrees go under `/Volumes/External HD/Desenvolvimento/.worktrees/` if you're developing on the maintainer's machine; otherwise `~/.worktrees/vaded-*` is fine.
 
 ## Reporting security issues
 
-See `SECURITY.md` (when present) or open a private security advisory at https://github.com/LucasSantana-Dev/Lucky/security/advisories/new.
+See `SECURITY.md` (when present) or open a private security advisory at https://github.com/LucasSantana-Dev/vaded-gaming/security/advisories/new.

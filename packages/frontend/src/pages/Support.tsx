@@ -87,22 +87,22 @@ export default function SupportPage() {
 
     if (state === 'success') {
         return (
-            <div className='min-h-screen bg-lucky-bg-primary flex items-center justify-center px-4 py-12'>
+            <div className='min-h-screen bg-vaded-bg-primary flex items-center justify-center px-4 py-12'>
                 <div className='max-w-md w-full text-center space-y-4'>
                     <CheckCircle2
-                        className='h-12 w-12 text-lucky-success mx-auto'
+                        className='h-12 w-12 text-vaded-success mx-auto'
                         aria-hidden='true'
                     />
-                    <h1 className='type-h1 text-lucky-text-primary'>
+                    <h1 className='type-h1 text-vaded-text-primary'>
                         {t('support.success.title')}
                     </h1>
-                    <p className='type-body text-lucky-text-secondary'>
+                    <p className='type-body text-vaded-text-secondary'>
                         {t('support.success.body')}
                     </p>
                     {cid && (
-                        <p className='type-body-sm text-lucky-text-tertiary'>
+                        <p className='type-body-sm text-vaded-text-tertiary'>
                             {t('support.referenceId')}:{' '}
-                            <code className='text-lucky-text-secondary'>
+                            <code className='text-vaded-text-secondary'>
                                 {cid}
                             </code>
                         </p>
@@ -113,27 +113,27 @@ export default function SupportPage() {
     }
 
     return (
-        <div className='min-h-screen bg-lucky-bg-primary flex items-center justify-center px-4 py-12'>
+        <div className='min-h-screen bg-vaded-bg-primary flex items-center justify-center px-4 py-12'>
             <div className='max-w-lg w-full space-y-6'>
                 <header className='flex items-center gap-3'>
                     <LifeBuoy
-                        className='h-7 w-7 text-lucky-brand shrink-0'
+                        className='h-7 w-7 text-vaded-brand shrink-0'
                         aria-hidden='true'
                     />
                     <div>
-                        <h1 className='type-h1 text-lucky-text-primary'>
+                        <h1 className='type-h1 text-vaded-text-primary'>
                             {t('support.title')}
                         </h1>
-                        <p className='type-body-sm text-lucky-text-secondary'>
+                        <p className='type-body-sm text-vaded-text-secondary'>
                             {t('support.subtitle')}
                         </p>
                     </div>
                 </header>
 
                 {cid && (
-                    <div className='type-body-sm text-lucky-text-secondary bg-lucky-bg-active border border-lucky-border rounded-sm p-3'>
+                    <div className='type-body-sm text-vaded-text-secondary bg-vaded-bg-active border border-vaded-border rounded-sm p-3'>
                         {t('support.referenceId')}:{' '}
-                        <code className='text-lucky-text-primary'>{cid}</code>
+                        <code className='text-vaded-text-primary'>{cid}</code>
                     </div>
                 )}
 
@@ -141,7 +141,7 @@ export default function SupportPage() {
                     <div className='space-y-1.5'>
                         <label
                             htmlFor='support-context'
-                            className='type-meta text-lucky-text-tertiary uppercase tracking-wide font-semibold'
+                            className='type-meta text-vaded-text-tertiary uppercase tracking-wide font-semibold'
                         >
                             {t('support.form.contextLabel')}
                         </label>
@@ -152,14 +152,14 @@ export default function SupportPage() {
                             required
                             rows={6}
                             placeholder={t('support.form.contextPlaceholder')}
-                            className='w-full rounded-sm bg-lucky-bg-active border border-lucky-border text-lucky-text-primary type-body p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lucky-brand'
+                            className='w-full rounded-sm bg-vaded-bg-active border border-vaded-border text-vaded-text-primary type-body p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vaded-brand'
                         />
                     </div>
 
                     <div className='space-y-1.5'>
                         <label
                             htmlFor='support-image'
-                            className='type-meta text-lucky-text-tertiary uppercase tracking-wide font-semibold'
+                            className='type-meta text-vaded-text-tertiary uppercase tracking-wide font-semibold'
                         >
                             {t('support.form.imageLabel')}
                         </label>
@@ -168,11 +168,11 @@ export default function SupportPage() {
                             type='file'
                             accept={ACCEPTED_TYPES.join(',')}
                             onChange={onFileChange}
-                            className='block w-full type-body-sm text-lucky-text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-lucky-bg-active file:px-3 file:py-1.5 file:text-lucky-text-primary'
+                            className='block w-full type-body-sm text-vaded-text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-vaded-bg-active file:px-3 file:py-1.5 file:text-vaded-text-primary'
                         />
                         {fileError && (
                             <p
-                                className='type-body-sm text-lucky-error'
+                                className='type-body-sm text-vaded-error'
                                 role='alert'
                             >
                                 {fileError}
@@ -182,7 +182,7 @@ export default function SupportPage() {
 
                     {state === 'error' && errorMessage && (
                         <div
-                            className='flex items-center gap-2 type-body-sm text-lucky-error bg-lucky-error/10 border border-lucky-error/20 rounded-sm p-3'
+                            className='flex items-center gap-2 type-body-sm text-vaded-error bg-vaded-error/10 border border-vaded-error/20 rounded-sm p-3'
                             role='alert'
                         >
                             <AlertCircle

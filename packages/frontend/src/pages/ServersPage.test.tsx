@@ -18,16 +18,16 @@ const translations: Record<string, string> = {
     totalServers: 'Total Servers',
     serversLabel: 'Servers',
     yourServers: 'Your Servers',
-    serversWithBot: '{{count}} servers — {{count2}} with Lucky installed',
+    serversWithBot: '{{count}} servers — {{count2}} with Vaded Gaming installed',
     navServers: 'Servers',
     navPremium: 'Premium',
     navSettings: 'Settings',
     recentlyActive: 'Recently Active',
     allOtherServers: 'All Other Servers',
-    luckyInstalled: 'Vaded installed',
-    inviteLucky: 'Invite Vaded',
+    vadedInstalled: 'Vaded installed',
+    inviteVaded: 'Invite Vaded',
     noServersTitle: 'No servers yet',
-    noServersDescription: 'Join a Discord server and Lucky will appear here.',
+    noServersDescription: 'Join a Discord server and Vaded Gaming will appear here.',
 }
 
 vi.mock('react-i18next', () => ({
@@ -127,7 +127,7 @@ describe('ServersPage', () => {
             </MemoryRouter>,
         )
         expect(
-            screen.getByText('2 servers — 0 with Lucky installed'),
+            screen.getByText('2 servers — 0 with Vaded Gaming installed'),
         ).toBeInTheDocument()
     })
 
@@ -161,13 +161,13 @@ describe('ServersPage', () => {
         expect(screen.getByText('No servers yet')).toBeInTheDocument()
     })
 
-    test('shows Lucky installed badge when botAdded is true', () => {
+    test('shows Vaded Gaming installed badge when botAdded is true', () => {
         mockStores({ guilds: [{ id: '1', name: 'Server 1', botAdded: true }] })
         render(
             <MemoryRouter>
                 <ServersPage />
             </MemoryRouter>,
         )
-        expect(screen.getByText('Lucky installed')).toBeInTheDocument()
+        expect(screen.getByText('Vaded Gaming installed')).toBeInTheDocument()
     })
 })

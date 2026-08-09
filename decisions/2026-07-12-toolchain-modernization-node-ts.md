@@ -1,4 +1,4 @@
-# Lucky toolchain modernization — Node & TypeScript
+# Vaded Gaming toolchain modernization — Node & TypeScript
 
 - **Date:** 2026-07-12
 - **Status:** Accepted
@@ -9,7 +9,7 @@
 
 Operator directive: *"node and npm should always be latest stable."* npm was already moved to
 `npm@latest` (separate merged PR). This ADR resolves **Node base image** and **TypeScript
-version** for the Lucky monorepo (packages shared/bot/backend/frontend; discord.js v14;
+version** for the Vaded Gaming monorepo (packages shared/bot/backend/frontend; discord.js v14;
 `@discordjs/opus ^0.10.0` — the **only** native dep; Next.js frontend; prod = homelab Docker,
 merge-to-main = prod deploy; single-container bot).
 
@@ -69,5 +69,5 @@ Current was actually intended.
   job proves the source-compile works. Then bump Docker + CI together to 26.
 - **TypeScript 7:** ALL of — (a) TS **7.1** GA (stable programmatic API, ~Oct 2026); AND
   (b) `@typescript-eslint` ships a TS7-compatible release; AND (c) Next.js fixes TS7 detection.
-  Then fold Lucky into the org-wide TS7 migration.
+  Then fold Vaded Gaming into the org-wide TS7 migration.
 - Re-open early if a security advisory forces a Node/TS bump.

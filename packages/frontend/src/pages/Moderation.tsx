@@ -148,22 +148,22 @@ function CaseDetailPanel({
                             damping: 25,
                             stiffness: 300,
                         }}
-                        className='fixed right-0 top-0 h-screen w-96 bg-lucky-bg-secondary border-l border-lucky-border z-50 flex flex-col'
+                        className='fixed right-0 top-0 h-screen w-96 bg-vaded-bg-secondary border-l border-vaded-border z-50 flex flex-col'
                     >
-                        <div className='flex items-center justify-between p-6 border-b border-lucky-border'>
+                        <div className='flex items-center justify-between p-6 border-b border-vaded-border'>
                             <div className='flex items-center gap-3'>
                                 <div className={cn('p-2 rounded-lg', style.bg)}>
                                     <ActionIcon
                                         className={cn('w-5 h-5', style.text)}
                                     />
                                 </div>
-                                <h2 className='type-title text-lucky-text-primary'>
+                                <h2 className='type-title text-vaded-text-primary'>
                                     Case #{caseData.caseNumber}
                                 </h2>
                             </div>
                             <button
                                 onClick={onClose}
-                                className='text-lucky-text-tertiary hover:text-lucky-text-primary transition-colors p-1'
+                                className='text-vaded-text-tertiary hover:text-vaded-text-primary transition-colors p-1'
                             >
                                 <X className='w-5 h-5' />
                             </button>
@@ -171,26 +171,26 @@ function CaseDetailPanel({
 
                         <div className='flex-1 overflow-y-auto p-6 space-y-4'>
                             <div className='space-y-1'>
-                                <p className='type-meta text-lucky-text-tertiary'>
+                                <p className='type-meta text-vaded-text-tertiary'>
                                     {t('caseUser')}
                                 </p>
-                                <p className='type-body text-lucky-text-primary'>
+                                <p className='type-body text-vaded-text-primary'>
                                     {caseData.userName || caseData.userId}
                                 </p>
                             </div>
 
                             <div className='space-y-1'>
-                                <p className='type-meta text-lucky-text-tertiary'>
+                                <p className='type-meta text-vaded-text-tertiary'>
                                     {t('caseModerator')}
                                 </p>
-                                <p className='type-body text-lucky-text-primary'>
+                                <p className='type-body text-vaded-text-primary'>
                                     {caseData.moderatorName ||
                                         caseData.moderatorId}
                                 </p>
                             </div>
 
                             <div className='space-y-1'>
-                                <p className='type-meta text-lucky-text-tertiary'>
+                                <p className='type-meta text-vaded-text-tertiary'>
                                     {t('caseAction')}
                                 </p>
                                 <Badge
@@ -207,29 +207,29 @@ function CaseDetailPanel({
                             </div>
 
                             <div className='space-y-1'>
-                                <p className='type-meta text-lucky-text-tertiary'>
+                                <p className='type-meta text-vaded-text-tertiary'>
                                     {t('caseDate')}
                                 </p>
-                                <p className='type-body-sm text-lucky-text-secondary'>
+                                <p className='type-body-sm text-vaded-text-secondary'>
                                     {formatDate(caseData.createdAt)}
                                 </p>
                             </div>
 
                             <div className='space-y-1 pt-2'>
-                                <p className='type-meta text-lucky-text-tertiary mb-2'>
+                                <p className='type-meta text-vaded-text-tertiary mb-2'>
                                     {t('caseReason')}
                                 </p>
-                                <p className='type-body-sm text-lucky-text-secondary bg-lucky-bg-tertiary border border-lucky-border rounded-lg p-3'>
+                                <p className='type-body-sm text-vaded-text-secondary bg-vaded-bg-tertiary border border-vaded-border rounded-lg p-3'>
                                     {caseData.reason || t('noReasonProvided')}
                                 </p>
                             </div>
 
                             {caseData.duration && (
                                 <div className='space-y-1'>
-                                    <p className='type-meta text-lucky-text-tertiary'>
+                                    <p className='type-meta text-vaded-text-tertiary'>
                                         {t('caseDuration')}
                                     </p>
-                                    <p className='type-body-sm text-lucky-text-secondary'>
+                                    <p className='type-body-sm text-vaded-text-secondary'>
                                         {t('durationMinutes', {
                                             minutes: Math.floor(
                                                 caseData.duration / 60,
@@ -245,7 +245,7 @@ function CaseDetailPanel({
                                         'flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border',
                                         caseData.active
                                             ? 'bg-green-500/10 text-green-400 border-green-500/20'
-                                            : 'bg-lucky-bg-tertiary text-lucky-text-tertiary border-lucky-border',
+                                            : 'bg-vaded-bg-tertiary text-vaded-text-tertiary border-vaded-border',
                                     )}
                                 >
                                     <div
@@ -253,7 +253,7 @@ function CaseDetailPanel({
                                             'w-1.5 h-1.5 rounded-full',
                                             caseData.active
                                                 ? 'bg-green-400'
-                                                : 'bg-lucky-text-disabled',
+                                                : 'bg-vaded-text-disabled',
                                         )}
                                     />
                                     {caseData.active
@@ -269,7 +269,7 @@ function CaseDetailPanel({
                         </div>
 
                         {caseData.active && (
-                            <div className='border-t border-lucky-border p-4'>
+                            <div className='border-t border-vaded-border p-4'>
                                 <Button
                                     onClick={() => onDeactivate(caseData.id)}
                                     disabled={deactivating}
@@ -393,11 +393,11 @@ export default function ModerationPage() {
     if (!selectedGuild) {
         return (
             <div className='flex flex-col items-center justify-center h-[60vh] text-center'>
-                <Shield className='w-16 h-16 text-lucky-text-tertiary mb-4' />
-                <h2 className='type-h2 text-lucky-text-primary mb-2'>
+                <Shield className='w-16 h-16 text-vaded-text-tertiary mb-4' />
+                <h2 className='type-h2 text-vaded-text-primary mb-2'>
                     {t('noServerSelected')}
                 </h2>
-                <p className='type-body text-lucky-text-secondary'>
+                <p className='type-body text-vaded-text-secondary'>
                     {t('selectServerToViewCases')}
                 </p>
             </div>
@@ -407,10 +407,10 @@ export default function ModerationPage() {
     return (
         <div className='space-y-6'>
             <header>
-                <h1 className='type-h1 text-lucky-text-primary'>
+                <h1 className='type-h1 text-vaded-text-primary'>
                     {t('moderationCases')}
                 </h1>
-                <p className='type-body text-lucky-text-secondary mt-1'>
+                <p className='type-body text-vaded-text-secondary mt-1'>
                     {t('manageWarningsAndBans')}
                 </p>
             </header>
@@ -454,35 +454,35 @@ export default function ModerationPage() {
             ) : null}
 
             {/* Filters */}
-            <Card className='p-4 border border-lucky-border'>
+            <Card className='p-4 border border-vaded-border'>
                 <div className='flex flex-col sm:flex-row gap-3'>
                     <div className='relative flex-1'>
-                        <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-lucky-text-tertiary' />
+                        <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-vaded-text-tertiary' />
                         <Input
                             placeholder={t('searchByUserModeratorOrReason')}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className='pl-9 bg-lucky-bg-tertiary border-lucky-border text-white placeholder:text-lucky-text-tertiary'
+                            className='pl-9 bg-vaded-bg-tertiary border-vaded-border text-white placeholder:text-vaded-text-tertiary'
                         />
                         {searchQuery && (
                             <button
                                 onClick={() => setSearchQuery('')}
-                                className='absolute right-3 top-1/2 -translate-y-1/2 text-lucky-text-tertiary hover:text-white transition-colors'
+                                className='absolute right-3 top-1/2 -translate-y-1/2 text-vaded-text-tertiary hover:text-white transition-colors'
                             >
                                 <X className='w-4 h-4' />
                             </button>
                         )}
                     </div>
                     <div className='flex items-center gap-2'>
-                        <Filter className='w-4 h-4 text-lucky-text-tertiary shrink-0' />
+                        <Filter className='w-4 h-4 text-vaded-text-tertiary shrink-0' />
                         <Select
                             value={typeFilter}
                             onValueChange={setTypeFilter}
                         >
-                            <SelectTrigger className='w-[140px] bg-lucky-bg-tertiary border-lucky-border text-white'>
+                            <SelectTrigger className='w-[140px] bg-vaded-bg-tertiary border-vaded-border text-white'>
                                 <SelectValue placeholder={t('allTypes')} />
                             </SelectTrigger>
-                            <SelectContent className='bg-lucky-bg-secondary border-lucky-border'>
+                            <SelectContent className='bg-vaded-bg-secondary border-vaded-border'>
                                 <SelectItem value='all'>
                                     {t('allTypes')}
                                 </SelectItem>
@@ -509,9 +509,9 @@ export default function ModerationPage() {
             </Card>
 
             {/* Cases Table */}
-            <Card className='overflow-hidden p-0 border border-lucky-border'>
+            <Card className='overflow-hidden p-0 border border-vaded-border'>
                 {/* Header */}
-                <div className='hidden md:grid grid-cols-[40px_1fr_1fr_80px_80px_120px] gap-4 px-6 py-3 border-b border-lucky-border bg-lucky-bg-tertiary/20'>
+                <div className='hidden md:grid grid-cols-[40px_1fr_1fr_80px_80px_120px] gap-4 px-6 py-3 border-b border-vaded-border bg-vaded-bg-tertiary/20'>
                     {[
                         t('tableHeaderCase'),
                         t('tableHeaderUser'),
@@ -522,7 +522,7 @@ export default function ModerationPage() {
                     ].map((h) => (
                         <span
                             key={h}
-                            className='type-meta text-lucky-text-tertiary text-xs uppercase font-semibold tracking-wide'
+                            className='type-meta text-vaded-text-tertiary text-xs uppercase font-semibold tracking-wide'
                         >
                             {h}
                         </span>
@@ -530,7 +530,7 @@ export default function ModerationPage() {
                 </div>
 
                 {/* Rows */}
-                <div className='divide-y divide-lucky-border/40'>
+                <div className='divide-y divide-vaded-border/40'>
                     {loading ? (
                         Array.from({ length: 8 }).map((_, i) => (
                             <div
@@ -567,16 +567,16 @@ export default function ModerationPage() {
                                                 ? 0
                                                 : i * 0.02,
                                         }}
-                                        className='grid grid-cols-1 md:grid-cols-[40px_1fr_1fr_80px_80px_120px] gap-2 md:gap-4 px-6 py-3 items-center transition-colors hover:bg-lucky-bg-active/25 cursor-pointer'
+                                        className='grid grid-cols-1 md:grid-cols-[40px_1fr_1fr_80px_80px_120px] gap-2 md:gap-4 px-6 py-3 items-center transition-colors hover:bg-vaded-bg-active/25 cursor-pointer'
                                         onClick={() => setSelectedCase(c)}
                                     >
-                                        <span className='type-meta font-mono text-lucky-text-tertiary text-xs uppercase font-semibold'>
+                                        <span className='type-meta font-mono text-vaded-text-tertiary text-xs uppercase font-semibold'>
                                             {c.caseNumber}
                                         </span>
-                                        <span className='type-body-sm text-lucky-text-primary truncate'>
+                                        <span className='type-body-sm text-vaded-text-primary truncate'>
                                             {c.userName || c.userId}
                                         </span>
-                                        <span className='type-body-sm text-lucky-text-secondary truncate'>
+                                        <span className='type-body-sm text-vaded-text-secondary truncate'>
                                             {c.moderatorName || c.moderatorId}
                                         </span>
                                         <Badge
@@ -596,7 +596,7 @@ export default function ModerationPage() {
                                                 'type-body-sm flex items-center gap-1',
                                                 c.active
                                                     ? 'text-green-400'
-                                                    : 'text-lucky-text-tertiary',
+                                                    : 'text-vaded-text-tertiary',
                                             )}
                                         >
                                             <div
@@ -604,7 +604,7 @@ export default function ModerationPage() {
                                                     'w-1.5 h-1.5 rounded-full shrink-0',
                                                     c.active
                                                         ? 'bg-green-400'
-                                                        : 'bg-lucky-text-disabled',
+                                                        : 'bg-vaded-text-disabled',
                                                 )}
                                             />
                                             <span className='text-xs'>
@@ -613,7 +613,7 @@ export default function ModerationPage() {
                                                     : t('expired')}
                                             </span>
                                         </div>
-                                        <span className='type-body-sm text-lucky-text-tertiary text-xs'>
+                                        <span className='type-body-sm text-vaded-text-tertiary text-xs'>
                                             {timeAgo(c.createdAt)}
                                         </span>
                                     </motion.div>
@@ -641,8 +641,8 @@ export default function ModerationPage() {
 
                 {/* Pagination */}
                 {total > limit && (
-                    <div className='flex items-center justify-between px-5 py-3 border-t border-lucky-border'>
-                        <span className='type-body-sm text-lucky-text-tertiary'>
+                    <div className='flex items-center justify-between px-5 py-3 border-t border-vaded-border'>
+                        <span className='type-body-sm text-vaded-text-tertiary'>
                             {t('showingToOf', {
                                 from: (page - 1) * limit + 1,
                                 to: Math.min(page * limit, total),
@@ -655,11 +655,11 @@ export default function ModerationPage() {
                                 variant='ghost'
                                 disabled={page <= 1}
                                 onClick={() => setPage((p) => p - 1)}
-                                className='h-8 w-8 p-0 text-lucky-text-secondary hover:text-lucky-text-primary'
+                                className='h-8 w-8 p-0 text-vaded-text-secondary hover:text-vaded-text-primary'
                             >
                                 <ChevronLeft className='w-4 h-4' />
                             </Button>
-                            <span className='type-body-sm text-lucky-text-secondary px-2'>
+                            <span className='type-body-sm text-vaded-text-secondary px-2'>
                                 {page} / {totalPages}
                             </span>
                             <Button
@@ -667,7 +667,7 @@ export default function ModerationPage() {
                                 variant='ghost'
                                 disabled={page >= totalPages}
                                 onClick={() => setPage((p) => p + 1)}
-                                className='h-8 w-8 p-0 text-lucky-text-secondary hover:text-lucky-text-primary'
+                                className='h-8 w-8 p-0 text-vaded-text-secondary hover:text-vaded-text-primary'
                             >
                                 <ChevronRight className='w-4 h-4' />
                             </Button>

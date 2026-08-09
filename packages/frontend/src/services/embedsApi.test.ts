@@ -13,7 +13,7 @@ describe('createEmbedsApi', () => {
         title: 'Welcome to Server',
         description: 'Welcome message',
         color: '#5865F2',
-        footer: 'Powered by Lucky',
+        footer: 'Powered by Vaded Gaming',
         thumbnail: 'https://example.com/thumb.png',
         image: 'https://example.com/img.png',
         fields: [{ name: 'Field 1', value: 'Value 1' }],

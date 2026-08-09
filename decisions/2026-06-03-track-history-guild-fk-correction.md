@@ -2,7 +2,7 @@
 
 **Date:** 2026-06-03  
 **Status:** Accepted  
-**Sentry:** LUCKY-3N (20 occurrences — FK constraint on `track_history_guildId_fkey`)
+**Sentry:** VADED-3N (20 occurrences — FK constraint on `track_history_guildId_fkey`)
 
 ## Context
 
@@ -28,7 +28,7 @@ Change the FK constraint to reference `guilds.discordId` instead of `guilds.id`.
 
 ## Consequences
 
-- **Positive:** LUCKY-3N stops firing. Track history is correctly saved for all guilds going forward.
+- **Positive:** VADED-3N stops firing. Track history is correctly saved for all guilds going forward.
 - **Positive:** `addTrackToHistory` requires no code changes — `queue.guild.id` was already the correct value.
 - **Neutral:** The migration is DROP + ADD CONSTRAINT only; non-destructive.
 - **Negative:** None identified.

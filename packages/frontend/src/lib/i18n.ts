@@ -24,7 +24,7 @@ void i18n
         interpolation: { escapeValue: false },
         detection: {
             order: ['localStorage', 'navigator'],
-            lookupLocalStorage: 'lucky-language',
+            lookupLocalStorage: 'vaded-language',
             caches: ['localStorage'],
             convertDetectedLanguage: (lng: string) =>
                 lng.toLowerCase().startsWith('pt') ? 'pt-BR' : lng,

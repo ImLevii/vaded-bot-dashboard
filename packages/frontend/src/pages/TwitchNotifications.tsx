@@ -235,7 +235,7 @@ export default function TwitchNotificationsPage() {
                     {TWITCH_LOADING_SKELETON_KEYS.map((key) => (
                         <div
                             key={key}
-                            className='h-14 rounded-sm bg-lucky-bg-tertiary animate-pulse'
+                            className='h-14 rounded-sm bg-vaded-bg-tertiary animate-pulse'
                         />
                     ))}
                 </div>
@@ -244,7 +244,7 @@ export default function TwitchNotificationsPage() {
 
         if (notifications.length === 0) {
             return (
-                <div className='text-center py-12 text-lucky-text-tertiary'>
+                <div className='text-center py-12 text-vaded-text-tertiary'>
                     {t('noNotificationsConfigured')}
                 </div>
             )
@@ -255,16 +255,16 @@ export default function TwitchNotificationsPage() {
                 {notifications.map((notif) => (
                     <div
                         key={notif.id}
-                        className='flex items-center gap-3 px-4 py-3 rounded-sm bg-lucky-bg-tertiary border border-lucky-border transition-colors hover:bg-lucky-bg-active/25 group'
+                        className='flex items-center gap-3 px-4 py-3 rounded-sm bg-vaded-bg-tertiary border border-vaded-border transition-colors hover:bg-vaded-bg-active/25 group'
                     >
                         <div className='w-8 h-8 rounded-sm bg-purple-600/20 flex items-center justify-center shrink-0'>
                             <Tv className='w-4 h-4 text-purple-400' />
                         </div>
                         <div className='flex-1 min-w-0'>
-                            <p className='type-body-sm font-semibold text-lucky-text-primary'>
+                            <p className='type-body-sm font-semibold text-vaded-text-primary'>
                                 {notif.twitchLogin}
                             </p>
-                            <p className='text-xs text-lucky-text-tertiary flex items-center gap-1'>
+                            <p className='text-xs text-vaded-text-tertiary flex items-center gap-1'>
                                 <Hash className='w-3 h-3' />
                                 {channelNameById.get(notif.discordChannelId) ??
                                     notif.discordChannelId}
@@ -272,7 +272,7 @@ export default function TwitchNotificationsPage() {
                         </div>
                         <button
                             onClick={() => handleRemove(notif.twitchUserId)}
-                            className='lucky-focus-visible p-1.5 rounded-sm text-lucky-text-tertiary hover:text-lucky-error hover:bg-lucky-error/10 transition-colors opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 cursor-pointer'
+                            className='vaded-focus-visible p-1.5 rounded-sm text-vaded-text-tertiary hover:text-vaded-error hover:bg-vaded-error/10 transition-colors opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 cursor-pointer'
                             aria-label={t('removeAriaLabel', {
                                 login: notif.twitchLogin,
                             })}
@@ -287,7 +287,7 @@ export default function TwitchNotificationsPage() {
 
     if (!selectedGuild) {
         return (
-            <div className='flex flex-col items-center justify-center h-64 text-lucky-text-secondary'>
+            <div className='flex flex-col items-center justify-center h-64 text-vaded-text-secondary'>
                 <Tv className='h-12 w-12 mb-4 opacity-50' />
                 <p className='text-lg'>{t('selectServerToManage')}</p>
             </div>
@@ -299,11 +299,11 @@ export default function TwitchNotificationsPage() {
             <div className='space-y-6 px-1 sm:px-0'>
                 <header className='flex items-center gap-3'>
                     <Tv className='h-6 w-6 text-purple-500' />
-                    <h1 className='type-title text-lucky-text-primary uppercase tracking-wide'>
+                    <h1 className='type-title text-vaded-text-primary uppercase tracking-wide'>
                         {t('twitchNotifications')}
                     </h1>
                 </header>
-                <div className='p-4 rounded-sm bg-lucky-error/10 border border-lucky-error text-lucky-error'>
+                <div className='p-4 rounded-sm bg-vaded-error/10 border border-vaded-error text-vaded-error'>
                     <p className='font-semibold uppercase tracking-wide mb-1'>
                         {t('notConfigured')}
                     </p>
@@ -318,10 +318,10 @@ export default function TwitchNotificationsPage() {
             <header className='flex items-center justify-between'>
                 <div className='flex items-center gap-3'>
                     <Tv className='h-6 w-6 text-purple-500' />
-                    <h1 className='type-title text-lucky-text-primary uppercase tracking-wide'>
+                    <h1 className='type-title text-vaded-text-primary uppercase tracking-wide'>
                         {t('twitchNotifications')}
                     </h1>
-                    <span className='text-sm text-lucky-text-tertiary'>
+                    <span className='text-sm text-vaded-text-tertiary'>
                         ({notifications.length})
                     </span>
                 </div>
@@ -336,14 +336,14 @@ export default function TwitchNotificationsPage() {
             </header>
 
             {error && (
-                <div className='p-3 rounded-lg bg-lucky-error/10 text-lucky-error text-sm'>
+                <div className='p-3 rounded-lg bg-vaded-error/10 text-vaded-error text-sm'>
                     {error}
                 </div>
             )}
 
             {showAdd && (
-                <div className='p-4 rounded-sm bg-lucky-bg-tertiary border border-lucky-border space-y-3'>
-                    <h3 className='type-body-sm font-semibold text-lucky-text-primary uppercase tracking-wide'>
+                <div className='p-4 rounded-sm bg-vaded-bg-tertiary border border-vaded-border space-y-3'>
+                    <h3 className='type-body-sm font-semibold text-vaded-text-primary uppercase tracking-wide'>
                         {t('addTwitchNotification')}
                     </h3>
                     <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
@@ -357,7 +357,7 @@ export default function TwitchNotificationsPage() {
                             placeholder={t('twitchUrlPlaceholder')}
                             value={newTwitchInput}
                             onChange={(e) => setNewTwitchInput(e.target.value)}
-                            className='px-3 py-2 text-sm rounded-sm bg-lucky-bg-active border border-lucky-border text-white placeholder:text-lucky-text-tertiary focus:outline-none focus:border-purple-500'
+                            className='px-3 py-2 text-sm rounded-sm bg-vaded-bg-active border border-vaded-border text-white placeholder:text-vaded-text-tertiary focus:outline-none focus:border-purple-500'
                         />
                         <Select
                             value={newChannelId}
@@ -365,12 +365,12 @@ export default function TwitchNotificationsPage() {
                                 setNewChannelId(value)
                             }
                         >
-                            <SelectTrigger className='bg-lucky-bg-active border-lucky-border text-white'>
+                            <SelectTrigger className='bg-vaded-bg-active border-vaded-border text-white'>
                                 <SelectValue
                                     placeholder={t('selectDiscordChannel')}
                                 />
                             </SelectTrigger>
-                            <SelectContent className='bg-lucky-bg-secondary border-lucky-border text-white'>
+                            <SelectContent className='bg-vaded-bg-secondary border-vaded-border text-white'>
                                 {channels.map((channel) => (
                                     <SelectItem
                                         key={channel.id}
@@ -383,7 +383,7 @@ export default function TwitchNotificationsPage() {
                         </Select>
                     </div>
                     {channelsError && (
-                        <p className='text-xs text-lucky-error'>
+                        <p className='text-xs text-vaded-error'>
                             {channelsError}
                         </p>
                     )}
@@ -401,7 +401,7 @@ export default function TwitchNotificationsPage() {
                         </button>
                         <button
                             onClick={() => setShowAdd(false)}
-                            className='px-4 py-1.5 text-sm font-semibold uppercase rounded-sm bg-lucky-bg-active text-lucky-text-secondary hover:text-white transition-colors cursor-pointer'
+                            className='px-4 py-1.5 text-sm font-semibold uppercase rounded-sm bg-vaded-bg-active text-vaded-text-secondary hover:text-white transition-colors cursor-pointer'
                         >
                             {t('cancel')}
                         </button>

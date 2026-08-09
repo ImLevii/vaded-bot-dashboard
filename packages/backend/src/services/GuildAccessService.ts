@@ -41,7 +41,7 @@ class GuildAccessService {
     // unhealthy this cache silently no-op'd, so every request hit Discord and
     // triggered 429 storms that degraded /moderation/cases, /logs, etc.). The
     // source of truth is the Discord API, not Postgres, so an in-memory TTL
-    // cache is the right home (single-instance; revisit if Lucky scales out).
+    // cache is the right home (single-instance; revisit if Vaded Gaming scales out).
     private readonly userGuildCache = new TtlCache<DiscordGuild[]>({
         ttlMs: this.userGuildCacheTtlSeconds * 1000,
         maxEntries: 1000,

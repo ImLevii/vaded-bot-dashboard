@@ -68,7 +68,7 @@ const SOURCE_BADGES: Record<string, SourceBadge> = {
 const DEFAULT_BADGE: SourceBadge = {
     label: 'Music',
     emoji: '<a:music:741605543046807626>',
-    color: COLOR.LUCKY_PURPLE,
+    color: COLOR.VADED_PURPLE,
 }
 
 /**

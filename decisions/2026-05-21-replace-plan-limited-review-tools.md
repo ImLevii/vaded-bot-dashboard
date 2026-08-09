@@ -9,7 +9,7 @@
 
 ## Context
 
-Lucky's `release/v2.12.0` PR pipeline runs ~18 checks. On 2026-05-21 a 4-PR ship attempt surfaced that three of those checks are plan-capped and were silently failing:
+Vaded Gaming's `release/v2.12.0` PR pipeline runs ~18 checks. On 2026-05-21 a 4-PR ship attempt surfaced that three of those checks are plan-capped and were silently failing:
 
 - **Snyk** (`code/snyk`) — `Code test limit reached` on every PR. Free tier is 200 tests/mo, exhausted.
 - **Greptile** (`greptile-apps`) — every review body says `Your free trial has ended.` since at least early May.
@@ -56,7 +56,7 @@ The mismatch: paying for and CI-gating on plan-limited tools (Snyk, Greptile, Co
 - **GitHub Copilot Code Review** — paid + Microsoft-only LLM. Costs more than the Anthropic spend on PR-Agent. No quality advantage observed.
 - **Cursor BugBot** — free preview, future pricing opaque. Adoption locks into another tool with future plan-cap risk — exactly what this ADR is undoing.
 - **Self-rolled `gh api` + `curl` to Anthropic** — possible, but PR-Agent already encapsulates the prompt engineering and the comment-posting workflow. Reinvention without benefit.
-- **Keep Snyk on paid tier** — ~$25/user/month. Trivy + OSV-Scanner combined cover the same surface for $0. The only Snyk-only feature Lucky used is the inline remediation hint on PR comments; OSV-Scanner SARIF output rendered in the GitHub UI is good enough.
+- **Keep Snyk on paid tier** — ~$25/user/month. Trivy + OSV-Scanner combined cover the same surface for $0. The only Snyk-only feature Vaded Gaming used is the inline remediation hint on PR comments; OSV-Scanner SARIF output rendered in the GitHub UI is good enough.
 - **Trivy fs scan instead of OSV-Scanner** — Trivy already runs but its dep-mode signal is noisier (also reports IaC + container findings inline). OSV-Scanner is the focused, single-purpose tool for the specific role Snyk filled.
 
 ## Consequences
@@ -104,7 +104,7 @@ Rollback: re-install the apps, restore branch-protection check names. ~10 min.
 
 ## Update 2026-06-04 — retire CodeRabbit, adopt cubic (free on public repo)
 
-The 2026-05-21 decision said to uninstall CodeRabbit but steps 4-5 were never executed — `.coderabbit.yaml` and the CodeRabbit App stayed live (it is not a required check, so it ran as advisory noise). This update closes that out and revisits the AI-review surface now that **Lucky is a public repository**.
+The 2026-05-21 decision said to uninstall CodeRabbit but steps 4-5 were never executed — `.coderabbit.yaml` and the CodeRabbit App stayed live (it is not a required check, so it ran as advisory noise). This update closes that out and revisits the AI-review surface now that **Vaded Gaming is a public repository**.
 
 **Context that changed the call:** cubic.dev's full codebase-aware reviewer is **free on public repositories** (its $40/$99 tiers are private-repo only). Its design goals — whole-codebase navigation + low false-positive rate — directly target the bug class that slipped recent sessions (cross-file intent gaps: validated `management.ts` but not `guilds.ts`; FK CUID-vs-snowflake mismatch; stale-test drift) and reduce the merge-thread noise that stalls the auto-merge pipeline.
 
@@ -120,7 +120,7 @@ The 2026-05-21 decision said to uninstall CodeRabbit but steps 4-5 were never ex
 
 - cubic false-positive rate > 3/week sustained for 2 weeks → tune its plain-English rules or drop it.
 - cubic introduces a paid gate for public repos → fall back to PR-Agent + claude-review only.
-- Lucky goes private → cubic costs $40/dev/mo; re-evaluate vs PR-Agent-only.
+- Vaded Gaming goes private → cubic costs $40/dev/mo; re-evaluate vs PR-Agent-only.
 
 ## Related artefacts
 

@@ -7,7 +7,7 @@
 
 ## Context
 
-Lucky runs on a single-node homelab box behind Cloudflare Tunnel. Current orchestration is docker-compose v2. PR #848 added resource limits, healthchecks, and security hardening but did not change orchestration. The question: is compose still the right runtime, or should we migrate to nomad / k3s / podman-quadlet / docker swarm?
+Vaded Gaming runs on a single-node homelab box behind Cloudflare Tunnel. Current orchestration is docker-compose v2. PR #848 added resource limits, healthchecks, and security hardening but did not change orchestration. The question: is compose still the right runtime, or should we migrate to nomad / k3s / podman-quadlet / docker swarm?
 
 Phase-1 research evaluated five candidates across 8 dimensions (effort, weekly tax, observability fit, systemd recovery, zero-downtime, volume safety, asleep-failure mode, 12-month ops cost). Critic Phase 2 stress-tested the leading "stay on compose" choice.
 

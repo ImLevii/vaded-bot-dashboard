@@ -8,7 +8,7 @@
 
 The 2026-06-09 security audit flagged an OWASP A05 gap: no HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, or CSP anywhere in the stack (only one route sets nosniff manually). Issue #1283 proposed fixing it "at nginx". Investigating the serving topology showed that framing is incomplete:
 
-- The SPA users actually hit is served by **Vercel** (`vercel.json`, Vite build), with `/api/:path*` rewritten to `https://lucky-api.lucassantana.tech`. nginx-only headers would miss the primary user-facing origin entirely.
+- The SPA users actually hit is served by **Vercel** (`vercel.json`, Vite build), with `/api/:path*` rewritten to `https://vaded-api.lucassantana.tech`. nginx-only headers would miss the primary user-facing origin entirely.
 - The homelab nginx fronts the API, the webhook service, and a second copy of the SPA — but it listens on **plain HTTP :8080 behind a Cloudflare Tunnel** (`cloudflared` service in docker-compose). TLS terminates at Cloudflare, not nginx. Per RFC 6797, browsers ignore `Strict-Transport-Security` received over http, so HSTS set at nginx is a no-op.
 - The frontend ships Sentry (browser SDK), Google Fonts, and Discord CDN avatars — all of which constrain the CSP.
 

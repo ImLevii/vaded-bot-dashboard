@@ -3,8 +3,8 @@
 set -euo pipefail
 
 remote_host="${1:-server-do-luk}"
-remote_dir="${OPENCODE_REMOTE_DIR:-/home/luk-server/Lucky}"
-remote_serve_cmd="${OPENCODE_REMOTE_SERVE_CMD:-\$HOME/.local/bin/opencode-lucky-serve}"
+remote_dir="${OPENCODE_REMOTE_DIR:-/home/luk-server/vaded-gaming}"
+remote_serve_cmd="${OPENCODE_REMOTE_SERVE_CMD:-\$HOME/.local/bin/opencode-vaded-serve}"
 remote_port="${OPENCODE_REMOTE_PORT:-4096}"
 local_port="${OPENCODE_LOCAL_PORT:-4096}"
 local_bin="${OPENCODE_LOCAL_BIN:-$HOME/.opencode/bin/opencode}"
@@ -23,7 +23,7 @@ ssh "$remote_host" "bash -lc '
   if ! ss -ltnH | awk '\''{print \$4}'\'' | grep -qx \"127.0.0.1:$remote_port\"; then
     mkdir -p \"\$HOME/.local/share/opencode\"
     OPENCODE_REMOTE_DIR=\"$remote_dir\" nohup $remote_serve_cmd \
-      >\"\$HOME/.local/share/opencode/lucky-serve.log\" 2>&1 &
+      >\"\$HOME/.local/share/opencode/vaded-serve.log\" 2>&1 &
     for _ in 1 2 3 4 5; do
       sleep 1
       if ss -ltnH | awk '\''{print \$4}'\'' | grep -qx \"127.0.0.1:$remote_port\"; then

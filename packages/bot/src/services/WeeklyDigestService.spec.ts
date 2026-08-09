@@ -39,7 +39,7 @@ jest.mock('@lucky/shared/utils', () => ({
 }))
 
 jest.mock('@lucky/shared/constants', () => ({
-    COLOR: { LUCKY_PURPLE: 0x9b59b6 },
+    COLOR: { VADED_PURPLE: 0x9b59b6 },
 }))
 
 import { WeeklyDigestService } from './WeeklyDigestService'

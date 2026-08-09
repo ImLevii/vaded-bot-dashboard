@@ -40,9 +40,9 @@ if [ -z "$actual" ]; then
         # The endpoint answered but carries no commitSha (older image without
         # a baked-in SHA). That is not "unreachable": we simply cannot tell
         # which SHA production serves.
-        echo "::error::Deploy failed and the health endpoint is reachable but reports no commitSha (pre-versioning image?). Check the homelab deploy log (/tmp/lucky-deploy.log) for a possible auto-rollback."
+        echo "::error::Deploy failed and the health endpoint is reachable but reports no commitSha (pre-versioning image?). Check the homelab deploy log (/tmp/vaded-deploy.log) for a possible auto-rollback."
     else
-        echo "::error::Deploy failed and the running production SHA could not be determined (health endpoint unreachable). Check the homelab deploy log (/tmp/lucky-deploy.log) for a possible auto-rollback."
+        echo "::error::Deploy failed and the running production SHA could not be determined (health endpoint unreachable). Check the homelab deploy log (/tmp/vaded-deploy.log) for a possible auto-rollback."
     fi
     exit 0
 fi

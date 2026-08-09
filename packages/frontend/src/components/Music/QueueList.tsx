@@ -90,14 +90,14 @@ export default memo(function QueueList({
             <div className='flex items-center justify-between mb-3 sm:mb-4'>
                 <div className='flex items-center gap-2.5'>
                     <ListMusic
-                        className='h-5 w-5 text-lucky-brand shrink-0'
+                        className='h-5 w-5 text-vaded-brand shrink-0'
                         aria-hidden='true'
                     />
-                    <h3 className='type-title text-lucky-text-primary font-bold'>
+                    <h3 className='type-title text-vaded-text-primary font-bold'>
                         Queue
                     </h3>
                     {tracks.length > 0 && (
-                        <span className='inline-flex items-center rounded-full bg-lucky-brand/15 border border-lucky-brand/25 px-2 py-0.5 text-[11px] font-bold text-lucky-brand tabular-nums'>
+                        <span className='inline-flex items-center rounded-full bg-vaded-brand/15 border border-vaded-brand/25 px-2 py-0.5 text-[11px] font-bold text-vaded-brand tabular-nums'>
                             {tracks.length}
                         </span>
                     )}
@@ -112,7 +112,7 @@ export default memo(function QueueList({
                             onClear()
                             toast.success('Queue cleared')
                         }}
-                        className='text-lucky-text-tertiary hover:text-red-400 hover:bg-red-500/10 h-8 px-2.5 text-xs gap-1.5 rounded-lg border border-transparent hover:border-red-500/20'
+                        className='text-vaded-text-tertiary hover:text-red-400 hover:bg-red-500/10 h-8 px-2.5 text-xs gap-1.5 rounded-lg border border-transparent hover:border-red-500/20'
                         aria-label='Clear queue'
                     >
                         <Trash2 className='h-3.5 w-3.5' aria-hidden='true' />
@@ -152,7 +152,7 @@ export default memo(function QueueList({
                     {hasMore && (
                         <button
                             onClick={showMore}
-                            className='w-full mt-2 min-h-[44px] type-body-sm text-lucky-text-secondary hover:text-white flex items-center justify-center gap-1 rounded-lg hover:bg-lucky-bg-tertiary active:bg-lucky-bg-tertiary transition-colors'
+                            className='w-full mt-2 min-h-[44px] type-body-sm text-vaded-text-secondary hover:text-white flex items-center justify-center gap-1 rounded-lg hover:bg-vaded-bg-tertiary active:bg-vaded-bg-tertiary transition-colors'
                             aria-label={`Show more tracks (${tracks.length - visibleCount} remaining)`}
                         >
                             <ChevronDown
@@ -217,9 +217,9 @@ const QueueItem = memo(function QueueItem({
 }) {
     return (
         <div
-            className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg hover:bg-lucky-bg-tertiary active:bg-lucky-bg-tertiary group transition-colors ${
+            className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg hover:bg-vaded-bg-tertiary active:bg-vaded-bg-tertiary group transition-colors ${
                 isDropTarget
-                    ? 'ring-1 ring-lucky-red/50 bg-lucky-bg-tertiary'
+                    ? 'ring-1 ring-vaded-red/50 bg-vaded-bg-tertiary'
                     : ''
             } ${disabled ? 'opacity-60' : ''}`}
             role='listitem'
@@ -230,34 +230,34 @@ const QueueItem = memo(function QueueItem({
             onDragEnd={onDragEnd}
         >
             <span
-                className='type-meta text-lucky-text-secondary w-5 sm:w-6 text-right tabular-nums shrink-0'
+                className='type-meta text-vaded-text-secondary w-5 sm:w-6 text-right tabular-nums shrink-0'
                 aria-hidden='true'
             >
                 {index + 1}
             </span>
 
             <GripVertical
-                className='h-4 w-4 text-lucky-text-secondary opacity-0 group-hover:opacity-100 cursor-grab shrink-0 hidden sm:block'
+                className='h-4 w-4 text-vaded-text-secondary opacity-0 group-hover:opacity-100 cursor-grab shrink-0 hidden sm:block'
                 aria-hidden='true'
             />
 
             <TrackThumbnail thumbnail={track.thumbnail} />
 
             <div className='flex-1 min-w-0'>
-                <p className='type-body text-lucky-text-primary truncate'>{track.title}</p>
+                <p className='type-body text-vaded-text-primary truncate'>{track.title}</p>
                 <div className='flex items-center gap-2 mt-0.5 flex-wrap'>
-                    <p className='type-meta text-lucky-text-secondary truncate'>
+                    <p className='type-meta text-vaded-text-secondary truncate'>
                         {track.author}
                     </p>
                     {track.requestedBy && (
                         <span className='inline-flex items-center gap-1 shrink-0'>
                             <span
-                                className='flex h-4 w-4 rounded-full items-center justify-center text-[9px] font-black bg-lucky-brand/20 text-lucky-brand border border-lucky-brand/30 shrink-0'
+                                className='flex h-4 w-4 rounded-full items-center justify-center text-[9px] font-black bg-vaded-brand/20 text-vaded-brand border border-vaded-brand/30 shrink-0'
                                 aria-hidden='true'
                             >
                                 {track.requestedBy.charAt(0).toUpperCase()}
                             </span>
-                            <span className='type-meta text-lucky-text-tertiary truncate max-w-[120px]'>
+                            <span className='type-meta text-vaded-text-tertiary truncate max-w-[120px]'>
                                 {track.requestedBy}
                             </span>
                         </span>
@@ -265,7 +265,7 @@ const QueueItem = memo(function QueueItem({
                 </div>
                 {track.recommendationReason ? (
                     <p
-                        className='type-meta text-lucky-text-tertiary truncate'
+                        className='type-meta text-vaded-text-tertiary truncate'
                         title={track.recommendationReason}
                     >
                         {track.recommendationReason}
@@ -273,7 +273,7 @@ const QueueItem = memo(function QueueItem({
                 ) : null}
             </div>
 
-            <span className='type-meta text-lucky-text-secondary tabular-nums shrink-0 hidden sm:block'>
+            <span className='type-meta text-vaded-text-secondary tabular-nums shrink-0 hidden sm:block'>
                 {track.durationFormatted}
             </span>
 
@@ -284,7 +284,7 @@ const QueueItem = memo(function QueueItem({
                     toast.success('Track removed')
                 }}
                 disabled={disabled}
-                className='min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-red-500/10 active:bg-red-500/10 text-lucky-text-secondary hover:text-red-400 sm:opacity-0 sm:group-hover:opacity-100 transition-all shrink-0 disabled:opacity-40 disabled:cursor-not-allowed'
+                className='min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-red-500/10 active:bg-red-500/10 text-vaded-text-secondary hover:text-red-400 sm:opacity-0 sm:group-hover:opacity-100 transition-all shrink-0 disabled:opacity-40 disabled:cursor-not-allowed'
                 aria-label={`Remove ${track.title} from queue`}
             >
                 <Trash2 className='h-4 w-4' />
@@ -306,9 +306,9 @@ function TrackThumbnail({ thumbnail }: { thumbnail?: string }) {
         )
     }
     return (
-        <div className='w-9 h-9 sm:w-10 sm:h-10 rounded bg-lucky-bg-secondary flex items-center justify-center shrink-0'>
+        <div className='w-9 h-9 sm:w-10 sm:h-10 rounded bg-vaded-bg-secondary flex items-center justify-center shrink-0'>
             <Music2
-                className='h-4 w-4 text-lucky-text-secondary'
+                className='h-4 w-4 text-vaded-text-secondary'
                 aria-hidden='true'
             />
         </div>

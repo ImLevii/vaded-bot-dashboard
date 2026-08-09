@@ -99,7 +99,7 @@ export default new Command({
                 const embed = new EmbedBuilder()
                     .setTitle('🏆 Top Tracks')
                     .setDescription(lines.join('\n'))
-                    .setColor(COLOR.LUCKY_PURPLE)
+                    .setColor(COLOR.VADED_PURPLE)
                     .setFooter({ text: `Top ${rows.length} · ${guild.name}` })
                 await interactionReply({
                     interaction,
@@ -130,7 +130,7 @@ export default new Command({
                 const embed = new EmbedBuilder()
                     .setTitle('🎤 Top Artists')
                     .setDescription(lines.join('\n'))
-                    .setColor(COLOR.LUCKY_PURPLE)
+                    .setColor(COLOR.VADED_PURPLE)
                     .setFooter({ text: `Top ${rows.length} · ${guild.name}` })
                 await interactionReply({
                     interaction,

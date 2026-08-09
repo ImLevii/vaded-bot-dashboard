@@ -10,7 +10,7 @@ import {
  */
 export const registry = new Registry()
 
-registry.setDefaultLabels({ service: 'lucky-backend' })
+registry.setDefaultLabels({ service: 'vaded-backend' })
 collectDefaultMetrics({ register: registry })
 
 /**
@@ -19,7 +19,7 @@ collectDefaultMetrics({ register: registry })
  * and status code.
  */
 export const httpRequestsTotal = new Counter<'method' | 'route' | 'status'>({
-    name: 'lucky_backend_http_requests_total',
+    name: 'vaded_backend_http_requests_total',
     help: 'Count of HTTP requests handled by the backend, labelled by method, route template, and status code.',
     labelNames: ['method', 'route', 'status'],
     registers: [registry],
@@ -32,7 +32,7 @@ export const httpRequestsTotal = new Counter<'method' | 'route' | 'status'>({
 export const httpRequestDurationSeconds = new Histogram<
     'method' | 'route' | 'status'
 >({
-    name: 'lucky_backend_http_request_duration_seconds',
+    name: 'vaded_backend_http_request_duration_seconds',
     help: 'HTTP request duration in seconds, observed at response finish.',
     labelNames: ['method', 'route', 'status'],
     buckets: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
@@ -44,7 +44,7 @@ export const httpRequestDurationSeconds = new Histogram<
  * Separate from the total counter for easier alerting.
  */
 export const httpServerErrorsTotal = new Counter<'method' | 'route'>({
-    name: 'lucky_backend_http_server_errors_total',
+    name: 'vaded_backend_http_server_errors_total',
     help: 'Count of HTTP 5xx responses, labelled by method and route template.',
     labelNames: ['method', 'route'],
     registers: [registry],
@@ -55,7 +55,7 @@ export const httpServerErrorsTotal = new Counter<'method' | 'route'>({
  * Cardinality is bounded: we label by operation type (plan|apply|reconcile) and count total attempts.
  */
 export const guildAutomationUsageTotal = new Counter<'operation'>({
-    name: 'lucky_guild_automation_usage_total',
+    name: 'vaded_guild_automation_usage_total',
     help: 'Count of Guild Automation plan/apply/reconcile attempts, labelled by operation type.',
     labelNames: ['operation'],
     registers: [registry],

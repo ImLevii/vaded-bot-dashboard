@@ -144,7 +144,7 @@ if (envFiles.length > 0) {
 }
 
 // --- 6. Console.log left behind in source ----------------------------------
-// Lucky uses structured logging via debugLog/infoLog/errorLog/warnLog.
+// Vaded Gaming uses structured logging via debugLog/infoLog/errorLog/warnLog.
 // Bare console.log in src/ is almost always debug residue.
 async function checkConsoleLogs(): Promise<void> {
     const sourceTouched = all.filter(

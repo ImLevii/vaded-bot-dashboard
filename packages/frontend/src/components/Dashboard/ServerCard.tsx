@@ -26,8 +26,8 @@ function ServerCard({ guild }: ServerCardProps) {
         <article
             className={cn(
                 'surface-card group flex flex-col gap-4 p-5 transition-all duration-200',
-                'hover:border-lucky-border-strong hover:-translate-y-0.5',
-                'focus-within:ring-2 focus-within:ring-lucky-brand focus-within:ring-offset-2 focus-within:ring-offset-lucky-bg-primary',
+                'hover:border-vaded-border-strong hover:-translate-y-0.5',
+                'focus-within:ring-2 focus-within:ring-vaded-brand focus-within:ring-offset-2 focus-within:ring-offset-vaded-bg-primary',
             )}
             role='article'
             aria-labelledby={`server-${guild.id}-name`}
@@ -43,13 +43,13 @@ function ServerCard({ guild }: ServerCardProps) {
                             }
                             alt={`${guild.name} icon`}
                         />
-                        <AvatarFallback className='type-h2 bg-lucky-bg-active text-lucky-text-secondary'>
+                        <AvatarFallback className='type-h2 bg-vaded-bg-active text-vaded-text-secondary'>
                             {guild.name.charAt(0).toUpperCase()}
                         </AvatarFallback>
                     </Avatar>
                     {guild.botAdded && (
                         <div
-                            className='absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-lucky-bg-secondary bg-lucky-success'
+                            className='absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-vaded-bg-secondary bg-vaded-success'
                             aria-label='Bot is installed'
                         >
                             <CheckCircle2 className='h-3 w-3 text-white' aria-hidden='true' />
@@ -60,7 +60,7 @@ function ServerCard({ guild }: ServerCardProps) {
                 <div className='min-w-0 flex-1'>
                     <h3
                         id={`server-${guild.id}-name`}
-                        className='type-title truncate text-lucky-text-primary'
+                        className='type-title truncate text-vaded-text-primary'
                     >
                         {guild.name}
                     </h3>
@@ -70,8 +70,8 @@ function ServerCard({ guild }: ServerCardProps) {
                             className={cn(
                                 'type-meta normal-case tracking-normal gap-1 transition-colors',
                                 guild.botAdded
-                                    ? 'bg-lucky-success/10 text-lucky-success border-lucky-success/30'
-                                    : 'bg-lucky-error/10 text-lucky-error border-lucky-error/30',
+                                    ? 'bg-vaded-success/10 text-vaded-success border-vaded-success/30'
+                                    : 'bg-vaded-error/10 text-vaded-error border-vaded-error/30',
                             )}
                             aria-label={guild.botAdded ? 'Bot installed' : 'Bot not installed'}
                         >
@@ -88,7 +88,7 @@ function ServerCard({ guild }: ServerCardProps) {
                             )}
                         </Badge>
                         {guild.memberCount != null && (
-                            <span className='type-meta text-lucky-text-tertiary normal-case tracking-normal'>
+                            <span className='type-meta text-vaded-text-tertiary normal-case tracking-normal'>
                                 {guild.memberCount.toLocaleString()} members
                             </span>
                         )}

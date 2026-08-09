@@ -71,11 +71,11 @@ export default memo(function ImportPlaylist({
                     className='h-5 w-5 text-primary shrink-0'
                     aria-hidden='true'
                 />
-                <h3 className='type-title text-lucky-text-primary'>
+                <h3 className='type-title text-vaded-text-primary'>
                     Import Playlist
                 </h3>
             </div>
-            <p className='type-body-sm text-lucky-text-secondary mb-3 sm:mb-4'>
+            <p className='type-body-sm text-vaded-text-secondary mb-3 sm:mb-4'>
                 Import from Spotify, YouTube, or SoundCloud
             </p>
             <form

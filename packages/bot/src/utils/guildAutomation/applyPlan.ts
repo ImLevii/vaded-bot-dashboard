@@ -146,7 +146,7 @@ async function applyRolesAndChannels(
                 hoist: role.hoist,
                 mentionable: role.mentionable,
                 permissions: toPermissions(role.permissions),
-                reason: 'Lucky guild automation reconcile',
+                reason: 'Vaded Gaming guild automation reconcile',
             })
             continue
         }
@@ -157,7 +157,7 @@ async function applyRolesAndChannels(
             hoist: role.hoist,
             mentionable: role.mentionable,
             permissions: toPermissions(role.permissions),
-            reason: 'Lucky guild automation reconcile',
+            reason: 'Vaded Gaming guild automation reconcile',
         })
     }
 
@@ -170,7 +170,7 @@ async function applyRolesAndChannels(
                 type: mapChannelType(channel.type),
                 parent: channel.parentId ?? undefined,
                 topic: channel.topic ?? undefined,
-                reason: 'Lucky guild automation reconcile',
+                reason: 'Vaded Gaming guild automation reconcile',
             })
             continue
         }
@@ -179,7 +179,7 @@ async function applyRolesAndChannels(
             name: channel.name,
             parent: channel.parentId ?? undefined,
             topic: channel.topic ?? undefined,
-            reason: 'Lucky guild automation reconcile',
+            reason: 'Vaded Gaming guild automation reconcile',
         })
     }
 
@@ -198,7 +198,7 @@ async function applyRolesAndChannels(
         }
 
         if (role.editable) {
-            await role.delete('Lucky guild automation protected-delete apply')
+            await role.delete('Vaded Gaming guild automation protected-delete apply')
         }
     }
 
@@ -209,7 +209,7 @@ async function applyRolesAndChannels(
 
         try {
             await channel.delete(
-                'Lucky guild automation protected-delete apply',
+                'Vaded Gaming guild automation protected-delete apply',
             )
         } catch (error) {
             if (shouldIgnoreProtectedDeleteError(error)) {

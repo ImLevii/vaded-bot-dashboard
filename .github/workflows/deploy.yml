@@ -40,7 +40,7 @@ jobs:
             # Build/CI secret — when unset, all Sentry release steps below are skipped.
             SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
             SENTRY_ORG: ${{ vars.SENTRY_ORG || 'lucas-santana-gm' }}
-            SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT || 'lucky' }}
+            SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT || 'vaded' }}
 
         steps:
             - name: Checkout

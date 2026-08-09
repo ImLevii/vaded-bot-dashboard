@@ -25,7 +25,7 @@ durable procedure rather than re-derivation each incident.
 
 A **generic global `/hotfix` agent skill already exists**, but it is built on a
 `release`-branch cadence (branch-from-main-not-release, manual `version-bump` +
-patch tag, `/ship-it`, cherry-pick back to `release`). Lucky is **main-as-trunk**
+patch tag, `/ship-it`, cherry-pick back to `release`). Vaded Gaming is **main-as-trunk**
 (no live `release` branch), is adopting **release-please** to own
 versioning/tags/changelog (ADR 2026-06-16, accepted), and deploys via
 **`workflow_dispatch` of a SHA** to a homelab box — not a tag-and-ship. The global
@@ -46,12 +46,12 @@ Enabling facts (verified in-repo, 2026-06-17):
   deploy completes in ~1.5 min (GH) + ~2 min (box).
 - `deploy.yml` has `concurrency: deployment-production` (no cancel) and `deploy.sh`
   holds a lockfile — concurrent hotfixes queue, they do not race.
-- `.claude/` in Lucky is local-only/untracked; agent-actionable context must be
+- `.claude/` in Vaded Gaming is local-only/untracked; agent-actionable context must be
   committed to be the source of truth.
 
 ## Decision
 
-Add a **committed `docs/runbooks/hotfix.md`** that codifies Lucky's verified
+Add a **committed `docs/runbooks/hotfix.md`** that codifies Vaded Gaming's verified
 emergency-deploy fast-path, and treat it as the authority over the generic global
 `/hotfix` skill when operating in this repo.
 
@@ -70,10 +70,10 @@ into the runbook without a second artifact that drifts from `deploy.yml`.
 
 ## Alternatives considered
 
-- **Lucky-local agent skill (`.claude/skills/`).** Rejected: `.claude/` is
+- **Vaded Gaming-local agent skill (`.claude/skills/`).** Rejected: `.claude/` is
   untracked → not SoT, lost on a clean clone, violates the commit-context rule.
-- **Fork/edit the global `/hotfix` skill to be Lucky-aware.** Rejected: pollutes a
-  generic cross-repo skill with Lucky homelab/`deploy.yml` specifics.
+- **Fork/edit the global `/hotfix` skill to be Vaded Gaming-aware.** Rejected: pollutes a
+  generic cross-repo skill with Vaded Gaming homelab/`deploy.yml` specifics.
 - **`scripts/hotfix.sh` automating the gh + box calls.** Deferred, not chosen now:
   it adds a second thing that drifts from `deploy.yml`, and shell is brittle for
   the SHA-resolution judgment; an agent running the runbook's exact `--json`
@@ -91,7 +91,7 @@ into the runbook without a second artifact that drifts from `deploy.yml`.
 - **Negative:** a runbook is not executable — it relies on being followed, and can
   drift from `deploy.yml` if that workflow changes (mitigated by the revisit
   trigger + the runbook citing the specific workflow behaviors it depends on); the
-  global `/hotfix` skill stays mismatched outside Lucky (only overridden here).
+  global `/hotfix` skill stays mismatched outside Vaded Gaming (only overridden here).
 - **Neutral:** when release-please lands, the "no manual tag" step is unchanged and
   even clearer.
 

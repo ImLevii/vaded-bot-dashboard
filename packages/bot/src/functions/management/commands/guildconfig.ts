@@ -402,7 +402,7 @@ export default new Command({
 
                         await member.roles.remove(
                             removableRoleIds,
-                            'Lucky cutover removed legacy bot permissions',
+                            'Vaded Gaming cutover removed legacy bot permissions',
                         )
                         cleanedBots += 1
                     }

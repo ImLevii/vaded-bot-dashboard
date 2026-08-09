@@ -5,7 +5,7 @@ describe('inferApiBase', () => {
     test('uses configured VITE_API_BASE_URL when provided', () => {
         const result = inferApiBase('https://custom.example.com/api', {
             protocol: 'https:',
-            hostname: 'lucky.lucassantana.tech',
+            hostname: 'vaded.lucassantana.tech',
         })
 
         expect(result).toBe('https://custom.example.com/api')

@@ -42,14 +42,14 @@ function EmbedPreview({ form }: { form: FormState }) {
             className='rounded-lg overflow-hidden max-w-md'
             style={{ borderLeft: `4px solid ${borderColor}` }}
         >
-            <div className='bg-lucky-bg-tertiary p-4 space-y-2'>
+            <div className='bg-vaded-bg-tertiary p-4 space-y-2'>
                 {form.title && (
-                    <p className='type-title text-lucky-text-primary'>
+                    <p className='type-title text-vaded-text-primary'>
                         {form.title}
                     </p>
                 )}
                 {form.description && (
-                    <p className='type-body-sm text-lucky-text-secondary whitespace-pre-wrap'>
+                    <p className='type-body-sm text-vaded-text-secondary whitespace-pre-wrap'>
                         {form.description}
                     </p>
                 )}
@@ -62,10 +62,10 @@ function EmbedPreview({ form }: { form: FormState }) {
                                     field.inline ? 'col-span-1' : 'col-span-3'
                                 }
                             >
-                                <p className='type-body-sm text-lucky-text-primary'>
+                                <p className='type-body-sm text-vaded-text-primary'>
                                     {field.name}
                                 </p>
-                                <p className='type-meta text-lucky-text-secondary'>
+                                <p className='type-meta text-vaded-text-secondary'>
                                     {field.value}
                                 </p>
                             </div>
@@ -84,7 +84,7 @@ function EmbedPreview({ form }: { form: FormState }) {
                     />
                 )}
                 {form.footer && (
-                    <p className='type-meta text-lucky-text-tertiary mt-2'>
+                    <p className='type-meta text-vaded-text-tertiary mt-2'>
                         {form.footer}
                     </p>
                 )}
@@ -117,7 +117,7 @@ function FieldEditor({
     return (
         <div className='space-y-3'>
             <div className='flex items-center justify-between'>
-                <p className='type-body-sm text-lucky-text-secondary'>
+                <p className='type-body-sm text-vaded-text-secondary'>
                     {t('embedBuilder.fields')}
                 </p>
                 <Button variant='secondary' size='sm' onClick={addField}>
@@ -135,11 +135,11 @@ function FieldEditor({
                             onChange={(e) =>
                                 updateField(i, { name: e.target.value })
                             }
-                            className='flex-1 bg-lucky-bg-tertiary border-lucky-border'
+                            className='flex-1 bg-vaded-bg-tertiary border-vaded-border'
                         />
                         <button
                             onClick={() => removeField(i)}
-                            className='min-h-[44px] min-w-[44px] flex items-center justify-center text-lucky-text-secondary hover:text-red-400 rounded transition-colors'
+                            className='min-h-[44px] min-w-[44px] flex items-center justify-center text-vaded-text-secondary hover:text-red-400 rounded transition-colors'
                             aria-label={t('embedBuilder.removeFieldAriaLabel', {
                                 index: i + 1,
                             })}
@@ -154,9 +154,9 @@ function FieldEditor({
                             updateField(i, { value: e.target.value })
                         }
                         rows={2}
-                        className='w-full bg-lucky-bg-tertiary border border-lucky-border rounded-md px-3 py-2 type-body-sm text-lucky-text-primary resize-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
+                        className='w-full bg-vaded-bg-tertiary border border-vaded-border rounded-md px-3 py-2 type-body-sm text-vaded-text-primary resize-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
                     />
-                    <Label className='flex items-center gap-2 type-meta text-lucky-text-secondary cursor-pointer font-normal'>
+                    <Label className='flex items-center gap-2 type-meta text-vaded-text-secondary cursor-pointer font-normal'>
                         <input
                             type='checkbox'
                             checked={field.inline ?? false}
@@ -233,8 +233,8 @@ function EmbedFormModal({
                 exit={{ opacity: 0, scale: 0.96 }}
                 className='surface-card w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-xl flex flex-col'
             >
-                <div className='flex items-center justify-between p-5 border-b border-lucky-border'>
-                    <h2 className='type-title text-lucky-text-primary'>
+                <div className='flex items-center justify-between p-5 border-b border-vaded-border'>
+                    <h2 className='type-title text-vaded-text-primary'>
                         {isEdit
                             ? t('embedBuilder.editEmbedTemplate')
                             : t('embedBuilder.newEmbedTemplate')}
@@ -254,7 +254,7 @@ function EmbedFormModal({
 
                         <div className='grid grid-cols-2 gap-4'>
                             <div className='space-y-1.5'>
-                                <Label className='type-meta text-lucky-text-tertiary uppercase tracking-wide font-semibold'>
+                                <Label className='type-meta text-vaded-text-tertiary uppercase tracking-wide font-semibold'>
                                     {t('embedBuilder.templateName')}
                                 </Label>
                                 <Input
@@ -265,11 +265,11 @@ function EmbedFormModal({
                                     placeholder={t(
                                         'embedBuilder.templateNamePlaceholder',
                                     )}
-                                    className='bg-lucky-bg-tertiary border-lucky-border'
+                                    className='bg-vaded-bg-tertiary border-vaded-border'
                                 />
                             </div>
                             <div className='space-y-1.5'>
-                                <Label className='type-meta text-lucky-text-tertiary uppercase tracking-wide font-semibold'>
+                                <Label className='type-meta text-vaded-text-tertiary uppercase tracking-wide font-semibold'>
                                     {t('embedBuilder.color')}
                                 </Label>
                                 <div className='flex gap-2 items-center'>
@@ -277,7 +277,7 @@ function EmbedFormModal({
                                         type='color'
                                         value={form.color}
                                         onChange={set('color')}
-                                        className='h-9 w-12 rounded cursor-pointer bg-transparent border border-lucky-border'
+                                        className='h-9 w-12 rounded cursor-pointer bg-transparent border border-vaded-border'
                                     />
                                     <Input
                                         type='text'
@@ -286,14 +286,14 @@ function EmbedFormModal({
                                         placeholder={t(
                                             'embedBuilder.urlPlaceholder',
                                         )}
-                                        className='flex-1 bg-lucky-bg-tertiary border-lucky-border font-mono'
+                                        className='flex-1 bg-vaded-bg-tertiary border-vaded-border font-mono'
                                     />
                                 </div>
                             </div>
                         </div>
 
                         <div className='space-y-1.5'>
-                            <Label className='type-meta text-lucky-text-tertiary uppercase tracking-wide font-normal'>
+                            <Label className='type-meta text-vaded-text-tertiary uppercase tracking-wide font-normal'>
                                 {t('embedBuilder.title')}
                             </Label>
                             <Input
@@ -301,12 +301,12 @@ function EmbedFormModal({
                                 value={form.title}
                                 onChange={set('title')}
                                 placeholder={t('embedBuilder.titlePlaceholder')}
-                                className='bg-lucky-bg-tertiary border-lucky-border'
+                                className='bg-vaded-bg-tertiary border-vaded-border'
                             />
                         </div>
 
                         <div className='space-y-1.5'>
-                            <Label className='type-meta text-lucky-text-tertiary uppercase tracking-wide font-normal'>
+                            <Label className='type-meta text-vaded-text-tertiary uppercase tracking-wide font-normal'>
                                 {t('embedBuilder.description')}
                             </Label>
                             <textarea
@@ -316,13 +316,13 @@ function EmbedFormModal({
                                     'embedBuilder.descriptionPlaceholder',
                                 )}
                                 rows={4}
-                                className='w-full bg-lucky-bg-tertiary border border-lucky-border rounded-md px-3 py-2 type-body-sm text-lucky-text-primary resize-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
+                                className='w-full bg-vaded-bg-tertiary border border-vaded-border rounded-md px-3 py-2 type-body-sm text-vaded-text-primary resize-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
                             />
                         </div>
 
                         <div className='grid grid-cols-2 gap-4'>
                             <div className='space-y-1.5'>
-                                <Label className='type-meta text-lucky-text-tertiary uppercase tracking-wide font-semibold'>
+                                <Label className='type-meta text-vaded-text-tertiary uppercase tracking-wide font-semibold'>
                                     {t('embedBuilder.thumbnailUrl')}
                                 </Label>
                                 <Input
@@ -332,11 +332,11 @@ function EmbedFormModal({
                                     placeholder={t(
                                         'embedBuilder.urlPlaceholder',
                                     )}
-                                    className='bg-lucky-bg-tertiary border-lucky-border'
+                                    className='bg-vaded-bg-tertiary border-vaded-border'
                                 />
                             </div>
                             <div className='space-y-1.5'>
-                                <Label className='type-meta text-lucky-text-tertiary uppercase tracking-wide font-semibold'>
+                                <Label className='type-meta text-vaded-text-tertiary uppercase tracking-wide font-semibold'>
                                     {t('embedBuilder.imageUrl')}
                                 </Label>
                                 <Input
@@ -346,13 +346,13 @@ function EmbedFormModal({
                                     placeholder={t(
                                         'embedBuilder.urlPlaceholder',
                                     )}
-                                    className='bg-lucky-bg-tertiary border-lucky-border'
+                                    className='bg-vaded-bg-tertiary border-vaded-border'
                                 />
                             </div>
                         </div>
 
                         <div className='space-y-1.5'>
-                            <Label className='type-meta text-lucky-text-tertiary uppercase tracking-wide font-normal'>
+                            <Label className='type-meta text-vaded-text-tertiary uppercase tracking-wide font-normal'>
                                 {t('embedBuilder.footer')}
                             </Label>
                             <Input
@@ -362,7 +362,7 @@ function EmbedFormModal({
                                 placeholder={t(
                                     'embedBuilder.footerPlaceholder',
                                 )}
-                                className='bg-lucky-bg-tertiary border-lucky-border'
+                                className='bg-vaded-bg-tertiary border-vaded-border'
                             />
                         </div>
 
@@ -374,8 +374,8 @@ function EmbedFormModal({
                         />
                     </div>
 
-                    <div className='w-80 border-l border-lucky-border p-5 space-y-3 overflow-y-auto bg-lucky-bg-primary/30'>
-                        <p className='type-meta text-lucky-text-tertiary uppercase tracking-wide'>
+                    <div className='w-80 border-l border-vaded-border p-5 space-y-3 overflow-y-auto bg-vaded-bg-primary/30'>
+                        <p className='type-meta text-vaded-text-tertiary uppercase tracking-wide'>
                             {t('embedBuilder.preview')}
                         </p>
                         {form.title ||
@@ -383,14 +383,14 @@ function EmbedFormModal({
                         form.fields.length > 0 ? (
                             <EmbedPreview form={form} />
                         ) : (
-                            <p className='type-body-sm text-lucky-text-tertiary'>
+                            <p className='type-body-sm text-vaded-text-tertiary'>
                                 {t('embedBuilder.fillFieldsToSeePreview')}
                             </p>
                         )}
                     </div>
                 </div>
 
-                <div className='flex justify-end gap-3 p-5 border-t border-lucky-border'>
+                <div className='flex justify-end gap-3 p-5 border-t border-vaded-border'>
                     <Button variant='secondary' onClick={onClose}>
                         {t('embedBuilder.cancel')}
                     </Button>
@@ -528,7 +528,7 @@ export default function EmbedBuilder() {
                                                         '#5865F2',
                                                 }}
                                             />
-                                            <p className='type-body text-lucky-text-primary truncate'>
+                                            <p className='type-body text-vaded-text-primary truncate'>
                                                 {template.name}
                                             </p>
                                         </div>
@@ -537,7 +537,7 @@ export default function EmbedBuilder() {
                                                 onClick={() =>
                                                     setModalTemplate(template)
                                                 }
-                                                className='flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-lucky-text-secondary hover:text-lucky-brand hover:bg-lucky-bg-active/50 transition-colors'
+                                                className='flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-vaded-text-secondary hover:text-vaded-brand hover:bg-vaded-bg-active/50 transition-colors'
                                                 aria-label={t(
                                                     'embedBuilder.editAriaLabel',
                                                     { name: template.name },
@@ -551,7 +551,7 @@ export default function EmbedBuilder() {
                                                         template.name,
                                                     )
                                                 }
-                                                className='flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-lucky-text-secondary hover:text-red-400 hover:bg-red-500/10 transition-colors'
+                                                className='flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-vaded-text-secondary hover:text-red-400 hover:bg-red-500/10 transition-colors'
                                                 aria-label={t(
                                                     'embedBuilder.deleteAriaLabel',
                                                     { name: template.name },
@@ -563,17 +563,17 @@ export default function EmbedBuilder() {
                                     </div>
 
                                     {template.title && (
-                                        <p className='type-body-sm text-lucky-text-primary line-clamp-1'>
+                                        <p className='type-body-sm text-vaded-text-primary line-clamp-1'>
                                             {template.title}
                                         </p>
                                     )}
                                     {template.description && (
-                                        <p className='type-body-sm text-lucky-text-secondary line-clamp-2'>
+                                        <p className='type-body-sm text-vaded-text-secondary line-clamp-2'>
                                             {template.description}
                                         </p>
                                     )}
 
-                                    <div className='mt-auto pt-2 flex items-center justify-between type-meta text-lucky-text-tertiary'>
+                                    <div className='mt-auto pt-2 flex items-center justify-between type-meta text-vaded-text-tertiary'>
                                         <span>
                                             {t('embedBuilder.used', {
                                                 count: template.useCount ?? 0,
@@ -620,10 +620,10 @@ export default function EmbedBuilder() {
                             exit={{ opacity: 0, scale: 0.96 }}
                             className='surface-card rounded-xl p-6 max-w-sm w-full space-y-4'
                         >
-                            <h3 className='type-title text-lucky-text-primary'>
+                            <h3 className='type-title text-vaded-text-primary'>
                                 {t('embedBuilder.deleteTemplate')}
                             </h3>
-                            <p className='type-body-sm text-lucky-text-secondary'>
+                            <p className='type-body-sm text-vaded-text-secondary'>
                                 {t('embedBuilder.deleteTemplateConfirm', {
                                     name: deleteTarget,
                                 })}

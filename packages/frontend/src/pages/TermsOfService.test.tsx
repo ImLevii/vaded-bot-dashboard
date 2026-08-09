@@ -54,11 +54,11 @@ describe('TermsOfService', () => {
     test('contact link points to github issues', () => {
         renderPage()
         const link = screen.getByRole('link', {
-            name: /^github\.com\/LucasSantana-Dev\/Lucky\/issues$/i,
+            name: /^github\.com\/LucasSantana-Dev\/vaded-gaming\/issues$/i,
         })
         expect(link).toHaveAttribute(
             'href',
-            'https://github.com/LucasSantana-Dev/Lucky/issues',
+            'https://github.com/LucasSantana-Dev/vaded-gaming/issues',
         )
     })
 

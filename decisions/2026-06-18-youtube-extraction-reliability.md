@@ -6,13 +6,13 @@
 
 ## Context
 
-Music playback is Lucky's advertised core, and YouTube extraction is its fragile dependency
-(Sentry LUCKY-2T "Bridge: all stages exhausted"; prior outages #1468/#1472; the growth ADR
+Music playback is Vaded Gaming's advertised core, and YouTube extraction is its fragile dependency
+(Sentry VADED-2T "Bridge: all stages exhausted"; prior outages #1468/#1472; the growth ADR
 flagged reliability as the churn driver). Decision: how to harden it for a single-operator,
 residential-IP, low-volume homelab bot (discord-player v7 + custom stream bridge + spawned
 yt-dlp + SoundCloud fallback; no Lavalink).
 
-Research (2026, web-verified) + repo + Lucky-specific data:
+Research (2026, web-verified) + repo + Vaded Gaming-specific data:
 
 - yt-dlp releases every 1–3 weeks and is **pinned at Docker build time** → goes stale between
   deploys.
@@ -22,7 +22,7 @@ Research (2026, web-verified) + repo + Lucky-specific data:
 - **Lavalink + youtube-source** is the most robust path (multi-client fallback) but is a
   separate JVM service + ~1–2 week migration + ongoing ops — heavy for a solo Node operator.
 - po_token providers (bgutil) / cookies-from-browser are the current robustness tools.
-- **Lucky's actual failure data** (LUCKY-2T): 36 exhaustions over ~2 months, sporadic, single
+- **Vaded Gaming's actual failure data** (VADED-2T): 36 exhaustions over ~2 months, sporadic, single
   track per event, 0 users impacted — no visible 403/velocity cluster.
 - **Verified in code:** `ytdlpExtractor` _does_ `errorLog` the raw yt-dlp error (stderr incl.
   "403"/"Sign in to confirm") at error level → it reaches Loki/Sentry. But intermediate
@@ -36,7 +36,7 @@ Lavalink behind a firm gate. (Incorporates the decision-critic's three revisions
 
 1. **Prerequisite — make the measurement real (do FIRST).** Add extraction **error
    classification** (genuinely-unavailable vs 403/429 rate-block vs timeout vs no-results) +
-   a counter (e.g. `lucky_bot_extraction_failures_total{type}`), and **raise retry-failure
+   a counter (e.g. `vaded_bot_extraction_failures_total{type}`), and **raise retry-failure
    logs from `debug` to `warn`** so velocity patterns surface. This unifies with #1500 (bridge
    log hygiene) and the growth ADR's extraction-failure signal. Without it, "no 403 pattern"
    is survivorship, not health (critic's strongest objection).
@@ -72,7 +72,7 @@ Lavalink behind a firm gate. (Incorporates the decision-critic's three revisions
 - **Adopt Lavalink now** — rejected for now: most robust, but JVM service + network dependency
     - ~1–2wk migration + solo-operator ops burden isn't justified before data shows the cheaper
       paths are insufficient. Kept as the gated escalation target with a hard revisit date.
-- **Add po_token/cookies now (preventative)** — rejected as first move: Lucky's data shows
+- **Add po_token/cookies now (preventative)** — rejected as first move: Vaded Gaming's data shows
   unavailable-track failures, not a 403/velocity cluster; adding po_token machinery for an
   unconfirmed problem is premature. Promoted to the first data-gated escalation if 403s appear.
 - **In-container yt-dlp auto-update** — rejected: faster reaction but can break extraction

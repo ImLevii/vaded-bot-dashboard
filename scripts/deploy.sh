@@ -9,14 +9,14 @@ EXPECTED_SECRET="${DEPLOY_WEBHOOK_SECRET:-}"
 DEPLOY_DIR="${DEPLOY_DIR:-/repo}"
 DISCORD_WEBHOOK="${DISCORD_DEPLOY_WEBHOOK:-}"
 LOG_PREFIX="[deploy]"
-LOCK_DIR="/tmp/lucky-deploy.lock"
+LOCK_DIR="/tmp/vaded-deploy.lock"
 LOCK_PID_FILE="$LOCK_DIR/pid"
-COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-lucky}"
+COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-vaded}"
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 export COMPOSE_PROJECT_NAME
 GITHUB_DEPLOY_STATUS_TOKEN="${GITHUB_DEPLOY_STATUS_TOKEN:-}"
-GITHUB_REPO="${GITHUB_REPO:-LucasSantana-Dev/Lucky}"
+GITHUB_REPO="${GITHUB_REPO:-LucasSantana-Dev/vaded-gaming}"
 DEPLOY_FINAL_STATE="failure"
 DEPLOY_FINAL_DESC="Deploy failed"
 DEPLOYED_SHA=""
@@ -32,7 +32,7 @@ resolve_cloudflared_config_dir() {
         return
     fi
 
-    if [[ -f "$DEPLOY_DIR/cloudflared/config-lucky.yml" ]]; then
+    if [[ -f "$DEPLOY_DIR/cloudflared/config-vaded.yml" ]]; then
         echo "$DEPLOY_DIR/cloudflared"
         return
     fi
@@ -52,7 +52,7 @@ resolve_compose_workdir() {
     fi
 
     local existing_workdir
-    existing_workdir=$(docker inspect lucky-backend \
+    existing_workdir=$(docker inspect vaded-backend \
         --format '{{ index .Config.Labels "com.docker.compose.project.working_dir" }}' \
         2>/dev/null || true)
 
@@ -132,7 +132,7 @@ print_targeted_logs() {
 
 verify_cloudflared_config() {
     local config_dir="$1"
-    local config_path="$config_dir/config-lucky.yml"
+    local config_path="$config_dir/config-vaded.yml"
     local credentials_container_path
     local credentials_basename
     local credentials_host_path
@@ -233,7 +233,7 @@ archive_local_checkout_state() {
         return 0
     fi
 
-    archive_root="${DEPLOY_ARCHIVE_DIR:-${HOME}/.lucky/deploy-archive}"
+    archive_root="${DEPLOY_ARCHIVE_DIR:-${HOME}/.vaded/deploy-archive}"
     timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
     archive_prefix="${archive_root}/${timestamp}"
 
@@ -387,9 +387,9 @@ run_health_checks() {
     # health-check failure so the auto-rollback path can be validated against a
     # real deploy. Lives in /tmp so the deploy's `git clean` can't remove it, and
     # self-deletes after one use. Absent in all normal operation.
-    if [[ -f /tmp/lucky-simulate-health-fail ]]; then
+    if [[ -f /tmp/vaded-simulate-health-fail ]]; then
         # Best-effort delete; never let an undeletable sentinel abort the deploy.
-        rm -f /tmp/lucky-simulate-health-fail 2>/dev/null || true
+        rm -f /tmp/vaded-simulate-health-fail 2>/dev/null || true
         log "TEST: simulated health-check failure (one-shot sentinel consumed)"
         return 1
     fi
@@ -424,9 +424,9 @@ run_health_checks() {
         return 1
     fi
 
-    # Frontend dashboard: the SPA is served by the long-running lucky-frontend
+    # Frontend dashboard: the SPA is served by the long-running vaded-frontend
     # container (nginx) and reverse-proxied at "/". Previously the deploy started
-    # lucky-frontend but never verified it, so a down/broken frontend (the surface
+    # vaded-frontend but never verified it, so a down/broken frontend (the surface
     # hosting the dashboard features) passed as a successful deploy. Verify the
     # SPA actually renders by matching the React mount point in the served HTML.
     if ! wait_for_http_ready \
@@ -434,7 +434,7 @@ run_health_checks() {
         "http://nginx:8080/" \
         'id="root"'; then
         print_targeted_logs
-        log "HEALTH: frontend dashboard did not serve the SPA (lucky-frontend down or stale image?)"
+        log "HEALTH: frontend dashboard did not serve the SPA (vaded-frontend down or stale image?)"
         return 1
     fi
 
@@ -581,7 +581,7 @@ post_deploy_status "pending" "Deploy in progress"
 # /.dockerenv + hostname matching the webhook container ID). Rebuilding from
 # inside kills our own process. The webhook will be rebuilt on the NEXT deploy.
 if [[ -f /.dockerenv ]] && \
-   docker inspect lucky-webhook --format '{{.Id}}' 2>/dev/null | grep -q "$(hostname)"; then
+   docker inspect vaded-webhook --format '{{.Id}}' 2>/dev/null | grep -q "$(hostname)"; then
     log "Skipping webhook rebuild (running inside webhook container)"
 else
     log "Rebuilding webhook container (early, before app build)..."
@@ -674,8 +674,8 @@ fi
 log "Restarting Cloudflare tunnel..."
 if docker_compose --profile tunnel up -d cloudflared >/dev/null 2>&1; then
     log "Cloudflare tunnel restarted via compose profile"
-elif docker ps --format '{{.Names}}' | grep -qx "lucky-tunnel"; then
-    docker restart lucky-tunnel >/dev/null
+elif docker ps --format '{{.Names}}' | grep -qx "vaded-tunnel"; then
+    docker restart vaded-tunnel >/dev/null
     log "Cloudflare tunnel restarted via container restart"
 else
     log "WARN: Could not restart cloudflared (service unavailable)"

@@ -60,10 +60,10 @@ function ArtistTile({
 
     // Determine ring color based on hover state and preference
     const getRingColor = () => {
-        if (active) return 'ring-lucky-brand'
-        if (preference === 'prefer') return 'ring-lucky-success'
-        if (preference === 'block') return 'ring-lucky-error'
-        return isHovered ? 'ring-lucky-brand' : 'ring-lucky-border'
+        if (active) return 'ring-vaded-brand'
+        if (preference === 'prefer') return 'ring-vaded-success'
+        if (preference === 'block') return 'ring-vaded-error'
+        return isHovered ? 'ring-vaded-brand' : 'ring-vaded-border'
     }
 
     return (
@@ -73,12 +73,12 @@ function ArtistTile({
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             className={cn(
-                'flex flex-col items-center gap-2 rounded-xl p-2 transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-lucky-brand',
+                'flex flex-col items-center gap-2 rounded-xl p-2 transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-vaded-brand',
                 active
-                    ? 'bg-lucky-bg-active'
+                    ? 'bg-vaded-bg-active'
                     : isHovered
-                      ? 'bg-lucky-bg-tertiary'
-                      : 'hover:bg-lucky-bg-tertiary',
+                      ? 'bg-vaded-bg-tertiary'
+                      : 'hover:bg-vaded-bg-tertiary',
                 !onClick && 'cursor-default',
             )}
         >
@@ -100,8 +100,8 @@ function ArtistTile({
                         onError={() => setImageBroken(true)}
                     />
                 ) : (
-                    <div className='w-full h-full bg-lucky-bg-active flex items-center justify-center'>
-                        <span className='font-semibold text-lucky-text-secondary text-xl'>
+                    <div className='w-full h-full bg-vaded-bg-active flex items-center justify-center'>
+                        <span className='font-semibold text-vaded-text-secondary text-xl'>
                             {initial}
                         </span>
                     </div>
@@ -132,9 +132,9 @@ function ArtistTile({
                                     e.stopPropagation()
                                     onPrefer()
                                 }}
-                                className='absolute top-2 left-2 rounded-full bg-lucky-bg-primary/90 p-1.5 ring-1 ring-lucky-border hover:bg-lucky-brand transition-colors'
+                                className='absolute top-2 left-2 rounded-full bg-vaded-bg-primary/90 p-1.5 ring-1 ring-vaded-border hover:bg-vaded-brand transition-colors'
                             >
-                                <Heart className='h-4 w-4 text-lucky-brand' />
+                                <Heart className='h-4 w-4 text-vaded-brand' />
                             </button>
                         )}
                         {onBlock && (
@@ -145,9 +145,9 @@ function ArtistTile({
                                     e.stopPropagation()
                                     onBlock()
                                 }}
-                                className='absolute top-2 right-2 rounded-full bg-lucky-bg-primary/90 p-1.5 ring-1 ring-lucky-border hover:bg-lucky-error transition-colors'
+                                className='absolute top-2 right-2 rounded-full bg-vaded-bg-primary/90 p-1.5 ring-1 ring-vaded-border hover:bg-vaded-error transition-colors'
                             >
-                                <X className='h-4 w-4 text-lucky-error' />
+                                <X className='h-4 w-4 text-vaded-error' />
                             </button>
                         )}
                     </>
@@ -158,9 +158,9 @@ function ArtistTile({
                     'max-w-[80px] text-center leading-tight font-medium line-clamp-2',
                     textSize[size],
                     active
-                        ? 'text-lucky-text-primary'
-                        : 'text-lucky-text-secondary transition-colors duration-150',
-                    isHovered && 'text-lucky-text-primary',
+                        ? 'text-vaded-text-primary'
+                        : 'text-vaded-text-secondary transition-colors duration-150',
+                    isHovered && 'text-vaded-text-primary',
                 )}
             >
                 {artist.name}
@@ -452,11 +452,11 @@ export default function PreferredArtistsPage() {
                 eyebrow={t('musicPersonalization')}
                 title={t('musicalTaste')}
                 description={t('chooseArtistsDescription')}
-                actions={<Heart className='h-5 w-5 text-lucky-accent' />}
+                actions={<Heart className='h-5 w-5 text-vaded-accent' />}
             />
 
             {/* Tab Buttons */}
-            <div className='surface-panel p-4 border border-lucky-border'>
+            <div className='surface-panel p-4 border border-vaded-border'>
                 <div className='flex gap-2'>
                     {(['discover', 'preferred', 'blocked'] as const).map(
                         (tab) => {
@@ -473,8 +473,8 @@ export default function PreferredArtistsPage() {
                                     className={cn(
                                         'px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2',
                                         currentTab === tab
-                                            ? 'bg-lucky-brand text-white'
-                                            : 'bg-lucky-bg-tertiary text-lucky-text-secondary hover:bg-lucky-bg-active',
+                                            ? 'bg-vaded-brand text-white'
+                                            : 'bg-vaded-bg-tertiary text-vaded-text-secondary hover:bg-vaded-bg-active',
                                     )}
                                 >
                                     <span className='capitalize'>
@@ -488,7 +488,7 @@ export default function PreferredArtistsPage() {
                                             'inline-flex items-center justify-center h-5 px-1.5 rounded-full text-xs font-medium',
                                             currentTab === tab
                                                 ? 'bg-white/20 text-white'
-                                                : 'bg-lucky-brand/20 text-lucky-brand',
+                                                : 'bg-vaded-brand/20 text-vaded-brand',
                                         )}
                                     >
                                         {counts[tab]}
@@ -503,21 +503,21 @@ export default function PreferredArtistsPage() {
             <div className='space-y-4'>
                 {/* Discover Tab */}
                 {currentTab === 'discover' && (
-                    <div className='surface-panel p-4 border border-lucky-border'>
+                    <div className='surface-panel p-4 border border-vaded-border'>
                         <div className='relative'>
-                            <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-lucky-text-subtle' />
+                            <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-vaded-text-subtle' />
                             <input
                                 type='text'
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
                                 placeholder={t('searchForArtist')}
-                                className='lucky-focus-visible w-full rounded-lg border border-lucky-border bg-lucky-bg-tertiary py-2.5 pl-9 pr-10 type-body-sm text-lucky-text-primary placeholder:text-lucky-text-subtle focus:border-lucky-brand focus:bg-lucky-bg-primary'
+                                className='vaded-focus-visible w-full rounded-lg border border-vaded-border bg-vaded-bg-tertiary py-2.5 pl-9 pr-10 type-body-sm text-vaded-text-primary placeholder:text-vaded-text-subtle focus:border-vaded-brand focus:bg-vaded-bg-primary'
                             />
                             {query && (
                                 <button
                                     type='button'
                                     onClick={() => setQuery('')}
-                                    className='absolute right-3 top-1/2 -translate-y-1/2 text-lucky-text-subtle hover:text-lucky-text-primary'
+                                    className='absolute right-3 top-1/2 -translate-y-1/2 text-vaded-text-subtle hover:text-vaded-text-primary'
                                 >
                                     <X className='h-3.5 w-3.5' />
                                 </button>
@@ -526,15 +526,15 @@ export default function PreferredArtistsPage() {
 
                         {searching && (
                             <div className='flex items-center justify-center py-6'>
-                                <Loader2 className='h-5 w-5 animate-spin text-lucky-text-tertiary' />
-                                <span className='text-lucky-text-tertiary text-sm'>
+                                <Loader2 className='h-5 w-5 animate-spin text-vaded-text-tertiary' />
+                                <span className='text-vaded-text-tertiary text-sm'>
                                     {t('searching')}
                                 </span>
                             </div>
                         )}
 
                         {searchError && (
-                            <p className='mt-3 type-body-sm text-lucky-error'>
+                            <p className='mt-3 type-body-sm text-vaded-error'>
                                 {t('failedToSearchArtists')}
                             </p>
                         )}
@@ -543,15 +543,15 @@ export default function PreferredArtistsPage() {
                             query.trim() &&
                             searchResults.length === 0 &&
                             !searchError && (
-                                <p className='mt-3 type-body-sm text-lucky-text-tertiary'>
+                                <p className='mt-3 type-body-sm text-vaded-text-tertiary'>
                                     {t('noArtistsFound', { query })}
                                 </p>
                             )}
 
                         {!searching && !query.trim() && suggestionsLoading && (
                             <div className='flex items-center justify-center py-6'>
-                                <Loader2 className='h-5 w-5 animate-spin text-lucky-text-tertiary' />
-                                <span className='text-lucky-text-tertiary text-sm'>
+                                <Loader2 className='h-5 w-5 animate-spin text-vaded-text-tertiary' />
+                                <span className='text-vaded-text-tertiary text-sm'>
                                     {t('searching')}
                                 </span>
                             </div>
@@ -650,13 +650,13 @@ export default function PreferredArtistsPage() {
                             suggestionsError &&
                             !suggestionsLoading && (
                                 <div className='py-6 text-center space-y-3'>
-                                    <p className='type-body-sm text-lucky-error'>
+                                    <p className='type-body-sm text-vaded-error'>
                                         {suggestionsError}
                                     </p>
                                     <button
                                         type='button'
                                         onClick={loadSuggestions}
-                                        className='lucky-focus-visible rounded-lg bg-lucky-brand px-4 py-2 type-body-sm font-medium text-white hover:bg-lucky-brand/90'
+                                        className='vaded-focus-visible rounded-lg bg-vaded-brand px-4 py-2 type-body-sm font-medium text-white hover:bg-vaded-brand/90'
                                     >
                                         Try again
                                     </button>
@@ -668,7 +668,7 @@ export default function PreferredArtistsPage() {
                             !suggestionsLoading &&
                             !suggestionsError && (
                                 <div className='py-6 text-center'>
-                                    <p className='type-body-sm text-lucky-text-tertiary'>
+                                    <p className='type-body-sm text-vaded-text-tertiary'>
                                         {t('noSuggestionsAvailable')}
                                     </p>
                                 </div>
@@ -678,7 +678,7 @@ export default function PreferredArtistsPage() {
 
                 {/* Preferred Tab */}
                 {currentTab === 'preferred' && (
-                    <div className='surface-panel p-4 border border-lucky-border'>
+                    <div className='surface-panel p-4 border border-vaded-border'>
                         {preferredArtists.length === 0 ? (
                             <EmptyState
                                 icon={
@@ -726,7 +726,7 @@ export default function PreferredArtistsPage() {
 
                 {/* Blocked Tab */}
                 {currentTab === 'blocked' && (
-                    <div className='surface-panel p-4 border border-lucky-border'>
+                    <div className='surface-panel p-4 border border-vaded-border'>
                         {blockedArtists.length === 0 ? (
                             <EmptyState
                                 icon={
@@ -778,10 +778,10 @@ export default function PreferredArtistsPage() {
                         onClick={handleSavePreferences}
                         disabled={isSaving}
                         className={cn(
-                            'lucky-focus-visible w-full rounded-lg px-4 py-2.5 type-body-sm font-medium transition-colors',
+                            'vaded-focus-visible w-full rounded-lg px-4 py-2.5 type-body-sm font-medium transition-colors',
                             isSaving
-                                ? 'bg-lucky-brand/50 text-white'
-                                : 'bg-lucky-brand text-white hover:bg-lucky-brand/90',
+                                ? 'bg-vaded-brand/50 text-white'
+                                : 'bg-vaded-brand text-white hover:bg-vaded-brand/90',
                         )}
                     >
                         {isSaving ? (

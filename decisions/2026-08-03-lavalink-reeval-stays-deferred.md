@@ -15,16 +15,16 @@ Filter is the exact bridge failure message `"all stages exhausted"` — within t
 | Rising week-over-week trend | rising | **Falling sharply**: 34 exhaustions (prev 30d) → 5 (last 30d); plays 655 → 414 | NO |
 | 403/velocity cluster | — | "Sign in to confirm you're not a bot": **7 in 60d, 0 in the last 30d**; age-gate: 2. The 2,501 other "403" log lines are Last.fm invalid-session-key noise, not YouTube | NO |
 
-Caveat: the ADR's prerequisite Prometheus counter (`lucky_bot_extraction_failures_total{type}`) was never shipped — this read used reproducible Loki queries instead (below). Retry logs at `warn` did ship, which is what makes the Loki read possible.
+Caveat: the ADR's prerequisite Prometheus counter (`vaded_bot_extraction_failures_total{type}`) was never shipped — this read used reproducible Loki queries instead (below). Retry logs at `warn` did ship, which is what makes the Loki read possible.
 
 ## Decision
 
-**Lavalink + youtube-source stays deferred.** None of the listed gate conditions reads positive, and the trend is improving (concurrency is unmeasured — see table; the other three conditions are measured and negative). The current stack (discord-player v7 + stream bridge + spawned yt-dlp + SoundCloud fallback) is holding at Lucky's actual volume.
+**Lavalink + youtube-source stays deferred.** None of the listed gate conditions reads positive, and the trend is improving (concurrency is unmeasured — see table; the other three conditions are measured and negative). The current stack (discord-player v7 + stream bridge + spawned yt-dlp + SoundCloud fallback) is holding at Vaded Gaming's actual volume.
 
 1. **No migration.** A JVM service + ~1–2 week migration + ongoing ops is not justified by 5 exhaustions in the last 30 days.
 2. **No cookies/po_token yet.** The velocity-block signal (7 events, none recent) is below the "cluster" bar that would trigger the cookies-first escalation.
 3. **Keep the weekly yt-dlp rebuild** — the improving trend coincides with it; it stays the primary freshness mechanism.
-4. **Ship the missing counter when the bot is next touched for observability** — the 2026-06-18 prerequisite (`lucky_bot_extraction_failures_total{type}`) is still unshipped; without it every re-evaluation pays the Loki-query cost again, and concurrency stays unmeasurable. Not urgent.
+4. **Ship the missing counter when the bot is next touched for observability** — the 2026-06-18 prerequisite (`vaded_bot_extraction_failures_total{type}`) is still unshipped; without it every re-evaluation pays the Loki-query cost again, and concurrency stays unmeasurable. Not urgent.
 
 ## Reproduction
 

@@ -12,7 +12,7 @@ The 2026-05-21 roadmap sequenced autoplay as telemetry-first and made Phase D (a
 
 > "Ship Phase D **only if** the baseline acceptance-rate delta is large enough… If Phase C shows the layered defense already produces **>85% acceptance per source, Phase D becomes optional and gets deferred to a future ADR.**"
 
-This ADR is that future ADR. The Phase-C baseline was pulled 2026-06-24 from **prod** (homelab `lucky-postgres`, table `recommendations`, since Phase-A telemetry landed 2026-05-22 — ~33 days).
+This ADR is that future ADR. The Phase-C baseline was pulled 2026-06-24 from **prod** (homelab `vaded-postgres`, table `recommendations`, since Phase-A telemetry landed 2026-05-22 — ~33 days).
 
 ### Baseline (prod)
 

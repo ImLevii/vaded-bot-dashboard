@@ -246,7 +246,7 @@ describe('Last.fm Routes Integration', () => {
 
         test('should derive callback origin from WEBAPP_REDIRECT_URI when backend url is unset', async () => {
             process.env.WEBAPP_REDIRECT_URI =
-                'https://lucky.example.com/api/auth/callback'
+                'https://vaded.example.com/api/auth/callback'
             const state = buildState(DISCORD_ID, LINK_SECRET)
 
             const res = await request(app)
@@ -256,7 +256,7 @@ describe('Last.fm Routes Integration', () => {
 
             expect(res.headers.location).toContain(
                 encodeURIComponent(
-                    `https://lucky.example.com/api/lastfm/callback?state=${state}`,
+                    `https://vaded.example.com/api/lastfm/callback?state=${state}`,
                 ),
             )
         })
@@ -264,7 +264,7 @@ describe('Last.fm Routes Integration', () => {
         test('should ignore non-absolute WEBAPP_BACKEND_URL and fallback to oauth origin', async () => {
             process.env.WEBAPP_BACKEND_URL = '/'
             process.env.WEBAPP_REDIRECT_URI =
-                'https://lucky.example.com/api/auth/callback'
+                'https://vaded.example.com/api/auth/callback'
             const state = buildState(DISCORD_ID, LINK_SECRET)
 
             const res = await request(app)
@@ -274,7 +274,7 @@ describe('Last.fm Routes Integration', () => {
 
             expect(res.headers.location).toContain(
                 encodeURIComponent(
-                    `https://lucky.example.com/api/lastfm/callback?state=${state}`,
+                    `https://vaded.example.com/api/lastfm/callback?state=${state}`,
                 ),
             )
         })

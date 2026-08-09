@@ -92,7 +92,7 @@ export async function startClient({
 
                 // Register globally, not per guild. Guild-scoped registration
                 // only ever covered guilds already in the cache at ready, so a
-                // server that added Lucky while the process was running saw no
+                // server that added Vaded Gaming while the process was running saw no
                 // slash commands at all until the next redeploy. That is what
                 // failed the Top.gg review (#1885): their verification bot
                 // joined after boot and found an empty command list.

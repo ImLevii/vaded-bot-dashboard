@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document tracks the baseline bundle sizes for the Lucky frontend application. Bundle size monitoring is critical to prevent performance regressions.
+This document tracks the baseline bundle sizes for the Vaded Gaming frontend application. Bundle size monitoring is critical to prevent performance regressions.
 
 ## Current Baseline (v2.17.0)
 

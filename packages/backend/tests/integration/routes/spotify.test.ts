@@ -37,7 +37,7 @@ jest.mock('../../../src/middleware/auth', () => ({
 }))
 
 jest.mock('../../../src/utils/frontendOrigin', () => ({
-    getPrimaryFrontendUrl: () => 'https://lucky.lucassantana.tech',
+    getPrimaryFrontendUrl: () => 'https://vaded.lucassantana.tech',
 }))
 
 jest.mock('../../../src/utils/oauthRedirectUri', () => ({

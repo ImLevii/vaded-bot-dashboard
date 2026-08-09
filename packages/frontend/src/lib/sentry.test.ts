@@ -70,14 +70,14 @@ describe('initSentry', () => {
         setEnv({
             VITE_SENTRY_DSN: 'https://abc@sentry.io/123',
             VITE_SENTRY_ENVIRONMENT: 'staging',
-            VITE_SENTRY_RELEASE: 'lucky@2.12.0',
+            VITE_SENTRY_RELEASE: 'vaded@2.12.0',
         })
         initSentry()
         expect(initMock).toHaveBeenCalledTimes(1)
         const config = initMock.mock.calls[0][0] as Record<string, unknown>
         expect(config.dsn).toBe('https://abc@sentry.io/123')
         expect(config.environment).toBe('staging')
-        expect(config.release).toBe('lucky@2.12.0')
+        expect(config.release).toBe('vaded@2.12.0')
     })
 
     test('wires the React Router v7 + replay integrations', () => {

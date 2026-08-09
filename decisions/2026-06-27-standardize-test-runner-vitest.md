@@ -10,7 +10,7 @@
 
 ## Context
 
-The Lucky monorepo has four packages with tests:
+The Vaded Gaming monorepo has four packages with tests:
 
 | Package  | Current runner | Test files | `jest.*` patterns                                                                                            | Status       |
 | -------- | -------------- | ---------- | ------------------------------------------------------------------------------------------------------------ | ------------ |

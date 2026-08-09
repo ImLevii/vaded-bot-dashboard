@@ -7,7 +7,7 @@ set -euo pipefail
 DEPLOY_DIR="${DEPLOY_DIR:-/repo}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DEPLOY_SCRIPT="$SCRIPT_DIR/deploy.sh"
-LOG_FILE="/tmp/lucky-deploy.log"
+LOG_FILE="/tmp/vaded-deploy.log"
 
 if [[ ! -x "$DEPLOY_SCRIPT" ]]; then
     echo "[deploy-wrapper] ERROR: $DEPLOY_SCRIPT is not executable"

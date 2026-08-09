@@ -89,7 +89,7 @@ vi.mock('react-i18next', () => ({
                 musicPersonalization: 'Music personalization',
                 musicalTaste: 'Musical Taste',
                 chooseArtistsDescription:
-                    "Choose artists to guide autoplay recommendations. When multiple people are in voice, Lucky blends everyone's preferences.",
+                    "Choose artists to guide autoplay recommendations. When multiple people are in voice, Vaded Gaming blends everyone's preferences.",
                 discoverTab: 'Discover',
                 preferredTab: 'Preferred',
                 blockedTab: 'Blocked',
@@ -103,7 +103,7 @@ vi.mock('react-i18next', () => ({
                 addFromDiscover: 'Add some from Discover.',
                 noBlockedArtists: 'No blocked artists',
                 blockArtistsDescription:
-                    "Block artists you don't want Lucky to autoplay.",
+                    "Block artists you don't want Vaded Gaming to autoplay.",
                 savePreferences: 'Save Preferences',
                 saving: 'Saving...',
             }
@@ -867,7 +867,7 @@ describe('PreferredArtistsPage', () => {
         const activeBadge = discoverBtn.querySelector('span.rounded-full')
         const inactiveBadge = preferredBtn.querySelector('span.rounded-full')
         expect(activeBadge?.className).toContain('text-white')
-        expect(inactiveBadge?.className).toContain('text-lucky-brand')
+        expect(inactiveBadge?.className).toContain('text-vaded-brand')
     })
 
     test('shows error + Try again on suggestions failure; retry re-fetches', async () => {

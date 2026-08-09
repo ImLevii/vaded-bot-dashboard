@@ -1210,7 +1210,7 @@ describe('queueManipulation.replenishQueue', () => {
         expect(mutableMeta.isAutoplay).toBe(true)
     })
 
-    it('marks autoplay metadata on tracks with a read-only metadata getter (LUCKY-2K)', async () => {
+    it('marks autoplay metadata on tracks with a read-only metadata getter (VADED-2K)', async () => {
         const trackWithReadOnlyMetadata = Object.defineProperty(
             {
                 title: 'Getter Song',

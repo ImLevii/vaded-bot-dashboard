@@ -146,7 +146,7 @@ const FORGE_CATEGORIES: CategoryDef[] = [
             },
             {
                 name: 'music-bot',
-                topic: 'Lucky music commands go here',
+                topic: 'Vaded Gaming music commands go here',
             },
         ],
     },
@@ -414,7 +414,7 @@ export default new Command({
             progress.push('')
             progress.push('**Next steps:**')
             progress.push(
-                '• Keep your current server icon/splash/banner (Lucky preserves guild identity)',
+                '• Keep your current server icon/splash/banner (Vaded Gaming preserves guild identity)',
             )
             progress.push('• Configure community features in Server Settings')
             progress.push('• Set up verification level')

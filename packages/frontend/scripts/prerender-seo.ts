@@ -47,7 +47,7 @@ function writeRouteFile(html: string, routePath: string): string {
  *  always resolves to a real image (build never breaks on the image). */
 async function generateOgImage(): Promise<string> {
     const out = join(distDir, 'og-image.png')
-    const logoPath = join(publicDir, 'lucky-logo.png')
+    const logoPath = join(publicDir, 'vaded-logo.png')
     try {
         const { Resvg } = await import('@resvg/resvg-js')
         let logoTag = ''
@@ -72,7 +72,7 @@ async function generateOgImage(): Promise<string> {
         const reason = err instanceof Error ? err.message : String(err)
         if (existsSync(logoPath)) {
             copyFileSync(logoPath, out)
-            return `fallback to lucky-logo.png (resvg unavailable: ${reason})`
+            return `fallback to vaded-logo.png (resvg unavailable: ${reason})`
         }
         return `SKIPPED — no og-image written (resvg failed: ${reason}, no logo fallback)`
     }

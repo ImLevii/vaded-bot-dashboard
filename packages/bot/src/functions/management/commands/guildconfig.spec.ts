@@ -308,7 +308,7 @@ describe('guildconfig command', () => {
         expect(getManifestMock).toHaveBeenCalledWith('123456789012345678')
         expect(removeRolesMock).toHaveBeenCalledWith(
             ['legacy-role'],
-            'Lucky cutover removed legacy bot permissions',
+            'Vaded Gaming cutover removed legacy bot permissions',
         )
     })
 

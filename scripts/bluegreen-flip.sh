@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Blue/green deployment flip script for Lucky web tier (backend + frontend).
+# Blue/green deployment flip script for Vaded Gaming web tier (backend + frontend).
 # This script is run by the deploy pipeline to flip traffic between blue and
 # green services with zero HTTP downtime.
 #
@@ -66,10 +66,10 @@ fi
 # baked HEALTHCHECK (see Step 1), so no per-service probe path/port is needed.
 case "$SERVICE" in
     backend)
-        CONTAINER_NAME="lucky-staging-backend-$COLOR"
+        CONTAINER_NAME="vaded-staging-backend-$COLOR"
         ;;
     frontend)
-        CONTAINER_NAME="lucky-staging-frontend-$COLOR"
+        CONTAINER_NAME="vaded-staging-frontend-$COLOR"
         ;;
 esac
 

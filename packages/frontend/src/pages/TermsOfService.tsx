@@ -27,21 +27,21 @@ export default function TermsOfServicePage() {
             lastUpdated='March 18, 2026'
         >
             <p>
-                By using Lucky, you agree to these Terms of Service. If you use
-                Lucky on behalf of a server, team, or organization, you confirm
+                By using Vaded Gaming, you agree to these Terms of Service. If you use
+                Vaded Gaming on behalf of a server, team, or organization, you confirm
                 you are authorized to accept these terms for that entity.
             </p>
 
             <h2 id='acceptance'>Acceptance</h2>
             <p>
-                These terms form a binding agreement between you and the Lucky
+                These terms form a binding agreement between you and the Vaded Gaming
                 maintainers. If you do not agree, do not install or use the bot,
                 and do not access the dashboard.
             </p>
 
             <h2 id='service-scope'>Service scope</h2>
             <p>
-                Lucky provides Discord bot functionality and a web dashboard for
+                Vaded Gaming provides Discord bot functionality and a web dashboard for
                 server management, moderation, automation, engagement, and
                 integrations. Features may change over time as we ship
                 improvements and respond to platform changes.
@@ -51,13 +51,13 @@ export default function TermsOfServicePage() {
             <p>
                 You must comply with the Discord Terms of Service, applicable
                 law, and your own server rules. You may not abuse the service,
-                attempt unauthorized access, bypass rate limits, or use Lucky
+                attempt unauthorized access, bypass rate limits, or use Vaded Gaming
                 for spam, harassment, malware distribution, or illegal activity.
             </p>
 
             <h2 id='third-party'>Third-party services</h2>
             <p>
-                Lucky relies on third-party services including Discord, and
+                Vaded Gaming relies on third-party services including Discord, and
                 optional Last.fm, Spotify, and Twitch integrations. We are not
                 responsible for outages, API changes, policy decisions, or
                 account actions taken by those providers.
@@ -65,7 +65,7 @@ export default function TermsOfServicePage() {
 
             <h2 id='availability'>Availability and modifications</h2>
             <p>
-                Lucky is provided on an &quot;as is&quot; and &quot;as
+                Vaded Gaming is provided on an &quot;as is&quot; and &quot;as
                 available&quot; basis. We may add, modify, limit, or remove
                 features at any time to improve security, performance, or
                 compliance. Self-hosters control their own deployments.
@@ -75,13 +75,13 @@ export default function TermsOfServicePage() {
             <p>
                 We may suspend or terminate access to the hosted bot if we
                 reasonably believe there is abuse, legal risk, or a security
-                threat to the platform or other users. You may stop using Lucky
+                threat to the platform or other users. You may stop using Vaded Gaming
                 at any time by removing the bot and disconnecting integrations.
             </p>
 
             <h2 id='disclaimers'>Disclaimers and liability</h2>
             <p>
-                To the maximum extent permitted by law, Lucky and its
+                To the maximum extent permitted by law, Vaded Gaming and its
                 maintainers disclaim implied warranties and are not liable for
                 indirect, incidental, special, or consequential damages arising
                 from use of the service.
@@ -99,11 +99,11 @@ export default function TermsOfServicePage() {
             <p>
                 For support or legal requests, open an issue at{' '}
                 <a
-                    href='https://github.com/LucasSantana-Dev/Lucky/issues'
+                    href='https://github.com/LucasSantana-Dev/vaded-gaming/issues'
                     target='_blank'
                     rel='noreferrer'
                 >
-                    github.com/LucasSantana-Dev/Lucky/issues
+                    github.com/LucasSantana-Dev/vaded-gaming/issues
                 </a>
                 .
             </p>

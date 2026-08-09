@@ -38,11 +38,11 @@ export default memo(function SearchBar({
                     className='h-5 w-5 text-primary shrink-0'
                     aria-hidden='true'
                 />
-                <h3 className='type-title text-lucky-text-primary'>
+                <h3 className='type-title text-vaded-text-primary'>
                     Search & Play
                 </h3>
             </div>
-            <p className='type-body-sm text-lucky-text-secondary mb-3 sm:mb-4'>
+            <p className='type-body-sm text-vaded-text-secondary mb-3 sm:mb-4'>
                 Search for a song or paste a YouTube/Spotify URL
             </p>
             <form

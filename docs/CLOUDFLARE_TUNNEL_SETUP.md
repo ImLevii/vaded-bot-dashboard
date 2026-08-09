@@ -1,6 +1,6 @@
 # Cloudflare Tunnel, Domain, and DNS for Bot Frontend
 
-This guide configures Cloudflare Tunnel so the Lucky web app (frontend + API) is reachable at a custom domain over HTTPS, without opening ports or exposing your origin IP.
+This guide configures Cloudflare Tunnel so the Vaded Gaming web app (frontend + API) is reachable at a custom domain over HTTPS, without opening ports or exposing your origin IP.
 
 ## Overview
 
@@ -52,10 +52,10 @@ You can create a **remotely-managed** tunnel (recommended) from the dashboard, o
 
 1. In [Cloudflare Dashboard](https://dash.cloudflare.com) → **Zero Trust** (or **Networks** → **Tunnels**), open **Networks** → **Tunnels**.
 2. Click **Create a tunnel**. Choose **Cloudflared**.
-3. Name it (e.g. `lucky-webapp`) and save.
+3. Name it (e.g. `vaded-webapp`) and save.
 4. On **Configure** (or **Route Traffic** → **Published applications**):
-    - **Public hostname**: your subdomain + domain (e.g. `lucky.yourdomain.com`).
-    - **Service type**: **HTTP** (the Lucky web app serves HTTP; do not use HTTPS unless your origin has TLS).
+    - **Public hostname**: your subdomain + domain (e.g. `vaded.yourdomain.com`).
+    - **Service type**: **HTTP** (the Vaded Gaming web app serves HTTP; do not use HTTPS unless your origin has TLS).
     - **URL (Required)**: `http://localhost:3000` (or `http://localhost:YOUR_WEBAPP_PORT`). This is the origin the tunnel forwards to; leave blank causes "url is required".
 5. Install the connector using the command shown in the dashboard (it includes the tunnel token). Run that command on the host where the web app is running.
 
@@ -74,7 +74,7 @@ The tunnel will appear as “Connected” when `cloudflared` is running with tha
 2. Create the tunnel:
 
     ```bash
-    cloudflared tunnel create lucky-webapp
+    cloudflared tunnel create vaded-webapp
     ```
 
     Note the tunnel ID from the output.
@@ -98,13 +98,13 @@ The tunnel will appear as “Connected” when `cloudflared` is running with tha
 4. Route DNS (creates CNAME to the tunnel):
 
     ```bash
-    cloudflared tunnel route dns lucky-webapp app.yourdomain.com
+    cloudflared tunnel route dns vaded-webapp app.yourdomain.com
     ```
 
 5. Run the tunnel:
 
     ```bash
-    cloudflared tunnel run lucky-webapp
+    cloudflared tunnel run vaded-webapp
     ```
 
 References:
@@ -161,14 +161,14 @@ You get a random `*.trycloudflare.com` URL. Limitations: no custom domain, reque
 ## 7. Running the tunnel in production
 
 - **Remotely-managed**: Run the install command from the dashboard (it includes the token). Use a process manager (e.g. systemd, PM2, Docker) so the tunnel restarts with the app.
-- **Locally-managed**: Run `cloudflared tunnel run lucky-webapp` (or your tunnel name) with the same process manager. Keep credentials and config secure and out of version control.
+- **Locally-managed**: Run `cloudflared tunnel run vaded-webapp` (or your tunnel name) with the same process manager. Keep credentials and config secure and out of version control.
 
-## 8. Production snippet (Lucky)
+## 8. Production snippet (Vaded Gaming)
 
 For this project, use:
 
-- Hostname: `lucky.lucassantana.tech`
-- Webhook endpoint: `https://lucky.lucassantana.tech/webhook/deploy`
+- Hostname: `vaded.lucassantana.tech`
+- Webhook endpoint: `https://vaded.lucassantana.tech/webhook/deploy`
 
 Docker-based `cloudflared` (same compose network as nginx):
 
@@ -177,7 +177,7 @@ tunnel: <TUNNEL_ID>
 credentials-file: /etc/cloudflared/<TUNNEL_ID>.json
 
 ingress:
-    - hostname: lucky.lucassantana.tech
+    - hostname: vaded.lucassantana.tech
       service: http://nginx:80
     - service: http_status:404
 ```
@@ -189,26 +189,26 @@ tunnel: <TUNNEL_ID>
 credentials-file: /home/<user>/.cloudflared/<TUNNEL_ID>.json
 
 ingress:
-    - hostname: lucky.lucassantana.tech
+    - hostname: vaded.lucassantana.tech
       service: http://localhost:8090
     - service: http_status:404
 ```
 
 Important: `localhost` in a container means the container itself. If `cloudflared` runs in Docker, prefer `http://nginx:80` and ensure it is attached to the same compose network.
 
-## 9. Zero-downtime migration checklist (`nexus` -> `lucky`)
+## 9. Zero-downtime migration checklist (`nexus` -> `vaded`)
 
-1. Add `lucky.lucassantana.tech` in Cloudflare DNS and map it to the existing tunnel.
-2. Keep `lucky.lucassantana.tech` active during migration (do not remove yet).
+1. Add `vaded.lucassantana.tech` in Cloudflare DNS and map it to the existing tunnel.
+2. Keep `vaded.lucassantana.tech` active during migration (do not remove yet).
 3. Add both hostnames to tunnel ingress (or publish both in dashboard).
-4. Verify Lucky endpoint:
-    - `curl -i -X POST https://lucky.lucassantana.tech/webhook/deploy`
+4. Verify Vaded Gaming endpoint:
+    - `curl -i -X POST https://vaded.lucassantana.tech/webhook/deploy`
 5. Update GitHub secret:
-    - `gh secret set DEPLOY_WEBHOOK_URL --body "https://lucky.lucassantana.tech/webhook/deploy"`
+    - `gh secret set DEPLOY_WEBHOOK_URL --body "https://vaded.lucassantana.tech/webhook/deploy"`
 6. Run deployment via workflow:
     - `npm run deploy:homelab`
 7. Monitor deploy and app health for at least one full release cycle.
-8. After stable operation, remove `lucky.lucassantana.tech` from tunnel and DNS.
+8. After stable operation, remove `vaded.lucassantana.tech` from tunnel and DNS.
 
 ## Troubleshooting
 

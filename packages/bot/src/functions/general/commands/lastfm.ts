@@ -98,7 +98,7 @@ export default new Command({
             }
             const embed = buildPlatformAttribEmbed('lastfm', {
                 title: 'Connect your Last.fm account',
-                description: `Click the link below to authorize Lucky with your Last.fm account. After you connect, tracks you request will be scrobbled to your profile.\n\n**[Click here to connect](${url})**\n\nThis link is valid for a short time and is only for you. Do not share it.`,
+                description: `Click the link below to authorize Vaded Gaming with your Last.fm account. After you connect, tracks you request will be scrobbled to your profile.\n\n**[Click here to connect](${url})**\n\nThis link is valid for a short time and is only for you. Do not share it.`,
             })
             await interactionReply({
                 interaction,

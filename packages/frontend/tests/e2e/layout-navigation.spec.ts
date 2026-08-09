@@ -150,10 +150,10 @@ test.describe('Layout and Navigation', () => {
         await page.waitForTimeout(2000)
     })
 
-    test('Lucky branding in sidebar', async ({ page }) => {
+    test('Vaded Gaming branding in sidebar', async ({ page }) => {
         await navigateToDashboard(page)
 
-        const branding = page.locator('text=Lucky').first()
+        const branding = page.locator('text=Vaded Gaming').first()
         await expect(branding).toBeVisible({ timeout: 5000 })
     })
 })

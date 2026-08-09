@@ -29,14 +29,14 @@ export default function AdminSupportPage() {
         <div className='space-y-6 px-1 sm:px-0'>
             <header className='flex items-center gap-3'>
                 <LifeBuoy
-                    className='h-6 w-6 sm:h-7 sm:w-7 text-lucky-brand shrink-0'
+                    className='h-6 w-6 sm:h-7 sm:w-7 text-vaded-brand shrink-0'
                     aria-hidden='true'
                 />
                 <div>
-                    <h1 className='type-h1 text-lucky-text-primary'>
+                    <h1 className='type-h1 text-vaded-text-primary'>
                         {t('support.admin.title')}
                     </h1>
-                    <p className='type-body-sm text-lucky-text-secondary'>
+                    <p className='type-body-sm text-vaded-text-secondary'>
                         {t('support.admin.subtitle')}
                     </p>
                 </div>
@@ -49,8 +49,8 @@ export default function AdminSupportPage() {
                         onClick={() => setStatus(s)}
                         className={`px-3 py-1.5 rounded-sm type-meta uppercase font-semibold border transition-colors ${
                             status === s
-                                ? 'bg-lucky-brand text-lucky-bg-primary border-lucky-brand'
-                                : 'bg-lucky-bg-active text-lucky-text-secondary border-lucky-border hover:text-lucky-text-primary'
+                                ? 'bg-vaded-brand text-vaded-bg-primary border-vaded-brand'
+                                : 'bg-vaded-bg-active text-vaded-text-secondary border-vaded-border hover:text-vaded-text-primary'
                         }`}
                     >
                         {t(`support.admin.status.${s}`)}
@@ -60,7 +60,7 @@ export default function AdminSupportPage() {
 
             {list.isError && (
                 <div
-                    className='type-body-sm text-lucky-error bg-lucky-error/10 border border-lucky-error/20 rounded-lg p-3'
+                    className='type-body-sm text-vaded-error bg-vaded-error/10 border border-vaded-error/20 rounded-lg p-3'
                     role='alert'
                 >
                     {t('support.admin.loadError')}
@@ -82,27 +82,27 @@ export default function AdminSupportPage() {
                             <li key={r.id}>
                                 <button
                                     onClick={() => setSelectedId(r.id)}
-                                    className={`w-full text-left surface-panel rounded-lg border p-3 transition-colors hover:bg-lucky-bg-active/25 ${
+                                    className={`w-full text-left surface-panel rounded-lg border p-3 transition-colors hover:bg-vaded-bg-active/25 ${
                                         selectedId === r.id
-                                            ? 'border-lucky-brand'
-                                            : 'border-lucky-border hover:border-lucky-text-tertiary'
+                                            ? 'border-vaded-brand'
+                                            : 'border-vaded-border hover:border-vaded-text-tertiary'
                                     }`}
                                 >
                                     <div className='flex items-center justify-between gap-2 mb-1'>
                                         <StatusBadge status={r.status} />
                                         {r.imageMimeType && (
                                             <ImageIcon
-                                                className='h-3.5 w-3.5 text-lucky-text-tertiary'
+                                                className='h-3.5 w-3.5 text-vaded-text-tertiary'
                                                 aria-label={t(
                                                     'support.admin.hasImage',
                                                 )}
                                             />
                                         )}
                                     </div>
-                                    <p className='type-body-sm text-lucky-text-primary line-clamp-2'>
+                                    <p className='type-body-sm text-vaded-text-primary line-clamp-2'>
                                         {r.context}
                                     </p>
-                                    <p className='type-meta text-lucky-text-tertiary mt-1'>
+                                    <p className='type-meta text-vaded-text-tertiary mt-1'>
                                         {new Date(r.createdAt).toLocaleString()}
                                         {r.correlationId
                                             ? ` · ${r.correlationId}`
@@ -113,22 +113,22 @@ export default function AdminSupportPage() {
                         ))}
                     </ul>
 
-                    <div className='surface-panel rounded-lg border border-lucky-border p-4 min-h-[200px]'>
+                    <div className='surface-panel rounded-lg border border-vaded-border p-4 min-h-[200px]'>
                         {selectedId === null ? (
-                            <p className='type-body-sm text-lucky-text-tertiary'>
+                            <p className='type-body-sm text-vaded-text-tertiary'>
                                 {t('support.admin.selectPrompt')}
                             </p>
                         ) : detail.isLoading ? (
-                            <p className='type-body-sm text-lucky-text-tertiary'>
+                            <p className='type-body-sm text-vaded-text-tertiary'>
                                 {t('common.loading')}
                             </p>
                         ) : detail.data ? (
                             <div className='space-y-3'>
                                 <StatusBadge status={detail.data.status} />
-                                <p className='type-body text-lucky-text-primary whitespace-pre-wrap'>
+                                <p className='type-body text-vaded-text-primary whitespace-pre-wrap'>
                                     {detail.data.context}
                                 </p>
-                                <dl className='type-meta text-lucky-text-tertiary space-y-1'>
+                                <dl className='type-meta text-vaded-text-tertiary space-y-1'>
                                     {detail.data.correlationId && (
                                         <div>
                                             cid: {detail.data.correlationId}
@@ -151,13 +151,13 @@ export default function AdminSupportPage() {
                                             detail.data.id,
                                         )}
                                         alt={t('support.admin.imageAlt')}
-                                        className='max-w-full rounded-lg border border-lucky-border'
+                                        className='max-w-full rounded-lg border border-vaded-border'
                                     />
                                 )}
                             </div>
                         ) : (
                             <p
-                                className='type-body-sm text-lucky-error'
+                                className='type-body-sm text-vaded-error'
                                 role='alert'
                             >
                                 {t('support.admin.loadError')}
@@ -174,12 +174,12 @@ function StatusBadge({ status }: { status: string }) {
     const { t } = useTranslation()
     const tone =
         status === 'new'
-            ? 'bg-lucky-brand/10 text-lucky-brand border-lucky-brand/20'
+            ? 'bg-vaded-brand/10 text-vaded-brand border-vaded-brand/20'
             : status === 'promoted'
-              ? 'bg-lucky-success/10 text-lucky-success border-lucky-success/20'
+              ? 'bg-vaded-success/10 text-vaded-success border-vaded-success/20'
               : status === 'dismissed'
-                ? 'bg-lucky-bg-active text-lucky-text-tertiary border-lucky-border'
-                : 'bg-lucky-warning/10 text-lucky-warning border-lucky-warning/20'
+                ? 'bg-vaded-bg-active text-vaded-text-tertiary border-vaded-border'
+                : 'bg-vaded-warning/10 text-vaded-warning border-vaded-warning/20'
     return (
         <span
             className={`inline-block px-2 py-0.5 rounded-sm type-meta uppercase font-semibold border ${tone}`}

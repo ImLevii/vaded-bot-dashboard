@@ -61,7 +61,7 @@ The historical workflow (PRs targeting `release/*`, confirmed in `feedback_tbd_r
     - If ≤2 unrelated failures/week: keep the check permanently.
     - If >2 unrelated failures/week: remove the check, investigate CI environment stability (native modules, Alpine build toolchain), and revisit adding the check only after the environment is stable.
 - The 30-minute wait timer should be reduced to 10 minutes if urgent hotfixes are blocked more than once.
-- If Lucky adds integration tests that boot the Docker image and verify it serves traffic: the Docker build check becomes more comprehensive and its value increases significantly.
+- If Vaded Gaming adds integration tests that boot the Docker image and verify it serves traffic: the Docker build check becomes more comprehensive and its value increases significantly.
 - If Docker failures recur (despite this change) due to a different root cause: re-evaluate whether `release/*` buffer is worth the overhead.
 
 ## Cross-references

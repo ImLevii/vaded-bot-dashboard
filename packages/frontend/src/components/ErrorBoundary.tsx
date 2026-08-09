@@ -53,17 +53,17 @@ class ErrorBoundary extends Component<Props, State> {
                 cid ? `&cid=${encodeURIComponent(cid)}` : ''
             }`
             return (
-                <div className='flex items-center justify-center min-h-screen bg-lucky-bg-primary'>
+                <div className='flex items-center justify-center min-h-screen bg-vaded-bg-primary'>
                     <div className='text-center space-y-4 p-6'>
                         <h1 className='text-2xl font-bold text-white'>
                             Something went wrong
                         </h1>
-                        <p className='text-lucky-text-secondary'>
+                        <p className='text-vaded-text-secondary'>
                             {this.state.error?.message ||
                                 'An unexpected error occurred'}
                         </p>
                         {cid && (
-                            <p className='text-sm text-lucky-text-tertiary'>
+                            <p className='text-sm text-vaded-text-tertiary'>
                                 Error ID: <code>{cid}</code>
                             </p>
                         )}
@@ -77,13 +77,13 @@ class ErrorBoundary extends Component<Props, State> {
                                     })
                                     window.location.reload()
                                 }}
-                                className='bg-lucky-red hover:bg-lucky-red/90'
+                                className='bg-vaded-red hover:bg-vaded-red/90'
                             >
                                 Reload Page
                             </Button>
                             <a
                                 href={reportHref}
-                                className='inline-flex items-center justify-center rounded-lg border border-lucky-border px-4 py-2 text-sm text-lucky-text-secondary hover:text-lucky-text-primary hover:border-lucky-text-tertiary transition-colors'
+                                className='inline-flex items-center justify-center rounded-lg border border-vaded-border px-4 py-2 text-sm text-vaded-text-secondary hover:text-vaded-text-primary hover:border-vaded-text-tertiary transition-colors'
                             >
                                 Report this problem
                             </a>

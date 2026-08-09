@@ -57,7 +57,7 @@ export class ArtistSuggestionService {
     // Caches moved off Redis (being decommissioned; an unhealthy client meant a
     // miss on every load) into bounded in-memory TTL caches. Suggestions are
     // regenerable/ephemeral, so this is the right trade per the Redis-removal
-    // ADRs (single-instance; revisit if Lucky scales out).
+    // ADRs (single-instance; revisit if Vaded Gaming scales out).
     private readonly userTopArtistsCache: TtlCache<SpotifyArtist[]>
     private readonly fallbackCache: TtlCache<SpotifyArtist[]>
 

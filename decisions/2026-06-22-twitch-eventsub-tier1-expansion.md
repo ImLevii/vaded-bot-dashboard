@@ -6,7 +6,7 @@
 
 ## Context
 
-Lucky's Twitch integration currently uses one EventSub event: `stream.online`. The WebSocket
+Vaded Gaming's Twitch integration currently uses one EventSub event: `stream.online`. The WebSocket
 client supports up to 300 concurrent subscriptions and is already connected and reconnecting
 on drop. The existing pattern (`subscribeToStreamOnline` → `handleStreamOnline`) is replicated
 cleanly in `eventsubSubscriptions.ts`.
@@ -14,15 +14,15 @@ cleanly in `eventsubSubscriptions.ts`.
 Research across four angles (codebase, Twitch EventSub official docs, Streamcord/MEE6
 competitor analysis, community context) found:
 
-- **Stream.online is one of 50+ event types** — Lucky uses 1.
+- **Stream.online is one of 50+ event types** — Vaded Gaming uses 1.
 - **Three events require no new OAuth scope**: `stream.offline`, `channel.update`, `channel.raid`.
-- **Criativaria** (primary Lucky community, PT-BR tech/coding, already seeded with `stream.online`
+- **Criativaria** (primary Vaded Gaming community, PT-BR tech/coding, already seeded with `stream.online`
   via `/serversetup criativaria`) is the primary beneficiary. Criativaria streams coding sessions
   where stream title/category changes frequently.
 - Streamcord (1M+ users) ships stream.offline and raid as part of its free tier.
 
 Tier 2 events (subscriptions, followers, bits, channel points) require a broadcaster-scoped
-OAuth token that Lucky's current flow doesn't collect. This is a separate decision.
+OAuth token that Vaded Gaming's current flow doesn't collect. This is a separate decision.
 
 ## Decision
 

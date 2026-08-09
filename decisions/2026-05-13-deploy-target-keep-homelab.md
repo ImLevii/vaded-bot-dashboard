@@ -3,7 +3,7 @@
 ## Status
 
 Accepted (decision). Audit-triggered. Replaces the "broken deploy" RED finding
-in `audit_deep_lucky_2026-05-13.md`.
+in `audit_deep_vaded_2026-05-13.md`.
 
 ## Context
 
@@ -106,7 +106,7 @@ Re-open this decision if **any** of the following hold:
    signal that the pipeline is fragile, not just typo-prone).
 3. **A managed-service free tier covers Discord-bot-grade persistent
    connections** (Fly.io has had this on roadmap; check yearly).
-4. **Lucky's MAU grows past ~5k guilds** where horizontal scale or
+4. **Vaded Gaming's MAU grows past ~5k guilds** where horizontal scale or
    multi-region matters more than self-hosting savings.
 5. **A homelab hardware failure forces an unplanned migration anyway** —
    in which case revisit alternatives under emergency constraints.
@@ -117,4 +117,4 @@ Re-open this decision if **any** of the following hold:
 - Failed runs to date: 4 consecutive (May 6) + 1 skipped (May 13 on v2.10.0
   tag push)
 - Observability memory: `project_homelab_observability_deployed.md`
-- Audit: `audit_deep_lucky_2026-05-13.md` (RED finding)
+- Audit: `audit_deep_vaded_2026-05-13.md` (RED finding)

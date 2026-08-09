@@ -1,10 +1,10 @@
-# Lucky Architecture
+# Vaded Gaming Architecture
 
 **Quick reference:** [Package structure](#package-structure) · [Where to add code](#package-layouts) · [Command loading (bot)](#command-loading-bot) · [Data layer](#data-layer-prisma-redis) · [Building](#building) · [Dependencies](DEPENDENCIES.md)
 
 ## Overview
 
-Lucky is structured as a modular monolith with clear separation of concerns across multiple packages. **Production runs only `packages/bot` (Discord bot) and `packages/backend` (Express API).** There is no root `src/` entry point; all runtime code lives in packages.
+Vaded Gaming is structured as a modular monolith with clear separation of concerns across multiple packages. **Production runs only `packages/bot` (Discord bot) and `packages/backend` (Express API).** There is no root `src/` entry point; all runtime code lives in packages.
 
 ## Entry points
 

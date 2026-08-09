@@ -10,7 +10,7 @@ Accepted (decision). Selects the next `/refactor-pipeline` target after surveyin
 
 Open refactor-shaped candidates as of 2026-05-16:
 
-1. **#871 bot circular dependencies** — flagged HIGH in `audit_deep_lucky_2026-05-13`. `npx madge --circular packages/bot/src` confirms 15 active cycles across 4 clusters (types, monitoring, autoplay/queue, self-cycles).
+1. **#871 bot circular dependencies** — flagged HIGH in `audit_deep_vaded_2026-05-13`. `npx madge --circular packages/bot/src` confirms 15 active cycles across 4 clusters (types, monitoring, autoplay/queue, self-cycles).
 2. **Dual-lockfile cleanup** — `pnpm-lock.yaml` is tracked alongside `package-lock.json`; CI uses `npm ci` so the pnpm lock is decorative + drifts. Memory `feedback_bulk_workflow_rollout_2026-05-13` documents recurring pain.
 3. **`docker-publish.yml` extract trivy-image step to reusable composite action** — premature; the step is 20 minutes old.
 4. **`config-drift-detect` HIGH findings** — diagnostic hasn't been re-run since v2.11; no data to ROI against.
@@ -78,7 +78,7 @@ Leading option flipped: **#871 bot circular-deps** (1 day, real structural block
 ### Negative
 
 - 1 day of focused refactor work; everything else (Snyk re-scan, observability rollout deploys, homelab PR #135) stalls during the cycle.
-- Cluster C (autoplay ↔ queue) is the riskiest piece — autoplay touches the music command path, which is the bot's highest-traffic surface. Test coverage on that area is decent (see `audit_deep_lucky_2026-05-13` test-ratio finding) but not exhaustive.
+- Cluster C (autoplay ↔ queue) is the riskiest piece — autoplay touches the music command path, which is the bot's highest-traffic surface. Test coverage on that area is decent (see `audit_deep_vaded_2026-05-13` test-ratio finding) but not exhaustive.
 - 4 PRs is more bureaucratic overhead than ideal; PR 1 + PR 2 could merge into one. Kept separate for clean revert windows on Cluster C if it goes wrong.
 
 ### Neutral
@@ -92,7 +92,7 @@ Leading option flipped: **#871 bot circular-deps** (1 day, real structural block
 - **Test coverage drops on autoplay** → per the composite's Phase 3 stop condition, revert PR 3 unless the user explicitly accepts the coverage drop with rationale.
 - **A new circular-dep audit finding lands AFTER PR 4** → indicates the `madge` gate isn't strict enough; tighten threshold or scope.
 - **Dual-lockfile cleanup is opened as a `/refactor-pipeline`** → re-read this ADR; it's a routine PR per critic, not a composite-weight task.
-- **Org standardizes on pnpm across all TS repos** → revisit the npm-over-pnpm assumption for Lucky.
+- **Org standardizes on pnpm across all TS repos** → revisit the npm-over-pnpm assumption for Vaded Gaming.
 
 ## Alternatives rejected (summary)
 
@@ -103,7 +103,7 @@ Leading option flipped: **#871 bot circular-deps** (1 day, real structural block
 
 ## Related
 
-- Issue [#871](https://github.com/LucasSantana-Dev/Lucky/issues/871) — the concrete target.
-- `audit_deep_lucky_2026-05-13` (memory) — original HIGH finding.
+- Issue [#871](https://github.com/LucasSantana-Dev/vaded-gaming/issues/871) — the concrete target.
+- `audit_deep_vaded_2026-05-13` (memory) — original HIGH finding.
 - [[2026-05-16-trivy-image-scan-vs-snyk-in-ci]] — same-week, same Phase A → B rollout pattern.
 - [[2026-05-15-no-ai-generated-docs-in-tracked-state]] — same-week decision style (delete + ADR + mechanical enforcement).

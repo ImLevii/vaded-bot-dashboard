@@ -10,7 +10,7 @@
 All numbers verified live 2026-07-02:
 
 - **No consumption pressure.** Host 14Gi: 10Gi available, swap idle, disk 62%. Every container under its `mem_limit`. Bot: 231MB RSS / 1G; V8 heap 132.8MB used vs `heap_size_limit` 560MB → 24% true utilization. 14-day heap trend `[119,131,144,145,143,151,135,143,130]` MB — oscillating, no growth, no leak.
-- **Broken resource signals, 23:1 noise:signal (15-day firing-minutes).** `LuckyBotHeapHigh` 7,370 min — expr `nodejs_heap_size_used/nodejs_heap_size_total > 0.9` is broken by design (V8 grows `heap_total` lazily; healthy processes idle at 92–96%). `HighMemoryUsage`+`Critical` 5,405 min — expr uses `container_memory_usage_bytes`, which includes page cache, so IO-heavy containers (healthchecks 84.7% by usage vs 77.9% working-set; kopia during snapshots) alert on cache, not pressure. Real signal `LuckyBotDown`: 551 min, drowned. Chronic noise is a plausible contributor to the 2026-07-01 outage alert going unnoticed (#1651).
+- **Broken resource signals, 23:1 noise:signal (15-day firing-minutes).** `VadedBotHeapHigh` 7,370 min — expr `nodejs_heap_size_used/nodejs_heap_size_total > 0.9` is broken by design (V8 grows `heap_total` lazily; healthy processes idle at 92–96%). `HighMemoryUsage`+`Critical` 5,405 min — expr uses `container_memory_usage_bytes`, which includes page cache, so IO-heavy containers (healthchecks 84.7% by usage vs 77.9% working-set; kopia during snapshots) alert on cache, not pressure. Real signal `VadedBotDown`: 551 min, drowned. Chronic noise is a plausible contributor to the 2026-07-01 outage alert going unnoticed (#1651).
 - **Real allocation items.** `healthchecks` at 399MB working-set / 512MB limit — now alerting-critical infrastructure (dead-man target). Staging stack (5 containers) runs 24/7 at 0.01–0.59% CPU (7-day avg) — genuinely idle; the `staging`-label deploy workflow starts it, nothing ever stops it; CI has no runtime dependency on it (visual verification only).
 - **Disk creep.** Docker images 22GB with **17.6GB reclaimable (79%)** — per-SHA deploy tags accumulate, never pruned. Build cache 5.5GB (2GB reclaimable). `/var/log` 4.3G. Postgres 13MB (no bloat).
 
@@ -20,10 +20,10 @@ Three-phase, strictly ordered (critic-mandated: never bundle calibration with al
 
 **Phase A — alert calibration (~2h, homelab prometheus rules):**
 
-1. Replace `LuckyBotHeapHigh` with container-level truth: `container_memory_working_set_bytes{name="vaded-gaming-bot"} / container_spec_memory_limit_bytes{name="vaded-gaming-bot"} > 0.9` (what the OOM killer acts on). The nodejs heap metrics stay for dashboards.
+1. Replace `VadedBotHeapHigh` with container-level truth: `container_memory_working_set_bytes{name="vaded-gaming-bot"} / container_spec_memory_limit_bytes{name="vaded-gaming-bot"} > 0.9` (what the OOM killer acts on). The nodejs heap metrics stay for dashboards.
 2. Switch `HighMemoryUsage` / `CriticalMemoryUsage` from `container_memory_usage_bytes` to `container_memory_working_set_bytes`.
 3. Raise `healthchecks` `mem_limit` 512MB → 1G (alerting-critical infra deserves headroom, and it is the one genuinely tight container).
-4. **Verification gate:** 24h+ of alert history; success = LuckyBotHeapHigh + HighMemoryUsage firing-minutes drop >90% with no missed real event. Only then Phase C.
+4. **Verification gate:** 24h+ of alert history; success = VadedBotHeapHigh + HighMemoryUsage firing-minutes drop >90% with no missed real event. Only then Phase C.
 
 **Phase C — allocation + disk (~2-3h, homelab):** 5. Staging on-demand: scheduled stop of the staging stack after N days without a staging deploy (label-deploy already restarts it). Accepted trade-off: a stale staging URL may be down until the next deploy — solo operator, visual-verify-only usage. 6. Docker image prune policy: scheduled prune of images older than ~30 days **retaining anything referenced by running containers and the rollback last-good `:sha`** (deploy.sh rollback depends on prior SHA images existing — a blind `prune -a` would break it). 7. logrotate sanity pass on `/var/log` (4.3G, minor).
 

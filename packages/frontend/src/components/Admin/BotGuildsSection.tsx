@@ -15,7 +15,7 @@ interface BotGuild {
 
 function GuildRow({ guild }: { guild: BotGuild }) {
     return (
-        <div className='flex items-center gap-3 rounded-lg border border-lucky-border bg-lucky-bg-secondary/60 px-4 py-3'>
+        <div className='flex items-center gap-3 rounded-lg border border-vaded-border bg-vaded-bg-secondary/60 px-4 py-3'>
             {guild.iconUrl ? (
                 <img
                     src={guild.iconUrl}
@@ -23,17 +23,17 @@ function GuildRow({ guild }: { guild: BotGuild }) {
                     className='h-10 w-10 rounded-full shrink-0 object-cover'
                 />
             ) : (
-                <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-lucky-bg-tertiary'>
-                    <Server className='h-5 w-5 text-lucky-text-subtle' />
+                <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-vaded-bg-tertiary'>
+                    <Server className='h-5 w-5 text-vaded-text-subtle' />
                 </div>
             )}
             <div className='min-w-0 flex-1'>
-                <p className='truncate text-sm font-medium text-lucky-text-primary'>
+                <p className='truncate text-sm font-medium text-vaded-text-primary'>
                     {guild.name}
                 </p>
-                <p className='text-xs text-lucky-text-subtle'>{guild.id}</p>
+                <p className='text-xs text-vaded-text-subtle'>{guild.id}</p>
             </div>
-            <div className='hidden sm:flex items-center gap-4 text-xs text-lucky-text-secondary shrink-0'>
+            <div className='hidden sm:flex items-center gap-4 text-xs text-vaded-text-secondary shrink-0'>
                 {guild.memberCount !== null && (
                     <span className='flex items-center gap-1'>
                         <Users className='h-3.5 w-3.5' />
@@ -84,12 +84,12 @@ export default function BotGuildsSection() {
     return (
         <section>
             <div className='flex items-center gap-2 mb-4'>
-                <Server className='w-5 h-5 text-lucky-purple' aria-hidden='true' />
+                <Server className='w-5 h-5 text-vaded-purple' aria-hidden='true' />
                 <h2 className='text-lg font-semibold text-white'>
                     Bot Servers
                 </h2>
                 {!loading && (
-                    <span className='ml-1 rounded-full bg-lucky-bg-tertiary px-2 py-0.5 text-xs text-lucky-text-secondary'>
+                    <span className='ml-1 rounded-full bg-vaded-bg-tertiary px-2 py-0.5 text-xs text-vaded-text-secondary'>
                         {guilds.length}
                     </span>
                 )}
@@ -104,11 +104,11 @@ export default function BotGuildsSection() {
             )}
 
             {error && (
-                <p className='text-sm text-lucky-red'>{error}</p>
+                <p className='text-sm text-vaded-red'>{error}</p>
             )}
 
             {!loading && !error && guilds.length === 0 && (
-                <p className='text-sm text-lucky-text-secondary'>
+                <p className='text-sm text-vaded-text-secondary'>
                     No servers found. The bot may not be connected.
                 </p>
             )}

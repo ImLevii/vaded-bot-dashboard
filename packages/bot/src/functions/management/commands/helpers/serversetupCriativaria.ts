@@ -404,7 +404,7 @@ async function applyBrandingAssets(
 
     try {
         const message = (await staffAssetsChannel.send({
-            content: 'Lucky setup asset cache: criativaria static banner',
+            content: 'Vaded Gaming setup asset cache: criativaria static banner',
             files: [welcomeImagePath],
         })) as {
             attachments?:
@@ -827,7 +827,7 @@ async function postSummaryToModLog(
     const color = result.warnings.length > 0 ? 0xf59e0b : 0x22c55e
     const embed = new EmbedBuilder()
         .setColor(color)
-        .setTitle('Lucky • Setup Criativaria concluído')
+        .setTitle('Vaded Gaming • Setup Criativaria concluído')
         .setDescription(formatCriativariaSummary(result, 'apply'))
 
     await channels.modLogSendable.send({ embeds: [embed] })

@@ -169,7 +169,7 @@ describe('Levels', () => {
 
         expect(await screen.findByText('Veteran')).toBeInTheDocument()
         expect(screen.getByText('Legend')).toBeInTheDocument()
-        const rewards = container.querySelectorAll('.text-lucky-brand')
+        const rewards = container.querySelectorAll('.text-vaded-brand')
         expect(rewards[0].textContent).toContain('Lv.5')
         expect(rewards[1].textContent).toContain('Lv.10')
     })
@@ -405,7 +405,7 @@ describe('Levels', () => {
         const trashIcon = Array.from(deleteIcons).find(
             (svg) =>
                 svg.closest('button') &&
-                svg.closest('.bg-lucky-bg-secondary\\/50'),
+                svg.closest('.bg-vaded-bg-secondary\\/50'),
         )
         const removeButton = trashIcon?.closest('button')
 
@@ -438,7 +438,7 @@ describe('Levels', () => {
         const trashIcon = Array.from(deleteIcons).find(
             (svg) =>
                 svg.closest('button') &&
-                svg.closest('.bg-lucky-bg-secondary\\/50'),
+                svg.closest('.bg-vaded-bg-secondary\\/50'),
         )
         const removeButton = trashIcon?.closest('button')
 
@@ -520,7 +520,7 @@ describe('Levels', () => {
         const { container } = render(<Levels />)
 
         expect(await screen.findByText('unknown-role')).toBeInTheDocument()
-        const rewards = container.querySelectorAll('.text-lucky-brand')
+        const rewards = container.querySelectorAll('.text-vaded-brand')
         expect(rewards[0].textContent).toContain('Lv.5')
     })
 

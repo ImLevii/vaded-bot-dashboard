@@ -7,7 +7,7 @@
 
 ## Context
 
-Lucky had drifted between two branching models. Documentation + an older memory
+Vaded Gaming had drifted between two branching models. Documentation + an older memory
 prescribed **versioned release branches** (`release/vX.Y.Z` cut from `main`, PRs
 target the release branch, `/release-cut` promotes to `main`). Recent practice had
 drifted to **main-as-trunk** (the last several v2.15.x releases were tagged

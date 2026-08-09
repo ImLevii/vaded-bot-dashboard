@@ -70,11 +70,11 @@ function GuildChip() {
             <button
                 type='button'
                 onClick={() => navigate('/servers')}
-                className='lucky-focus-visible flex items-center gap-2 rounded-md border border-lucky-border bg-lucky-bg-secondary px-3 py-1.5 text-lucky-text-secondary transition-colors hover:border-lucky-border-strong hover:bg-lucky-bg-tertiary hover:text-lucky-text-primary'
+                className='vaded-focus-visible flex items-center gap-2 rounded-md border border-vaded-border bg-vaded-bg-secondary px-3 py-1.5 text-vaded-text-secondary transition-colors hover:border-vaded-border-strong hover:bg-vaded-bg-tertiary hover:text-vaded-text-primary'
                 aria-label={t('common.selectServer')}
             >
                 <span className='type-body-sm'>{t('common.selectServer')}</span>
-                <ChevronDown className='h-3.5 w-3.5 shrink-0 text-lucky-text-subtle' />
+                <ChevronDown className='h-3.5 w-3.5 shrink-0 text-vaded-text-subtle' />
             </button>
         )
     }
@@ -83,7 +83,7 @@ function GuildChip() {
         <button
             type='button'
             onClick={() => navigate('/servers')}
-            className='lucky-focus-visible flex items-center gap-2 rounded-md border border-lucky-border bg-lucky-bg-secondary px-3 py-1.5 text-left transition-colors hover:border-lucky-border-strong hover:bg-lucky-bg-tertiary'
+            className='vaded-focus-visible flex items-center gap-2 rounded-md border border-vaded-border bg-vaded-bg-secondary px-3 py-1.5 text-left transition-colors hover:border-vaded-border-strong hover:bg-vaded-bg-tertiary'
             aria-label={t('common.activeServerAriaLabel', {
                 name: selectedGuild.name,
             })}
@@ -98,14 +98,14 @@ function GuildChip() {
                     }
                     alt={selectedGuild.name}
                 />
-                <AvatarFallback className='bg-lucky-bg-active text-[9px] font-semibold text-lucky-text-primary'>
+                <AvatarFallback className='bg-vaded-bg-active text-[9px] font-semibold text-vaded-text-primary'>
                     {selectedGuild.name.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
             </Avatar>
-            <p className='type-body-sm truncate max-w-[140px] text-lucky-text-primary'>
+            <p className='type-body-sm truncate max-w-[140px] text-vaded-text-primary'>
                 {selectedGuild.name}
             </p>
-            <ChevronDown className='h-3.5 w-3.5 shrink-0 text-lucky-text-subtle' />
+            <ChevronDown className='h-3.5 w-3.5 shrink-0 text-vaded-text-subtle' />
         </button>
     )
 }
@@ -122,20 +122,20 @@ function UserMenu() {
             : undefined
 
     return (
-        <div className='flex items-center gap-2 rounded-md border border-lucky-border bg-lucky-bg-secondary px-2 py-1'>
+        <div className='flex items-center gap-2 rounded-md border border-vaded-border bg-vaded-bg-secondary px-2 py-1'>
             <Avatar className='h-6 w-6 shrink-0'>
                 <AvatarImage src={avatarSrc} alt={profileName} />
-                <AvatarFallback className='bg-lucky-bg-active text-[10px] font-semibold text-lucky-text-primary'>
+                <AvatarFallback className='bg-vaded-bg-active text-[10px] font-semibold text-vaded-text-primary'>
                     {(user?.username || 'U').substring(0, 2).toUpperCase()}
                 </AvatarFallback>
             </Avatar>
-            <span className='type-body-sm hidden max-w-[120px] truncate text-lucky-text-primary sm:block'>
+            <span className='type-body-sm hidden max-w-[120px] truncate text-vaded-text-primary sm:block'>
                 {profileName}
             </span>
             <button
                 type='button'
                 onClick={logout}
-                className='lucky-focus-visible flex min-h-[28px] min-w-[28px] items-center justify-center rounded-md text-lucky-text-subtle transition-colors hover:bg-lucky-error/10 hover:text-lucky-error'
+                className='vaded-focus-visible flex min-h-[28px] min-w-[28px] items-center justify-center rounded-md text-vaded-text-subtle transition-colors hover:bg-vaded-error/10 hover:text-vaded-error'
                 aria-label={t('common.logout')}
                 title={t('common.logout')}
             >
@@ -156,23 +156,23 @@ function Layout({ children }: LayoutProps) {
     }
 
     return (
-        <div className='lucky-shell lucky-shell-authenticated flex min-h-screen'>
+        <div className='vaded-shell vaded-shell-authenticated flex min-h-screen'>
             <a
-                className='lucky-skip-link'
-                href='#lucky-main-content'
+                className='vaded-skip-link'
+                href='#vaded-main-content'
                 onClick={handleSkipLinkClick}
             >
                 Skip to content
             </a>
             <Sidebar />
             <div className='flex min-w-0 flex-1 flex-col'>
-                <header className='lucky-shell-header sticky top-0 z-30 border-b border-lucky-border bg-lucky-bg-primary relative'>
+                <header className='vaded-shell-header sticky top-0 z-30 border-b border-vaded-border bg-vaded-bg-primary relative'>
                     <div className='mx-auto flex w-full max-w-[1400px] items-center justify-between gap-4 px-4 py-3.5 md:px-6 md:py-4'>
                         <div className='min-w-0'>
-                            <h1 className='type-title text-lucky-text-primary leading-tight'>
+                            <h1 className='type-title text-vaded-text-primary leading-tight'>
                                 {routeCopy.title}
                             </h1>
-                            <p className='type-body-sm text-lucky-text-tertiary hidden sm:block'>
+                            <p className='type-body-sm text-vaded-text-tertiary hidden sm:block'>
                                 {routeCopy.subtitle}
                             </p>
                         </div>
@@ -184,14 +184,14 @@ function Layout({ children }: LayoutProps) {
                         </div>
                     </div>
                     <div
-                        className='lucky-header-accent-line'
+                        className='vaded-header-accent-line'
                         aria-hidden='true'
                     />
                 </header>
 
                 <main
                     ref={mainRef}
-                    id='lucky-main-content'
+                    id='vaded-main-content'
                     className='flex-1 min-w-0 overflow-y-auto'
                     tabIndex={-1}
                 >

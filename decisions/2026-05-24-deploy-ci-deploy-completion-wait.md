@@ -4,7 +4,7 @@ Date: 2026-05-24
 
 ## Context
 
-The Lucky CI deploy pipeline fires via `workflow_run` after Docker images are published. The
+The Vaded Gaming CI deploy pipeline fires via `workflow_run` after Docker images are published. The
 webhook handler runs `deploy.sh` asynchronously (`nohup ... & disown`), so the webhook
 returns before `deploy.sh` completes.
 

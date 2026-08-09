@@ -20,7 +20,7 @@ import type { AccessMode, ModuleKey } from './types'
 // ponytail: inlined from PageLoader component for single-use
 function PageLoader() {
     return (
-        <div className='min-h-screen bg-lucky-bg-primary flex items-center justify-center'>
+        <div className='min-h-screen bg-vaded-bg-primary flex items-center justify-center'>
             <div
                 className='flex flex-col items-center gap-4'
                 role='status'
@@ -28,7 +28,7 @@ function PageLoader() {
                 aria-live='polite'
             >
                 <Loader2 className='w-10 h-10 text-primary animate-spin' />
-                <p className='text-lucky-text-secondary'>Loading...</p>
+                <p className='text-vaded-text-secondary'>Loading...</p>
             </div>
         </div>
     )

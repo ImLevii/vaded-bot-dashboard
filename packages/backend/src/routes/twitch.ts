@@ -239,7 +239,7 @@ export function setupTwitchRoutes(app: Express): void {
         asyncHandler(async (req: Request, res: Response) => {
             const apiKey = req.headers['x-internal-api-key']
             const expectedKey =
-                process.env.INTERNAL_API_KEY ?? process.env.LUCKY_NOTIFY_API_KEY
+                process.env.INTERNAL_API_KEY ?? process.env.VADED_NOTIFY_API_KEY
             if (!expectedKey || apiKey !== expectedKey) {
                 res.status(401).json({ error: 'Unauthorized' })
                 return

@@ -44,7 +44,7 @@ describe('Docs', () => {
         vi.mocked(usePageMetadata).mockImplementation(() => undefined)
         renderAt('/docs')
         expect(screen.getAllByText(/Getting started/i).length).toBeGreaterThanOrEqual(1)
-        expect(screen.getAllByText(/Using Lucky/i).length).toBeGreaterThanOrEqual(1)
+        expect(screen.getAllByText(/Using Vaded Gaming/i).length).toBeGreaterThanOrEqual(1)
         expect(screen.getAllByText(/Reference/i).length).toBeGreaterThanOrEqual(1)
     })
 })

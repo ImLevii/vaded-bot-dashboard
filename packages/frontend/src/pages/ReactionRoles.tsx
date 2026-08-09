@@ -94,11 +94,11 @@ function MappingPill({
         BUTTON_STYLE_COLORS[style] ??
         'bg-purple-500/15 text-purple-400 border-purple-500/30'
     return (
-        <div className='flex items-center gap-2 rounded-lg border border-lucky-border bg-lucky-bg-tertiary/50 px-3 py-2'>
+        <div className='flex items-center gap-2 rounded-lg border border-vaded-border bg-vaded-bg-tertiary/50 px-3 py-2'>
             {emoji && (
                 <span className='shrink-0 text-base leading-none'>{emoji}</span>
             )}
-            <span className='type-body-sm truncate font-medium text-lucky-text-primary'>
+            <span className='type-body-sm truncate font-medium text-vaded-text-primary'>
                 {label}
             </span>
             <span
@@ -106,7 +106,7 @@ function MappingPill({
             >
                 {styleLabel}
             </span>
-            <code className='type-body-sm shrink-0 rounded bg-lucky-bg-active/60 px-1.5 py-0.5 font-mono text-[11px] text-lucky-text-secondary'>
+            <code className='type-body-sm shrink-0 rounded bg-vaded-bg-active/60 px-1.5 py-0.5 font-mono text-[11px] text-vaded-text-secondary'>
                 {roleId}
             </code>
         </div>
@@ -158,16 +158,16 @@ function MessageCard({
     }
 
     return (
-        <Card className='space-y-4 p-5 border border-lucky-border'>
+        <Card className='space-y-4 p-5 border border-vaded-border'>
             <div className='flex items-start justify-between gap-3'>
                 <div className='min-w-0 flex-1'>
                     <div className='flex items-center gap-2'>
-                        <MessageSquare className='h-4 w-4 shrink-0 text-lucky-accent' />
-                        <code className='type-body-sm truncate font-mono text-lucky-text-secondary'>
+                        <MessageSquare className='h-4 w-4 shrink-0 text-vaded-accent' />
+                        <code className='type-body-sm truncate font-mono text-vaded-text-secondary'>
                             {message.messageId}
                         </code>
                     </div>
-                    <div className='mt-1 flex items-center gap-3 text-lucky-text-tertiary'>
+                    <div className='mt-1 flex items-center gap-3 text-vaded-text-tertiary'>
                         <span className='flex items-center gap-1'>
                             <Hash className='h-3.5 w-3.5' />
                             <code className='type-body-sm font-mono'>
@@ -189,7 +189,7 @@ function MessageCard({
                             size='sm'
                             onClick={() => void handleCreateRoleGroup()}
                             disabled={creatingGroup}
-                            className='text-lucky-text-secondary'
+                            className='text-vaded-text-secondary'
                             title={t('reactionRoles.createRoleGroupTitle')}
                         >
                             {t('reactionRoles.createRoleGroup')}
@@ -200,7 +200,7 @@ function MessageCard({
                         size='sm'
                         aria-label='Edit'
                         onClick={() => onEdit(message)}
-                        className='text-lucky-text-secondary'
+                        className='text-vaded-text-secondary'
                     >
                         <Pencil className='h-3.5 w-3.5' />
                     </Button>
@@ -210,7 +210,7 @@ function MessageCard({
                         aria-label='Delete'
                         onClick={() => void handleDelete()}
                         disabled={deleting}
-                        className='text-lucky-error hover:border-lucky-error/40 hover:bg-lucky-error/10'
+                        className='text-vaded-error hover:border-vaded-error/40 hover:bg-vaded-error/10'
                     >
                         <Trash2 className='h-3.5 w-3.5' />
                     </Button>
@@ -230,13 +230,13 @@ function MessageCard({
                     ))}
                 </div>
             ) : (
-                <p className='type-body-sm text-lucky-text-tertiary'>
+                <p className='type-body-sm text-vaded-text-tertiary'>
                     {t('reactionRoles.noMappings')}
                 </p>
             )}
 
             {message.groupId && (
-                <div className='border-t border-lucky-border pt-4'>
+                <div className='border-t border-vaded-border pt-4'>
                     {!showAddRole ? (
                         <Button
                             variant='secondary'
@@ -549,7 +549,7 @@ function MessageForm({
 
                 <div className='space-y-4 py-2'>
                     {error && (
-                        <p className='type-body-sm rounded-md border border-lucky-error/30 bg-lucky-error/10 px-3 py-2 text-lucky-error'>
+                        <p className='type-body-sm rounded-md border border-vaded-error/30 bg-vaded-error/10 px-3 py-2 text-vaded-error'>
                             {error}
                         </p>
                     )}
@@ -577,7 +577,7 @@ function MessageForm({
                             </SelectContent>
                         </Select>
                         {mode === 'edit' && (
-                            <p className='type-body-sm text-lucky-text-tertiary'>
+                            <p className='type-body-sm text-vaded-text-tertiary'>
                                 {t('reactionRoles.channelCannotChange')}
                             </p>
                         )}
@@ -628,7 +628,7 @@ function MessageForm({
                                     return false
                                 }
                             })() && (
-                                <div className='mt-2 overflow-hidden rounded-md border border-lucky-border'>
+                                <div className='mt-2 overflow-hidden rounded-md border border-vaded-border'>
                                     <img
                                         src={imageUrl}
                                         alt='Preview'
@@ -640,7 +640,7 @@ function MessageForm({
                                                 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"%3E%3Crect x="3" y="3" width="18" height="18" rx="2"/%3E%3Ccircle cx="8.5" cy="8.5" r="1.5"/%3E%3Cpath d="m21 15-5-5L5 21"/%3E%3C/svg%3E'
                                             img.classList.add(
                                                 'p-4',
-                                                'text-lucky-text-tertiary',
+                                                'text-vaded-text-tertiary',
                                             )
                                         }}
                                     />
@@ -670,14 +670,14 @@ function MessageForm({
                                 />
                             </Button>
                             {imageFile && (
-                                <div className='flex flex-1 items-center justify-between rounded-md border border-lucky-border bg-lucky-bg-tertiary/40 px-3 py-2'>
-                                    <span className='type-body-sm truncate text-lucky-text-primary'>
+                                <div className='flex flex-1 items-center justify-between rounded-md border border-vaded-border bg-vaded-bg-tertiary/40 px-3 py-2'>
+                                    <span className='type-body-sm truncate text-vaded-text-primary'>
                                         {imageFile.name}
                                     </span>
                                     <button
                                         type='button'
                                         onClick={handleFileClear}
-                                        className='ml-2 text-lucky-text-tertiary hover:text-lucky-error'
+                                        className='ml-2 text-vaded-text-tertiary hover:text-vaded-error'
                                         aria-label='Clear file'
                                     >
                                         <X className='h-3.5 w-3.5' />
@@ -686,7 +686,7 @@ function MessageForm({
                             )}
                         </div>
                         {imageFile && imageFilePreviewUrl && (
-                            <div className='mt-2 overflow-hidden rounded-md border border-lucky-border'>
+                            <div className='mt-2 overflow-hidden rounded-md border border-vaded-border'>
                                 <img
                                     src={imageFilePreviewUrl}
                                     alt='File preview'
@@ -696,7 +696,7 @@ function MessageForm({
                         )}
                     </div>
 
-                    <div className='sticky top-0 z-10 space-y-2 border-t border-lucky-border bg-lucky-bg-secondary pt-3'>
+                    <div className='sticky top-0 z-10 space-y-2 border-t border-vaded-border bg-vaded-bg-secondary pt-3'>
                         <div className='flex items-center justify-between'>
                             <Label>
                                 {t('reactionRoles.roles')} ({entries.length}/25)
@@ -716,10 +716,10 @@ function MessageForm({
                             {entries.map((entry, i) => (
                                 <div
                                     key={i}
-                                    className='space-y-2 rounded-lg border border-lucky-border bg-lucky-bg-tertiary/40 p-3'
+                                    className='space-y-2 rounded-lg border border-vaded-border bg-vaded-bg-tertiary/40 p-3'
                                 >
                                     <div className='flex items-center justify-between'>
-                                        <span className='type-body-sm font-medium text-lucky-text-secondary'>
+                                        <span className='type-body-sm font-medium text-vaded-text-secondary'>
                                             Role {i + 1}
                                         </span>
                                         {entries.length > 1 && (
@@ -727,7 +727,7 @@ function MessageForm({
                                                 type='button'
                                                 aria-label='Remove'
                                                 onClick={() => removeEntry(i)}
-                                                className='text-lucky-text-tertiary hover:text-lucky-error'
+                                                className='text-vaded-text-tertiary hover:text-vaded-error'
                                             >
                                                 <X className='h-3.5 w-3.5' />
                                             </button>
@@ -1004,8 +1004,8 @@ export default function ReactionRoles() {
             />
 
             {(error ?? deleteError) && (
-                <Card className='border-lucky-error/30 bg-lucky-error/5 p-4'>
-                    <p className='type-body-sm text-lucky-error'>
+                <Card className='border-vaded-error/30 bg-vaded-error/5 p-4'>
+                    <p className='type-body-sm text-vaded-error'>
                         {error ?? deleteError}
                     </p>
                     {error && (

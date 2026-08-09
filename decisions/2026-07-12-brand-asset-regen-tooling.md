@@ -7,9 +7,9 @@
 
 ## Context
 
-The README hero `assets/lucky-social-preview.png` (1280×640 baked raster) is off-brand: a
+The README hero `assets/vaded-social-preview.png` (1280×640 baked raster) is off-brand: a
 neon-glow cat mascot with **gold/orange** stripes + eyes, plus overlaid text chips
-("Lucky", "TypeScript", "React", "849+ Tests", "4 Packages") where some accents render gold.
+("Vaded Gaming", "TypeScript", "React", "849+ Tests", "4 Packages") where some accents render gold.
 Brand palette is Discord **Blurple `#5865f2`** + **Neon Pink `#ec4899`** (gold explicitly
 removed — `packages/frontend/branding/BRANDING_GUIDE.md`). No source pipeline composes this
 PNG (repo grep: referenced only as a static file in `README.md` + `docs/TOP_GG_SUBMISSION.md`).
@@ -19,11 +19,11 @@ Scope corrections established during research (do NOT route these through AI):
 - **Production `og-image.png`** (served to web) is a SEPARATE asset, already code-generated at
   build time via **resvg** from SVG in `packages/frontend/scripts/prerender-seo.ts` — clean,
   brand-colored, no gold. Out of scope.
-- **`assets/lucky-logo.svg`** is off-brand **purple** (`#7c3aed`/`#8b5cf6`/`#a78bfa`/`#c4b5fd`)
+- **`assets/vaded-logo.svg`** is off-brand **purple** (`#7c3aed`/`#8b5cf6`/`#a78bfa`/`#c4b5fd`)
   → fix by deterministic fill-swap, not AI. Separate cleanup.
 - **`assets/outline-layer-{all,mid,gold}.svg`** are orphan design exports, referenced nowhere
   → ignore (YAGNI).
-- **`--color-lucky-gold-*`** CSS vars (`index.css:130-132`) are legacy compat aliases already
+- **`--color-vaded-gold-*`** CSS vars (`index.css:130-132`) are legacy compat aliases already
   holding pink values, 0 live refs, slated for the planned migration-cleanup PR → leave as-is.
 
 So the only asset that genuinely needs a raster generator is the hero mascot.
@@ -137,7 +137,7 @@ rejected):
 vector-DIY beat it. Stop mascot work. If a definitive polished mascot is ever wanted, the
 reliable path is a **human illustrator** (debate plan B), not another generation attempt.
 **Redirect visual-identity effort to higher-ROI, taste-safe gaps:** the off-brand PURPLE
-`lucky-logo.svg` (deterministic recolor to Blurple/Pink) and missing product/dashboard
+`vaded-logo.svg` (deterministic recolor to Blurple/Pink) and missing product/dashboard
 screenshots in the README.
 
 ## Logo close-out (2026-07-12) — RASTER SUFFICIENT, vector DEFERRED

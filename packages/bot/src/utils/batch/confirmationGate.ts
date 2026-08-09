@@ -100,7 +100,7 @@ export async function showBatchConfirmation(
  */
 function buildConfirmationEmbed(params: BatchConfirmationParams): EmbedBuilder {
     const embed = new EmbedBuilder()
-        .setColor(COLOR.LUCKY_PURPLE)
+        .setColor(COLOR.VADED_PURPLE)
         .setTitle(`Confirm Batch ${params.operation}`)
         .addFields({
             name: 'Affected Items',

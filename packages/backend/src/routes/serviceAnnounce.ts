@@ -10,14 +10,14 @@ import {
 
 function requireAnnounceKey(req: Request): void {
     const provided = req.header('x-announce-key')?.trim()
-    const expected = process.env.LUCKY_ANNOUNCE_API_KEY?.trim()
+    const expected = process.env.VADED_ANNOUNCE_API_KEY?.trim()
     if (!timingSafeKeyCompare(provided, expected)) {
         throw AppError.unauthorized('invalid announce key')
     }
 }
 
 function getChannelAllowlist(): Set<string> {
-    const allowlistEnv = process.env.LUCKY_ANNOUNCE_CHANNEL_IDS
+    const allowlistEnv = process.env.VADED_ANNOUNCE_CHANNEL_IDS
     if (!allowlistEnv || !allowlistEnv.trim()) {
         return new Set()
     }

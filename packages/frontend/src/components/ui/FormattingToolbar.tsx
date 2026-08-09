@@ -67,7 +67,7 @@ function FormattingToolbar({ textareaRef }: FormattingToolbarProps) {
     }
 
     return (
-        <div className='flex gap-1 rounded-md border border-lucky-border bg-lucky-bg-tertiary/50 p-1.5'>
+        <div className='flex gap-1 rounded-md border border-vaded-border bg-vaded-bg-tertiary/50 p-1.5'>
             {Object.entries(FORMATTING_MARKS).map(
                 ([key, { label, icon: Icon }]) => (
                     <Button

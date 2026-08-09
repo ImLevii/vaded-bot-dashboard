@@ -18,8 +18,8 @@ export default function ServersPage() {
     const navigate = useNavigate()
 
     usePageMetadata({
-        title: 'Servers - Lucky',
-        description: 'Manage your Discord servers with Lucky',
+        title: 'Servers - Vaded Gaming',
+        description: 'Manage your Discord servers with Vaded Gaming',
     })
 
     const withBotCount = guilds.filter((g) => g.botAdded).length
@@ -46,8 +46,8 @@ export default function ServersPage() {
 
     return (
         <main className='space-y-8'>
-            <div className='surface-panel flex flex-wrap items-center gap-6 p-6 border border-lucky-border'>
-                <Avatar className='h-16 w-16 border border-lucky-border flex-shrink-0'>
+            <div className='surface-panel flex flex-wrap items-center gap-6 p-6 border border-vaded-border'>
+                <Avatar className='h-16 w-16 border border-vaded-border flex-shrink-0'>
                     <AvatarImage
                         src={
                             user?.avatar && user?.id
@@ -56,28 +56,28 @@ export default function ServersPage() {
                         }
                         alt={user?.username || 'User avatar'}
                     />
-                    <AvatarFallback className='bg-lucky-brand/20 font-semibold text-lucky-brand'>
+                    <AvatarFallback className='bg-vaded-brand/20 font-semibold text-vaded-brand'>
                         {user?.username?.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                 </Avatar>
 
                 <div className='space-y-1'>
-                    <p className='text-xs uppercase tracking-wider font-semibold text-lucky-text-tertiary'>
+                    <p className='text-xs uppercase tracking-wider font-semibold text-vaded-text-tertiary'>
                         {t('discordAccount')}
                     </p>
-                    <p className='text-lg font-semibold text-lucky-text-primary'>
+                    <p className='text-lg font-semibold text-vaded-text-primary'>
                         {user?.username}
                     </p>
-                    <p className='text-sm text-lucky-text-secondary'>
+                    <p className='text-sm text-vaded-text-secondary'>
                         @{user?.username}
                     </p>
                 </div>
 
                 <div className='ml-auto text-right flex-shrink-0'>
-                    <p className='text-xs uppercase tracking-wider font-semibold text-lucky-text-tertiary'>
+                    <p className='text-xs uppercase tracking-wider font-semibold text-vaded-text-tertiary'>
                         {t('totalServers')}
                     </p>
-                    <p className='text-2xl font-bold text-lucky-brand'>
+                    <p className='text-2xl font-bold text-vaded-brand'>
                         {guilds.length}
                     </p>
                 </div>
@@ -87,17 +87,17 @@ export default function ServersPage() {
                 <div className='flex items-baseline justify-between'>
                     <div>
                         <div className='flex items-center gap-2'>
-                            <h2 className='text-xs uppercase tracking-wider font-semibold text-lucky-text-tertiary'>
+                            <h2 className='text-xs uppercase tracking-wider font-semibold text-vaded-text-tertiary'>
                                 {t('serversLabel')}
                             </h2>
                         </div>
                         <h1
-                            className='text-3xl font-bold text-lucky-text-primary mt-2'
-                            style={{ fontFamily: 'var(--font-lucky-display)' }}
+                            className='text-3xl font-bold text-vaded-text-primary mt-2'
+                            style={{ fontFamily: 'var(--font-vaded-display)' }}
                         >
                             {t('yourServers')}
                         </h1>
-                        <p className='text-sm text-lucky-text-tertiary mt-2'>
+                        <p className='text-sm text-vaded-text-tertiary mt-2'>
                             {t('serversWithBot', {
                                 count: guilds.length,
                                 count2: withBotCount,
@@ -132,8 +132,8 @@ export default function ServersPage() {
                                 className={cn(
                                     'inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors',
                                     active
-                                        ? 'border-lucky-border-strong bg-lucky-bg-active text-lucky-text-primary'
-                                        : 'border-lucky-border bg-transparent text-lucky-text-secondary hover:text-lucky-text-primary hover:bg-lucky-bg-tertiary',
+                                        ? 'border-vaded-border-strong bg-vaded-bg-active text-vaded-text-primary'
+                                        : 'border-vaded-border bg-transparent text-vaded-text-secondary hover:text-vaded-text-primary hover:bg-vaded-bg-tertiary',
                                 )}
                                 aria-current={active ? 'page' : undefined}
                                 onClick={onClick}
@@ -147,7 +147,7 @@ export default function ServersPage() {
 
                 {primaryGuild && (
                     <section className='space-y-3'>
-                        <h2 className='text-xs uppercase tracking-wider font-semibold text-lucky-text-tertiary'>
+                        <h2 className='text-xs uppercase tracking-wider font-semibold text-vaded-text-tertiary'>
                             {t('recentlyActive')}
                         </h2>
                         <button
@@ -155,39 +155,39 @@ export default function ServersPage() {
                                 navigate(`/guild/${primaryGuild.id}`)
                             }
                             className={cn(
-                                'surface-panel w-full p-6 text-left border-2 transition-all hover:bg-lucky-bg-active/25 hover:border-lucky-brand/50',
+                                'surface-panel w-full p-6 text-left border-2 transition-all hover:bg-vaded-bg-active/25 hover:border-vaded-brand/50',
                                 primaryGuild.botAdded
-                                    ? 'border-lucky-border-strong'
-                                    : 'border-lucky-border',
+                                    ? 'border-vaded-border-strong'
+                                    : 'border-vaded-border',
                             )}
                         >
                             <div className='flex items-start gap-4'>
-                                <Avatar className='h-14 w-14 border border-lucky-border flex-shrink-0'>
+                                <Avatar className='h-14 w-14 border border-vaded-border flex-shrink-0'>
                                     <AvatarImage
                                         src={primaryGuild.icon || undefined}
                                         alt={primaryGuild.name}
                                     />
-                                    <AvatarFallback className='bg-lucky-brand/15 text-lucky-brand font-semibold'>
+                                    <AvatarFallback className='bg-vaded-brand/15 text-vaded-brand font-semibold'>
                                         {primaryGuild.name
                                             .substring(0, 2)
                                             .toUpperCase()}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className='flex-1 min-w-0'>
-                                    <h3 className='text-base font-semibold text-lucky-text-primary truncate'>
+                                    <h3 className='text-base font-semibold text-vaded-text-primary truncate'>
                                         {primaryGuild.name}
                                     </h3>
                                     {primaryGuild.botAdded ? (
-                                        <p className='text-xs text-lucky-success mt-1 inline-block'>
-                                            {t('luckyInstalled')}
+                                        <p className='text-xs text-vaded-success mt-1 inline-block'>
+                                            {t('vadedInstalled')}
                                         </p>
                                     ) : (
-                                        <p className='text-xs text-lucky-text-tertiary mt-1'>
-                                            {t('inviteLucky')}
+                                        <p className='text-xs text-vaded-text-tertiary mt-1'>
+                                            {t('inviteVaded')}
                                         </p>
                                     )}
                                 </div>
-                                <ExternalLink className='h-4 w-4 text-lucky-text-tertiary flex-shrink-0 mt-1' />
+                                <ExternalLink className='h-4 w-4 text-vaded-text-tertiary flex-shrink-0 mt-1' />
                             </div>
                         </button>
                     </section>
@@ -195,7 +195,7 @@ export default function ServersPage() {
 
                 {secondaryGuilds.length > 0 && (
                     <section className='space-y-3'>
-                        <h2 className='text-xs uppercase tracking-wider font-semibold text-lucky-text-tertiary'>
+                        <h2 className='text-xs uppercase tracking-wider font-semibold text-vaded-text-tertiary'>
                             {t('allOtherServers')}
                         </h2>
                         <ServerGrid />
@@ -203,14 +203,14 @@ export default function ServersPage() {
                 )}
 
                 {guilds.length === 0 && (
-                    <div className='surface-panel rounded-lg p-12 text-center border border-lucky-border'>
-                        <div className='w-12 h-12 rounded-full bg-lucky-bg-tertiary mx-auto mb-4 flex items-center justify-center'>
-                            <LayoutGrid className='h-6 w-6 text-lucky-text-tertiary' />
+                    <div className='surface-panel rounded-lg p-12 text-center border border-vaded-border'>
+                        <div className='w-12 h-12 rounded-full bg-vaded-bg-tertiary mx-auto mb-4 flex items-center justify-center'>
+                            <LayoutGrid className='h-6 w-6 text-vaded-text-tertiary' />
                         </div>
-                        <p className='text-lucky-text-primary font-medium mb-2'>
+                        <p className='text-vaded-text-primary font-medium mb-2'>
                             {t('noServersTitle')}
                         </p>
-                        <p className='text-sm text-lucky-text-secondary'>
+                        <p className='text-sm text-vaded-text-secondary'>
                             {t('noServersDescription')}
                         </p>
                     </div>

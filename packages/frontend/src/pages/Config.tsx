@@ -19,7 +19,7 @@ const CommandsConfig = lazy(() => import('@/components/Config/CommandsConfig'))
 export default function ConfigPage() {
     const { t } = useTranslation()
     usePageMetadata({
-        title: 'Configuration - Lucky',
+        title: 'Configuration - Vaded Gaming',
         description: 'Configure modules and commands for your Discord servers',
     })
     const [selectedModule, setSelectedModule] = useState<string | null>(null)
@@ -59,17 +59,17 @@ export default function ConfigPage() {
 
     if (!selectedGuild) {
         return (
-            <main className='bg-lucky-bg-primary min-h-screen px-4 md:px-6 py-6'>
+            <main className='bg-vaded-bg-primary min-h-screen px-4 md:px-6 py-6'>
                 <header className='space-y-4'>
                     <div className='space-y-1'>
                         <h1
-                            className='text-2xl font-semibold text-lucky-text-primary uppercase tracking-wide'
+                            className='text-2xl font-semibold text-vaded-text-primary uppercase tracking-wide'
                             style={{ fontFamily: 'Sora' }}
                         >
                             {t('config.configuration')}
                         </h1>
                         <p
-                            className='text-sm text-lucky-text-secondary'
+                            className='text-sm text-vaded-text-secondary'
                             style={{ fontFamily: 'Manrope' }}
                         >
                             {t('config.selectServerToConfigure')}
@@ -81,22 +81,22 @@ export default function ConfigPage() {
     }
 
     return (
-        <main className='bg-lucky-bg-primary min-h-screen'>
+        <main className='bg-vaded-bg-primary min-h-screen'>
             {/* Header */}
-            <header className='border-b border-lucky-border bg-lucky-surface-sidebar px-4 md:px-6 py-4'>
+            <header className='border-b border-vaded-border bg-vaded-surface-sidebar px-4 md:px-6 py-4'>
                 <div className='space-y-1'>
                     <h1
-                        className='text-xl font-semibold text-lucky-text-primary uppercase tracking-wide'
+                        className='text-xl font-semibold text-vaded-text-primary uppercase tracking-wide'
                         style={{ fontFamily: 'Sora' }}
                     >
                         Configuration
                     </h1>
                     <p
-                        className='text-xs text-lucky-text-tertiary'
+                        className='text-xs text-vaded-text-tertiary'
                         style={{ fontFamily: 'Manrope' }}
                     >
                         Server:{' '}
-                        <span className='text-lucky-text-secondary font-medium'>
+                        <span className='text-vaded-text-secondary font-medium'>
                             {selectedGuild.name}
                         </span>
                     </p>
@@ -118,7 +118,7 @@ export default function ConfigPage() {
                                     <button
                                         key={module.id}
                                         type='button'
-                                        className='group relative flex items-start gap-4 p-4 rounded-lg border border-lucky-border bg-lucky-surface-panel transition-colors duration-120 hover:border-lucky-border-strong hover:bg-lucky-surface-elevated focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-lucky-brand focus-visible:ring-offset-2 focus-visible:ring-offset-lucky-bg-primary'
+                                        className='group relative flex items-start gap-4 p-4 rounded-lg border border-vaded-border bg-vaded-surface-panel transition-colors duration-120 hover:border-vaded-border-strong hover:bg-vaded-surface-elevated focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-vaded-brand focus-visible:ring-offset-2 focus-visible:ring-offset-vaded-bg-primary'
                                         onClick={() =>
                                             handleModuleClick(module.id)
                                         }
@@ -129,7 +129,7 @@ export default function ConfigPage() {
                                         }}
                                     >
                                         <div
-                                            className='flex-shrink-0 p-2 rounded-lg bg-lucky-surface-highlight group-hover:bg-lucky-brand/15 transition-colors duration-120'
+                                            className='flex-shrink-0 p-2 rounded-lg bg-vaded-surface-highlight group-hover:bg-vaded-brand/15 transition-colors duration-120'
                                             style={{
                                                 transitionDuration: '120ms',
                                                 transitionTimingFunction:
@@ -137,17 +137,17 @@ export default function ConfigPage() {
                                             }}
                                             aria-hidden='true'
                                         >
-                                            <Icon className='w-5 h-5 text-lucky-brand' />
+                                            <Icon className='w-5 h-5 text-vaded-brand' />
                                         </div>
                                         <div className='flex-1 text-left space-y-1'>
                                             <h3
-                                                className='text-base font-semibold text-lucky-text-primary'
+                                                className='text-base font-semibold text-vaded-text-primary'
                                                 style={{ fontFamily: 'Sora' }}
                                             >
                                                 {module.name}
                                             </h3>
                                             <p
-                                                className='text-xs text-lucky-text-secondary leading-snug'
+                                                className='text-xs text-vaded-text-secondary leading-snug'
                                                 style={{
                                                     fontFamily: 'Manrope',
                                                 }}
@@ -156,7 +156,7 @@ export default function ConfigPage() {
                                             </p>
                                         </div>
                                         <div
-                                            className='flex-shrink-0 text-lucky-text-tertiary group-hover:text-lucky-text-secondary transition-colors duration-120'
+                                            className='flex-shrink-0 text-vaded-text-tertiary group-hover:text-vaded-text-secondary transition-colors duration-120'
                                             style={{
                                                 transitionDuration: '120ms',
                                                 transitionTimingFunction:
@@ -181,7 +181,7 @@ export default function ConfigPage() {
                                 variant='ghost'
                                 size='sm'
                                 onClick={() => setSelectedModule(null)}
-                                className='gap-2 text-lucky-text-secondary hover:text-lucky-text-primary'
+                                className='gap-2 text-vaded-text-secondary hover:text-vaded-text-primary'
                             >
                                 <ArrowLeft
                                     className='w-4 h-4'

@@ -8,13 +8,13 @@ revisit_after: 2026-06-15
 
 ## Status
 
-Accepted (decision). Triggered by the `/observability-audit` run on 2026-05-30, which scored Lucky's monitoring **practice** RED while runtime error health was GREEN (256 error events / 30d, 0 in the last 48h; top groups all fixed and quiet post-deploy). The audit surfaced: zero SLOs, zero alert rules, no on-call/paging, dormant OpenTelemetry, and metrics that are shallow on the bot side.
+Accepted (decision). Triggered by the `/observability-audit` run on 2026-05-30, which scored Vaded Gaming's monitoring **practice** RED while runtime error health was GREEN (256 error events / 30d, 0 in the last 48h; top groups all fixed and quiet post-deploy). The audit surfaced: zero SLOs, zero alert rules, no on-call/paging, dormant OpenTelemetry, and metrics that are shallow on the bot side.
 
 The forcing incident is concrete: the production deploy pipeline was **silently broken for ~5 consecutive deploys over ~1 week** (prisma devDep + esbuild dual-version, fixed in v2.15.2 / #1080). It masked two already-merged fixes from reaching prod and was found by manual inspection — **no signal fired.**
 
 ## Context
 
-Lucky is a single-operator, self-hosted (homelab) Discord music bot: 2 runtime services (bot + Express backend) + a React frontend, deployed via `deploy.yml` + Docker to one homelab box. Audited current state:
+Vaded Gaming is a single-operator, self-hosted (homelab) Discord music bot: 2 runtime services (bot + Express backend) + a React frontend, deployed via `deploy.yml` + Docker to one homelab box. Audited current state:
 
 - **Errors** — Sentry well-wired across all 3 surfaces (PII scrub, env gating, flush-on-shutdown, frontend replay). Volume tiny.
 - **Metrics** — `prom-client` /metrics scraped by homelab Prometheus. Backend HTTP rate/latency/errors are good; bot has only a guild-count gauge. A `SimplifiedTelemetry` subsystem exists but is **dead code** (logs only, never invoked).
@@ -71,7 +71,7 @@ In-sequence (the critic's order):
 
 1. **Heartbeat first** (binary, no tuning): bot/backend POST to Healthchecks on a startup hook + interval, embedding the running version in the ping; Healthchecks → Discord on miss (timeout 60–90s). Add one external heartbeat for full-box-down.
 2. **Sentry release markers + source-map upload** in `deploy.yml` (`sentry-cli releases create` pre-deploy, `finalize` after the service reports its version). Closes the silent-deploy class.
-3. **Burn-rate / error-rate alert** in Grafana on `lucky_backend_http_server_errors_total` → Discord. Measure backend errors/day for ~3 days first; treat the first ~7 days as a tuning window. **Define the availability SLO after 14 days of observed data**, not up front.
+3. **Burn-rate / error-rate alert** in Grafana on `vaded_backend_http_server_errors_total` → Discord. Measure backend errors/day for ~3 days first; treat the first ~7 days as a tuning window. **Define the availability SLO after 14 days of observed data**, not up front.
 4. **Defer OpenTelemetry (Layer 4)** to the 2026-06-15 decision point; do not adopt until one revisit trigger fires.
 5. **Delete dead `SimplifiedTelemetry`** in a separate PR after Layer 1–3 are validated (not bundled — avoid debugging two things at once).
 

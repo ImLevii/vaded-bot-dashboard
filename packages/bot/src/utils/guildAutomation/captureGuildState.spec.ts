@@ -38,11 +38,11 @@ function createGuild(overrides: Record<string, unknown> = {}) {
     const guildId = 'guild-1'
     return {
         id: guildId,
-        name: 'Lucky Guild',
+        name: 'Vaded Gaming Guild',
         fetchOnboarding: jest.fn(),
         members: {
             cache: new Map([
-                ['bot-self', { id: 'bot-self', user: { bot: true, username: 'Lucky' } }],
+                ['bot-self', { id: 'bot-self', user: { bot: true, username: 'Vaded Gaming' } }],
                 ['legacy-bot', { id: 'legacy-bot', user: { bot: true, username: 'LegacyBot' } }],
                 ['human-user', { id: 'human-user', user: { bot: false, username: 'User' } }],
             ]),
@@ -167,7 +167,7 @@ describe('captureGuildAutomationState', () => {
         const result = await captureGuildAutomationState(guild as any, 'bot-self')
 
         expect(onboardingToManifestMock).toHaveBeenCalledWith('guild-1', null)
-        expect(result.guild).toEqual({ id: 'guild-1', name: 'Lucky Guild' })
+        expect(result.guild).toEqual({ id: 'guild-1', name: 'Vaded Gaming Guild' })
         expect(result.roles.roles).toHaveLength(1)
         expect(result.roles.roles[0]).toMatchObject({
             id: 'role-admin',

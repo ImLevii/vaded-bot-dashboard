@@ -50,7 +50,7 @@ Today `GuildAutomationDrift` rows are only written via `createPlan()` (`packages
 - **B. Apply path updates drift records per-module (accepted).** See decision above.
 - **C. Apply path re-captures after applying, computes residual diff, persists.** Rejected. Doubles capture cost per Run (one before apply, one after). For DB-only modules the cost is negligible; for Discord-touching modules it's two REST round trips per Run. The marginal accuracy gain (residual diff exactly mirrors post-apply state) is captured by option B with one fewer capture — the executor's `errors[]` already tells us what failed, so we don't need a second capture to compute residual state.
 - **D. Persist pre-apply intent diff, let `/plan` reconcile later.** Rejected. Conflates "what we tried to do" with "what's still wrong." Operator reading the dashboard right after an apply would see the pre-apply intent, not the post-apply residual — exactly the bug option A has.
-- **E. Use a CQRS / event-sourcing model where drift is a projection of apply events.** Rejected for now. Lucky has no event store today. Massive over-engineering for a ~7-module schema with bounded row count per guild. Revisitable if Lucky adopts event sourcing for other reasons.
+- **E. Use a CQRS / event-sourcing model where drift is a projection of apply events.** Rejected for now. Vaded Gaming has no event store today. Massive over-engineering for a ~7-module schema with bounded row count per guild. Revisitable if Vaded Gaming adopts event sourcing for other reasons.
 
 ## Consequences
 
@@ -63,7 +63,7 @@ Today `GuildAutomationDrift` rows are only written via `createPlan()` (`packages
 
 **Negative**
 
-- One extra Prisma upsert per applied module per Run. At Lucky's current ~3000-guild scale and 7 modules max, that's ≤21 upserts per full reconcile Run. Negligible.
+- One extra Prisma upsert per applied module per Run. At Vaded Gaming's current ~3000-guild scale and 7 modules max, that's ≤21 upserts per full reconcile Run. Negligible.
 - Concurrent apply + scheduled-reconcile on the same `(guildId, module)` is last-write-wins. Documented and accepted as transient.
 - Drift JSON shape refactor in `service.ts:createPlan()` is a write-side change to an existing production path. Old rows remain readable by the frontend (which only inspects `severity`/`updatedAt`), so user-visible impact is zero — but it does mean rows written before this PR have a different `drift` JSON shape than rows written after. Acceptable because drift is ephemeral (next plan/apply overwrites).
 

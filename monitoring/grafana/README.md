@@ -1,14 +1,14 @@
 # Grafana Dashboards as Code
 
-This directory contains Grafana dashboards for Lucky, version-controlled and ready for provisioning in CI/CD environments.
+This directory contains Grafana dashboards for Vaded Gaming, version-controlled and ready for provisioning in CI/CD environments.
 
 ## Metrics
 
-Lucky exposes the following key application metrics:
+Vaded Gaming exposes the following key application metrics:
 
-- `lucky_backend_http_requests_total` — Total HTTP requests to the backend (counter)
-- `lucky_backend_http_server_errors_total` — Total HTTP 5xx errors from the backend (counter)
-- `lucky_bot_guilds_total` — Total number of Discord guilds the bot is a member of (gauge)
+- `vaded_backend_http_requests_total` — Total HTTP requests to the backend (counter)
+- `vaded_backend_http_server_errors_total` — Total HTTP 5xx errors from the backend (counter)
+- `vaded_bot_guilds_total` — Total number of Discord guilds the bot is a member of (gauge)
 
 ## Directory Structure
 

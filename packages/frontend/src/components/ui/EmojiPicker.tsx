@@ -199,7 +199,7 @@ function EmojiPicker({ value, onChange, guildId }: EmojiPickerProps) {
                         <span className='text-base leading-none'>
                             {displayValue}
                         </span>
-                        <span className='ml-2 text-xs text-lucky-text-tertiary'>
+                        <span className='ml-2 text-xs text-vaded-text-tertiary'>
                             {displayValue}
                         </span>
                     </>
@@ -212,16 +212,16 @@ function EmojiPicker({ value, onChange, guildId }: EmojiPickerProps) {
             </Button>
 
             {open && (
-                <div className='absolute right-0 top-full z-50 mt-1 w-80 rounded-lg border border-lucky-border bg-lucky-bg-secondary shadow-lg'>
+                <div className='absolute right-0 top-full z-50 mt-1 w-80 rounded-lg border border-vaded-border bg-vaded-bg-secondary shadow-lg'>
                     {/* Tabs */}
-                    <div className='flex border-b border-lucky-border'>
+                    <div className='flex border-b border-vaded-border'>
                         <button
                             type='button'
                             onClick={() => setActiveTab('emoji')}
                             className={`flex-1 px-3 py-2 text-xs font-medium transition-colors ${
                                 activeTab === 'emoji'
-                                    ? 'border-b-2 border-lucky-accent text-lucky-text-primary'
-                                    : 'text-lucky-text-secondary hover:text-lucky-text-primary'
+                                    ? 'border-b-2 border-vaded-accent text-vaded-text-primary'
+                                    : 'text-vaded-text-secondary hover:text-vaded-text-primary'
                             }`}
                         >
                             Emoji
@@ -231,8 +231,8 @@ function EmojiPicker({ value, onChange, guildId }: EmojiPickerProps) {
                             onClick={() => setActiveTab('server')}
                             className={`flex-1 px-3 py-2 text-xs font-medium transition-colors ${
                                 activeTab === 'server'
-                                    ? 'border-b-2 border-lucky-accent text-lucky-text-primary'
-                                    : 'text-lucky-text-secondary hover:text-lucky-text-primary'
+                                    ? 'border-b-2 border-vaded-accent text-vaded-text-primary'
+                                    : 'text-vaded-text-secondary hover:text-vaded-text-primary'
                             }`}
                         >
                             Server
@@ -246,7 +246,7 @@ function EmojiPicker({ value, onChange, guildId }: EmojiPickerProps) {
                                 {Object.entries(EMOJI_CATEGORIES).map(
                                     ([category, emojis]) => (
                                         <div key={category}>
-                                            <div className='mb-2 text-xs font-medium text-lucky-text-secondary'>
+                                            <div className='mb-2 text-xs font-medium text-vaded-text-secondary'>
                                                 {category}
                                             </div>
                                             <div className='grid grid-cols-8 gap-1'>
@@ -259,7 +259,7 @@ function EmojiPicker({ value, onChange, guildId }: EmojiPickerProps) {
                                                                 emoji,
                                                             )
                                                         }
-                                                        className='flex items-center justify-center rounded p-2 text-base transition-colors hover:bg-lucky-bg-tertiary'
+                                                        className='flex items-center justify-center rounded p-2 text-base transition-colors hover:bg-vaded-bg-tertiary'
                                                     >
                                                         {emoji}
                                                     </button>
@@ -273,7 +273,7 @@ function EmojiPicker({ value, onChange, guildId }: EmojiPickerProps) {
                             <div className='p-3'>
                                 {loadingEmojis ? (
                                     <div className='flex items-center justify-center py-8'>
-                                        <Loader2 className='h-5 w-5 animate-spin text-lucky-accent' />
+                                        <Loader2 className='h-5 w-5 animate-spin text-vaded-accent' />
                                     </div>
                                 ) : customEmojis.length > 0 ? (
                                     <div className='grid grid-cols-8 gap-2'>
@@ -286,7 +286,7 @@ function EmojiPicker({ value, onChange, guildId }: EmojiPickerProps) {
                                                         emoji,
                                                     )
                                                 }
-                                                className='flex items-center justify-center rounded p-1 transition-colors hover:bg-lucky-bg-tertiary'
+                                                className='flex items-center justify-center rounded p-1 transition-colors hover:bg-vaded-bg-tertiary'
                                                 title={emoji.name}
                                             >
                                                 <img
@@ -304,7 +304,7 @@ function EmojiPicker({ value, onChange, guildId }: EmojiPickerProps) {
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className='py-8 text-center text-xs text-lucky-text-tertiary'>
+                                    <div className='py-8 text-center text-xs text-vaded-text-tertiary'>
                                         No custom emojis found
                                     </div>
                                 )}

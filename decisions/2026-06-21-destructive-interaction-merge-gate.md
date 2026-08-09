@@ -8,7 +8,7 @@
 
 ## Context
 
-Lucky's bot suite is 100% unit tests with discord.js mocked at the boundary; no
+Vaded Gaming's bot suite is 100% unit tests with discord.js mocked at the boundary; no
 test exercises a real gateway. The new "Move message" command reposts a message
 then **deletes the original** — irreversible. Unit tests + the full suite (2612)
 

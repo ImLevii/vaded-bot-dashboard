@@ -227,7 +227,7 @@ describe('api service bootstrap', () => {
             .mockResolvedValueOnce({
                 data: {
                     id: 'user-1',
-                    username: 'Lucky',
+                    username: 'Vaded Gaming',
                 },
             })
             .mockResolvedValueOnce({
@@ -253,7 +253,7 @@ describe('api service bootstrap', () => {
 
         expect(authResponse.data.user).toEqual({
             id: 'user-1',
-            username: 'Lucky',
+            username: 'Vaded Gaming',
         })
         expect(guildResponse.data.guild).toEqual(
             expect.objectContaining({
@@ -310,11 +310,11 @@ describe('api service bootstrap', () => {
         await module.api.trackHistory.getTopTracks('guild-1')
         await module.api.trackHistory.getTopArtists('guild-1')
         await module.api.trackHistory.clearHistory('guild-1')
-        await module.api.twitch.lookupUser('lucky')
+        await module.api.twitch.lookupUser('vaded')
         await module.api.twitch.list('guild-1')
         await module.api.twitch.add('guild-1', {
             twitchUserId: 'tw-1',
-            twitchLogin: 'lucky',
+            twitchLogin: 'vaded',
             discordChannelId: 'chan-1',
         })
         await module.api.twitch.remove('guild-1', 'tw-1')
@@ -385,7 +385,7 @@ describe('api service bootstrap', () => {
         expect(apiClient.delete).toHaveBeenCalledWith(
             '/guilds/guild-1/music/history',
         )
-        expect(apiClient.get).toHaveBeenCalledWith('/twitch/users?login=lucky')
+        expect(apiClient.get).toHaveBeenCalledWith('/twitch/users?login=vaded')
         expect(apiClient.get).toHaveBeenCalledWith(
             '/guilds/guild-1/twitch/notifications',
         )
@@ -393,7 +393,7 @@ describe('api service bootstrap', () => {
             '/guilds/guild-1/twitch/notifications',
             {
                 twitchUserId: 'tw-1',
-                twitchLogin: 'lucky',
+                twitchLogin: 'vaded',
                 discordChannelId: 'chan-1',
             },
         )

@@ -2,10 +2,10 @@ export const TOP_GG_BOT_ID = '962198089161134131'
 export const TOP_GG_VOTE_URL = `https://top.gg/bot/${TOP_GG_BOT_ID}/vote`
 
 export const TOP_GG_VOTE_TIERS = [
-    { threshold: 30, label: 'Lucky Legend' },
-    { threshold: 14, label: 'Lucky Regular' },
-    { threshold: 7, label: 'Lucky Fan' },
-    { threshold: 1, label: 'Lucky Supporter' },
+    { threshold: 30, label: 'Vaded Gaming Legend' },
+    { threshold: 14, label: 'Vaded Gaming Regular' },
+    { threshold: 7, label: 'Vaded Gaming Fan' },
+    { threshold: 1, label: 'Vaded Gaming Supporter' },
 ] as const
 
 /** Type representing a voting tier from the top.gg vote tiers list. */

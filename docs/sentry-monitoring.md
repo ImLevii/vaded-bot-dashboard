@@ -1,6 +1,6 @@
 # Sentry monitoring
 
-Lucky already initializes Sentry from the shared monitoring layer, and the bot now passes bot-specific identity so issues are easier to group.
+Vaded Gaming already initializes Sentry from the shared monitoring layer, and the bot now passes bot-specific identity so issues are easier to group.
 
 Required environment variable:
 
@@ -21,7 +21,7 @@ Docker and host wiring:
 
 - `docker-compose.yml` forwards the supported `SENTRY_*` variables into the production `bot` and `backend` containers.
 - `docker-compose.dev.yml` forwards the same variables for local parity, but now defaults `SENTRY_ENABLED=false` so local runs do not imply Sentry is active.
-- On the homelab host, add the variables to `/home/luk-server/Lucky/.env` alongside the other compose secrets before restarting the bot.
+- On the homelab host, add the variables to `/home/luk-server/vaded-gaming/.env` alongside the other compose secrets before restarting the bot.
 
 Example:
 
@@ -31,7 +31,7 @@ SENTRY_ENABLED=true
 SENTRY_ENVIRONMENT=production
 SENTRY_RELEASE=vaded-gaming-bot@<git-sha>
 SENTRY_SERVER_NAME=<host-name>
-SENTRY_APP_NAME=lucky
+SENTRY_APP_NAME=vaded
 SENTRY_SERVICE_NAME=bot
 ```
 

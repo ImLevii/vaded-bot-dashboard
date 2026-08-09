@@ -38,7 +38,7 @@ Both `GuildAutomationExecutionService` (backend) and `applyPlan.ts` (bot) import
 - **A. Drop singleton, compose at orchestrator roots for all 7 (accepted).** Single consistent pattern. Zero test restructuring per current spec evidence. Onboarding/Channels/Roles slot in naturally via the same composition seam (just with a `DiscordWriteAdapter` argument).
 - **B. Singleton for DB-only executors, composition-root for Discord-writing.** Rejected. Creates a bifurcated shape: 4 singleton exports in `shared/index.ts` (AutoMessages + the 3 DB-only) alongside 3 factory-only exports for the Discord-writing ones. When PR #4 (Onboarding) lands, the choice is either accept the inconsistency forever or do a coordinated mid-stream refactor across both orchestrators — exactly the cost option A is trying to avoid.
 - **C. Keep the singleton; add `withAdapter(executor, adapter)` later for Discord-writing.** Rejected outright. The adapter is needed at _construction_ (the executor closes over it for use inside `apply`), not as a per-call argument. Wrapping a singleton after the fact would force the apply surface to take an adapter parameter, leaking adapter state into the executor's public API.
-- **D. Build a shared executor registry in `packages/shared` keyed by module name, plus a DI helper to construct it per package.** Rejected. Over-engineered for 7 modules. Adds a registry abstraction and a DI surface that nothing else in Lucky uses; the critic explicitly flagged this would replicate the monolith inside one abstraction.
+- **D. Build a shared executor registry in `packages/shared` keyed by module name, plus a DI helper to construct it per package.** Rejected. Over-engineered for 7 modules. Adds a registry abstraction and a DI surface that nothing else in Vaded Gaming uses; the critic explicitly flagged this would replicate the monolith inside one abstraction.
 
 ## Consequences
 
@@ -61,8 +61,8 @@ Both `GuildAutomationExecutionService` (backend) and `applyPlan.ts` (bot) import
 ## Revisit when
 
 - **PR #4 (Onboarding Executor) lands**, surfacing the first `DiscordWriteAdapter` consumer. Confirm the composition-root pattern carries the adapter cleanly. If not, this ADR is the place to record the change.
-- A future Lucky package (e.g. a new service or worker) needs to apply Manifest changes and we discover the cost of re-wiring executors at _that_ package's composition root is high enough to argue for a shared registry. Concrete signal: ≥3 packages duplicating the executor-construction block.
-- We adopt a DI container across Lucky for unrelated reasons; at that point the executor composition would naturally fold into it.
+- A future Vaded Gaming package (e.g. a new service or worker) needs to apply Manifest changes and we discover the cost of re-wiring executors at _that_ package's composition root is high enough to argue for a shared registry. Concrete signal: ≥3 packages duplicating the executor-construction block.
+- We adopt a DI container across Vaded Gaming for unrelated reasons; at that point the executor composition would naturally fold into it.
 - Production data shows orchestrator boot-time cost from per-orchestrator executor construction is non-trivial (extremely unlikely — these are pure object literals).
 
 ## Cross-references
@@ -70,5 +70,5 @@ Both `GuildAutomationExecutionService` (backend) and `applyPlan.ts` (bot) import
 - `decisions/2026-05-19-guild-automation-module-executors.md` — parent ADR.
 - `packages/shared/src/services/guildAutomation/autoMessagesExecutor.ts` — first executor; its `createAutoMessagesExecutor` builder is the seam this ADR commits to.
 - `packages/bot/src/utils/guildAutomation/applyPlan.spec.ts`, `packages/backend/tests/unit/services/GuildAutomationExecutionService.test.ts` — orchestrator specs that already build executors per-test, evidence cited for zero-test-rewrite migration.
-- `~/.claude/projects/-Volumes-External-HD-Desenvolvimento-Lucky/memory/feedback_wait_for_quality_gates_2026-05-19.md` — Quality Gates lane is the authority for green-on-merge.
+- `~/.claude/projects/-Volumes-External-HD-Desenvolvimento-vaded-gaming/memory/feedback_wait_for_quality_gates_2026-05-19.md` — Quality Gates lane is the authority for green-on-merge.
 - This ADR was produced via `/research-and-decide` during a `/grill-me` session on PR #906 (commit `a2b0c8a7`).

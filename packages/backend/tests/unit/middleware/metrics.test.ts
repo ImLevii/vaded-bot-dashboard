@@ -55,11 +55,11 @@ describe('metricsMiddleware', () => {
 
         const text = await registry.metrics()
         expect(text).toMatch(
-            /lucky_backend_http_requests_total\{[^}]*method="GET"[^}]*route="\/api\/guilds\/:guildId"[^}]*status="200"[^}]*\}\s+1/,
+            /vaded_backend_http_requests_total\{[^}]*method="GET"[^}]*route="\/api\/guilds\/:guildId"[^}]*status="200"[^}]*\}\s+1/,
         )
-        expect(text).toContain('lucky_backend_http_request_duration_seconds_bucket')
+        expect(text).toContain('vaded_backend_http_request_duration_seconds_bucket')
         expect(text).toMatch(
-            /lucky_backend_http_request_duration_seconds_count\{[^}]*route="\/api\/guilds\/:guildId"[^}]*\}\s+1/,
+            /vaded_backend_http_request_duration_seconds_count\{[^}]*route="\/api\/guilds\/:guildId"[^}]*\}\s+1/,
         )
     })
 
@@ -72,7 +72,7 @@ describe('metricsMiddleware', () => {
 
         const text = await registry.metrics()
         expect(text).toMatch(
-            /lucky_backend_http_server_errors_total\{[^}]*method="POST"[^}]*route="\/api\/guilds\/:guildId"[^}]*\}\s+1/,
+            /vaded_backend_http_server_errors_total\{[^}]*method="POST"[^}]*route="\/api\/guilds\/:guildId"[^}]*\}\s+1/,
         )
     })
 
@@ -86,7 +86,7 @@ describe('metricsMiddleware', () => {
         const text = await registry.metrics()
         // No 5xx error line should appear at all for this test.
         expect(text).not.toMatch(
-            /lucky_backend_http_server_errors_total\{[^}]*\}\s+[1-9]/,
+            /vaded_backend_http_server_errors_total\{[^}]*\}\s+[1-9]/,
         )
     })
 
@@ -99,7 +99,7 @@ describe('metricsMiddleware', () => {
 
         const text = await registry.metrics()
         expect(text).toMatch(
-            /lucky_backend_http_requests_total\{[^}]*route="unmatched"[^}]*\}\s+1/,
+            /vaded_backend_http_requests_total\{[^}]*route="unmatched"[^}]*\}\s+1/,
         )
     })
 
@@ -112,7 +112,7 @@ describe('metricsMiddleware', () => {
 
         const text = await registry.metrics()
         expect(text).toMatch(
-            /lucky_backend_http_requests_total\{[^}]*route="\/api\/unmatched"[^}]*\}\s+1/,
+            /vaded_backend_http_requests_total\{[^}]*route="\/api\/unmatched"[^}]*\}\s+1/,
         )
     })
 })

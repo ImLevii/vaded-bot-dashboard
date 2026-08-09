@@ -1,6 +1,6 @@
 # Last.fm API integration
 
-Lucky can send **Now Playing** and **Scrobbles** to Last.fm. Users connect their own Last.fm accounts via `/lastfm link`; optionally a global session key in env can be used as fallback for unlinked users.
+Vaded Gaming can send **Now Playing** and **Scrobbles** to Last.fm. Users connect their own Last.fm accounts via `/lastfm link`; optionally a global session key in env can be used as fallback for unlinked users.
 
 ## Requirements
 
@@ -18,7 +18,7 @@ Scrobbling and updateNowPlaying require authentication; see [Last.fm Authenticat
 | `LASTFM_API_SECRET`   | Yes (when Last.fm enabled) | API secret from Last.fm API account                                                                   |
 | `LASTFM_SESSION_KEY`  | No                         | Optional global session key (fallback when a user has not linked)                                     |
 | `LASTFM_LINK_SECRET`  | No                         | Secret to sign connect links (defaults to `WEBAPP_SESSION_SECRET`)                                    |
-| `WEBAPP_BACKEND_URL`  | Recommended for /lastfm link | Canonical backend/API origin for Last.fm connect links (e.g. `https://lucky-api.lucassantana.tech`) |
+| `WEBAPP_BACKEND_URL`  | Recommended for /lastfm link | Canonical backend/API origin for Last.fm connect links (e.g. `https://vaded-api.lucassantana.tech`) |
 | `WEBAPP_REDIRECT_URI` | Fallback for /lastfm link  | Discord OAuth callback URL; its origin is used only when `WEBAPP_BACKEND_URL` is unset               |
 
 If `LASTFM_API_KEY` or `LASTFM_API_SECRET` are missing, Last.fm integration is disabled (no crash).
@@ -59,8 +59,8 @@ Alternatively use [auth.getMobileSession](https://www.last.fm/api/show/auth.getM
 
 ## Behaviour
 
-- When a track **starts** playing, Lucky calls Last.fm `track.updateNowPlaying` for the **requester’s** session (linked account or env fallback).
-- When a track **finishes** or is **skipped**, Lucky calls `track.scrobble` for the same session.
+- When a track **starts** playing, Vaded Gaming calls Last.fm `track.updateNowPlaying` for the **requester’s** session (linked account or env fallback).
+- When a track **finishes** or is **skipped**, Vaded Gaming calls `track.scrobble` for the same session.
 - The Discord channel still receives the plain-text "Now playing: Artist – Title" message so .fmbot and other channel-based scrobblers continue to work.
 
 ## Discord commands

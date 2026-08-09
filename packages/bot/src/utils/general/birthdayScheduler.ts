@@ -247,7 +247,7 @@ export class BirthdayScheduler extends IntervalScheduler {
                 .setDescription(
                     `Wishing a wonderful day to ${mentions}!\n\nSet yours with \`/birthday set\`.`,
                 )
-                .setColor(COLOR.LUCKY_PURPLE)
+                .setColor(COLOR.VADED_PURPLE)
             await (channel as TextChannel).send({
                 content: mentions,
                 embeds: [embed.toJSON()],

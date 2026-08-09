@@ -41,7 +41,7 @@ function statusColor(status: string): string {
         case 'running':
             return 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
         default:
-            return 'bg-lucky-bg-active/60 text-lucky-text-muted border-lucky-border'
+            return 'bg-vaded-bg-active/60 text-vaded-text-muted border-vaded-border'
     }
 }
 
@@ -57,7 +57,7 @@ function StatusIcon({ status }: { status: string }) {
         case 'pending':
             return <Clock className='h-4 w-4 text-yellow-400' />
         default:
-            return <Clock className='h-4 w-4 text-lucky-text-muted' />
+            return <Clock className='h-4 w-4 text-vaded-text-muted' />
     }
 }
 
@@ -65,14 +65,14 @@ function RunCard({ run }: { run: AutomationRun }) {
     const [expanded, setExpanded] = useState(false)
     const date = new Date(run.createdAt).toLocaleString()
     return (
-        <div className='surface-panel rounded-lg border border-lucky-border overflow-hidden'>
+        <div className='surface-panel rounded-lg border border-vaded-border overflow-hidden'>
             <button
                 onClick={() => setExpanded(!expanded)}
-                className='w-full p-3 flex items-center justify-between gap-2 hover:bg-lucky-bg-active/30 transition-colors text-left'
+                className='w-full p-3 flex items-center justify-between gap-2 hover:bg-vaded-bg-active/30 transition-colors text-left'
             >
                 <div className='flex items-center gap-2 min-w-0'>
                     <StatusIcon status={run.status} />
-                    <span className='text-sm font-medium text-lucky-text-strong capitalize truncate'>
+                    <span className='text-sm font-medium text-vaded-text-strong capitalize truncate'>
                         {run.type}
                     </span>
                     <Badge
@@ -82,7 +82,7 @@ function RunCard({ run }: { run: AutomationRun }) {
                     </Badge>
                 </div>
                 <div className='flex items-center gap-2 flex-shrink-0'>
-                    <span className='text-xs text-lucky-text-muted'>
+                    <span className='text-xs text-vaded-text-muted'>
                         {date}
                     </span>
                     {run.summary &&
@@ -95,10 +95,10 @@ function RunCard({ run }: { run: AutomationRun }) {
             </button>
             {expanded && (
                 <>
-                    <div className='border-t border-lucky-border' />
-                    <div className='p-3 space-y-2 bg-lucky-bg-active/20'>
+                    <div className='border-t border-vaded-border' />
+                    <div className='p-3 space-y-2 bg-vaded-bg-active/20'>
                         {run.summary && (
-                            <p className='text-xs text-lucky-text-muted font-mono bg-lucky-bg-primary/60 rounded p-2 break-all'>
+                            <p className='text-xs text-vaded-text-muted font-mono bg-vaded-bg-primary/60 rounded p-2 break-all'>
                                 {run.summary}
                             </p>
                         )}
@@ -117,13 +117,13 @@ function RunCard({ run }: { run: AutomationRun }) {
 function PlanResultView({ result }: { result: PlanResult }) {
     return (
         <div className='space-y-3'>
-            <p className='text-sm text-lucky-text-body'>{result.summary}</p>
+            <p className='text-sm text-vaded-text-body'>{result.summary}</p>
             {result.changes.length > 0 ? (
                 <div className='space-y-2'>
                     {result.changes.map((change, i) => (
                         <div
                             key={i}
-                            className='surface-panel rounded border border-lucky-border p-3 flex items-center gap-3'
+                            className='surface-panel rounded border border-vaded-border p-3 flex items-center gap-3'
                         >
                             <Badge
                                 className={`text-xs border flex-shrink-0 ${
@@ -136,17 +136,17 @@ function PlanResultView({ result }: { result: PlanResult }) {
                             >
                                 {change.action}
                             </Badge>
-                            <span className='text-xs text-lucky-text-muted capitalize'>
+                            <span className='text-xs text-vaded-text-muted capitalize'>
                                 {change.type}
                             </span>
-                            <span className='text-xs text-lucky-text-strong font-mono'>
+                            <span className='text-xs text-vaded-text-strong font-mono'>
                                 {change.resource}
                             </span>
                         </div>
                     ))}
                 </div>
             ) : (
-                <p className='text-sm text-lucky-text-muted'>
+                <p className='text-sm text-vaded-text-muted'>
                     No changes detected.
                 </p>
             )}
@@ -167,13 +167,13 @@ function ApplyResultView({ result }: { result: ApplyResult }) {
                     </span>
                 )}
             </div>
-            <p className='text-sm text-lucky-text-body'>{result.summary}</p>
+            <p className='text-sm text-vaded-text-body'>{result.summary}</p>
             {result.changes.length > 0 && (
                 <div className='space-y-2'>
                     {result.changes.map((change, i) => (
                         <div
                             key={i}
-                            className='surface-panel rounded border border-lucky-border p-3 flex items-center gap-3'
+                            className='surface-panel rounded border border-vaded-border p-3 flex items-center gap-3'
                         >
                             <StatusIcon status={change.status} />
                             <Badge
@@ -181,10 +181,10 @@ function ApplyResultView({ result }: { result: ApplyResult }) {
                             >
                                 {change.status}
                             </Badge>
-                            <span className='text-xs text-lucky-text-muted capitalize'>
+                            <span className='text-xs text-vaded-text-muted capitalize'>
                                 {change.type}
                             </span>
-                            <span className='text-xs text-lucky-text-strong font-mono'>
+                            <span className='text-xs text-vaded-text-strong font-mono'>
                                 {change.resource}
                             </span>
                             {change.error && (
@@ -346,8 +346,8 @@ export default function GuildAutomation() {
             />
 
             {loadError && !loading && (
-                <div className='surface-panel rounded-lg border border-lucky-error/40 p-4 flex items-center justify-between gap-4'>
-                    <p className='text-sm text-lucky-error'>
+                <div className='surface-panel rounded-lg border border-vaded-error/40 p-4 flex items-center justify-between gap-4'>
+                    <p className='text-sm text-vaded-error'>
                         {t('loadErrorMessage')}
                     </p>
                     <Button
@@ -361,10 +361,10 @@ export default function GuildAutomation() {
             )}
 
             {/* Status + Action Bar (Polaris structured actions) */}
-            <div className='surface-panel rounded-lg border border-lucky-border p-4 space-y-4'>
+            <div className='surface-panel rounded-lg border border-vaded-border p-4 space-y-4'>
                 <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-3'>
-                        <h2 className='type-meta text-lucky-text-tertiary uppercase tracking-wide font-semibold'>
+                        <h2 className='type-meta text-vaded-text-tertiary uppercase tracking-wide font-semibold'>
                             {t('automationStatus')}
                         </h2>
                         {loading ? (
@@ -376,7 +376,7 @@ export default function GuildAutomation() {
                                 {status}
                             </Badge>
                         ) : (
-                            <Badge className='text-xs border bg-lucky-bg-active/60 text-lucky-text-muted border-lucky-border'>
+                            <Badge className='text-xs border bg-vaded-bg-active/60 text-vaded-text-muted border-vaded-border'>
                                 unknown
                             </Badge>
                         )}
@@ -384,7 +384,7 @@ export default function GuildAutomation() {
                     <button
                         onClick={() => void fetchData()}
                         disabled={loading}
-                        className='text-lucky-text-muted hover:text-lucky-text-body disabled:opacity-40 transition-colors'
+                        className='text-vaded-text-muted hover:text-vaded-text-body disabled:opacity-40 transition-colors'
                         title={t('refreshStatusTitle')}
                     >
                         <RefreshCw
@@ -392,7 +392,7 @@ export default function GuildAutomation() {
                         />
                     </button>
                 </div>
-                <div className='border-t border-lucky-border' />
+                <div className='border-t border-vaded-border' />
                 <div className='flex flex-wrap gap-2'>
                     <Button
                         variant='secondary'
@@ -438,44 +438,44 @@ export default function GuildAutomation() {
 
             {/* Plan / Plan Records (surface-panel groups) */}
             {planResult && (
-                <div className='surface-panel rounded-lg border border-lucky-border p-4 space-y-3'>
+                <div className='surface-panel rounded-lg border border-vaded-border p-4 space-y-3'>
                     <div className='flex items-center gap-2'>
-                        <GitBranch className='h-4 w-4 text-lucky-brand' />
-                        <h2 className='type-meta text-lucky-text-tertiary uppercase tracking-wide font-semibold'>
+                        <GitBranch className='h-4 w-4 text-vaded-brand' />
+                        <h2 className='type-meta text-vaded-text-tertiary uppercase tracking-wide font-semibold'>
                             {t('planResult')}
                         </h2>
                     </div>
-                    <div className='border-t border-lucky-border' />
+                    <div className='border-t border-vaded-border' />
                     <PlanResultView result={planResult} />
                 </div>
             )}
             {applyResult && (
-                <div className='surface-panel rounded-lg border border-lucky-border p-4 space-y-3'>
+                <div className='surface-panel rounded-lg border border-vaded-border p-4 space-y-3'>
                     <div className='flex items-center gap-2'>
-                        <Zap className='h-4 w-4 text-lucky-accent' />
-                        <h2 className='type-meta text-lucky-text-tertiary uppercase tracking-wide font-semibold'>
+                        <Zap className='h-4 w-4 text-vaded-accent' />
+                        <h2 className='type-meta text-vaded-text-tertiary uppercase tracking-wide font-semibold'>
                             {t('planRecord')}
                         </h2>
                     </div>
-                    <div className='border-t border-lucky-border' />
+                    <div className='border-t border-vaded-border' />
                     <ApplyResultView result={applyResult} />
                 </div>
             )}
 
             {/* Manifest Editor (collapsible surface-panel) */}
-            <div className='surface-panel rounded-lg border border-lucky-border overflow-hidden'>
+            <div className='surface-panel rounded-lg border border-vaded-border overflow-hidden'>
                 <button
                     onClick={() => setManifestExpanded(!manifestExpanded)}
                     aria-label='Expand'
-                    className='w-full p-4 flex items-center justify-between gap-2 hover:bg-lucky-bg-active/30 transition-colors text-left'
+                    className='w-full p-4 flex items-center justify-between gap-2 hover:bg-vaded-bg-active/30 transition-colors text-left'
                 >
                     <div className='flex items-center gap-2'>
-                        <FileJson className='h-4 w-4 text-lucky-brand' />
-                        <h2 className='type-meta text-lucky-text-tertiary uppercase tracking-wide font-semibold'>
+                        <FileJson className='h-4 w-4 text-vaded-brand' />
+                        <h2 className='type-meta text-vaded-text-tertiary uppercase tracking-wide font-semibold'>
                             {t('manifest')}
                         </h2>
                         {manifest?.version && (
-                            <Badge className='text-xs border bg-lucky-bg-active/60 text-lucky-text-muted border-lucky-border'>
+                            <Badge className='text-xs border bg-vaded-bg-active/60 text-vaded-text-muted border-vaded-border'>
                                 v{manifest.version}
                             </Badge>
                         )}
@@ -488,14 +488,14 @@ export default function GuildAutomation() {
                 </button>
                 {manifestExpanded && (
                     <>
-                        <div className='border-t border-lucky-border' />
-                        <div className='p-4 space-y-3 bg-lucky-bg-active/20'>
+                        <div className='border-t border-vaded-border' />
+                        <div className='p-4 space-y-3 bg-vaded-bg-active/20'>
                             {loading ? (
                                 <Skeleton className='h-40 w-full rounded' />
                             ) : (
                                 <>
                                     {!manifest && (
-                                        <p className='text-sm text-lucky-text-muted flex items-center gap-2'>
+                                        <p className='text-sm text-vaded-text-muted flex items-center gap-2'>
                                             <AlertTriangle className='h-4 w-4 text-yellow-400' />
                                             {t('noManifestFound')}
                                         </p>
@@ -507,7 +507,7 @@ export default function GuildAutomation() {
                                         }
                                         rows={16}
                                         spellCheck={false}
-                                        className='w-full rounded-lg bg-lucky-bg-primary/80 border border-lucky-border text-lucky-text-body font-mono text-xs p-3 resize-y focus:outline-none focus:border-lucky-brand transition-colors'
+                                        className='w-full rounded-lg bg-vaded-bg-primary/80 border border-vaded-border text-vaded-text-body font-mono text-xs p-3 resize-y focus:outline-none focus:border-vaded-brand transition-colors'
                                         placeholder={t('manifestPlaceholder')}
                                     />
                                     {manifestError && (

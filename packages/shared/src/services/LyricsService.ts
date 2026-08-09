@@ -84,7 +84,7 @@ export class LyricsService {
             const response = await axios.get<{ lyrics?: string }>(url, {
                 timeout: LyricsService.TIMEOUT,
                 headers: {
-                    'User-Agent': 'Lucky/1.0',
+                    'User-Agent': 'VadedGaming/1.0',
                 },
             })
 

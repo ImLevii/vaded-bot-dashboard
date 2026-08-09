@@ -3,11 +3,11 @@ import { useVoteStatus } from '@/hooks/useVoteStatus'
 
 const TIER_STYLES: Record<string, string> = {
     'Vaded Supporter':
-        'bg-lucky-bg-secondary text-lucky-text-secondary border-lucky-border',
+        'bg-vaded-bg-secondary text-vaded-text-secondary border-vaded-border',
     'Vaded Fan':
-        'bg-lucky-bg-tertiary text-lucky-text-primary border-lucky-border-strong',
+        'bg-vaded-bg-tertiary text-vaded-text-primary border-vaded-border-strong',
     'Vaded Regular':
-        'bg-lucky-brand/10 text-lucky-brand border-lucky-brand/30',
+        'bg-vaded-brand/10 text-vaded-brand border-vaded-brand/30',
     'Vaded Legend':
         'bg-gradient-to-r from-amber-500/20 to-amber-500/40 text-amber-200 border-amber-500/60',
 }
@@ -23,11 +23,11 @@ export function VoteBadge() {
                 href={status.voteUrl}
                 target='_blank'
                 rel='noreferrer'
-                className='lucky-focus-visible hidden sm:inline-flex items-center gap-1 rounded-md border border-lucky-brand/25 bg-lucky-brand/8 px-2.5 py-1.5 font-black text-sm tracking-tight hover:bg-lucky-brand/15 transition-colors'
+                className='vaded-focus-visible hidden sm:inline-flex items-center gap-1 rounded-md border border-vaded-brand/25 bg-vaded-brand/8 px-2.5 py-1.5 font-black text-sm tracking-tight hover:bg-vaded-brand/15 transition-colors'
                 title='Vote for Vaded Gaming on top.gg'
             >
                 <span>VADED</span>
-                <span className='text-lucky-brand'>GAMING</span>
+                <span className='text-vaded-brand'>GAMING</span>
             </a>
         )
     }
@@ -40,7 +40,7 @@ export function VoteBadge() {
             href={status.voteUrl}
             target='_blank'
             rel='noreferrer'
-            className={`lucky-focus-visible hidden sm:inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 type-body-sm transition-colors hover:brightness-110 ${style}`}
+            className={`vaded-focus-visible hidden sm:inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 type-body-sm transition-colors hover:brightness-110 ${style}`}
             title={`${status.tier.label} — ${status.streak}-vote streak. Click to vote again.`}
         >
             <Heart aria-hidden='true' className='h-3.5 w-3.5 shrink-0' />

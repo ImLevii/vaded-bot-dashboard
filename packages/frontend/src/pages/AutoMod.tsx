@@ -60,18 +60,18 @@ function FilterRow({
     children,
 }: FilterRowProps) {
     return (
-        <div className='border-b border-lucky-border/50 last:border-b-0'>
+        <div className='border-b border-vaded-border/50 last:border-b-0'>
             <button
                 onClick={() => onToggle(!enabled)}
-                className='w-full flex items-center justify-between px-6 py-3 hover:bg-lucky-bg-active/25 transition-colors'
+                className='w-full flex items-center justify-between px-6 py-3 hover:bg-vaded-bg-active/25 transition-colors'
             >
                 <div className='flex items-center gap-3 flex-1 text-left'>
-                    <Icon className='w-4 h-4 text-lucky-brand flex-shrink-0' />
+                    <Icon className='w-4 h-4 text-vaded-brand flex-shrink-0' />
                     <div>
                         <h3 className='text-sm font-semibold text-white'>
                             {title}
                         </h3>
-                        <p className='text-xs text-lucky-text-tertiary mt-0.5'>
+                        <p className='text-xs text-vaded-text-tertiary mt-0.5'>
                             {description}
                         </p>
                     </div>
@@ -84,9 +84,9 @@ function FilterRow({
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                    className='border-t border-lucky-border/30'
+                    className='border-t border-vaded-border/30'
                 >
-                    <div className='px-6 py-3 space-y-3 bg-lucky-bg-secondary/20'>
+                    <div className='px-6 py-3 space-y-3 bg-vaded-bg-secondary/20'>
                         {children}
                     </div>
                 </motion.div>
@@ -110,14 +110,14 @@ function NumberInput({
 }) {
     return (
         <div className='space-y-1.5'>
-            <Label className='text-xs text-lucky-text-secondary'>{label}</Label>
+            <Label className='text-xs text-vaded-text-secondary'>{label}</Label>
             <Input
                 type='number'
                 value={value}
                 onChange={(e) => onChange(Number(e.target.value))}
                 min={min}
                 max={max}
-                className='h-9 bg-lucky-bg-tertiary border-lucky-border text-white text-sm'
+                className='h-9 bg-vaded-bg-tertiary border-vaded-border text-white text-sm'
             />
         </div>
     )
@@ -157,12 +157,12 @@ function TagList({
                         }
                     }}
                     placeholder={placeholder}
-                    className='h-9 bg-lucky-bg-tertiary border-lucky-border text-white text-sm flex-1'
+                    className='h-9 bg-vaded-bg-tertiary border-vaded-border text-white text-sm flex-1'
                 />
                 <Button
                     size='sm'
                     onClick={handleAdd}
-                    className='h-9 px-3 bg-lucky-bg-active hover:bg-lucky-bg-active/80'
+                    className='h-9 px-3 bg-vaded-bg-active hover:bg-vaded-bg-active/80'
                 >
                     <Plus className='w-4 h-4' />
                 </Button>
@@ -173,12 +173,12 @@ function TagList({
                         <Badge
                             key={item}
                             variant='outline'
-                            className='bg-lucky-bg-tertiary border-lucky-border text-lucky-text-secondary text-xs gap-1 pr-1 rounded-sm uppercase font-semibold'
+                            className='bg-vaded-bg-tertiary border-vaded-border text-vaded-text-secondary text-xs gap-1 pr-1 rounded-sm uppercase font-semibold'
                         >
                             {item}
                             <button
                                 onClick={() => onRemove(item)}
-                                className='hover:text-lucky-error transition-colors p-0.5'
+                                className='hover:text-vaded-error transition-colors p-0.5'
                             >
                                 <X className='w-3 h-3' />
                             </button>
@@ -211,16 +211,16 @@ function ChannelPicker({
         <div className='space-y-2'>
             {available.length > 0 && (
                 <Select onValueChange={onAdd}>
-                    <SelectTrigger className='h-9 bg-lucky-bg-tertiary border-lucky-border text-white text-sm'>
+                    <SelectTrigger className='h-9 bg-vaded-bg-tertiary border-vaded-border text-white text-sm'>
                         <SelectValue
                             placeholder={t('autoMod.selectChannelPlaceholder')}
                         />
                     </SelectTrigger>
-                    <SelectContent className='bg-lucky-bg-secondary border-lucky-border'>
+                    <SelectContent className='bg-vaded-bg-secondary border-vaded-border'>
                         {available.map((channel) => (
                             <SelectItem key={channel.id} value={channel.id}>
                                 <span className='flex items-center gap-2'>
-                                    <Hash className='w-3 h-3 text-lucky-text-tertiary' />
+                                    <Hash className='w-3 h-3 text-vaded-text-tertiary' />
                                     {channel.name}
                                 </span>
                             </SelectItem>
@@ -234,13 +234,13 @@ function ChannelPicker({
                         <Badge
                             key={id}
                             variant='outline'
-                            className='bg-lucky-bg-tertiary border-lucky-border text-lucky-text-secondary text-xs gap-1 pr-1 rounded-sm uppercase font-semibold'
+                            className='bg-vaded-bg-tertiary border-vaded-border text-vaded-text-secondary text-xs gap-1 pr-1 rounded-sm uppercase font-semibold'
                         >
                             <Hash className='w-3 h-3' />
                             {getChannelName(id)}
                             <button
                                 onClick={() => onRemove(id)}
-                                className='hover:text-lucky-error transition-colors p-0.5'
+                                className='hover:text-vaded-error transition-colors p-0.5'
                             >
                                 <X className='w-3 h-3' />
                             </button>
@@ -249,7 +249,7 @@ function ChannelPicker({
                 </div>
             )}
             {channels.length === 0 && (
-                <p className='text-xs text-lucky-text-tertiary'>
+                <p className='text-xs text-vaded-text-tertiary'>
                     Channels unavailable, enter IDs manually below
                 </p>
             )}
@@ -278,16 +278,16 @@ function RolePicker({
         <div className='space-y-2'>
             {available.length > 0 && (
                 <Select onValueChange={onAdd}>
-                    <SelectTrigger className='h-9 bg-lucky-bg-tertiary border-lucky-border text-white text-sm'>
+                    <SelectTrigger className='h-9 bg-vaded-bg-tertiary border-vaded-border text-white text-sm'>
                         <SelectValue
                             placeholder={t('autoMod.selectRolePlaceholder')}
                         />
                     </SelectTrigger>
-                    <SelectContent className='bg-lucky-bg-secondary border-lucky-border'>
+                    <SelectContent className='bg-vaded-bg-secondary border-vaded-border'>
                         {available.map((role) => (
                             <SelectItem key={role.id} value={role.id}>
                                 <span className='flex items-center gap-2'>
-                                    <Shield className='w-3 h-3 text-lucky-text-tertiary' />
+                                    <Shield className='w-3 h-3 text-vaded-text-tertiary' />
                                     {role.name}
                                 </span>
                             </SelectItem>
@@ -301,13 +301,13 @@ function RolePicker({
                         <Badge
                             key={id}
                             variant='outline'
-                            className='bg-lucky-bg-tertiary border-lucky-border text-lucky-text-secondary text-xs gap-1 pr-1 rounded-sm uppercase font-semibold'
+                            className='bg-vaded-bg-tertiary border-vaded-border text-vaded-text-secondary text-xs gap-1 pr-1 rounded-sm uppercase font-semibold'
                         >
                             <Shield className='w-3 h-3' />
                             {getRoleName(id)}
                             <button
                                 onClick={() => onRemove(id)}
-                                className='hover:text-lucky-error transition-colors p-0.5'
+                                className='hover:text-vaded-error transition-colors p-0.5'
                             >
                                 <X className='w-3 h-3' />
                             </button>
@@ -316,7 +316,7 @@ function RolePicker({
                 </div>
             )}
             {roles.length === 0 && (
-                <p className='text-xs text-lucky-text-tertiary'>
+                <p className='text-xs text-vaded-text-tertiary'>
                     Roles unavailable, enter IDs manually below
                 </p>
             )}
@@ -594,7 +594,7 @@ export default function AutoModPage() {
     const renderTemplates = () => {
         if (templatesError) {
             return (
-                <div className='p-3 rounded-lg bg-lucky-error/10 text-lucky-error text-sm'>
+                <div className='p-3 rounded-lg bg-vaded-error/10 text-vaded-error text-sm'>
                     {templatesError}
                 </div>
             )
@@ -606,7 +606,7 @@ export default function AutoModPage() {
 
         if (templates.length === 0) {
             return (
-                <p className='text-sm text-lucky-text-secondary'>
+                <p className='text-sm text-vaded-text-secondary'>
                     No templates available right now.
                 </p>
             )
@@ -617,12 +617,12 @@ export default function AutoModPage() {
                 {templates.map((template) => (
                     <div
                         key={template.id}
-                        className='rounded-xl border border-lucky-border bg-lucky-bg-tertiary/50 p-4'
+                        className='rounded-xl border border-vaded-border bg-vaded-bg-tertiary/50 p-4'
                     >
                         <h3 className='text-sm font-semibold text-white'>
                             {template.name}
                         </h3>
-                        <p className='mt-1 text-xs text-lucky-text-secondary'>
+                        <p className='mt-1 text-xs text-vaded-text-secondary'>
                             {template.description}
                         </p>
                         <Button
@@ -653,11 +653,11 @@ export default function AutoModPage() {
     if (!selectedGuild) {
         return (
             <div className='flex flex-col items-center justify-center h-[60vh] text-center'>
-                <ShieldAlert className='w-16 h-16 text-lucky-text-tertiary mb-4' />
+                <ShieldAlert className='w-16 h-16 text-vaded-text-tertiary mb-4' />
                 <h2 className='text-xl font-semibold text-white mb-2'>
                     No Server Selected
                 </h2>
-                <p className='text-lucky-text-secondary text-sm'>
+                <p className='text-vaded-text-secondary text-sm'>
                     Select a server to configure auto-moderation
                 </p>
             </div>
@@ -687,7 +687,7 @@ export default function AutoModPage() {
                     <h1 className='text-2xl font-bold text-white uppercase tracking-wide'>
                         Auto-Moderation
                     </h1>
-                    <p className='text-sm text-lucky-text-secondary mt-1'>
+                    <p className='text-sm text-vaded-text-secondary mt-1'>
                         Configure automatic content filters for{' '}
                         {selectedGuild.name}
                     </p>
@@ -695,7 +695,7 @@ export default function AutoModPage() {
                 <Button
                     onClick={handleSave}
                     disabled={saving}
-                    className='bg-lucky-red hover:bg-lucky-red/90 gap-2'
+                    className='bg-vaded-red hover:bg-vaded-red/90 gap-2'
                 >
                     {saving ? (
                         <Loader2 className='w-4 h-4 animate-spin' />
@@ -713,14 +713,14 @@ export default function AutoModPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0 }}
                 >
-                    <Card className='p-5 space-y-4 border border-lucky-border'>
+                    <Card className='p-5 space-y-4 border border-vaded-border'>
                         <div className='flex items-center gap-2'>
-                            <Sparkles className='w-5 h-5 text-lucky-warning' />
+                            <Sparkles className='w-5 h-5 text-vaded-warning' />
                             <h2 className='text-base font-semibold text-white uppercase tracking-wide'>
                                 Templates
                             </h2>
                         </div>
-                        <p className='text-xs text-lucky-text-tertiary'>
+                        <p className='text-xs text-vaded-text-tertiary'>
                             Start from curated defaults for common malicious
                             links and harmful words.
                         </p>
@@ -734,8 +734,8 @@ export default function AutoModPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.05 }}
                 >
-                    <Card className='overflow-hidden border border-lucky-border'>
-                        <div className='px-6 py-4 border-b border-lucky-border'>
+                    <Card className='overflow-hidden border border-vaded-border'>
+                        <div className='px-6 py-4 border-b border-vaded-border'>
                             <h2 className='text-base font-semibold text-white uppercase tracking-wide'>
                                 Content Filters
                             </h2>
@@ -789,7 +789,7 @@ export default function AutoModPage() {
                             onToggle={(v) => update('linksEnabled', v)}
                         >
                             <div className='space-y-1.5'>
-                                <Label className='text-xs text-lucky-text-secondary'>
+                                <Label className='text-xs text-vaded-text-secondary'>
                                     Allowed domains
                                 </Label>
                                 <TagList
@@ -827,7 +827,7 @@ export default function AutoModPage() {
                             onToggle={(v) => update('wordsEnabled', v)}
                         >
                             <div className='space-y-1.5'>
-                                <Label className='text-xs text-lucky-text-secondary'>
+                                <Label className='text-xs text-vaded-text-secondary'>
                                     Banned words
                                 </Label>
                                 <TagList
@@ -862,22 +862,22 @@ export default function AutoModPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
             >
-                <Card className='overflow-hidden border border-lucky-border'>
-                    <div className='px-6 py-4 border-b border-lucky-border'>
+                <Card className='overflow-hidden border border-vaded-border'>
+                    <div className='px-6 py-4 border-b border-vaded-border'>
                         <div className='flex items-center gap-2 mb-2'>
-                            <CheckCircle2 className='w-5 h-5 text-lucky-success' />
+                            <CheckCircle2 className='w-5 h-5 text-vaded-success' />
                             <h2 className='text-base font-semibold text-white uppercase tracking-wide'>
                                 Exemptions
                             </h2>
                         </div>
-                        <p className='text-xs text-lucky-text-tertiary'>
+                        <p className='text-xs text-vaded-text-tertiary'>
                             Channels and roles exempt from auto-moderation
                             filters
                         </p>
                     </div>
                     <div className='grid grid-cols-1 md:grid-cols-2'>
-                        <div className='p-6 space-y-3 border-r border-lucky-border md:border-r md:border-b-0 border-b md:border-b-0'>
-                            <Label className='text-xs text-lucky-text-secondary'>
+                        <div className='p-6 space-y-3 border-r border-vaded-border md:border-r md:border-b-0 border-b md:border-b-0'>
+                            <Label className='text-xs text-vaded-text-secondary'>
                                 Exempt Channels
                             </Label>
                             <ChannelPicker
@@ -899,7 +899,7 @@ export default function AutoModPage() {
                                 }
                             />
                             {channelsError && (
-                                <div className='p-3 rounded-lg bg-lucky-error/10 text-lucky-error text-xs'>
+                                <div className='p-3 rounded-lg bg-vaded-error/10 text-vaded-error text-xs'>
                                     {channelsError}
                                 </div>
                             )}
@@ -925,7 +925,7 @@ export default function AutoModPage() {
                             )}
                         </div>
                         <div className='p-6 space-y-3'>
-                            <Label className='text-xs text-lucky-text-secondary'>
+                            <Label className='text-xs text-vaded-text-secondary'>
                                 Exempt Roles
                             </Label>
                             <RolePicker
@@ -947,7 +947,7 @@ export default function AutoModPage() {
                                 }
                             />
                             {rolesError && (
-                                <div className='p-3 rounded-lg bg-lucky-error/10 text-lucky-error text-xs'>
+                                <div className='p-3 rounded-lg bg-vaded-error/10 text-vaded-error text-xs'>
                                     {rolesError}
                                 </div>
                             )}
@@ -977,11 +977,11 @@ export default function AutoModPage() {
             </motion.div>
 
             {/* Sticky Save Bar (mobile) */}
-            <div className='lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-lucky-bg-primary/95 backdrop-blur-sm border-t border-lucky-border z-30'>
+            <div className='lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-vaded-bg-primary/95 backdrop-blur-sm border-t border-vaded-border z-30'>
                 <Button
                     onClick={handleSave}
                     disabled={saving}
-                    className='w-full bg-lucky-red hover:bg-lucky-red/90 gap-2'
+                    className='w-full bg-vaded-red hover:bg-vaded-red/90 gap-2'
                 >
                     {saving ? (
                         <Loader2 className='w-4 h-4 animate-spin' />

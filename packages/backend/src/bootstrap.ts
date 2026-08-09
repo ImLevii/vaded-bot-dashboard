@@ -17,7 +17,7 @@ export async function bootstrapBackend(): Promise<void> {
     validateBackendEnvironment()
     setupErrorHandlers()
     initializeSentry({
-        appName: 'lucky',
+        appName: 'vaded',
         serviceName: 'backend',
         // || not ??: compose sets SENTRY_RELEASE to "" when unset, which is
         // not nullish and would block the COMMIT_SHA fallback

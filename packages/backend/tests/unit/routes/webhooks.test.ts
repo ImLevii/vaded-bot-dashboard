@@ -77,14 +77,14 @@ function buildApp(): express.Express {
 
 beforeEach(() => {
     process.env.TOPGG_AUTH_TOKEN = 'valid-token'
-    process.env.LUCKY_NOTIFY_API_KEY = 'internal-key'
+    process.env.VADED_NOTIFY_API_KEY = 'internal-key'
     mockFindUnique.mockClear()
     mockTransaction.mockClear()
 })
 
 afterEach(() => {
     delete process.env.TOPGG_AUTH_TOKEN
-    delete process.env.LUCKY_NOTIFY_API_KEY
+    delete process.env.VADED_NOTIFY_API_KEY
 })
 
 describe('POST /webhooks/topgg-votes', () => {
@@ -251,8 +251,8 @@ describe('GET /api/me/vote-status', () => {
         expect(res.status).toBe(200)
         expect(res.body.hasVoted).toBe(true)
         expect(res.body.streak).toBe(14)
-        expect(res.body.tier).toEqual({ label: 'Lucky Regular', threshold: 14 })
-        expect(res.body.nextTier).toEqual({ label: 'Lucky Legend', threshold: 30 })
+        expect(res.body.tier).toEqual({ label: 'Vaded Gaming Regular', threshold: 14 })
+        expect(res.body.nextTier).toEqual({ label: 'Vaded Gaming Legend', threshold: 30 })
         expect(res.body.voteUrl).toBe('https://top.gg/bot/962198089161134131/vote')
     })
 
@@ -264,7 +264,7 @@ describe('GET /api/me/vote-status', () => {
         expect(res.status).toBe(200)
         expect(res.body.tier).toBeNull()
         expect(res.body.nextTier).toEqual({
-            label: 'Lucky Supporter',
+            label: 'Vaded Gaming Supporter',
             threshold: 1,
         })
         expect(res.body.streak).toBe(0)
@@ -283,7 +283,7 @@ describe('GET /api/me/vote-status', () => {
             .get('/api/me/vote-status')
             .set('x-test-user', '999')
         expect(res.status).toBe(200)
-        expect(res.body.tier.label).toBe('Lucky Legend')
+        expect(res.body.tier.label).toBe('Vaded Gaming Legend')
         expect(res.body.nextTier).toBeNull()
         expect(res.body.streak).toBe(45)
     })

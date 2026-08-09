@@ -66,9 +66,9 @@ async function collectSourceFiles(dir) {
 // `import …/export … from '@lucky/shared…'` — group 1 captures a leading `type ` so
 // type-only statements (erased at build, never resolved at runtime) are skipped.
 const FROM_RE =
-    /(?:import|export)\s+(type\s+)?[^;'"]*?from\s+['"](@lucky\/shared[^'"]*)['"]/g
+    /(?:import|export)\s+(type\s+)?[^;'"]*?from\s+['"](@vaded\/shared[^'"]*)['"]/g
 // Bare side-effect import: `import '@lucky/shared/x'`.
-const BARE_RE = /(?:^|\n)\s*import\s+['"](@lucky\/shared[^'"]*)['"]/g
+const BARE_RE = /(?:^|\n)\s*import\s+['"](@vaded\/shared[^'"]*)['"]/g
 
 async function collectSpecifiers() {
     const specifiers = new Set()

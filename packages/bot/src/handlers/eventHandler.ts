@@ -93,7 +93,7 @@ function handleClientReady(client: Client): void {
 // utility-first avoids the Platform-Manipulation flags that jeopardize verification.
 const ONBOARDING_EMBED = new EmbedBuilder()
     .setColor(0x111111)
-    .setTitle('<a:music:741605543046807626> Thanks for adding Lucky!')
+    .setTitle('<a:music:741605543046807626> Thanks for adding Vaded Gaming!')
     .setDescription(
         [
             "Here's how to get started:",
@@ -103,7 +103,7 @@ const ONBOARDING_EMBED = new EmbedBuilder()
             '`/help` — browse every command',
         ].join('\n'),
     )
-    .setFooter({ text: 'Lucky' })
+    .setFooter({ text: 'Vaded Gaming' })
 
 // First text channel the bot can actually post to (system channel preferred).
 function findOnboardingChannel(guild: Guild): GuildBasedChannel | null {

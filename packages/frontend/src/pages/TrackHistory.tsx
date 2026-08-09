@@ -132,15 +132,15 @@ export default function TrackHistoryPage() {
         <div className='space-y-6 px-1 sm:px-0'>
             <header className='flex items-center justify-between'>
                 <div className='flex items-center gap-3'>
-                    <History className='h-6 w-6 text-lucky-error' />
-                    <h1 className='type-h2 text-lucky-text-primary'>
+                    <History className='h-6 w-6 text-vaded-error' />
+                    <h1 className='type-h2 text-vaded-text-primary'>
                         {t('trackHistory.trackHistory')}
                     </h1>
                 </div>
                 {history.length > 0 && (
                     <button
                         onClick={handleClear}
-                        className='flex items-center gap-2 px-3 min-h-[44px] type-body-sm rounded-sm bg-lucky-error/10 text-lucky-error hover:bg-lucky-error/20 transition-colors font-semibold uppercase'
+                        className='flex items-center gap-2 px-3 min-h-[44px] type-body-sm rounded-sm bg-vaded-error/10 text-vaded-error hover:bg-vaded-error/20 transition-colors font-semibold uppercase'
                     >
                         <Trash2 className='w-4 h-4' />
                         {t('trackHistory.clear')}
@@ -149,7 +149,7 @@ export default function TrackHistoryPage() {
             </header>
 
             {error && (
-                <div className='p-3 rounded-lg bg-lucky-error/10 text-lucky-error type-body-sm'>
+                <div className='p-3 rounded-lg bg-vaded-error/10 text-vaded-error type-body-sm'>
                     {error}
                 </div>
             )}
@@ -159,7 +159,7 @@ export default function TrackHistoryPage() {
                     {[...Array(3)].map((_, i) => (
                         <div
                             key={i}
-                            className='h-16 rounded-lg bg-lucky-bg-tertiary animate-pulse'
+                            className='h-16 rounded-lg bg-vaded-bg-tertiary animate-pulse'
                         />
                     ))}
                 </div>
@@ -221,11 +221,11 @@ export default function TrackHistoryPage() {
 
                     <div className='space-y-1'>
                         <div className='flex items-center justify-between px-1 mb-3'>
-                            <h2 className='type-meta text-lucky-text-tertiary uppercase tracking-wide font-semibold'>
+                            <h2 className='type-meta text-vaded-text-tertiary uppercase tracking-wide font-semibold'>
                                 {t('trackHistory.recentTracks')}
                             </h2>
                             {total > 0 && (
-                                <span className='type-body-sm text-lucky-text-tertiary'>
+                                <span className='type-body-sm text-vaded-text-tertiary'>
                                     {t('trackHistory.showing', {
                                         count: history.length,
                                         total: total,
@@ -250,16 +250,16 @@ export default function TrackHistoryPage() {
                         ) : (
                             <div className='space-y-1'>
                                 <div
-                                    className='surface-panel border border-lucky-border divide-y divide-lucky-border overflow-hidden'
+                                    className='surface-panel border border-vaded-border divide-y divide-vaded-border overflow-hidden'
                                     role='list'
                                 >
                                     {history.map((track, i) => (
                                         <div
                                             key={`${track.trackId}-${i}`}
-                                            className='flex items-center gap-4 px-4 py-3 transition-colors hover:bg-lucky-bg-active/25'
+                                            className='flex items-center gap-4 px-4 py-3 transition-colors hover:bg-vaded-bg-active/25'
                                             role='listitem'
                                         >
-                                            <span className='type-meta text-lucky-text-tertiary w-6 text-center shrink-0'>
+                                            <span className='type-meta text-vaded-text-tertiary w-6 text-center shrink-0'>
                                                 {i + 1}
                                             </span>
 
@@ -269,23 +269,23 @@ export default function TrackHistoryPage() {
                                                         href={track.url}
                                                         target='_blank'
                                                         rel='noopener noreferrer'
-                                                        className='type-body text-lucky-text-primary truncate block hover:text-lucky-brand transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lucky-brand'
+                                                        className='type-body text-vaded-text-primary truncate block hover:text-vaded-brand transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vaded-brand'
                                                     >
                                                         {track.title}
                                                     </a>
-                                                    <p className='type-body-sm text-lucky-text-tertiary truncate'>
+                                                    <p className='type-body-sm text-vaded-text-tertiary truncate'>
                                                         {track.author}
                                                     </p>
                                                 </div>
 
                                                 <div className='hidden sm:block min-w-0'>
-                                                    <p className='type-body-sm text-lucky-text-tertiary'>
+                                                    <p className='type-body-sm text-vaded-text-tertiary'>
                                                         {track.duration}
                                                     </p>
                                                     {track.playedBy && (
-                                                        <p className='type-body-sm text-lucky-text-tertiary'>
+                                                        <p className='type-body-sm text-vaded-text-tertiary'>
                                                             By{' '}
-                                                            <span className='text-lucky-text-secondary font-medium'>
+                                                            <span className='text-vaded-text-secondary font-medium'>
                                                                 {track.playedBy}
                                                             </span>
                                                         </p>
@@ -293,7 +293,7 @@ export default function TrackHistoryPage() {
                                                 </div>
 
                                                 <div className='hidden sm:flex sm:justify-end sm:items-start'>
-                                                    <span className='type-body-sm text-lucky-text-tertiary'>
+                                                    <span className='type-body-sm text-vaded-text-tertiary'>
                                                         {formatTimeAgo(
                                                             track.timestamp,
                                                         )}
@@ -301,7 +301,7 @@ export default function TrackHistoryPage() {
                                                 </div>
                                             </div>
 
-                                            <span className='type-body-sm text-lucky-text-tertiary sm:hidden shrink-0'>
+                                            <span className='type-body-sm text-vaded-text-tertiary sm:hidden shrink-0'>
                                                 {formatTimeAgo(track.timestamp)}
                                             </span>
                                         </div>
@@ -312,7 +312,7 @@ export default function TrackHistoryPage() {
                                     <button
                                         onClick={handleLoadMore}
                                         disabled={isLoadingMore}
-                                        className='w-full mt-4 px-4 py-3 rounded-sm border border-lucky-border text-lucky-text-secondary type-body-sm font-semibold uppercase hover:text-lucky-text-primary hover:bg-lucky-bg-active transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+                                        className='w-full mt-4 px-4 py-3 rounded-sm border border-vaded-border text-vaded-text-secondary type-body-sm font-semibold uppercase hover:text-vaded-text-primary hover:bg-vaded-bg-active transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
                                     >
                                         {isLoadingMore
                                             ? t('trackHistory.loading')
@@ -340,28 +340,28 @@ function RankingCard({
 }) {
     const max = items[0]?.count ?? 1
     return (
-        <div className='p-4 rounded-sm bg-lucky-bg-tertiary border border-lucky-border'>
-            <h3 className='type-title text-lucky-text-primary uppercase tracking-wide mb-3 font-semibold'>
+        <div className='p-4 rounded-sm bg-vaded-bg-tertiary border border-vaded-border'>
+            <h3 className='type-title text-vaded-text-primary uppercase tracking-wide mb-3 font-semibold'>
                 {title}
             </h3>
             <div className='space-y-2'>
                 {items.slice(0, 5).map((item, i) => (
                     <div key={item.label} className='flex items-center gap-2'>
-                        <span className='type-meta text-lucky-text-tertiary w-4'>
+                        <span className='type-meta text-vaded-text-tertiary w-4'>
                             {i + 1}
                         </span>
                         <div className='flex-1 min-w-0'>
                             <div className='flex items-center justify-between mb-0.5'>
-                                <span className='type-body-sm text-lucky-text-primary truncate'>
+                                <span className='type-body-sm text-vaded-text-primary truncate'>
                                     {item.label}
                                 </span>
-                                <span className='type-body-sm text-lucky-text-tertiary ml-2 shrink-0'>
+                                <span className='type-body-sm text-vaded-text-tertiary ml-2 shrink-0'>
                                     {item.count}
                                 </span>
                             </div>
-                            <div className='h-1 bg-lucky-bg-active rounded-full overflow-hidden'>
+                            <div className='h-1 bg-vaded-bg-active rounded-full overflow-hidden'>
                                 <div
-                                    className='h-full bg-lucky-brand rounded-full'
+                                    className='h-full bg-vaded-brand rounded-full'
                                     style={{
                                         width: `${(item.count / max) * 100}%`,
                                     }}

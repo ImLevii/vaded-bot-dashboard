@@ -22,13 +22,13 @@ Servers that need API keys or tokens are started via **`~/.cursor/scripts/run-mc
 Infisical uses project-specific scripts so two projects can use different credentials:
 
 - **infisical-craftvaria**: `run-mcp-infisical-craftvaria.sh` (uses `INFISICAL_CRAFTVARIA_*`)
-- **infisical-lucky**: `run-mcp-infisical-lucky.sh` (uses `INFISICAL_LUCKY_*`)
+- **infisical-vaded**: `run-mcp-infisical-vaded.sh` (uses `INFISICAL_VADED_*`)
 
 Scripts live under `~/.cursor/scripts/` and must be executable (`chmod +x`).
 
 ## Filesystem server
 
-The filesystem MCP server is configured with the Lucky workspace path so it can read this repo. To point it at another directory, edit the `filesystem` entry in `~/.cursor/mcp.json` and change the path in `args`.
+The filesystem MCP server is configured with the Vaded Gaming workspace path so it can read this repo. To point it at another directory, edit the `filesystem` entry in `~/.cursor/mcp.json` and change the path in `args`.
 
 **GitHub** uses `run-mcp-github.sh` and should launch the official
 `github-mcp-server` binary, not `@modelcontextprotocol/server-github`.
@@ -37,7 +37,7 @@ The wrapper should prefer `gh auth token` and fall back to
 
 **BrowserStack** uses `run-mcp-browserstack.sh` and reads `BROWSERSTACK_USERNAME` and `BROWSERSTACK_ACCESS_KEY` from `.env.mcp`. If either is unset, the server is skipped (no error).
 
-**Infisical** wrappers skip cleanly when their env vars are unset. For Lucky, set `INFISICAL_LUCKY_CLIENT_ID` and `INFISICAL_LUCKY_CLIENT_SECRET` in one of: `~/.cursor/.env.mcp`, the project `.cursor/.env.mcp`, or the project root `.env`. The Lucky wrapper sources them in that order when the script runs with Lucky as the current directory. The `.cursor/` directory is gitignored.
+**Infisical** wrappers skip cleanly when their env vars are unset. For Vaded Gaming, set `INFISICAL_VADED_CLIENT_ID` and `INFISICAL_VADED_CLIENT_SECRET` in one of: `~/.cursor/.env.mcp`, the project `.cursor/.env.mcp`, or the project root `.env`. The Vaded Gaming wrapper sources them in that order when the script runs with Vaded Gaming as the current directory. The `.cursor/` directory is gitignored.
 
 ## MCP Gateway (Context Forge)
 
@@ -83,7 +83,7 @@ For each [mcpmarket.com/tools/skills/...](https://mcpmarket.com/tools/skills/) o
 - **BrowserStack**: Set `BROWSERSTACK_USERNAME` and `BROWSERSTACK_ACCESS_KEY` in `.env.mcp`; if unset, the server exits without error.
 - **fetch**: Removed from the default `mcp.json` (requires Docker). To use it, add a `fetch` entry with `"command": "docker"` and `"args": ["run", "-i", "--rm", "mcp/fetch"]` and ensure Docker is running.
 - **cloudflare-observability / cloudflare-bindings**: Each uses a distinct OAuth callback port (3335 and 3336) to avoid port conflicts.
-- **infisical-craftvaria / infisical-lucky**: Set the corresponding vars in `.env.mcp` to enable; when unset, the wrapper exits without error.
+- **infisical-craftvaria / infisical-vaded**: Set the corresponding vars in `.env.mcp` to enable; when unset, the wrapper exits without error.
 
 ## After changes
 
@@ -108,7 +108,7 @@ For guidance on when to use which MCP tools and how AI agents should work on thi
 
 ## OpenCode
 
-Lucky now uses repo-local OpenCode config in `opencode.jsonc`.
+Vaded Gaming now uses repo-local OpenCode config in `opencode.jsonc`.
 
 ### Config split
 
@@ -127,12 +127,12 @@ Never commit host-local auth, tokens, or MCP headers.
 
 ### Plugin posture
 
-Default Lucky OpenCode stack:
+Default Vaded Gaming OpenCode stack:
 
-- local Lucky plugins:
-  - `./.opencode/plugins/lucky-policy.mjs`
-  - `./.opencode/plugins/lucky-context.mjs`
-  - `./.opencode/plugins/lucky-doc-reminders.mjs`
+- local Vaded Gaming plugins:
+  - `./.opencode/plugins/vaded-policy.mjs`
+  - `./.opencode/plugins/vaded-context.mjs`
+  - `./.opencode/plugins/vaded-doc-reminders.mjs`
 - approved community add-ons:
   - `opencode-shell-strategy`
   - `@tarquinen/opencode-dcp@latest`
@@ -157,7 +157,7 @@ Heavy orchestration plugins are intentionally excluded in v1:
 
 ### Guardrails
 
-Lucky OpenCode sessions hard-block:
+Vaded Gaming OpenCode sessions hard-block:
 
 - direct push to `main`
 - `git reset --hard`
@@ -165,14 +165,14 @@ Lucky OpenCode sessions hard-block:
 - `git clean -fd` and `git clean -fdx`
 - access to `.env`, `.env.*`, `.cursor/.env.mcp`, `~/.ssh/**`, `~/.aws/**`,
   `~/.config/fish/config.fish`, and OpenCode auth stores
-- mutating work from the primary Lucky checkout unless
-  `LUCKY_ALLOW_ROOT_MUTATION=1`
+- mutating work from the primary Vaded Gaming checkout unless
+  `VADED_ALLOW_ROOT_MUTATION=1`
 
 The plugins also inject:
 
 - `OPENCODE_GIT_REPOSITORY`
 - `OPENCODE_SERENA_PROJECT`
-- `LUCKY_WORKTREE_ROOT`
+- `VADED_WORKTREE_ROOT`
 
 ### Commands
 
@@ -241,23 +241,23 @@ opencode run --format json "Say only OK"
 
 ### `server-do-luk` attach
 
-Attach a local OpenCode client to the remote Lucky workspace:
+Attach a local OpenCode client to the remote Vaded Gaming workspace:
 
 ```bash
 ./scripts/opencode-attach-server-do-luk.sh
 ```
 
-To target a remote worktree instead of `/home/luk-server/Lucky`:
+To target a remote worktree instead of `/home/luk-server/vaded-gaming`:
 
 ```bash
-OPENCODE_REMOTE_DIR=/home/luk-server/Lucky/.worktrees/<branch> \
+OPENCODE_REMOTE_DIR=/home/luk-server/vaded-gaming/.worktrees/<branch> \
   ./scripts/opencode-attach-server-do-luk.sh
 ```
 
 The remote helper remains:
 
 ```bash
-~/.local/bin/opencode-lucky-serve
+~/.local/bin/opencode-vaded-serve
 ```
 
 It starts OpenCode on `127.0.0.1:4096` and respects `OPENCODE_REMOTE_DIR` when
@@ -268,5 +268,5 @@ present.
 If `server-do-luk` loses OpenAI auth:
 
 ```bash
-ssh server-do-luk 'cd /home/luk-server/Lucky && ~/.opencode/bin/opencode providers login -p openai'
+ssh server-do-luk 'cd /home/luk-server/Vaded Gaming && ~/.opencode/bin/opencode providers login -p openai'
 ```

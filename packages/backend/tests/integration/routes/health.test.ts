@@ -28,10 +28,10 @@ describe('Health Routes Integration', () => {
         process.env.CLIENT_ID = 'test-client-id'
         process.env.WEBAPP_SESSION_SECRET = 'test-session-secret'
         process.env.WEBAPP_FRONTEND_URL =
-            'https://lucky.lucassantana.tech,https://lukbot.vercel.app'
+            'https://vaded.lucassantana.tech,https://lukbot.vercel.app'
         process.env.WEBAPP_REDIRECT_URI =
-            'https://lucky-api.lucassantana.tech/api/auth/callback'
-        process.env.WEBAPP_BACKEND_URL = 'https://lucky-api.lucassantana.tech'
+            'https://vaded-api.lucassantana.tech/api/auth/callback'
+        process.env.WEBAPP_BACKEND_URL = 'https://vaded-api.lucassantana.tech'
         delete process.env.WEBAPP_EXPECTED_CLIENT_ID
     })
 
@@ -139,16 +139,16 @@ describe('Health Routes Integration', () => {
                 auth: {
                     clientId: 'test-client-id',
                     redirectUri:
-                        'https://lucky-api.lucassantana.tech/api/auth/callback',
+                        'https://vaded-api.lucassantana.tech/api/auth/callback',
                     frontendOrigins: [
-                        'https://lucky.lucassantana.tech',
+                        'https://vaded.lucassantana.tech',
                         'https://lukbot.vercel.app',
                     ],
                     clientIdConfigured: true,
                     sessionSecretConfigured: true,
                     redisHealthy: true,
                     authorizeUrlPreview:
-                        'https://discord.com/api/oauth2/authorize?client_id=test-client-id&redirect_uri=https%3A%2F%2Flucky-api.lucassantana.tech%2Fapi%2Fauth%2Fcallback&response_type=code&scope=identify%20guilds',
+                        'https://discord.com/api/oauth2/authorize?client_id=test-client-id&redirect_uri=https%3A%2F%2Fvaded-api.lucassantana.tech%2Fapi%2Fauth%2Fcallback&response_type=code&scope=identify%20guilds',
                 },
                 warnings: [],
             })
@@ -223,13 +223,13 @@ describe('Health Routes Integration', () => {
             delete process.env.WEBAPP_BACKEND_URL
             process.env.WEBAPP_EXPECTED_CLIENT_ID = 'test-client-id'
             process.env.WEBAPP_REDIRECT_URI =
-                'https://lucky-api.lucassantana.tech/api/auth/callback'
+                'https://vaded-api.lucassantana.tech/api/auth/callback'
 
             const response = await request(app)
                 .get('/api/health/auth-config')
                 .set('x-forwarded-proto', 'https')
-                .set('x-forwarded-host', 'lucky-api.lucassantana.tech')
-                .set('Host', 'lucky-api.lucassantana.tech')
+                .set('x-forwarded-host', 'vaded-api.lucassantana.tech')
+                .set('Host', 'vaded-api.lucassantana.tech')
                 .expect(200)
 
             // warnings/status/sessionSecretConfigured/redisHealthy are
@@ -239,7 +239,7 @@ describe('Health Routes Integration', () => {
             expect(response.body.warnings).toBeUndefined()
             expect(response.body.status).toBeUndefined()
             expect(response.body.auth.redirectUri).toBe(
-                'https://lucky-api.lucassantana.tech/api/auth/callback',
+                'https://vaded-api.lucassantana.tech/api/auth/callback',
             )
         })
 

@@ -6,7 +6,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DEPLOY_SCRIPT="$SCRIPT_DIR/deploy-staging.sh"
-LOG_FILE="/tmp/lucky-staging-deploy.log"
+LOG_FILE="/tmp/vaded-staging-deploy.log"
 
 if [[ ! -x "$DEPLOY_SCRIPT" ]]; then
     echo "[deploy-staging-wrapper] ERROR: $DEPLOY_SCRIPT is not executable"

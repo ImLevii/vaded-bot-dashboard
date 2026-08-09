@@ -20,7 +20,7 @@ third option (Sentry-native tracing) was identified and assessed.
 The audit flagged the tracing pillar as absent (OTel dormant; only Sentry @ 10%). The operator
 chose to revisit early. Under the no-big-bang gate, a backend OTel prototype was built on branch
 `feat/otel-layer4-prototype` (@ 85731672). It **tripped the gate**, and a research pass surfaced
-that `@sentry/node` v8+ is OpenTelemetry-based internally — i.e. Lucky may already have most of the
+that `@sentry/node` v8+ is OpenTelemetry-based internally — i.e. Vaded Gaming may already have most of the
 tracing it wants, via Sentry, without the OTel SDK.
 
 ## Options (re-assessed with new evidence)

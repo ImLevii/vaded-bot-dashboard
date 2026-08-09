@@ -10,10 +10,10 @@
 
 ## Context
 
-PR #1687 adds automatic channel cleanup to the Lucky bot — an **irreversible, destructive**
+PR #1687 adds automatic channel cleanup to the Vaded Gaming bot — an **irreversible, destructive**
 feature (it deletes user messages). The repo's destructive-interaction gate
 (`decisions/2026-06-21-destructive-interaction-merge-gate.md`) classifies it Tier-A and blocks
-merge without a live-smoke attestation. Lucky serves ~11 guilds including Criativaria (a
+merge without a live-smoke attestation. Vaded Gaming serves ~11 guilds including Criativaria (a
 belonging/inclusion community); prod = homelab, merge-to-main = prod deploy, single-container.
 
 Original PR shipped two modes: `purge_interval` (5-min tick, bulk-delete) and `ttl` (delete

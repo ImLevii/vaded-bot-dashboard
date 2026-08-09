@@ -188,7 +188,7 @@ export default new Command({
                     .setDescription(
                         `Got it — I'll celebrate with you on **${formatBirthday(month, day)}** every year.`,
                     )
-                    .setColor(COLOR.LUCKY_PURPLE)
+                    .setColor(COLOR.VADED_PURPLE)
                     .setFooter({
                         text: 'Only the date is stored. No year, no age.',
                     })
@@ -317,7 +317,7 @@ export default new Command({
                 const embed = new EmbedBuilder()
                     .setTitle('🎂 Upcoming Birthdays')
                     .setDescription(lines.join('\n'))
-                    .setColor(COLOR.LUCKY_PURPLE)
+                    .setColor(COLOR.VADED_PURPLE)
                     .setFooter({
                         text: `Showing ${annotated.length} of ${rows.length} · ${guild.name}`,
                     })

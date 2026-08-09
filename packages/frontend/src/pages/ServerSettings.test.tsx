@@ -13,7 +13,7 @@ vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
 
 const mockGuild = { id: '123', name: 'Test Guild', canManageRbac: false }
 const mockSettings = {
-    nickname: 'Lucky',
+    nickname: 'Vaded Gaming',
     commandPrefix: '!',
     managerRoles: [],
     updatesChannel: '',
@@ -177,7 +177,7 @@ describe('ServerSettingsPage', () => {
             expect(api.guilds.updateSettings).toHaveBeenCalledWith(
                 '123',
                 expect.objectContaining({
-                    nickname: 'Lucky',
+                    nickname: 'Vaded Gaming',
                     commandPrefix: '!',
                 }),
             )

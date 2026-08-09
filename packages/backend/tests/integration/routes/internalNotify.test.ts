@@ -18,7 +18,7 @@ describe('Internal Notify Routes Integration', () => {
         app.use(errorHandler)
 
         jest.clearAllMocks()
-        process.env.LUCKY_NOTIFY_API_KEY = API_KEY
+        process.env.VADED_NOTIFY_API_KEY = API_KEY
         process.env.DISCORD_TOKEN = DISCORD_TOKEN
 
         global.fetch = jest.fn()
@@ -143,7 +143,7 @@ describe('Internal Notify Routes Integration', () => {
         })
 
         test('should reject request when api key not configured', async () => {
-            delete process.env.LUCKY_NOTIFY_API_KEY
+            delete process.env.VADED_NOTIFY_API_KEY
 
             const response = await request(app)
                 .post('/api/internal/notify')

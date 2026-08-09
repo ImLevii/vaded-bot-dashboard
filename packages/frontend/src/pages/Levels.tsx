@@ -168,10 +168,10 @@ function Levels() {
         return (
             <div className='flex flex-col items-center justify-center py-12'>
                 <div className='text-center'>
-                    <p className='text-lg font-semibold text-lucky-text-primary mb-2'>
+                    <p className='text-lg font-semibold text-vaded-text-primary mb-2'>
                         {t('levels.noServerSelected')}
                     </p>
-                    <p className='text-sm text-lucky-text-secondary'>
+                    <p className='text-sm text-vaded-text-secondary'>
                         {t('levels.selectServerToView')}
                     </p>
                 </div>
@@ -198,37 +198,37 @@ function Levels() {
         <div className='space-y-6'>
             {/* Leaderboard */}
             <section>
-                <h2 className='type-title text-lucky-text-primary mb-4'>
+                <h2 className='type-title text-vaded-text-primary mb-4'>
                     {t('levels.leaderboard')}
                 </h2>
                 {leaderboard.length === 0 ? (
-                    <Card className='p-8 text-center border border-lucky-border'>
-                        <p className='text-lg font-semibold text-lucky-text-primary mb-2'>
+                    <Card className='p-8 text-center border border-vaded-border'>
+                        <p className='text-lg font-semibold text-vaded-text-primary mb-2'>
                             {t('levels.noDataYet')}
                         </p>
-                        <p className='text-sm text-lucky-text-secondary'>
+                        <p className='text-sm text-vaded-text-secondary'>
                             {t('levels.membersGainXp')}
                         </p>
                     </Card>
                 ) : (
-                    <Card className='overflow-hidden border border-lucky-border'>
-                        <div className='divide-y divide-lucky-border'>
+                    <Card className='overflow-hidden border border-vaded-border'>
+                        <div className='divide-y divide-vaded-border'>
                             {leaderboard.map((member) => (
                                 <div
                                     key={member.userId}
-                                    className='flex items-center justify-between p-4 transition-colors hover:bg-lucky-bg-active/25'
+                                    className='flex items-center justify-between p-4 transition-colors hover:bg-vaded-bg-active/25'
                                 >
                                     <div className='flex-1'>
-                                        <p className='type-body-sm font-medium text-lucky-text-primary'>
+                                        <p className='type-body-sm font-medium text-vaded-text-primary'>
                                             {member.displayName ??
                                                 member.userId}
                                         </p>
-                                        <p className='type-body-sm text-lucky-text-secondary'>
+                                        <p className='type-body-sm text-vaded-text-secondary'>
                                             {t('levels.level')} {member.level}
                                         </p>
                                     </div>
                                     <div className='text-right'>
-                                        <p className='type-body-sm font-semibold text-lucky-accent'>
+                                        <p className='type-body-sm font-semibold text-vaded-accent'>
                                             {member.xp.toLocaleString()}{' '}
                                             {t('levels.xp')}
                                         </p>
@@ -242,8 +242,8 @@ function Levels() {
 
             <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
                 {/* Config Settings */}
-                <Card className='p-6 border border-lucky-border'>
-                    <h3 className='type-body-sm font-semibold text-lucky-text-primary mb-4 uppercase tracking-wide'>
+                <Card className='p-6 border border-vaded-border'>
+                    <h3 className='type-body-sm font-semibold text-vaded-text-primary mb-4 uppercase tracking-wide'>
                         {t('levels.settings')}
                     </h3>
                     <div className='space-y-4'>
@@ -321,33 +321,33 @@ function Levels() {
                 </Card>
 
                 {/* Rewards */}
-                <Card className='p-6 border border-lucky-border'>
-                    <h3 className='type-body-sm font-semibold text-lucky-text-primary mb-4 uppercase tracking-wide'>
+                <Card className='p-6 border border-vaded-border'>
+                    <h3 className='type-body-sm font-semibold text-vaded-text-primary mb-4 uppercase tracking-wide'>
                         {t('levels.levelRewards')}
                     </h3>
 
                     {rolesError && (
-                        <p className='text-sm text-lucky-error mb-4'>
+                        <p className='text-sm text-vaded-error mb-4'>
                             {t('levels.couldNotLoadRoles')}
                         </p>
                     )}
 
                     <div className='space-y-3 mb-4'>
                         {rewards.length === 0 ? (
-                            <p className='text-sm text-lucky-text-secondary'>
+                            <p className='text-sm text-vaded-text-secondary'>
                                 {t('levels.noRewardsConfigured')}
                             </p>
                         ) : (
                             rewards.map((reward) => (
                                 <div
                                     key={reward.id}
-                                    className='flex items-center justify-between p-3 rounded bg-lucky-bg-secondary/50'
+                                    className='flex items-center justify-between p-3 rounded bg-vaded-bg-secondary/50'
                                 >
                                     <div className='flex-1'>
-                                        <p className='text-lucky-brand'>
+                                        <p className='text-vaded-brand'>
                                             Lv.{reward.level}
                                         </p>
-                                        <p className='text-sm text-lucky-text-secondary'>
+                                        <p className='text-sm text-vaded-text-secondary'>
                                             {getRoleName(reward.roleId)}
                                         </p>
                                     </div>
@@ -355,16 +355,16 @@ function Levels() {
                                         onClick={() =>
                                             handleRemoveReward(reward.level)
                                         }
-                                        className='p-1.5 hover:bg-lucky-bg-tertiary rounded transition-colors'
+                                        className='p-1.5 hover:bg-vaded-bg-tertiary rounded transition-colors'
                                     >
-                                        <TrashIcon className='w-4 h-4 text-lucky-text-secondary hover:text-lucky-brand' />
+                                        <TrashIcon className='w-4 h-4 text-vaded-text-secondary hover:text-vaded-brand' />
                                     </button>
                                 </div>
                             ))
                         )}
                     </div>
 
-                    <div className='space-y-3 pt-4 border-t border-lucky-border'>
+                    <div className='space-y-3 pt-4 border-t border-vaded-border'>
                         <div>
                             <Label htmlFor='newLevel' className='text-sm'>
                                 {t('levels.levelLabel')}

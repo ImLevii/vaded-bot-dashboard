@@ -9,11 +9,11 @@
 apiVersion: 1
 
 providers:
-  - name: Lucky Dashboards
+  - name: Vaded Gaming Dashboards
     type: file
     updateIntervalSeconds: 10
     allowUiUpdates: true
     options:
       path: GRAFANA_DASHBOARDS_PATH
       folderId: 0
-      folderTitle: Lucky Monitoring
+      folderTitle: Vaded Gaming Monitoring

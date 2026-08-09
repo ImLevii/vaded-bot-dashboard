@@ -67,7 +67,7 @@ async function handleSpotifyLink(
     }
     const embed = buildPlatformAttribEmbed('spotify', {
         title: 'Connect your Spotify account',
-        description: `Click the link below to authorize Lucky with your Spotify account. After you connect, Lucky can provide personalized music recommendations based on your library and listening history.\n\n**[Click here to connect](${url})**\n\nThis link is valid for a short time and is only for you. Do not share it.`,
+        description: `Click the link below to authorize Vaded Gaming with your Spotify account. After you connect, Vaded Gaming can provide personalized music recommendations based on your library and listening history.\n\n**[Click here to connect](${url})**\n\nThis link is valid for a short time and is only for you. Do not share it.`,
     })
     await interactionReply({
         interaction,
@@ -136,8 +136,8 @@ async function handleSpotifyStatus(
     const link = await spotifyLinkService.getByDiscordId(discordId)
     if (link) {
         const description = link.spotifyUsername
-            ? `Your Spotify account **${link.spotifyUsername}** is connected. Lucky can access your library and listening history for personalized recommendations.`
-            : 'Your Spotify account is connected. Lucky can access your library and listening history for personalized recommendations.'
+            ? `Your Spotify account **${link.spotifyUsername}** is connected. Vaded Gaming can access your library and listening history for personalized recommendations.`
+            : 'Your Spotify account is connected. Vaded Gaming can access your library and listening history for personalized recommendations.'
         const embed = buildPlatformAttribEmbed('spotify', {
             title: 'Spotify linked',
             description,

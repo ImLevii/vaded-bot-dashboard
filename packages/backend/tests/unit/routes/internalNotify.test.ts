@@ -34,19 +34,19 @@ function buildApp(): express.Express {
 }
 
 beforeEach(() => {
-    process.env.LUCKY_NOTIFY_API_KEY = 'k'
+    process.env.VADED_NOTIFY_API_KEY = 'k'
     process.env.DISCORD_TOKEN = 'tok'
 })
 
 afterEach(() => {
     global.fetch = ORIGINAL_FETCH
-    delete process.env.LUCKY_NOTIFY_API_KEY
+    delete process.env.VADED_NOTIFY_API_KEY
     delete process.env.DISCORD_TOKEN
 })
 
 describe('POST /api/internal/notify', () => {
-    it('rejects when LUCKY_NOTIFY_API_KEY is unset', async () => {
-        delete process.env.LUCKY_NOTIFY_API_KEY
+    it('rejects when VADED_NOTIFY_API_KEY is unset', async () => {
+        delete process.env.VADED_NOTIFY_API_KEY
         const res = await request(buildApp())
             .post('/api/internal/notify')
             .set('x-notify-key', 'anything')

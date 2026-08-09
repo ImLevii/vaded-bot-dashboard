@@ -14,7 +14,7 @@ channel": the original is deleted and a faithful copy is reposted elsewhere.
 
 The bot already has a full moderation suite (`packages/bot/src/functions/moderation/commands/`),
 a `Command` model with a `botPermissions` guard enforced in `commandsHandler.ts`,
-shared embed builders (`COLOR.LUCKY_PURPLE`), and `interactionReply()`. It does
+shared embed builders (`COLOR.VADED_PURPLE`), and `interactionReply()`. It does
 **not** have any message context-menu command, any component (select-menu)
 routing beyond music buttons/reaction-roles, a webhook repost client, or an
 attachment re-upload helper. discord.js is 14.26.4.
@@ -33,7 +33,7 @@ Resolved design forks (operator decisions, 2026-06-21):
    The bot has no context-menu infrastructure, so this decision also introduces
    a small, reusable context-menu command subsystem (parallel to the slash
    `Command` registry).
-3. **Fidelity — branded embed.** The copy is reposted as a Lucky embed: original
+3. **Fidelity — branded embed.** The copy is reposted as a Vaded Gaming embed: original
    author name + avatar in the embed header, message content as the body, footer
    carrying the source channel, original timestamp, and who moved it. No webhook
    impersonation (avoids the extra Manage-Webhooks permission and the confusion

@@ -16,7 +16,7 @@ this as `BLOATED` and recommended targeting 50–200 tests per its
 proportionality table. Three structural problems made that ceiling
 unworkable as written:
 
-1. **Lucky is not the "≤30 commands, ~5k LOC" bot the table assumes.** The
+1. **Vaded Gaming is not the "≤30 commands, ~5k LOC" bot the table assumes.** The
    bot has ~30+ slash commands across music/autoplay engine/Last.fm
    scrobbling/Twitch integration/web music/automod/mod digest/giveaways/
    voterewards/levels/Spotify recommendations/guild automation. By app
@@ -35,7 +35,7 @@ unworkable as written:
 
 ## Decision
 
-1. **Adopt a Lucky-specific test-count target of ≤ 1,500.** The 50–200
+1. **Adopt a Vaded Gaming-specific test-count target of ≤ 1,500.** The 50–200
    bracket from the skill table does not apply. Future cleanup phases
    target the lower end of 500–1,500 only when the suite shrinks
    organically; aggressive deletion below 1,500 is not a goal. Tests
@@ -76,7 +76,7 @@ unworkable as written:
   `~/.claude/skills/test-cleanup/` as a refinement: add a "polyglot
   bot" row to the table (15-50k LOC, ~500-1500 tests) so the skill's
   Step 1.5 conflict check produces a workable target instead of
-  flagging Lucky as 14× over.
+  flagging Vaded Gaming as 14× over.
 - **Phase-2 cleanup is multi-PR work, not one big PR.** Batch 1 (PR
   #836) shipped 2 files, −21 tests, −1097 LOC, gate held. Subsequent
   batches will continue per the plan and merge independently.
@@ -107,4 +107,4 @@ unworkable as written:
 - Skill: `~/.claude/skills/test-cleanup/SKILL.md` (per-file pass)
 - Skill: `~/.claude/skills/test-health/SKILL.md` (diagnostic baseline)
 - Plan: `.agents/plans/test-cleanup-phase2.md` (per-batch targets)
-- Memory: `~/.claude/projects/-Volumes-External-HD-Desenvolvimento-Lucky/memory/MEMORY.md`
+- Memory: `~/.claude/projects/-Volumes-External-HD-Desenvolvimento-vaded-gaming/memory/MEMORY.md`

@@ -236,7 +236,7 @@ describe('createResilientStream', () => {
             createResilientStream(makeTrack({ title: 'Some Song' })),
         ).rejects.toThrow('Bridge exhausted')
         // #1500: an unplayable track is an expected outcome → WARN, not
-        // error→Sentry (which produced false "regression" alerts, LUCKY-2T).
+        // error→Sentry (which produced false "regression" alerts, VADED-2T).
         expect(mockWarnLog).toHaveBeenCalledWith(
             expect.objectContaining({
                 message: 'Bridge: all stages exhausted',

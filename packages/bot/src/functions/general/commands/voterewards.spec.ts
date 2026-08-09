@@ -15,7 +15,7 @@ jest.mock('@lucky/shared/utils', () => ({
 jest.mock('@lucky/shared/constants', () => ({
     COLOR: {
         INFO_GREEN: 0x22c55e,
-        LUCKY_PURPLE: 0x7c3aed,
+        VADED_PURPLE: 0x7c3aed,
     },
     TOP_GG_VOTE_TIERS: [
         { threshold: 30, label: 'Ultimate' },
@@ -53,7 +53,7 @@ const realFetch = global.fetch
 beforeEach(() => {
     interactionReply.mockClear().mockResolvedValue(undefined)
     delete process.env.WEBAPP_BACKEND_URL
-    delete process.env.LUCKY_NOTIFY_API_KEY
+    delete process.env.VADED_NOTIFY_API_KEY
     // Deterministic backend: every nominal test gets a valid VoteState without
     // touching the network (previously hit http://localhost:3000 for real).
     global.fetch = jest.fn().mockResolvedValue({
@@ -73,7 +73,7 @@ afterEach(() => {
 describe('/voterewards', () => {
     test('sends response with vote info', async () => {
         process.env.WEBAPP_BACKEND_URL = 'http://localhost:3000'
-        process.env.LUCKY_NOTIFY_API_KEY = 'test-key'
+        process.env.VADED_NOTIFY_API_KEY = 'test-key'
 
         const interaction = makeInteraction() as never
 
@@ -84,7 +84,7 @@ describe('/voterewards', () => {
 
     test('includes tiers in response', async () => {
         process.env.WEBAPP_BACKEND_URL = 'http://localhost:3000'
-        process.env.LUCKY_NOTIFY_API_KEY = 'test-key'
+        process.env.VADED_NOTIFY_API_KEY = 'test-key'
 
         const interaction = makeInteraction() as never
 
@@ -98,7 +98,7 @@ describe('/voterewards', () => {
 
     test('includes vote URL link', async () => {
         process.env.WEBAPP_BACKEND_URL = 'http://localhost:3000'
-        process.env.LUCKY_NOTIFY_API_KEY = 'test-key'
+        process.env.VADED_NOTIFY_API_KEY = 'test-key'
 
         const interaction = makeInteraction() as never
 
@@ -113,7 +113,7 @@ describe('/voterewards', () => {
 
     test('handles missing backend config gracefully', async () => {
         delete process.env.WEBAPP_BACKEND_URL
-        delete process.env.LUCKY_NOTIFY_API_KEY
+        delete process.env.VADED_NOTIFY_API_KEY
 
         const interaction = makeInteraction() as never
 
@@ -124,7 +124,7 @@ describe('/voterewards', () => {
 
     test('handles API errors gracefully', async () => {
         process.env.WEBAPP_BACKEND_URL = 'http://localhost:3000'
-        process.env.LUCKY_NOTIFY_API_KEY = 'test-key'
+        process.env.VADED_NOTIFY_API_KEY = 'test-key'
 
         const interaction = makeInteraction() as never
 

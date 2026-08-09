@@ -18,8 +18,8 @@ describe('Service Announce Routes Integration', () => {
 
     beforeEach(() => {
         originalEnv = { ...process.env }
-        process.env.LUCKY_ANNOUNCE_API_KEY = 'test-announce-key'
-        process.env.LUCKY_ANNOUNCE_CHANNEL_IDS =
+        process.env.VADED_ANNOUNCE_API_KEY = 'test-announce-key'
+        process.env.VADED_ANNOUNCE_CHANNEL_IDS =
             '895505900016631839,968982002701332610'
         process.env.DISCORD_TOKEN = 'test-bot-token'
 
@@ -104,7 +104,7 @@ describe('Service Announce Routes Integration', () => {
         })
 
         test('should reject with empty allowlist', async () => {
-            process.env.LUCKY_ANNOUNCE_CHANNEL_IDS = ''
+            process.env.VADED_ANNOUNCE_CHANNEL_IDS = ''
 
             const response = await request(app)
                 .post('/api/service/announce')
@@ -298,7 +298,7 @@ describe('Service Announce Routes Integration', () => {
         })
 
         test('should accept a matching key even when the env var has trailing whitespace', async () => {
-            process.env.LUCKY_ANNOUNCE_API_KEY = '  test-announce-key\n'
+            process.env.VADED_ANNOUNCE_API_KEY = '  test-announce-key\n'
             const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>
             mockFetch.mockResolvedValueOnce({
                 ok: true,

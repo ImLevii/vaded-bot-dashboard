@@ -43,7 +43,7 @@ async function main(): Promise<void> {
 
     setupErrorHandlers()
     initializeSentry({
-        appName: 'lucky',
+        appName: 'vaded',
         serviceName: 'bot',
         // || not ??: compose sets SENTRY_RELEASE to "" when unset, which is
         // not nullish and would block the COMMIT_SHA fallback (#release-empty)

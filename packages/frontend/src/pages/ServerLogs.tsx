@@ -63,8 +63,8 @@ const LEVEL_CONFIG: Record<
     },
     system: {
         icon: Settings,
-        color: 'text-lucky-text-secondary',
-        bg: 'bg-lucky-bg-tertiary',
+        color: 'text-vaded-text-secondary',
+        bg: 'bg-vaded-bg-tertiary',
     },
 }
 
@@ -89,7 +89,7 @@ function LogEntry({ log, index }: { log: ServerLog; index: number }) {
             initial={{ opacity: 0, x: -4 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.15, delay: index * 0.015 }}
-            className='flex items-start gap-3 px-4 py-3.5 hover:bg-lucky-bg-tertiary/40 transition-colors group border-b border-lucky-border/20 last:border-b-0'
+            className='flex items-start gap-3 px-4 py-3.5 hover:bg-vaded-bg-tertiary/40 transition-colors group border-b border-vaded-border/20 last:border-b-0'
         >
             <div
                 className={cn(
@@ -112,32 +112,32 @@ function LogEntry({ log, index }: { log: ServerLog; index: number }) {
                         {log.level}
                     </Badge>
                     {log.type && (
-                        <code className='text-[9px] text-lucky-text-tertiary font-mono bg-lucky-bg-tertiary/50 px-1.5 py-0.5 rounded'>
+                        <code className='text-[9px] text-vaded-text-tertiary font-mono bg-vaded-bg-tertiary/50 px-1.5 py-0.5 rounded'>
                             {log.type}
                         </code>
                     )}
                 </div>
-                <p className='text-sm text-lucky-text-secondary mt-1.5 break-words'>
+                <p className='text-sm text-vaded-text-secondary mt-1.5 break-words'>
                     {log.message}
                 </p>
                 {(log.userName || log.channelName) && (
-                    <div className='flex items-center gap-3 mt-2 text-[10px] text-lucky-text-tertiary'>
+                    <div className='flex items-center gap-3 mt-2 text-[10px] text-vaded-text-tertiary'>
                         {log.userName && (
                             <span>
-                                <span className='text-lucky-text-tertiary'>
+                                <span className='text-vaded-text-tertiary'>
                                     {t('userLabel')}
                                 </span>{' '}
-                                <span className='text-lucky-text-secondary font-medium'>
+                                <span className='text-vaded-text-secondary font-medium'>
                                     {log.userName}
                                 </span>
                             </span>
                         )}
                         {log.channelName && (
                             <span>
-                                <span className='text-lucky-text-tertiary'>
+                                <span className='text-vaded-text-tertiary'>
                                     {t('channelLabel')}
                                 </span>{' '}
-                                <span className='text-lucky-text-secondary font-medium'>
+                                <span className='text-vaded-text-secondary font-medium'>
                                     #{log.channelName}
                                 </span>
                             </span>
@@ -145,7 +145,7 @@ function LogEntry({ log, index }: { log: ServerLog; index: number }) {
                     </div>
                 )}
             </div>
-            <div className='flex items-center gap-1.5 shrink-0 text-[10px] text-lucky-text-tertiary whitespace-nowrap'>
+            <div className='flex items-center gap-1.5 shrink-0 text-[10px] text-vaded-text-tertiary whitespace-nowrap'>
                 <Clock className='w-3 h-3 opacity-70' />
                 {formatTimestamp(log.createdAt)}
             </div>
@@ -228,11 +228,11 @@ export default function ServerLogsPage() {
     if (!selectedGuild) {
         return (
             <div className='flex flex-col items-center justify-center h-[60vh] text-center'>
-                <ScrollText className='w-16 h-16 text-lucky-text-tertiary mb-4' />
-                <h2 className='type-h2 text-lucky-text-primary mb-2'>
+                <ScrollText className='w-16 h-16 text-vaded-text-tertiary mb-4' />
+                <h2 className='type-h2 text-vaded-text-primary mb-2'>
                     {t('noServerSelected')}
                 </h2>
-                <p className='text-lucky-text-secondary text-sm'>
+                <p className='text-vaded-text-secondary text-sm'>
                     {t('selectServerDescription')}
                 </p>
             </div>
@@ -243,10 +243,10 @@ export default function ServerLogsPage() {
         <div className='space-y-6'>
             <div className='flex items-start justify-between flex-wrap gap-3'>
                 <header>
-                    <h1 className='type-h1 text-lucky-text-primary'>
+                    <h1 className='type-h1 text-vaded-text-primary'>
                         {t('title')}
                     </h1>
-                    <p className='text-sm text-lucky-text-secondary mt-1'>
+                    <p className='text-sm text-vaded-text-secondary mt-1'>
                         {t('subtitle', { name: selectedGuild.name })}
                     </p>
                 </header>
@@ -255,7 +255,7 @@ export default function ServerLogsPage() {
                         size='sm'
                         variant='ghost'
                         onClick={handleExport}
-                        className='gap-1.5 border border-lucky-border text-lucky-text-secondary hover:text-white'
+                        className='gap-1.5 border border-vaded-border text-vaded-text-secondary hover:text-white'
                     >
                         <Download className='w-3.5 h-3.5' /> {t('export')}
                     </Button>
@@ -263,34 +263,34 @@ export default function ServerLogsPage() {
             </div>
 
             {/* Filters: Linear-density layout */}
-            <Card className='p-4 space-y-3 border border-lucky-border'>
-                <div className='flex items-center gap-2 text-xs font-semibold text-lucky-text-tertiary uppercase tracking-wider'>
+            <Card className='p-4 space-y-3 border border-vaded-border'>
+                <div className='flex items-center gap-2 text-xs font-semibold text-vaded-text-tertiary uppercase tracking-wider'>
                     <Filter className='w-4 h-4' />
                     {t('searchAndFilter')}
                 </div>
                 <div className='flex flex-col sm:flex-row gap-3'>
                     <div className='relative flex-1'>
-                        <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-lucky-text-tertiary' />
+                        <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-vaded-text-tertiary' />
                         <Input
                             placeholder={t('searchPlaceholder')}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className='pl-9 bg-lucky-bg-tertiary border-lucky-border text-lucky-text-primary placeholder:text-lucky-text-tertiary'
+                            className='pl-9 bg-vaded-bg-tertiary border-vaded-border text-vaded-text-primary placeholder:text-vaded-text-tertiary'
                         />
                         {searchQuery && (
                             <button
                                 onClick={() => setSearchQuery('')}
-                                className='absolute right-3 top-1/2 -translate-y-1/2 text-lucky-text-tertiary hover:text-white transition-colors'
+                                className='absolute right-3 top-1/2 -translate-y-1/2 text-vaded-text-tertiary hover:text-white transition-colors'
                             >
                                 <X className='w-4 h-4' />
                             </button>
                         )}
                     </div>
                     <Select value={levelFilter} onValueChange={setLevelFilter}>
-                        <SelectTrigger className='sm:w-[140px] bg-lucky-bg-tertiary border-lucky-border text-lucky-text-primary'>
+                        <SelectTrigger className='sm:w-[140px] bg-vaded-bg-tertiary border-vaded-border text-vaded-text-primary'>
                             <SelectValue placeholder={t('allLevels')} />
                         </SelectTrigger>
-                        <SelectContent className='bg-lucky-bg-secondary border-lucky-border'>
+                        <SelectContent className='bg-vaded-bg-secondary border-vaded-border'>
                             <SelectItem value='all'>
                                 {t('allLevels')}
                             </SelectItem>
@@ -336,8 +336,8 @@ export default function ServerLogsPage() {
                                 'flex flex-col items-start p-3.5 rounded-lg border transition-all text-left',
                                 isLead && 'lg:col-span-2',
                                 levelFilter === level
-                                    ? 'border-lucky-border/80 bg-lucky-bg-active'
-                                    : 'border-lucky-border/40 bg-lucky-bg-secondary/50 hover:border-lucky-border/60 hover:bg-lucky-bg-tertiary/50',
+                                    ? 'border-vaded-border/80 bg-vaded-bg-active'
+                                    : 'border-vaded-border/40 bg-vaded-bg-secondary/50 hover:border-vaded-border/60 hover:bg-vaded-bg-tertiary/50',
                             )}
                         >
                             <div className='flex items-center gap-2 mb-2 w-full'>
@@ -347,13 +347,13 @@ export default function ServerLogsPage() {
                                         config.color,
                                     )}
                                 />
-                                <p className='text-[9px] uppercase font-semibold text-lucky-text-tertiary tracking-wider'>
+                                <p className='text-[9px] uppercase font-semibold text-vaded-text-tertiary tracking-wider'>
                                     {level}
                                 </p>
                             </div>
                             <p
                                 className={cn(
-                                    'font-semibold text-lucky-text-primary',
+                                    'font-semibold text-vaded-text-primary',
                                     isLead ? 'text-2xl' : 'text-lg',
                                 )}
                             >
@@ -365,8 +365,8 @@ export default function ServerLogsPage() {
             </div>
 
             {/* Logs List */}
-            <Card className='p-0 overflow-hidden border border-lucky-border'>
-                <div className='divide-y divide-lucky-border/30'>
+            <Card className='p-0 overflow-hidden border border-vaded-border'>
+                <div className='divide-y divide-vaded-border/30'>
                     {loading ? (
                         Array.from({ length: 10 }).map((_, i) => (
                             <div
@@ -389,11 +389,11 @@ export default function ServerLogsPage() {
                         </AnimatePresence>
                     ) : (
                         <div className='py-16 text-center'>
-                            <ScrollText className='w-12 h-12 text-lucky-text-tertiary mx-auto mb-3' />
-                            <p className='text-sm text-lucky-text-secondary'>
+                            <ScrollText className='w-12 h-12 text-vaded-text-tertiary mx-auto mb-3' />
+                            <p className='text-sm text-vaded-text-secondary'>
                                 {t('noLogsFound')}
                             </p>
-                            <p className='text-xs text-lucky-text-tertiary mt-1'>
+                            <p className='text-xs text-vaded-text-tertiary mt-1'>
                                 {searchQuery || levelFilter !== 'all'
                                     ? t('adjustFilters')
                                     : t('logsWillAppear')}
@@ -404,8 +404,8 @@ export default function ServerLogsPage() {
 
                 {/* Pagination */}
                 {total > limit && (
-                    <div className='flex items-center justify-between px-4 py-3 border-t border-lucky-border'>
-                        <span className='text-xs text-lucky-text-tertiary'>
+                    <div className='flex items-center justify-between px-4 py-3 border-t border-vaded-border'>
+                        <span className='text-xs text-vaded-text-tertiary'>
                             {(page - 1) * limit + 1}-
                             {Math.min(page * limit, total)} of {total}
                         </span>
@@ -419,7 +419,7 @@ export default function ServerLogsPage() {
                             >
                                 <ChevronLeft className='w-4 h-4' />
                             </Button>
-                            <span className='text-xs text-lucky-text-secondary px-2'>
+                            <span className='text-xs text-vaded-text-secondary px-2'>
                                 {page}/{totalPages}
                             </span>
                             <Button

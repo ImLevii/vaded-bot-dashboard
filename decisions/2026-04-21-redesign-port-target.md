@@ -1,4 +1,4 @@
-# ADR — Lucky redesign port target
+# ADR — Vaded Gaming redesign port target
 
 - **Date:** 2026-04-21
 - **Status:** Accepted
@@ -9,9 +9,9 @@
 
 ## Context
 
-A new visual redesign of the Lucky dashboard exists at:
+A new visual redesign of the Vaded Gaming dashboard exists at:
 
-- Repo: `github.com/LucasSantana-Dev/Lucky-redesign` (private; created 2026-04-21).
+- Repo: `github.com/LucasSantana-Dev/vaded-gaming-redesign` (private; created 2026-04-21).
 - AI Studio app: `https://ai.studio/apps/1fd5d19a-c793-4190-a354-777d6295bfd1`.
 
 The redesign is a **Next.js 15 App Router prototype** with mocked data only:
@@ -41,7 +41,7 @@ Adopt the redesign repo's brand commit:
   `--color-panel`, `--color-elevated`, `--color-highlight`,
   `--color-brand-discord`, `--color-brand-accent`,
   `--color-text-strong/body/muted/subtle`, `--shadow-soft/panel`) added
-  alongside existing `--lucky-*` tokens for the duration of the migration.
+  alongside existing `--vaded-*` tokens for the duration of the migration.
 
 ## Reasoning
 
@@ -77,7 +77,7 @@ Adopt the redesign repo's brand commit:
 - The visual port is incremental — production will run a mixed-style
   dashboard while pages migrate one at a time. Acceptable because each PR
   ships an internally-consistent page.
-- We carry both `--lucky-*` and short-form tokens during the migration.
+- We carry both `--vaded-*` and short-form tokens during the migration.
   Cleanup PR is queued for after the page ports complete.
 - We do not pick up the redesign's `@google/genai` dependency until a
   concrete LLM feature spec exists.
@@ -99,7 +99,7 @@ Per `docs/LOVABLE_PROMPT.md`:
 3. `<Layout>` top bar with Access Level chip + global status (one PR).
 4. Per-page ports (one PR each, 13 pages, in priority order).
 5. Sidebar `nav.config.ts` extraction.
-6. `--lucky-*` cleanup pass after all page ports land.
+6. `--vaded-*` cleanup pass after all page ports land.
 
 Success criteria for each PR: lint, type-check, vitest, playwright e2e,
 build all pass; total compressed bundle within +5 KB of pre-port baseline.

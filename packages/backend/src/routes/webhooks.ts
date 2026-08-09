@@ -42,7 +42,7 @@ function verifyTopggAuth(req: Request): void {
 }
 
 function verifyInternalKey(req: Request): void {
-    const expected = process.env.LUCKY_NOTIFY_API_KEY
+    const expected = process.env.VADED_NOTIFY_API_KEY
     const provided = req.header('x-notify-key')?.trim()
     if (!expected || !provided || !timingSafeKeyCompare(provided, expected)) {
         throw AppError.unauthorized('invalid internal key')

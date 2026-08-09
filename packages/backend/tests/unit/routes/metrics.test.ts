@@ -83,7 +83,7 @@ describe('GET /metrics', () => {
         // Default Node metrics must be present.
         expect(res.body).toContain('process_cpu_user_seconds_total')
         // Service label is applied.
-        expect(res.body).toMatch(/service="lucky-backend"/)
+        expect(res.body).toMatch(/service="vaded-backend"/)
     })
 
     test('does not mount the route when METRICS_DISABLED=true', async () => {

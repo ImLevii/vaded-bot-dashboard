@@ -24,7 +24,7 @@ What actually happened. Include any error messages or screenshots.
   - [ ] Self-hosted (Docker)
   - [ ] Self-hosted (bare metal)
   - [ ] Public bot
-- Lucky version / Docker image tag: `v`
+- Vaded Gaming version / Docker image tag: `v`
 - Node.js version (if bare metal): `node -v`
 - Discord.js version: (from `package.json`)
 

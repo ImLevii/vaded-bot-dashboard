@@ -4,7 +4,7 @@ set -euo pipefail
 PRISMA_CONFIG_PATH="prisma/prisma.config.ts"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "🗄️  Setting up database for Lucky..."
+echo "🗄️  Setting up database for Vaded Gaming..."
 
 if [[ -z "${DATABASE_URL:-}" ]]; then
     echo "❌ DATABASE_URL environment variable is not set"
@@ -39,4 +39,4 @@ echo "📊 Database status:"
 npx prisma migrate status --config "$PRISMA_CONFIG_PATH"
 
 echo ""
-echo "🎉 Lucky database is ready to use!"
+echo "🎉 Vaded Gaming database is ready to use!"

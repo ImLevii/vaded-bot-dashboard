@@ -1,6 +1,6 @@
 # Logging
 
-Lucky uses shared logging utilities that forward errors to Sentry for observability. This document describes correct usage and a common footgun to avoid.
+Vaded Gaming uses shared logging utilities that forward errors to Sentry for observability. This document describes correct usage and a common footgun to avoid.
 
 ## The logging utils
 

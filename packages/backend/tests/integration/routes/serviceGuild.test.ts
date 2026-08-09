@@ -18,7 +18,7 @@ describe('Service Guild Routes Integration', () => {
 
     beforeEach(() => {
         originalEnv = { ...process.env }
-        process.env.LUCKY_MEMBERS_API_KEY = 'test-members-key'
+        process.env.VADED_MEMBERS_API_KEY = 'test-members-key'
         process.env.CRIATIVARIA_GUILD_ID = '895505900016631839'
         process.env.DISCORD_TOKEN = 'test-bot-token'
 

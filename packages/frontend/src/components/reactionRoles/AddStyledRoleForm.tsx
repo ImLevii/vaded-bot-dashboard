@@ -104,13 +104,13 @@ export function AddStyledRoleForm({
         <div className='space-y-4'>
             {!preview ? (
                 <Card className='space-y-4 p-5'>
-                    <h3 className='type-body-md font-semibold text-lucky-text-primary'>
+                    <h3 className='type-body-md font-semibold text-vaded-text-primary'>
                         Add Styled Role
                     </h3>
 
                     {error && (
-                        <div className='rounded-md border border-lucky-error/30 bg-lucky-error/10 px-3 py-2'>
-                            <p className='type-body-sm text-lucky-error'>
+                        <div className='rounded-md border border-vaded-error/30 bg-vaded-error/10 px-3 py-2'>
+                            <p className='type-body-sm text-vaded-error'>
                                 {error}
                             </p>
                         </div>
@@ -162,7 +162,7 @@ export function AddStyledRoleForm({
                             {colorOverride && (
                                 <div className='flex items-center gap-2'>
                                     <div
-                                        className='h-6 w-6 rounded border border-lucky-border'
+                                        className='h-6 w-6 rounded border border-vaded-border'
                                         style={{
                                             backgroundColor:
                                                 colorOverride.startsWith('0x')
@@ -170,7 +170,7 @@ export function AddStyledRoleForm({
                                                     : colorOverride,
                                         }}
                                     />
-                                    <code className='type-body-sm text-lucky-text-secondary'>
+                                    <code className='type-body-sm text-vaded-text-secondary'>
                                         {colorOverride}
                                     </code>
                                 </div>
@@ -190,13 +190,13 @@ export function AddStyledRoleForm({
             ) : isDryRun ? (
                 <Card className='space-y-4 p-5'>
                     <div className='flex items-center justify-between'>
-                        <h3 className='type-body-md font-semibold text-lucky-text-primary'>
+                        <h3 className='type-body-md font-semibold text-vaded-text-primary'>
                             Preview
                         </h3>
                         <button
                             type='button'
                             onClick={handleReset}
-                            className='text-lucky-text-tertiary hover:text-lucky-error'
+                            className='text-vaded-text-tertiary hover:text-vaded-error'
                             aria-label='Close preview'
                         >
                             <X className='h-4 w-4' />
@@ -204,25 +204,25 @@ export function AddStyledRoleForm({
                     </div>
 
                     {error && (
-                        <div className='rounded-md border border-lucky-error/30 bg-lucky-error/10 px-3 py-2'>
-                            <p className='type-body-sm text-lucky-error'>
+                        <div className='rounded-md border border-vaded-error/30 bg-vaded-error/10 px-3 py-2'>
+                            <p className='type-body-sm text-vaded-error'>
                                 {error}
                             </p>
                         </div>
                     )}
 
-                    <div className='space-y-3 rounded-lg border border-lucky-border bg-lucky-bg-tertiary/50 p-4'>
+                    <div className='space-y-3 rounded-lg border border-vaded-border bg-vaded-bg-tertiary/50 p-4'>
                         <div className='space-y-1'>
-                            <p className='type-body-sm text-lucky-text-tertiary'>
+                            <p className='type-body-sm text-vaded-text-tertiary'>
                                 Role Name
                             </p>
-                            <p className='type-body-md font-medium text-lucky-text-primary'>
+                            <p className='type-body-md font-medium text-vaded-text-primary'>
                                 {preview.plan.roleName}
                             </p>
                         </div>
 
                         <div className='space-y-1'>
-                            <p className='type-body-sm text-lucky-text-tertiary'>
+                            <p className='type-body-sm text-vaded-text-tertiary'>
                                 Button Label
                             </p>
                             <div className='flex items-center gap-2'>
@@ -231,20 +231,20 @@ export function AddStyledRoleForm({
                                         {preview.plan.emoji}
                                     </span>
                                 )}
-                                <p className='type-body-md font-medium text-lucky-text-primary'>
+                                <p className='type-body-md font-medium text-vaded-text-primary'>
                                     {preview.plan.buttonLabel}
                                 </p>
                             </div>
                         </div>
 
                         <div className='space-y-1'>
-                            <p className='type-body-sm text-lucky-text-tertiary'>
+                            <p className='type-body-sm text-vaded-text-tertiary'>
                                 Color
                             </p>
                             <div className='flex items-center gap-2'>
                                 <div
                                     data-testid='color-swatch'
-                                    className='h-6 w-6 rounded border border-lucky-border'
+                                    className='h-6 w-6 rounded border border-vaded-border'
                                     style={{
                                         backgroundColor:
                                             preview.plan.color.startsWith('0x')
@@ -252,7 +252,7 @@ export function AddStyledRoleForm({
                                                 : preview.plan.color,
                                     }}
                                 />
-                                <code className='type-body-sm text-lucky-text-secondary'>
+                                <code className='type-body-sm text-vaded-text-secondary'>
                                     {preview.plan.color}
                                 </code>
                             </div>
@@ -279,29 +279,29 @@ export function AddStyledRoleForm({
                 </Card>
             ) : isApplied ? (
                 <Card className='space-y-4 p-5'>
-                    <h3 className='type-body-md font-semibold text-lucky-text-primary'>
+                    <h3 className='type-body-md font-semibold text-vaded-text-primary'>
                         Role Added
                     </h3>
 
                     {error && (
-                        <div className='rounded-md border border-lucky-error/30 bg-lucky-error/10 px-3 py-2'>
-                            <p className='type-body-sm text-lucky-error'>
+                        <div className='rounded-md border border-vaded-error/30 bg-vaded-error/10 px-3 py-2'>
+                            <p className='type-body-sm text-vaded-error'>
                                 {error}
                             </p>
                         </div>
                     )}
 
-                    <div className='space-y-3 rounded-lg border border-lucky-border bg-lucky-bg-tertiary/50 p-4'>
+                    <div className='space-y-3 rounded-lg border border-vaded-border bg-vaded-bg-tertiary/50 p-4'>
                         <div className='space-y-1'>
-                            <p className='type-body-sm text-lucky-text-tertiary'>
+                            <p className='type-body-sm text-vaded-text-tertiary'>
                                 Role
                             </p>
-                            <p className='type-body-md font-medium text-lucky-text-primary'>
+                            <p className='type-body-md font-medium text-vaded-text-primary'>
                                 {preview.role.name}
                             </p>
                         </div>
                         <div className='space-y-1'>
-                            <p className='type-body-sm text-lucky-text-tertiary'>
+                            <p className='type-body-sm text-vaded-text-tertiary'>
                                 Button
                             </p>
                             <div className='flex items-center gap-2'>
@@ -310,7 +310,7 @@ export function AddStyledRoleForm({
                                         {preview.mapping.emoji}
                                     </span>
                                 )}
-                                <p className='type-body-md font-medium text-lucky-text-primary'>
+                                <p className='type-body-md font-medium text-vaded-text-primary'>
                                     {preview.mapping.label}
                                 </p>
                             </div>

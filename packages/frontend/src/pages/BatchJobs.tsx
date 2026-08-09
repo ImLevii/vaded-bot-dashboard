@@ -196,22 +196,22 @@ function JobDetailPanel({
                             damping: 25,
                             stiffness: 300,
                         }}
-                        className='fixed right-0 top-0 h-screen w-96 bg-lucky-bg-secondary border-l border-lucky-border z-50 flex flex-col'
+                        className='fixed right-0 top-0 h-screen w-96 bg-vaded-bg-secondary border-l border-vaded-border z-50 flex flex-col'
                     >
-                        <div className='flex items-center justify-between p-6 border-b border-lucky-border'>
+                        <div className='flex items-center justify-between p-6 border-b border-vaded-border'>
                             <div className='flex items-center gap-3'>
                                 <div className={cn('p-2 rounded-lg', style.bg)}>
                                     <StatusIcon
                                         className={cn('w-5 h-5', style.text)}
                                     />
                                 </div>
-                                <h2 className='type-title text-lucky-text-primary'>
+                                <h2 className='type-title text-vaded-text-primary'>
                                     {t('jobDetails')}
                                 </h2>
                             </div>
                             <button
                                 onClick={onClose}
-                                className='text-lucky-text-tertiary hover:text-lucky-text-primary transition-colors p-1'
+                                className='text-vaded-text-tertiary hover:text-vaded-text-primary transition-colors p-1'
                             >
                                 <X className='w-5 h-5' />
                             </button>
@@ -219,16 +219,16 @@ function JobDetailPanel({
 
                         <div className='flex-1 overflow-y-auto p-6 space-y-4'>
                             <div className='space-y-1'>
-                                <p className='type-meta text-lucky-text-tertiary'>
+                                <p className='type-meta text-vaded-text-tertiary'>
                                     {t('tableHeaderType')}
                                 </p>
-                                <p className='type-body text-lucky-text-primary'>
+                                <p className='type-body text-vaded-text-primary'>
                                     {jobData.jobType}
                                 </p>
                             </div>
 
                             <div className='space-y-1'>
-                                <p className='type-meta text-lucky-text-tertiary'>
+                                <p className='type-meta text-vaded-text-tertiary'>
                                     {t('tableHeaderStatus')}
                                 </p>
                                 <Badge
@@ -245,29 +245,29 @@ function JobDetailPanel({
                             </div>
 
                             <div className='space-y-1'>
-                                <p className='type-meta text-lucky-text-tertiary'>
+                                <p className='type-meta text-vaded-text-tertiary'>
                                     {t('tableHeaderInitiator')}
                                 </p>
-                                <p className='type-body text-lucky-text-primary'>
+                                <p className='type-body text-vaded-text-primary'>
                                     {jobData.initiatedBy}
                                 </p>
                             </div>
 
                             <div className='space-y-1'>
-                                <p className='type-meta text-lucky-text-tertiary'>
+                                <p className='type-meta text-vaded-text-tertiary'>
                                     {t('tableHeaderDate')}
                                 </p>
-                                <p className='type-body-sm text-lucky-text-secondary'>
+                                <p className='type-body-sm text-vaded-text-secondary'>
                                     {formatDate(jobData.createdAt)}
                                 </p>
                             </div>
 
                             {jobData.startedAt && (
                                 <div className='space-y-1'>
-                                    <p className='type-meta text-lucky-text-tertiary'>
+                                    <p className='type-meta text-vaded-text-tertiary'>
                                         {t('startedAt')}
                                     </p>
-                                    <p className='type-body-sm text-lucky-text-secondary'>
+                                    <p className='type-body-sm text-vaded-text-secondary'>
                                         {formatDate(jobData.startedAt)}
                                     </p>
                                 </div>
@@ -275,10 +275,10 @@ function JobDetailPanel({
 
                             {jobData.completedAt && (
                                 <div className='space-y-1'>
-                                    <p className='type-meta text-lucky-text-tertiary'>
+                                    <p className='type-meta text-vaded-text-tertiary'>
                                         {t('completedAt')}
                                     </p>
-                                    <p className='type-body-sm text-lucky-text-secondary'>
+                                    <p className='type-body-sm text-vaded-text-secondary'>
                                         {formatDate(jobData.completedAt)}
                                     </p>
                                 </div>
@@ -286,10 +286,10 @@ function JobDetailPanel({
 
                             {jobData.estimatedMinutes && (
                                 <div className='space-y-1'>
-                                    <p className='type-meta text-lucky-text-tertiary'>
+                                    <p className='type-meta text-vaded-text-tertiary'>
                                         {t('estimatedTime')}
                                     </p>
-                                    <p className='type-body-sm text-lucky-text-secondary'>
+                                    <p className='type-body-sm text-vaded-text-secondary'>
                                         {t('minutes', {
                                             count: jobData.estimatedMinutes,
                                         })}
@@ -298,14 +298,14 @@ function JobDetailPanel({
                             )}
 
                             <div className='space-y-3 pt-2'>
-                                <p className='type-meta text-lucky-text-tertiary mb-2'>
+                                <p className='type-meta text-vaded-text-tertiary mb-2'>
                                     {loadingProgress
                                         ? t('liveProgress')
                                         : t('progress')}
                                 </p>
 
                                 <div className='space-y-2'>
-                                    <div className='relative w-full h-2 bg-lucky-bg-tertiary rounded-full overflow-hidden'>
+                                    <div className='relative w-full h-2 bg-vaded-bg-tertiary rounded-full overflow-hidden'>
                                         <div
                                             className='h-full bg-blue-500 transition-all'
                                             style={{
@@ -313,7 +313,7 @@ function JobDetailPanel({
                                             }}
                                         />
                                     </div>
-                                    <div className='flex justify-between text-xs text-lucky-text-tertiary'>
+                                    <div className='flex justify-between text-xs text-vaded-text-tertiary'>
                                         <span>
                                             {currentProcessed} / {currentTotal}
                                         </span>
@@ -324,7 +324,7 @@ function JobDetailPanel({
 
                             <div className='grid grid-cols-4 gap-2 pt-2'>
                                 <div className='text-center'>
-                                    <p className='text-xs text-lucky-text-tertiary mb-1'>
+                                    <p className='text-xs text-vaded-text-tertiary mb-1'>
                                         {t('successItems')}
                                     </p>
                                     <p className='type-body font-semibold text-green-400'>
@@ -334,7 +334,7 @@ function JobDetailPanel({
                                     </p>
                                 </div>
                                 <div className='text-center'>
-                                    <p className='text-xs text-lucky-text-tertiary mb-1'>
+                                    <p className='text-xs text-vaded-text-tertiary mb-1'>
                                         {t('failedItems')}
                                     </p>
                                     <p className='type-body font-semibold text-red-400'>
@@ -342,7 +342,7 @@ function JobDetailPanel({
                                     </p>
                                 </div>
                                 <div className='text-center'>
-                                    <p className='text-xs text-lucky-text-tertiary mb-1'>
+                                    <p className='text-xs text-vaded-text-tertiary mb-1'>
                                         {t('skippedItems')}
                                     </p>
                                     <p className='type-body font-semibold text-yellow-400'>
@@ -350,10 +350,10 @@ function JobDetailPanel({
                                     </p>
                                 </div>
                                 <div className='text-center'>
-                                    <p className='text-xs text-lucky-text-tertiary mb-1'>
+                                    <p className='text-xs text-vaded-text-tertiary mb-1'>
                                         {t('totalItems')}
                                     </p>
-                                    <p className='type-body font-semibold text-lucky-text-primary'>
+                                    <p className='type-body font-semibold text-vaded-text-primary'>
                                         {currentTotal}
                                     </p>
                                 </div>
@@ -362,7 +362,7 @@ function JobDetailPanel({
 
                         {(jobData.status === 'pending' ||
                             jobData.status === 'in_progress') && (
-                            <div className='border-t border-lucky-border p-4'>
+                            <div className='border-t border-vaded-border p-4'>
                                 <Button
                                     onClick={() => onCancel(jobData.id)}
                                     disabled={cancelling}
@@ -453,11 +453,11 @@ export default function BatchJobsPage() {
     if (!selectedGuild) {
         return (
             <div className='flex flex-col items-center justify-center h-[60vh] text-center'>
-                <Clock className='w-16 h-16 text-lucky-text-tertiary mb-4' />
-                <h2 className='type-h2 text-lucky-text-primary mb-2'>
+                <Clock className='w-16 h-16 text-vaded-text-tertiary mb-4' />
+                <h2 className='type-h2 text-vaded-text-primary mb-2'>
                     {t('noServerSelected')}
                 </h2>
-                <p className='type-body text-lucky-text-secondary'>
+                <p className='type-body text-vaded-text-secondary'>
                     {t('selectServerToViewJobs')}
                 </p>
             </div>
@@ -467,35 +467,35 @@ export default function BatchJobsPage() {
     return (
         <div className='space-y-6'>
             <header>
-                <h1 className='type-h1 text-lucky-text-primary'>
+                <h1 className='type-h1 text-vaded-text-primary'>
                     {t('batchJobs')}
                 </h1>
-                <p className='type-body text-lucky-text-secondary mt-1'>
+                <p className='type-body text-vaded-text-secondary mt-1'>
                     {t('manageOperations')}
                 </p>
             </header>
 
             {/* Filters */}
-            <Card className='p-4 border border-lucky-border'>
+            <Card className='p-4 border border-vaded-border'>
                 <div className='flex flex-col sm:flex-row gap-3'>
                     <div className='relative flex-1'>
-                        <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-lucky-text-tertiary' />
+                        <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-vaded-text-tertiary' />
                         <Input
                             placeholder={t('searchByTypeOrInitiator')}
                             disabled
-                            className='pl-9 bg-lucky-bg-tertiary border-lucky-border text-white placeholder:text-lucky-text-tertiary'
+                            className='pl-9 bg-vaded-bg-tertiary border-vaded-border text-white placeholder:text-vaded-text-tertiary'
                         />
                     </div>
                     <div className='flex items-center gap-2'>
-                        <Filter className='w-4 h-4 text-lucky-text-tertiary shrink-0' />
+                        <Filter className='w-4 h-4 text-vaded-text-tertiary shrink-0' />
                         <Select
                             value={statusFilter}
                             onValueChange={setStatusFilter}
                         >
-                            <SelectTrigger className='w-[140px] bg-lucky-bg-tertiary border-lucky-border text-white'>
+                            <SelectTrigger className='w-[140px] bg-vaded-bg-tertiary border-vaded-border text-white'>
                                 <SelectValue placeholder={t('allStatuses')} />
                             </SelectTrigger>
-                            <SelectContent className='bg-lucky-bg-secondary border-lucky-border'>
+                            <SelectContent className='bg-vaded-bg-secondary border-vaded-border'>
                                 <SelectItem value='all'>
                                     {t('allStatuses')}
                                 </SelectItem>
@@ -524,9 +524,9 @@ export default function BatchJobsPage() {
             </Card>
 
             {/* Jobs Table */}
-            <Card className='overflow-hidden p-0 border border-lucky-border'>
+            <Card className='overflow-hidden p-0 border border-vaded-border'>
                 {/* Header */}
-                <div className='hidden md:grid grid-cols-[1fr_100px_80px_100px_80px] gap-4 px-6 py-3 border-b border-lucky-border bg-lucky-bg-tertiary/20'>
+                <div className='hidden md:grid grid-cols-[1fr_100px_80px_100px_80px] gap-4 px-6 py-3 border-b border-vaded-border bg-vaded-bg-tertiary/20'>
                     {[
                         t('tableHeaderJob'),
                         t('tableHeaderType'),
@@ -536,7 +536,7 @@ export default function BatchJobsPage() {
                     ].map((h) => (
                         <span
                             key={h}
-                            className='type-meta text-lucky-text-tertiary text-xs uppercase font-semibold tracking-wide'
+                            className='type-meta text-vaded-text-tertiary text-xs uppercase font-semibold tracking-wide'
                         >
                             {h}
                         </span>
@@ -544,7 +544,7 @@ export default function BatchJobsPage() {
                 </div>
 
                 {/* Rows */}
-                <div className='divide-y divide-lucky-border/40'>
+                <div className='divide-y divide-vaded-border/40'>
                     {loading ? (
                         Array.from({ length: 8 }).map((_, i) => (
                             <div
@@ -589,19 +589,19 @@ export default function BatchJobsPage() {
                                                 ? 0
                                                 : i * 0.02,
                                         }}
-                                        className='grid grid-cols-1 md:grid-cols-[1fr_100px_80px_100px_80px] gap-2 md:gap-4 px-6 py-3 items-center transition-colors hover:bg-lucky-bg-active/25 cursor-pointer'
+                                        className='grid grid-cols-1 md:grid-cols-[1fr_100px_80px_100px_80px] gap-2 md:gap-4 px-6 py-3 items-center transition-colors hover:bg-vaded-bg-active/25 cursor-pointer'
                                         onClick={() => setSelectedJob(job)}
                                     >
                                         <div className='space-y-1'>
-                                            <span className='type-body-sm text-lucky-text-primary truncate block'>
+                                            <span className='type-body-sm text-vaded-text-primary truncate block'>
                                                 {job.jobType}
                                             </span>
                                             <div className='flex gap-2 items-center text-xs'>
-                                                <span className='type-meta text-lucky-text-tertiary'>
+                                                <span className='type-meta text-vaded-text-tertiary'>
                                                     {job.processedItems} /{' '}
                                                     {job.totalItems}
                                                 </span>
-                                                <div className='relative w-24 h-1.5 bg-lucky-bg-tertiary rounded-full overflow-hidden'>
+                                                <div className='relative w-24 h-1.5 bg-vaded-bg-tertiary rounded-full overflow-hidden'>
                                                     <div
                                                         className='h-full bg-blue-500 transition-all'
                                                         style={{
@@ -611,7 +611,7 @@ export default function BatchJobsPage() {
                                                 </div>
                                             </div>
                                         </div>
-                                        <span className='type-body-sm text-lucky-text-secondary'>
+                                        <span className='type-body-sm text-vaded-text-secondary'>
                                             {job.jobType.substring(0, 10)}
                                         </span>
                                         <Badge
@@ -626,10 +626,10 @@ export default function BatchJobsPage() {
                                             <StatusIcon className='w-3 h-3' />
                                             {t(job.status)}
                                         </Badge>
-                                        <span className='type-body-sm text-lucky-text-secondary truncate'>
+                                        <span className='type-body-sm text-vaded-text-secondary truncate'>
                                             {job.initiatedBy}
                                         </span>
-                                        <span className='type-body-sm text-lucky-text-tertiary text-xs'>
+                                        <span className='type-body-sm text-vaded-text-tertiary text-xs'>
                                             {timeAgo(job.createdAt)}
                                         </span>
                                     </motion.div>
@@ -657,8 +657,8 @@ export default function BatchJobsPage() {
 
                 {/* Pagination */}
                 {total > limit && (
-                    <div className='flex items-center justify-between px-5 py-3 border-t border-lucky-border'>
-                        <span className='type-body-sm text-lucky-text-tertiary'>
+                    <div className='flex items-center justify-between px-5 py-3 border-t border-vaded-border'>
+                        <span className='type-body-sm text-vaded-text-tertiary'>
                             {t('showingToOf', {
                                 from: (page - 1) * limit + 1,
                                 to: Math.min(page * limit, total),
@@ -671,11 +671,11 @@ export default function BatchJobsPage() {
                                 variant='ghost'
                                 disabled={page <= 1}
                                 onClick={() => setPage((p) => p - 1)}
-                                className='h-8 w-8 p-0 text-lucky-text-secondary hover:text-lucky-text-primary'
+                                className='h-8 w-8 p-0 text-vaded-text-secondary hover:text-vaded-text-primary'
                             >
                                 <ChevronLeft className='w-4 h-4' />
                             </Button>
-                            <span className='type-body-sm text-lucky-text-secondary px-2'>
+                            <span className='type-body-sm text-vaded-text-secondary px-2'>
                                 {page} / {totalPages}
                             </span>
                             <Button
@@ -683,7 +683,7 @@ export default function BatchJobsPage() {
                                 variant='ghost'
                                 disabled={page >= totalPages}
                                 onClick={() => setPage((p) => p + 1)}
-                                className='h-8 w-8 p-0 text-lucky-text-secondary hover:text-lucky-text-primary'
+                                className='h-8 w-8 p-0 text-vaded-text-secondary hover:text-vaded-text-primary'
                             >
                                 <ChevronRight className='w-4 h-4' />
                             </Button>

@@ -9,7 +9,7 @@
 
 ## Context
 
-Lucky's monorepo currently runs two Zod majors at the same time, and the lockfile only works by historical accident:
+Vaded Gaming's monorepo currently runs two Zod majors at the same time, and the lockfile only works by historical accident:
 
 - `packages/frontend/package.json` pins `"zod": "^4.4.3"`
 - `packages/shared/package.json` pins `"zod": "^4.4.3"`
@@ -35,7 +35,7 @@ Concrete changes (verified scope, ~1 hour engineering time):
 2. **`packages/backend/src/schemas/autoMessages.ts:9,37`** — replace each `{ required_error: "..." }` with `{ error: () => "..." }` per Zod 4's unified error API.
 3. **Tests adjacent to these files** — re-run the suite; only assertions on `ZodError.format()` shape would break, and Zod 4's shape is backward-compatible enough that most tests pass unchanged.
 
-The PR is purely a refactor; no functional behaviour change. After merge, the brace-expansion CVE override (which Lucky already keeps in `package.json` overrides for several other deps) is a 3-line edit that no longer fights the lockfile.
+The PR is purely a refactor; no functional behaviour change. After merge, the brace-expansion CVE override (which Vaded Gaming already keeps in `package.json` overrides for several other deps) is a 3-line edit that no longer fights the lockfile.
 
 ## Alternatives considered
 
@@ -68,7 +68,7 @@ The PR is purely a refactor; no functional behaviour change. After merge, the br
 
 Pilot scope = one PR.
 
-1. Branch `refactor/backend-zod4` from `release` (bare; or `release/v2.12.0` if Lucky's migration to bare hasn't landed yet).
+1. Branch `refactor/backend-zod4` from `release` (bare; or `release/v2.12.0` if Vaded Gaming's migration to bare hasn't landed yet).
 2. Apply the 3 listed code changes.
 3. Run `npm run type:check --workspace=packages/backend` + `npm run test:ci --workspace=packages/backend`. Both must pass.
 4. **Lockfile sanity test**: `rm -rf node_modules package-lock.json && npm install --ignore-scripts`. Confirm Zod hoists to 4.x at root and the backend's checks still pass against the regenerated lockfile.
@@ -76,18 +76,18 @@ Pilot scope = one PR.
 6. Reopen the brace-expansion + ws CVE work as a new PR: 3-line `package.json` overrides edit (`brace-expansion: ">=5.0.6"`, `ws: "8.20.1"`) + lockfile regen. Verify `npm audit` clean.
 7. Close issue #907 after the CVE PR merges.
 
-Rollback: revert the refactor commit. No downstream impact — backend is a leaf in the Lucky dependency graph.
+Rollback: revert the refactor commit. No downstream impact — backend is a leaf in the Vaded Gaming dependency graph.
 
 ## Revisit triggers
 
 - **The 3 line changes aren't actually surgical** (TS build emits other Zod 4 errors not enumerated above). Surface in PR description, scope up to E (migrate-all) if too tangled.
 - **`@infisical/sdk` drops Zod 3 support** (likely within 6-12 months). Independent of this migration; just removes the transitive Zod-3 install from the tree.
 - **Zod 5 ships.** Re-evaluate; may want to skip 4 and jump to 5 if release timing aligns.
-- **A new Lucky package wants Zod and pins a different major.** Pattern signal that the monorepo needs a single root-pinned Zod version. Currently each package pins independently — fine for 4 packages, fragile beyond.
+- **A new Vaded Gaming package wants Zod and pins a different major.** Pattern signal that the monorepo needs a single root-pinned Zod version. Currently each package pins independently — fine for 4 packages, fragile beyond.
 
 ## Related artefacts
 
 - Issue #907 (reopened) — brace-expansion + ws CVE; blocked on this ADR's implementation.
 - PR #915 (closed) — two failed CVE-fix attempts that produced the Zod flip in CI.
-- Memory: `~/.claude/projects/-Volumes-External-HD-Desenvolvimento-Lucky/memory/project_supabase_migration.md` (notes Zod 3→4 will affect Prisma's `z.infer<>` patterns).
+- Memory: `~/.claude/projects/-Volumes-External-HD-Desenvolvimento-vaded-gaming/memory/project_supabase_migration.md` (notes Zod 3→4 will affect Prisma's `z.infer<>` patterns).
 - `CONTEXT.md` — "Module / Interface / Adapter" vocab still applies; this is purely impl-side, no Seam change.

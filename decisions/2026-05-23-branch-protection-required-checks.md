@@ -5,7 +5,7 @@
 
 ## Context
 
-Lucky's `main` branch had three required status checks: `Quality Gates`, `Security`, and `SonarCloud Scan`. A gap was identified: `madge / packages/bot` (the circular dependency gate) was supposed to be promoted to a required check when PR #889 landed (per ADR `2026-05-16-next-refactor-target-bot-circular-deps.md`), but the promotion was never executed. The promotion code had been written on branch `ci/madge-gate-blocking` (PR #945) and left stranded.
+Vaded Gaming's `main` branch had three required status checks: `Quality Gates`, `Security`, and `SonarCloud Scan`. A gap was identified: `madge / packages/bot` (the circular dependency gate) was supposed to be promoted to a required check when PR #889 landed (per ADR `2026-05-16-next-refactor-target-bot-circular-deps.md`), but the promotion was never executed. The promotion code had been written on branch `ci/madge-gate-blocking` (PR #945) and left stranded.
 
 ### CI structure at time of decision
 

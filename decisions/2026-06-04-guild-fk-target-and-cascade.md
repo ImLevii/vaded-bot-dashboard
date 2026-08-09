@@ -2,7 +2,7 @@
 
 **Status:** Accepted
 **Issue:** #1181
-**Related:** track_history FK fix (PR #1146, ADR-less hotfix), Sentry LUCKY-3N
+**Related:** track_history FK fix (PR #1146, ADR-less hotfix), Sentry VADED-3N
 
 ## Context
 
@@ -11,7 +11,7 @@
 Yet the existing FKs target the CUID PK:
 
 - **9 models already FK → `guilds.id` (CUID):** GuildSettings, GuildSession, GuildFeatureToggle, TwitchNotification, CommandUsage, NamedQueue, MusicSessionSnapshot, GuildCounter (+ TrackHistory, already re-pointed to `discordId` in PR #1146).
-- These FKs only resolve for guild rows whose `guilds.id` legacy-equals the snowflake; they break for guilds created with auto-CUID ids. LUCKY-3N (track_history, ~20 events) was the first symptom.
+- These FKs only resolve for guild rows whose `guilds.id` legacy-equals the snowflake; they break for guilds created with auto-CUID ids. VADED-3N (track_history, ~20 events) was the first symptom.
 - **~19 models have NO Guild FK at all** (orphan-row risk): ModerationCase, ModerationSettings, AutoModSettings, CustomCommand, EmbedTemplate, AutoMessage, ServerLog, StarboardEntry, LevelConfig, MemberXP, LevelReward, AutoRole, MemberBirthday, GuildRoleGrant, GuildAutomationManifest/Run/Drift, ReactionRoleMessage, RoleExclusion, Download, GuildSubscription.
 
 The `guilds.id` CUID is effectively vestigial — nothing references it correctly.

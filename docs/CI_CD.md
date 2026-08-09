@@ -1,6 +1,6 @@
 # CI/CD Pipeline
 
-This document describes the continuous integration and deployment setup for Lucky.
+This document describes the continuous integration and deployment setup for Vaded Gaming.
 
 ## Overview
 
@@ -128,7 +128,7 @@ From the repo root, with [GitHub CLI](https://cli.github.com/) installed and aut
 
 ```bash
 gh secret set DEPLOY_WEBHOOK_SECRET --body "your-random-secret"
-gh secret set DEPLOY_WEBHOOK_URL --body "https://lucky.lucassantana.tech/webhook/deploy"
+gh secret set DEPLOY_WEBHOOK_URL --body "https://vaded.lucassantana.tech/webhook/deploy"
 ```
 
 #### Discord deploy notifications (optional)
@@ -140,7 +140,7 @@ Set `DISCORD_DEPLOY_WEBHOOK` on the homelab host to receive rich Discord embeds 
 3. On the homelab host, add the variable to `.env` (same directory as `docker-compose.yml`):
 
 ```bash
-echo 'DISCORD_DEPLOY_WEBHOOK=https://discord.com/api/webhooks/<id>/<token>' >> /home/luk-server/Lucky/.env
+echo 'DISCORD_DEPLOY_WEBHOOK=https://discord.com/api/webhooks/<id>/<token>' >> /home/luk-server/vaded-gaming/.env
 ```
 
 4. Restart the webhook container to pick up the new variable:
@@ -178,11 +178,11 @@ After this bootstrap, future deploys run without SSH through GitHub Actions.
 
 If deploy fails with curl exit code `6` (Could not resolve host):
 
-1. Confirm `DEPLOY_WEBHOOK_URL` points to an existing DNS host (Lucky):
-    - `gh secret set DEPLOY_WEBHOOK_URL --body "https://lucky.lucassantana.tech/webhook/deploy"`
-2. Ensure Cloudflare DNS has `lucky.lucassantana.tech` published to the active tunnel.
+1. Confirm `DEPLOY_WEBHOOK_URL` points to an existing DNS host (Vaded Gaming):
+    - `gh secret set DEPLOY_WEBHOOK_URL --body "https://vaded.lucassantana.tech/webhook/deploy"`
+2. Ensure Cloudflare DNS has `vaded.lucassantana.tech` published to the active tunnel.
 3. Verify from any machine:
-    - `curl -i -X POST https://lucky.lucassantana.tech/webhook/deploy`
+    - `curl -i -X POST https://vaded.lucassantana.tech/webhook/deploy`
 4. Re-run:
     - `npm run deploy:homelab`
 
@@ -194,7 +194,7 @@ upstream "webhook"`:
 1. Confirm webhook container is running:
     - `docker compose ps webhook`
 2. Confirm service discovery from nginx:
-    - `docker exec lucky-nginx getent hosts webhook backend frontend`
+    - `docker exec vaded-nginx getent hosts webhook backend frontend`
 3. Restart only webhook if needed:
     - `docker compose up -d webhook`
 4. Check recent logs:
@@ -219,16 +219,16 @@ CLOUDFLARED_CONFIG_DIR=/home/luk-server/.cloudflared
 
 Required files in that directory:
 
-- `config-lucky.yml`
+- `config-vaded.yml`
 - tunnel credentials JSON referenced by `credentials-file` inside
-  `config-lucky.yml`
+  `config-vaded.yml`
 
 Quick validation commands on host:
 
 ```bash
 ls -la "$CLOUDFLARED_CONFIG_DIR"
-test -f "$CLOUDFLARED_CONFIG_DIR/config-lucky.yml"
-awk -F': ' '/^credentials-file:/ {print $2}' "$CLOUDFLARED_CONFIG_DIR/config-lucky.yml"
+test -f "$CLOUDFLARED_CONFIG_DIR/config-vaded.yml"
+awk -F': ' '/^credentials-file:/ {print $2}' "$CLOUDFLARED_CONFIG_DIR/config-vaded.yml"
 ```
 
 If deploy context differs from login shell context, this explicit variable
@@ -246,9 +246,9 @@ If `Auth config smoke check` times out with repeated `HTTP 502`:
     - `upstream unavailable` counters in `Auth config smoke summary`
     - deploy-side service/log diagnostics from `scripts/deploy.sh`
 4. Confirm public probes recover:
-    - `https://lucky.lucassantana.tech/api/health` -> `200`
-    - `https://lucky.lucassantana.tech/api/health/auth-config` -> `200`
-    - `https://lucky.lucassantana.tech/api/auth/discord` -> `302`
+    - `https://vaded.lucassantana.tech/api/health` -> `200`
+    - `https://vaded.lucassantana.tech/api/health/auth-config` -> `200`
+    - `https://vaded.lucassantana.tech/api/auth/discord` -> `302`
 
 **Recommendation**: Configure branch protection for `main` so that the CI workflow must pass before merge. Deploy then runs only when CI has already succeeded.
 
@@ -263,8 +263,8 @@ If deploy webhook succeeds but smoke checks keep returning `502` on
 
 The diagnostics output is sanitized and includes:
 
-1. Lucky container status
-2. `lucky-backend` log tail
+1. Vaded Gaming container status
+2. `vaded-backend` log tail
 3. Local/public auth health checks
 4. Public OAuth redirect check
 

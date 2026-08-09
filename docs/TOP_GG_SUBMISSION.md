@@ -1,18 +1,18 @@
 # top.gg Submission Pack
 
-Copy-paste artifacts for filing Lucky on https://top.gg. Launch sequence in `~/.claude/plans/lucky-next-phases-ultraplan.md` Phase 0.
+Copy-paste artifacts for filing Vaded Gaming on https://top.gg. Launch sequence in `~/.claude/plans/vaded-next-phases-ultraplan.md` Phase 0.
 
 ## 1. Bot identification
 
 | Field          | Value                                                                            |
 | -------------- | -------------------------------------------------------------------------------- |
 | Client ID      | `962198089161134131`                                                             |
-| Invite URL     | `https://lucky.lucassantana.tech/invite`                                         |
-| Website        | `https://lucky.lucassantana.tech`                                                |
-| GitHub         | `https://github.com/LucasSantana-Dev/Lucky`                                      |
-| Support server | _Create a Lucky Discord server first (Phase 0 task #7), then paste invite here._ |
+| Invite URL     | `https://vaded.lucassantana.tech/invite`                                         |
+| Website        | `https://vaded.lucassantana.tech`                                                |
+| GitHub         | `https://github.com/LucasSantana-Dev/vaded-gaming`                                      |
+| Support server | _Create a Vaded Gaming Discord server first (Phase 0 task #7), then paste invite here._ |
 
-**Note on the invite URL** — do not hardcode a `permissions=` integer here. `https://lucky.lucassantana.tech/invite` redirects to Discord via the backend, which builds the URL from `BOT_INVITE_PERMISSIONS` in `packages/shared/src/constants/invite.ts`, and logs the `utm_*` parameters on the way through so directory clicks are attributable.
+**Note on the invite URL** — do not hardcode a `permissions=` integer here. `https://vaded.lucassantana.tech/invite` redirects to Discord via the backend, which builds the URL from `BOT_INVITE_PERMISSIONS` in `packages/shared/src/constants/invite.ts`, and logs the `utm_*` parameters on the way through so directory clicks are attributable.
 
 The curated set is `3173504` — View Audit Log, View Channels, Send Messages, Manage Messages, Embed Links, Connect, Speak — per `decisions/2026-06-18-invite-permission-scope.md`. **Never Administrator.** High-alarm permissions (Ban/Kick/ManageRoles/ManageChannels/ManageGuild/ModerateMembers) are escalated on demand rather than requested up front.
 
@@ -29,7 +29,7 @@ Character count: 108.
 ## 3. Long description (Markdown supported)
 
 ```markdown
-# Lucky 🎵
+# Vaded Gaming 🎵
 
 **Self-hosted Discord music bot + React dashboard.** Production-grade TypeScript monorepo — music, moderation, engagement — fully open source under ISC.
 
@@ -37,24 +37,24 @@ Character count: 108.
 
 - 🎵 **Music**: YouTube + Spotify + SoundCloud · autoplay with diversity-aware recommendations · `/queue smartshuffle` · `/session save|restore`
 - 🛡️ **Moderation**: warn · mute · kick · ban · case tracking · `/digest` weekly reports · automod presets
-- 📊 **Dashboard**: Discord OAuth · RBAC · guild management · feature toggles at [lucky.lucassantana.tech](https://lucky.lucassantana.tech)
+- 📊 **Dashboard**: Discord OAuth · RBAC · guild management · feature toggles at [vaded.lucassantana.tech](https://vaded.lucassantana.tech)
 - 🎯 **Engagement**: leveling · starboard · Last.fm scrobbling · Twitch notifications
 - ⚡ **Reliability**: music watchdog auto-recovery · provider health cooldown · queue snapshot restore · cold-Redis survival
 
-## Why pick Lucky
+## Why pick Vaded Gaming
 
 - Real autoplay — uses Spotify Discover + genre graphs, not a static playlist loop
 - Self-hostable in Docker — no vendor lock-in, no hidden costs
-- Active development — [releases every few days](https://github.com/LucasSantana-Dev/Lucky/releases)
+- Active development — [releases every few days](https://github.com/LucasSantana-Dev/vaded-gaming/releases)
 - Every PR runs lint, build, the full test suite and SonarCloud gates; a deploy that fails its health checks rolls back to the last good build
 
 ## Get started
 
-- [Invite Lucky](https://lucky.lucassantana.tech/invite) to your server
-- [Star on GitHub](https://github.com/LucasSantana-Dev/Lucky) if you find it useful
-- Report issues on [GitHub Issues](https://github.com/LucasSantana-Dev/Lucky/issues)
+- [Invite Vaded Gaming](https://vaded.lucassantana.tech/invite) to your server
+- [Star on GitHub](https://github.com/LucasSantana-Dev/vaded-gaming) if you find it useful
+- Report issues on [GitHub Issues](https://github.com/LucasSantana-Dev/vaded-gaming/issues)
 
-Made with ❤️ in Brazil · Open source under [ISC](https://github.com/LucasSantana-Dev/Lucky/blob/main/LICENSE)
+Made with ❤️ in Brazil · Open source under [ISC](https://github.com/LucasSantana-Dev/vaded-gaming/blob/main/LICENSE)
 ```
 
 ## 4. Tags
@@ -65,8 +65,8 @@ Secondary (add up to 5): `typescript`, `open-source`, `self-hosted`, `autoplay`,
 ## 5. Banner spec
 
 - Size: 1000×500 px (top.gg recommendation)
-- Source: adapt existing `assets/lucky-social-preview.png` (currently 252 KB, 1280×640) — crop/resize
-- Must include: "Lucky" wordmark, bot avatar, one-line value prop, subtle link to `lucky.lucassantana.tech`
+- Source: adapt existing `assets/vaded-social-preview.png` (currently 252 KB, 1280×640) — crop/resize
+- Must include: "Vaded Gaming" wordmark, bot avatar, one-line value prop, subtle link to `vaded.lucassantana.tech`
 - Keep text < 30% of canvas so Discord thumbnail still reads
 
 ## 6. Vote webhook wiring (prep)
@@ -135,6 +135,6 @@ Finally, in `packages/bot/src/functions/general/commands/`, add `/voterewards` t
 - [ ] Support server invite link added
 - [ ] GitHub URL added
 - [ ] Prefix: `/` (slash commands only)
-- [ ] Webhook URL set to `https://api.lucky.lucassantana.tech/webhooks/topgg-votes` (after deploy)
+- [ ] Webhook URL set to `https://api.vaded.lucassantana.tech/webhooks/topgg-votes` (after deploy)
 - [ ] Webhook auth token pasted in top.gg's field
 - [ ] Announce the listing in the support Discord + a GitHub release note

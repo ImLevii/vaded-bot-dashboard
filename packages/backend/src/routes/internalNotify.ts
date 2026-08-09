@@ -10,7 +10,7 @@ import {
 
 function requireKey(req: Request): void {
     const provided = req.header('x-notify-key')?.trim()
-    const expected = process.env.LUCKY_NOTIFY_API_KEY?.trim()
+    const expected = process.env.VADED_NOTIFY_API_KEY?.trim()
     if (!timingSafeKeyCompare(provided, expected)) {
         throw AppError.unauthorized('invalid notify key')
     }

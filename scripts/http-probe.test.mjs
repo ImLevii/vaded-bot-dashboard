@@ -9,7 +9,7 @@ const repoRoot = new URL('..', import.meta.url)
 const probeScript = new URL('./http-probe.sh', import.meta.url)
 
 test('falls back to wget when curl is unavailable', () => {
-  const tempDir = mkdtempSync(join(tmpdir(), 'lucky-http-probe-'))
+  const tempDir = mkdtempSync(join(tmpdir(), 'vaded-http-probe-'))
   const binDir = join(tempDir, 'bin')
 
   try {

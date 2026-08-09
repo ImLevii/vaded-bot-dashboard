@@ -25,7 +25,7 @@ describe('prometheus registry', () => {
         getStoredClientMock.mockReset()
     })
 
-    it('exposes lucky_bot_guilds_total with active and left labels on scrape', async () => {
+    it('exposes vaded_bot_guilds_total with active and left labels on scrape', async () => {
         countMock.mockImplementation(async (args) => {
             const arg = args as { where?: { leftAt?: null | { not: null } } }
             if (arg?.where?.leftAt === null) return 42
@@ -34,12 +34,12 @@ describe('prometheus registry', () => {
 
         const text = await renderMetrics()
 
-        expect(text).toContain('# HELP lucky_bot_guilds_total')
+        expect(text).toContain('# HELP vaded_bot_guilds_total')
         expect(text).toMatch(
-            /lucky_bot_guilds_total\{[^}]*state="active"[^}]*\}\s+42/,
+            /vaded_bot_guilds_total\{[^}]*state="active"[^}]*\}\s+42/,
         )
         expect(text).toMatch(
-            /lucky_bot_guilds_total\{[^}]*state="left"[^}]*\}\s+3/,
+            /vaded_bot_guilds_total\{[^}]*state="left"[^}]*\}\s+3/,
         )
         // service default label is applied to all series
         expect(text).toMatch(/service="vaded-gaming-bot"/)
@@ -49,7 +49,7 @@ describe('prometheus registry', () => {
         countMock.mockRejectedValue(new Error('db down'))
         const text = await renderMetrics()
         // Should still render (just without fresh values for the failing gauge).
-        expect(text).toContain('lucky_bot_guilds_total')
+        expect(text).toContain('vaded_bot_guilds_total')
         expect(errorLogMock).toHaveBeenCalled()
     })
 
@@ -64,30 +64,30 @@ describe('prometheus registry', () => {
         expect(registry.contentType).toMatch(/^text\/plain.*version=0\.0\.4/i)
     })
 
-    it('reports lucky_bot_gateway_connected=1 when the client is ready', async () => {
+    it('reports vaded_bot_gateway_connected=1 when the client is ready', async () => {
         countMock.mockResolvedValue(0)
         getStoredClientMock.mockReturnValue({ isReady: () => true })
 
         const text = await renderMetrics()
 
-        expect(text).toMatch(/lucky_bot_gateway_connected(\{[^}]*\})?\s+1/)
+        expect(text).toMatch(/vaded_bot_gateway_connected(\{[^}]*\})?\s+1/)
     })
 
-    it('reports lucky_bot_gateway_connected=0 when the client is not ready', async () => {
+    it('reports vaded_bot_gateway_connected=0 when the client is not ready', async () => {
         countMock.mockResolvedValue(0)
         getStoredClientMock.mockReturnValue({ isReady: () => false })
 
         const text = await renderMetrics()
 
-        expect(text).toMatch(/lucky_bot_gateway_connected(\{[^}]*\})?\s+0/)
+        expect(text).toMatch(/vaded_bot_gateway_connected(\{[^}]*\})?\s+0/)
     })
 
-    it('reports lucky_bot_gateway_connected=0 when no client is stored yet', async () => {
+    it('reports vaded_bot_gateway_connected=0 when no client is stored yet', async () => {
         countMock.mockResolvedValue(0)
         getStoredClientMock.mockReturnValue(null)
 
         const text = await renderMetrics()
 
-        expect(text).toMatch(/lucky_bot_gateway_connected(\{[^}]*\})?\s+0/)
+        expect(text).toMatch(/vaded_bot_gateway_connected(\{[^}]*\})?\s+0/)
     })
 })

@@ -46,7 +46,7 @@ Definitions (mirror `recommendationTelemetryReadService`):
 Exact query (run 2026-08-03 against homelab prod; window bounds `[start, end)` on `createdAt`, DB timestamps UTC):
 
 ```sh
-ssh homelab 'docker exec -i lucky-postgres sh -c '"'"'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"'"'"''
+ssh homelab 'docker exec -i vaded-postgres sh -c '"'"'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"'"'"''
 ```
 
 ```sql

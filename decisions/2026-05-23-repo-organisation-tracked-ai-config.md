@@ -2,7 +2,7 @@
 
 ## Context
 
-Lucky's `.gitignore` blanket-ignores `.claude/` and all other AI-tool directories, but three `.claude/` files were explicitly whitelisted as tracked exceptions since PR #842 (2026-05-13):
+Vaded Gaming's `.gitignore` blanket-ignores `.claude/` and all other AI-tool directories, but three `.claude/` files were explicitly whitelisted as tracked exceptions since PR #842 (2026-05-13):
 
 1. `.claude/dep-sweep-config.json` — `/dep-sweep` skill config
 2. `.claude/branch-hygiene-config.json` — `/branch-hygiene` skill config

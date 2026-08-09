@@ -8,9 +8,9 @@
 #     act in production guilds. Its purpose is pre-merge live smoke of bot
 #     features (e.g. the destructive-interaction gate).
 #   - NO webhook / cloudflared services (staging reuses the PRODUCTION tunnel;
-#     an ingress rule in config-lucky.yml routes lucky-staging.* → this nginx's
+#     an ingress rule in config-vaded.yml routes vaded-staging.* → this nginx's
 #     published host port 8093).
-#   - Its own project (`lucky-staging`), container names, network, and volumes
+#   - Its own project (`vaded-staging`), container names, network, and volumes
 #     so it never touches production data.
 #   - Service names stay `backend`/`frontend`/`nginx`/`postgres`/`redis` so the
 #     image-baked nginx upstreams (http://backend:3000, http://frontend:8080)
@@ -19,7 +19,7 @@
 # Driven by .env.staging on the host (WEBAPP_* point at the staging domains).
 # Deployed by scripts/deploy-staging.sh (builds locally from the branch).
 
-name: lucky-staging
+name: vaded-staging
 
 x-small-svc: &small-svc
     mem_limit: 128m
@@ -62,7 +62,7 @@ services:
     postgres:
         <<: *large-svc
         image: postgres:18-alpine
-        container_name: lucky-staging-postgres
+        container_name: vaded-staging-postgres
         environment:
             POSTGRES_DB: discordbot
             POSTGRES_USER: discordbot
@@ -71,7 +71,7 @@ services:
         volumes:
             - staging_postgres_data:/var/lib/postgresql/data
         networks:
-            - lucky-staging-network
+            - vaded-staging-network
         healthcheck:
             test: ["CMD-SHELL", "pg_isready -U discordbot -d discordbot"]
             interval: 30s
@@ -87,12 +87,12 @@ services:
     redis:
         <<: *medium-svc
         image: redis:8-alpine
-        container_name: lucky-staging-redis
+        container_name: vaded-staging-redis
         command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
         volumes:
             - staging_redis_data:/data
         networks:
-            - lucky-staging-network
+            - vaded-staging-network
         healthcheck:
             test: ["CMD", "redis-cli", "ping"]
             interval: 30s
@@ -107,7 +107,7 @@ services:
 
     backend:
         <<: *medium-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/lucky}-backend:${IMAGE_TAG:-staging}
+        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-backend:${IMAGE_TAG:-staging}
         build:
             context: .
             dockerfile: Dockerfile
@@ -115,7 +115,7 @@ services:
             args:
                 SERVICE: backend
                 NODE_ENV: production
-        container_name: lucky-staging-backend
+        container_name: vaded-staging-backend
         env_file:
             - .env.staging
         depends_on:
@@ -126,14 +126,14 @@ services:
         environment:
             <<: *common-app-env
             SENTRY_SERVICE_NAME: ${SENTRY_SERVICE_NAME:-backend}
-            LUCKY_NOTIFY_API_KEY: ${LUCKY_NOTIFY_API_KEY:-}
+            VADED_NOTIFY_API_KEY: ${VADED_NOTIFY_API_KEY:-}
             CLIENT_SECRET: ${CLIENT_SECRET}
             WEBAPP_PORT: 3000
             DEVELOPER_USER_IDS: ${DEVELOPER_USER_IDS:-}
             WEBAPP_FRONTEND_URL: ${WEBAPP_FRONTEND_URL:-}
             WEBAPP_BACKEND_URL: ${WEBAPP_BACKEND_URL:-}
         networks:
-            - lucky-staging-network
+            - vaded-staging-network
         logging:
             driver: "json-file"
             options:
@@ -150,7 +150,7 @@ services:
     # Started only when the token is present (see scripts/deploy-staging.sh).
     bot:
         <<: *small-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/lucky}-bot:${IMAGE_TAG:-staging}
+        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-bot:${IMAGE_TAG:-staging}
         build:
             context: .
             dockerfile: Dockerfile
@@ -158,7 +158,7 @@ services:
             args:
                 SERVICE: bot
                 NODE_ENV: production
-        container_name: lucky-staging-bot
+        container_name: vaded-staging-bot
         env_file:
             - .env.staging
         depends_on:
@@ -172,9 +172,9 @@ services:
             # test-app token; empty default = clean login failure, never prod.
             DISCORD_TOKEN: ${STAGING_DISCORD_TOKEN:-}
             SENTRY_SERVICE_NAME: ${SENTRY_SERVICE_NAME:-bot}
-            BOT_NAME: ${BOT_NAME:-Lucky-Staging}
+            BOT_NAME: ${BOT_NAME:-Vaded Gaming-Staging}
         networks:
-            - lucky-staging-network
+            - vaded-staging-network
         logging:
             driver: "json-file"
             options:
@@ -184,14 +184,14 @@ services:
 
     frontend:
         <<: *small-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/lucky}-frontend:${IMAGE_TAG:-staging}
+        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-frontend:${IMAGE_TAG:-staging}
         build:
             context: .
             dockerfile: Dockerfile
             target: production-frontend
-        container_name: lucky-staging-frontend
+        container_name: vaded-staging-frontend
         networks:
-            - lucky-staging-network
+            - vaded-staging-network
         logging:
             driver: "json-file"
             options:
@@ -209,7 +209,7 @@ services:
 
     backend-blue:
         <<: *medium-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/lucky}-backend:${IMAGE_TAG:-staging}
+        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-backend:${IMAGE_TAG:-staging}
         build:
             context: .
             dockerfile: Dockerfile
@@ -217,7 +217,7 @@ services:
             args:
                 SERVICE: backend
                 NODE_ENV: production
-        container_name: lucky-staging-backend-blue
+        container_name: vaded-staging-backend-blue
         env_file:
             - .env.staging
         depends_on:
@@ -228,14 +228,14 @@ services:
         environment:
             <<: *common-app-env
             SENTRY_SERVICE_NAME: ${SENTRY_SERVICE_NAME:-backend}
-            LUCKY_NOTIFY_API_KEY: ${LUCKY_NOTIFY_API_KEY:-}
+            VADED_NOTIFY_API_KEY: ${VADED_NOTIFY_API_KEY:-}
             CLIENT_SECRET: ${CLIENT_SECRET}
             WEBAPP_PORT: 3000
             DEVELOPER_USER_IDS: ${DEVELOPER_USER_IDS:-}
             WEBAPP_FRONTEND_URL: ${WEBAPP_FRONTEND_URL:-}
             WEBAPP_BACKEND_URL: ${WEBAPP_BACKEND_URL:-}
         networks:
-            lucky-staging-network:
+            vaded-staging-network:
                 aliases:
                     - backend-blue
         logging:
@@ -251,7 +251,7 @@ services:
 
     backend-green:
         <<: *medium-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/lucky}-backend:${IMAGE_TAG:-staging}
+        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-backend:${IMAGE_TAG:-staging}
         build:
             context: .
             dockerfile: Dockerfile
@@ -259,7 +259,7 @@ services:
             args:
                 SERVICE: backend
                 NODE_ENV: production
-        container_name: lucky-staging-backend-green
+        container_name: vaded-staging-backend-green
         env_file:
             - .env.staging
         depends_on:
@@ -270,14 +270,14 @@ services:
         environment:
             <<: *common-app-env
             SENTRY_SERVICE_NAME: ${SENTRY_SERVICE_NAME:-backend}
-            LUCKY_NOTIFY_API_KEY: ${LUCKY_NOTIFY_API_KEY:-}
+            VADED_NOTIFY_API_KEY: ${VADED_NOTIFY_API_KEY:-}
             CLIENT_SECRET: ${CLIENT_SECRET}
             WEBAPP_PORT: 3000
             DEVELOPER_USER_IDS: ${DEVELOPER_USER_IDS:-}
             WEBAPP_FRONTEND_URL: ${WEBAPP_FRONTEND_URL:-}
             WEBAPP_BACKEND_URL: ${WEBAPP_BACKEND_URL:-}
         networks:
-            lucky-staging-network:
+            vaded-staging-network:
                 aliases:
                     - backend-green
         logging:
@@ -293,14 +293,14 @@ services:
 
     frontend-blue:
         <<: *small-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/lucky}-frontend:${IMAGE_TAG:-staging}
+        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-frontend:${IMAGE_TAG:-staging}
         build:
             context: .
             dockerfile: Dockerfile
             target: production-frontend
-        container_name: lucky-staging-frontend-blue
+        container_name: vaded-staging-frontend-blue
         networks:
-            lucky-staging-network:
+            vaded-staging-network:
                 aliases:
                     - frontend-blue
         logging:
@@ -318,14 +318,14 @@ services:
 
     frontend-green:
         <<: *small-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/lucky}-frontend:${IMAGE_TAG:-staging}
+        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-frontend:${IMAGE_TAG:-staging}
         build:
             context: .
             dockerfile: Dockerfile
             target: production-frontend
-        container_name: lucky-staging-frontend-green
+        container_name: vaded-staging-frontend-green
         networks:
-            lucky-staging-network:
+            vaded-staging-network:
                 aliases:
                     - frontend-green
         logging:
@@ -343,11 +343,11 @@ services:
 
     nginx:
         <<: *small-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/lucky}-nginx:${IMAGE_TAG:-staging}
+        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-nginx:${IMAGE_TAG:-staging}
         build:
             context: .
             dockerfile: Dockerfile.nginx
-        container_name: lucky-staging-nginx
+        container_name: vaded-staging-nginx
         volumes:
             # The active-color upstream config is NOT baked into the image — the
             # flip script rewrites this host file and reloads nginx, so it must be
@@ -358,10 +358,10 @@ services:
             - frontend
         ports:
             # Published on the host so the production cloudflared tunnel can
-            # route lucky-staging.* → http://100.95.204.103:8093 (config-lucky.yml).
+            # route vaded-staging.* → http://100.95.204.103:8093 (config-vaded.yml).
             - "${NGINX_PORT:-8093}:8080"
         networks:
-            - lucky-staging-network
+            - vaded-staging-network
         logging:
             driver: "json-file"
             options:
@@ -374,5 +374,5 @@ volumes:
     staging_redis_data:
 
 networks:
-    lucky-staging-network:
+    vaded-staging-network:
         driver: bridge

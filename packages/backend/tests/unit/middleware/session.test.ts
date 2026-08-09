@@ -115,7 +115,7 @@ describe('Session Middleware', () => {
         }).not.toThrow()
 
         // sameSite: 'none' + secure: true ensures the session cookie is sent
-        // on credentialed JS fetches between subdomains (lucky.* → lucky-api.*)
+        // on credentialed JS fetches between subdomains (vaded.* → vaded-api.*)
         const source = readFileSync(
             resolve(__dirname, '../../../src/middleware/session.ts'),
             'utf8',

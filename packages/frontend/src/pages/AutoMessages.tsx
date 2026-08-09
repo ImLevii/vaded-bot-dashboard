@@ -87,9 +87,9 @@ function MessageFormDialog({
                 if (!v) onClose()
             }}
         >
-            <DialogContent className='bg-lucky-bg-secondary border-lucky-border max-w-md'>
+            <DialogContent className='bg-vaded-bg-secondary border-vaded-border max-w-md'>
                 <DialogHeader>
-                    <DialogTitle className='type-title text-lucky-text-primary'>
+                    <DialogTitle className='type-title text-vaded-text-primary'>
                         {initial
                             ? t('autoMessages.editAutoMessage')
                             : t('autoMessages.newAutoMessage')}
@@ -99,13 +99,13 @@ function MessageFormDialog({
                     <div className='space-y-1.5'>
                         <Label
                             htmlFor='am-type'
-                            className='type-meta text-lucky-text-secondary'
+                            className='type-meta text-vaded-text-secondary'
                         >
                             {t('autoMessages.type')}
                         </Label>
                         <select
                             id='am-type'
-                            className='w-full rounded-lg border border-lucky-border bg-lucky-bg-tertiary px-3 py-2 type-body-sm text-white disabled:opacity-50 disabled:cursor-not-allowed'
+                            className='w-full rounded-lg border border-vaded-border bg-vaded-bg-tertiary px-3 py-2 type-body-sm text-white disabled:opacity-50 disabled:cursor-not-allowed'
                             value={type}
                             onChange={(e) =>
                                 setType(e.target.value as AutoMessageType)
@@ -122,13 +122,13 @@ function MessageFormDialog({
                     <div className='space-y-1.5'>
                         <Label
                             htmlFor='am-channel'
-                            className='type-meta text-lucky-text-secondary'
+                            className='type-meta text-vaded-text-secondary'
                         >
                             {t('autoMessages.channelId')}
                         </Label>
                         <Input
                             id='am-channel'
-                            className='bg-lucky-bg-tertiary border-lucky-border text-white placeholder:text-lucky-text-tertiary'
+                            className='bg-vaded-bg-tertiary border-vaded-border text-white placeholder:text-vaded-text-tertiary'
                             placeholder={t('autoMessages.channelIdPlaceholder')}
                             value={channelId}
                             onChange={(e) => setChannelId(e.target.value)}
@@ -138,13 +138,13 @@ function MessageFormDialog({
                     <div className='space-y-1.5'>
                         <Label
                             htmlFor='am-message'
-                            className='type-meta text-lucky-text-secondary'
+                            className='type-meta text-vaded-text-secondary'
                         >
                             {t('autoMessages.message')}
                         </Label>
                         <textarea
                             id='am-message'
-                            className='w-full rounded-lg border border-lucky-border bg-lucky-bg-tertiary px-3 py-2 type-body-sm text-white placeholder:text-lucky-text-tertiary focus:outline-none focus:border-lucky-brand resize-none'
+                            className='w-full rounded-lg border border-vaded-border bg-vaded-bg-tertiary px-3 py-2 type-body-sm text-white placeholder:text-vaded-text-tertiary focus:outline-none focus:border-vaded-brand resize-none'
                             placeholder={t('autoMessages.messagePlaceholder')}
                             rows={3}
                             value={message}
@@ -157,13 +157,13 @@ function MessageFormDialog({
                             <div className='space-y-1.5'>
                                 <Label
                                     htmlFor='am-trigger'
-                                    className='type-meta text-lucky-text-secondary'
+                                    className='type-meta text-vaded-text-secondary'
                                 >
                                     {t('autoMessages.trigger')}
                                 </Label>
                                 <Input
                                     id='am-trigger'
-                                    className='bg-lucky-bg-tertiary border-lucky-border text-white placeholder:text-lucky-text-tertiary'
+                                    className='bg-vaded-bg-tertiary border-vaded-border text-white placeholder:text-vaded-text-tertiary'
                                     placeholder={t(
                                         'autoMessages.triggerPlaceholder',
                                     )}
@@ -180,14 +180,14 @@ function MessageFormDialog({
                                 />
                                 <Label
                                     htmlFor='am-exact-match'
-                                    className='type-body-sm text-lucky-text-secondary cursor-pointer'
+                                    className='type-body-sm text-vaded-text-secondary cursor-pointer'
                                 >
                                     {t('autoMessages.exactMatch')}
                                 </Label>
                             </div>
                         </>
                     )}
-                    <div className='flex justify-end gap-2 pt-2 border-t border-lucky-border'>
+                    <div className='flex justify-end gap-2 pt-2 border-t border-vaded-border'>
                         <Button
                             variant='ghost'
                             type='button'
@@ -284,11 +284,11 @@ export default function AutoMessagesPage() {
     if (!selectedGuild) {
         return (
             <div className='flex flex-col items-center justify-center h-[60vh] text-center'>
-                <MessageSquare className='w-16 h-16 text-lucky-text-tertiary mb-4' />
-                <h2 className='type-h2 text-lucky-text-primary mb-2'>
+                <MessageSquare className='w-16 h-16 text-vaded-text-tertiary mb-4' />
+                <h2 className='type-h2 text-vaded-text-primary mb-2'>
                     {t('autoMessages.noServerSelected')}
                 </h2>
-                <p className='type-body text-lucky-text-secondary'>
+                <p className='type-body text-vaded-text-secondary'>
                     {t('autoMessages.selectServerToManage')}
                 </p>
             </div>
@@ -306,10 +306,10 @@ export default function AutoMessagesPage() {
             <div className='space-y-6'>
                 <div className='flex items-start justify-between'>
                     <header>
-                        <h1 className='type-h1 text-lucky-text-primary'>
+                        <h1 className='type-h1 text-vaded-text-primary'>
                             {t('autoMessages.title')}
                         </h1>
-                        <p className='type-body text-lucky-text-secondary mt-1'>
+                        <p className='type-body text-vaded-text-secondary mt-1'>
                             {t('autoMessages.subtitle', {
                                 name: selectedGuild.name,
                             })}
@@ -364,16 +364,16 @@ export default function AutoMessagesPage() {
                                             : i * 0.03,
                                     }}
                                 >
-                                    <Card className='p-5 border border-lucky-border hover:border-lucky-border-strong transition-all'>
+                                    <Card className='p-5 border border-vaded-border hover:border-vaded-border-strong transition-all'>
                                         <div className='flex items-start justify-between mb-3'>
                                             <div className='flex items-center gap-2'>
-                                                <div className='p-2 rounded-lg bg-lucky-brand/15'>
+                                                <div className='p-2 rounded-lg bg-vaded-brand/15'>
                                                     <MessageSquare
-                                                        className='w-4 h-4 text-lucky-brand'
+                                                        className='w-4 h-4 text-vaded-brand'
                                                         aria-hidden='true'
                                                     />
                                                 </div>
-                                                <h3 className='type-body-sm font-semibold text-lucky-text-primary'>
+                                                <h3 className='type-body-sm font-semibold text-vaded-text-primary'>
                                                     {t(
                                                         `autoMessages.types.${msg.type}`,
                                                     )}
@@ -402,7 +402,7 @@ export default function AutoMessagesPage() {
                                                     onClick={() =>
                                                         openEdit(msg)
                                                     }
-                                                    className='p-1.5 rounded-md text-lucky-text-tertiary hover:text-lucky-text-primary hover:bg-lucky-bg-active transition-colors'
+                                                    className='p-1.5 rounded-md text-vaded-text-tertiary hover:text-vaded-text-primary hover:bg-vaded-bg-active transition-colors'
                                                     aria-label={`Edit ${t(`autoMessages.types.${msg.type}`)}`}
                                                 >
                                                     <Pencil
@@ -416,7 +416,7 @@ export default function AutoMessagesPage() {
                                                             msg.id,
                                                         )
                                                     }
-                                                    className='p-1.5 rounded-md text-lucky-text-tertiary hover:text-lucky-error hover:bg-lucky-error/10 transition-colors'
+                                                    className='p-1.5 rounded-md text-vaded-text-tertiary hover:text-vaded-error hover:bg-vaded-error/10 transition-colors'
                                                     aria-label={`Delete ${t(`autoMessages.types.${msg.type}`)}`}
                                                 >
                                                     <Trash2
@@ -426,14 +426,14 @@ export default function AutoMessagesPage() {
                                                 </button>
                                             </div>
                                         </div>
-                                        <p className='type-body-sm text-lucky-text-secondary line-clamp-2 mb-3'>
+                                        <p className='type-body-sm text-vaded-text-secondary line-clamp-2 mb-3'>
                                             {msg.message}
                                         </p>
                                         <div className='flex flex-wrap items-center gap-2'>
                                             {msg.channelId && (
                                                 <Badge
                                                     variant='outline'
-                                                    className='type-meta gap-1 uppercase font-semibold bg-lucky-bg-tertiary border-lucky-border text-lucky-text-secondary rounded-sm'
+                                                    className='type-meta gap-1 uppercase font-semibold bg-vaded-bg-tertiary border-vaded-border text-vaded-text-secondary rounded-sm'
                                                 >
                                                     <Hash
                                                         className='w-3 h-3'
@@ -446,7 +446,7 @@ export default function AutoMessagesPage() {
                                                 msg.trigger && (
                                                     <Badge
                                                         variant='outline'
-                                                        className='type-meta gap-1 uppercase font-semibold bg-lucky-bg-tertiary border-lucky-border text-lucky-text-secondary rounded-sm'
+                                                        className='type-meta gap-1 uppercase font-semibold bg-vaded-bg-tertiary border-vaded-border text-vaded-text-secondary rounded-sm'
                                                     >
                                                         {msg.trigger}
                                                     </Badge>
@@ -455,8 +455,8 @@ export default function AutoMessagesPage() {
                                                 variant='outline'
                                                 className={`type-meta uppercase font-semibold rounded-sm ${
                                                     msg.enabled
-                                                        ? 'bg-lucky-success/10 text-lucky-success border-lucky-success/20'
-                                                        : 'bg-lucky-bg-tertiary text-lucky-text-tertiary border-lucky-border'
+                                                        ? 'bg-vaded-success/10 text-vaded-success border-vaded-success/20'
+                                                        : 'bg-vaded-bg-tertiary text-vaded-text-tertiary border-vaded-border'
                                                 }`}
                                             >
                                                 {msg.enabled

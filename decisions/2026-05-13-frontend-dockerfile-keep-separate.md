@@ -1,6 +1,6 @@
 # ADR — Keep `Dockerfile.frontend` separate (deferred consolidation)
 
-- **Status:** Superseded by [PR #851 — `refactor/dockerfile-frontend-consolidation`](https://github.com/LucasSantana-Dev/Lucky/pull/851)
+- **Status:** Superseded by [PR #851 — `refactor/dockerfile-frontend-consolidation`](https://github.com/LucasSantana-Dev/vaded-gaming/pull/851)
 - **Date:** 2026-05-13
 - **Superseded:** 2026-05-14
 - **Decided by:** `/research-and-decide` composite
@@ -8,7 +8,7 @@
 
 ## Context
 
-The Lucky monorepo builds frontend images via a standalone `Dockerfile.frontend` that runs its own `npm ci` against the workspace root. The main `Dockerfile` builds bot + backend. The two Dockerfiles duplicate dependency installation, `prisma generate`, and shared package build steps.
+The Vaded Gaming monorepo builds frontend images via a standalone `Dockerfile.frontend` that runs its own `npm ci` against the workspace root. The main `Dockerfile` builds bot + backend. The two Dockerfiles duplicate dependency installation, `prisma generate`, and shared package build steps.
 
 PR #848 added a non-trivial `Dockerfile.frontend` (nginx-unprivileged migration, healthcheck, build cache) that diverged further from the main file. PR #846 surfaced a sharp downside of this separation: because the frontend Dockerfile runs `npm ci` at the workspace root, it pulls in the bot's native `@discordjs/opus` dependency, which lacked Node-26 prebuilt binaries on Alpine and broke `docker-publish` for two days.
 

@@ -3,7 +3,7 @@
 - **Date:** 2026-07-12
 - **Status:** Accepted (defer)
 - **Deciders:** Lucas Santana
-- **Scope:** Build-tooling for the Lucky monorepo — whether to adopt `moon` (moonrepo)
+- **Scope:** Build-tooling for the Vaded Gaming monorepo — whether to adopt `moon` (moonrepo)
 - **Method:** `/research-and-decide` — repo-evidence research → decision-critic (verdict
   SOUND, no flip; surfaced the missing CI-timing baseline + the script-sprawl framing
   error, both reconciled below) → this ADR

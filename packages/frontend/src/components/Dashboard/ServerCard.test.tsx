@@ -75,7 +75,7 @@ describe('ServerCard', () => {
         const badge = screen.getByLabelText('Bot installed')
         expect(badge).toBeInTheDocument()
         expect(screen.getByText(/bot active/i)).toBeInTheDocument()
-        expect(badge).toHaveClass('bg-lucky-success/10')
+        expect(badge).toHaveClass('bg-vaded-success/10')
     })
 
     test('shows no bot badge when bot is not in server', () => {
@@ -84,7 +84,7 @@ describe('ServerCard', () => {
         const badge = screen.getByLabelText('Bot not installed')
         expect(badge).toBeInTheDocument()
         expect(screen.getByText(/no bot/i)).toBeInTheDocument()
-        expect(badge).toHaveClass('bg-lucky-error/10')
+        expect(badge).toHaveClass('bg-vaded-error/10')
     })
 
     test('shows member count when present', () => {

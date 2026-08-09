@@ -139,11 +139,11 @@ The Roles executor apply result **must** expose a `createdIds: { roles: Map<desi
 - The pilot reveals that `DiscordWriteAdapter` needs to leak so much Discord state that executors end up adapter-coupled anyway.
 - A new Manifest module type would naturally fit a different shape (e.g. requires multi-phase commit, transactions across DB + Discord).
 - Production data on `GuildAutomationDrift` shows partial-success Runs cause user-visible degradation that argues for option D (best-effort revert).
-- Lucky adopts a different Discord library (currently `discord.js` v14) — would force a `DiscordWriteAdapter` redesign and is a natural moment to reconsider.
+- Vaded Gaming adopts a different Discord library (currently `discord.js` v14) — would force a `DiscordWriteAdapter` redesign and is a natural moment to reconsider.
 
 ## Cross-references
 
 - `CONTEXT.md` — see entries: **Guild Automation**, **Manifest**, **Drift**, **Run**, **Module Executor**, **Discord Write Adapter**, **Capture / Diff / Apply**.
 - `docs/ARCHITECTURE.md` — confirms the `backend → shared` dependency direction and `bot → shared` direction that make this design legal.
 - `decisions/2026-05-19-automod-does-not-create-moderation-cases.md` — confirms the Moderation Executor covers `automod` + `moderationSettings` sub-sections without bridging to `ModerationCase`.
-- This ADR was produced via `/improve-codebase-architecture` grilling on Lucky's `packages/` graph (2026-05-19 session) — the candidate ranked #2 (worst friction) of seven deepening opportunities surfaced.
+- This ADR was produced via `/improve-codebase-architecture` grilling on Vaded Gaming's `packages/` graph (2026-05-19 session) — the candidate ranked #2 (worst friction) of seven deepening opportunities surfaced.

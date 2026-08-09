@@ -294,9 +294,9 @@ describe('POST /api/twitch/follower-link', () => {
         expect(mockLinkUser).not.toHaveBeenCalled()
     })
 
-    test('falls back to LUCKY_NOTIFY_API_KEY when INTERNAL_API_KEY absent', async () => {
+    test('falls back to VADED_NOTIFY_API_KEY when INTERNAL_API_KEY absent', async () => {
         delete process.env.INTERNAL_API_KEY
-        process.env.LUCKY_NOTIFY_API_KEY = 'fallback-key'
+        process.env.VADED_NOTIFY_API_KEY = 'fallback-key'
         mockLinkUser.mockResolvedValue(true)
 
         const res = await request(app)
@@ -304,7 +304,7 @@ describe('POST /api/twitch/follower-link', () => {
             .set('x-internal-api-key', 'fallback-key')
             .send(VALID_BODY)
 
-        delete process.env.LUCKY_NOTIFY_API_KEY
+        delete process.env.VADED_NOTIFY_API_KEY
         expect(res.status).toBe(200)
         expect(res.body.ok).toBe(true)
     })

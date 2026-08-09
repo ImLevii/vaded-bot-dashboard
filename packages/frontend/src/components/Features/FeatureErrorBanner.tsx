@@ -10,15 +10,15 @@ interface FeatureErrorBannerProps {
 
 export default function FeatureErrorBanner({ loadError, retryLoad }: FeatureErrorBannerProps) {
     return (
-        <section className='rounded-xl border border-lucky-border bg-lucky-bg-secondary/80 p-4'>
+        <section className='rounded-xl border border-vaded-border bg-vaded-bg-secondary/80 p-4'>
             <div className='flex items-start gap-3'>
-                <AlertTriangle className='h-5 w-5 text-lucky-yellow mt-0.5' />
+                <AlertTriangle className='h-5 w-5 text-vaded-yellow mt-0.5' />
                 <div className='space-y-3'>
                     <div>
-                        <h2 className='type-body-sm font-semibold text-lucky-text-primary'>
+                        <h2 className='type-body-sm font-semibold text-vaded-text-primary'>
                             Unable to load feature data
                         </h2>
-                        <p className='text-sm text-lucky-text-secondary'>
+                        <p className='text-sm text-vaded-text-secondary'>
                             {loadError.message}
                         </p>
                     </div>
@@ -29,7 +29,7 @@ export default function FeatureErrorBanner({ loadError, retryLoad }: FeatureErro
                         {(loadError.kind === 'auth' || loadError.kind === 'forbidden') && (
                             <a
                                 href={api.auth.getDiscordLoginUrl()}
-                                className='text-sm text-lucky-text-secondary hover:text-lucky-text-primary'
+                                className='text-sm text-vaded-text-secondary hover:text-vaded-text-primary'
                             >
                                 Re-authenticate
                             </a>

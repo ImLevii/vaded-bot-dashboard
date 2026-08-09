@@ -9,7 +9,7 @@
 
 ## Context
 
-The Lucky Discord bot's test suite is entirely unit-tested with Jest mocks. All Discord.js, discord-player, and yt-dlp interactions are mocked at the boundary. This means voice channel joins, playback lifecycle, autoplay, and yt-dlp extraction are never exercised against real Discord infrastructure in CI.
+The Vaded Gaming Discord bot's test suite is entirely unit-tested with Jest mocks. All Discord.js, discord-player, and yt-dlp interactions are mocked at the boundary. This means voice channel joins, playback lifecycle, autoplay, and yt-dlp extraction are never exercised against real Discord infrastructure in CI.
 
 The question posed: **what is the right approach to test voice channel features, autoplay, and music features in a real Discord environment?**
 

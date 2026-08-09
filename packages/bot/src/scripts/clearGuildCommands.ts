@@ -12,7 +12,7 @@ export type ClearResult = {
 /**
  * One-off migration for #1886.
  *
- * Lucky used to register slash commands per guild. Those guild-scoped copies
+ * Vaded Gaming used to register slash commands per guild. Those guild-scoped copies
  * live on Discord's side until explicitly deleted, and they shadow the global
  * set with whatever definitions the last redeploy wrote, so they have to go.
  *
@@ -61,7 +61,7 @@ const GUILD_PAGE_SIZE = 200
  * `/users/@me/guilds` is paginated and returns at most 200 entries. Taking only
  * the first page would silently skip every guild after that, leaving them
  * shadowing the global commands with no error — the exact failure this script
- * exists to prevent. Lucky is well under 200 today, but growing past it is the
+ * exists to prevent. Vaded Gaming is well under 200 today, but growing past it is the
  * point of being listed, and a migration that quietly half-runs is worse than
  * one that fails.
  */

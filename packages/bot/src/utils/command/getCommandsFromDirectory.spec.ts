@@ -65,7 +65,7 @@ afterEach(async () => {
 
 describe('getCommandsFromDirectory', () => {
     it('ignores test/spec files when listing command modules', async () => {
-        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'lucky-cmd-loader-'))
+        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'vaded-cmd-loader-'))
 
         await fs.writeFile(
             path.join(tempDir, 'valid.js'),
@@ -90,7 +90,7 @@ describe('getCommandsFromDirectory', () => {
     }, 30_000)
 
     it('only excludes spec files with correctly escaped patterns', async () => {
-        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'lucky-cmd-loader-'))
+        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'vaded-cmd-loader-'))
 
         await fs.writeFile(
             path.join(tempDir, 'valid.js'),
@@ -111,7 +111,7 @@ describe('getCommandsFromDirectory', () => {
     })
 
     it('prefers JavaScript files when both JS and TS command files exist', async () => {
-        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'lucky-cmd-loader-'))
+        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'vaded-cmd-loader-'))
         await fs.writeFile(
             path.join(tempDir, 'alpha.ts'),
             'export default {}\n',
@@ -137,7 +137,7 @@ describe('getCommandsFromDirectory', () => {
     })
 
     it('returns empty list when category is disabled by config', async () => {
-        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'lucky-cmd-loader-'))
+        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'vaded-cmd-loader-'))
         mockConfig.COMMAND_CATEGORIES_DISABLED = ['management']
 
         const commands = await getCommandsFromDirectory({
@@ -149,7 +149,7 @@ describe('getCommandsFromDirectory', () => {
     })
 
     it('loads commands and filters disabled command names', async () => {
-        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'lucky-cmd-loader-'))
+        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'vaded-cmd-loader-'))
 
         await fs.writeFile(
             path.join(tempDir, 'allowed.js'),
@@ -172,7 +172,7 @@ describe('getCommandsFromDirectory', () => {
     })
 
     it('skips invalid command modules and modules that throw during import', async () => {
-        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'lucky-cmd-loader-'))
+        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'vaded-cmd-loader-'))
 
         await fs.writeFile(
             path.join(tempDir, 'valid.js'),
@@ -196,7 +196,7 @@ describe('getCommandsFromDirectory', () => {
     })
 
     it('discovers commands in subdirectory index files', async () => {
-        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'lucky-cmd-loader-'))
+        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'vaded-cmd-loader-'))
 
         const subDir = path.join(tempDir, 'play')
         await fs.mkdir(subDir)
@@ -220,7 +220,7 @@ describe('getCommandsFromDirectory', () => {
     })
 
     it('prefers subdirectory index.js over index.ts', async () => {
-        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'lucky-cmd-loader-'))
+        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'vaded-cmd-loader-'))
         const subDir = path.join(tempDir, 'queue')
         await fs.mkdir(subDir)
         await fs.writeFile(
@@ -239,7 +239,7 @@ describe('getCommandsFromDirectory', () => {
     })
 
     it('skips subdirectory when a flat file with the same base name exists', async () => {
-        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'lucky-cmd-loader-'))
+        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'vaded-cmd-loader-'))
 
         await fs.writeFile(
             path.join(tempDir, 'play.js'),
@@ -260,7 +260,7 @@ describe('getCommandsFromDirectory', () => {
     })
 
     it('returns empty list and logs when directory does not exist', async () => {
-        const missingDir = path.join(os.tmpdir(), `lucky-missing-${Date.now()}`)
+        const missingDir = path.join(os.tmpdir(), `vaded-missing-${Date.now()}`)
         const commands = await getCommandsFromDirectory({ url: missingDir })
 
         expect(commands).toEqual([])

@@ -6,7 +6,7 @@
 
 ## Context
 
-Lucky's commands are single-item (move-message, ban, kick, warn, purge…). Users need
+Vaded Gaming's commands are single-item (move-message, ban, kick, warn, purge…). Users need
 **batch** variants — flagship: move _all_ (or filtered) messages from channel A → B.
 
 The hard constraints (research):

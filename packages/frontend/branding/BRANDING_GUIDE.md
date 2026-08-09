@@ -7,7 +7,7 @@
 
 ## Logo Source
 
-- Frontend runtime asset: `packages/frontend/public/lucky-logo.png`
+- Frontend runtime asset: `packages/frontend/public/vaded-logo.png`
 - Favicon: `packages/frontend/public/favicon.png`
 
 ## Logo Usage
@@ -66,6 +66,6 @@ Removed the neon pink/orange and Discord blurple primaries — not part of the c
 ## Visual Style
 
 - Flat panels: no glassmorphism, no radial gradients on page backgrounds, no shimmer/glow effects.
-- Borders use `--lucky-border-soft` by default, upgrade to `--lucky-border-strong` on hover.
+- Borders use `--vaded-border-soft` by default, upgrade to `--vaded-border-strong` on hover.
 - Motion: only fade transitions (`fade-up`, `fade-in`). No floating, glowing, or pulsing effects.
 - Icons in colored contexts use blurple, success green, warning amber, or error red as appropriate.

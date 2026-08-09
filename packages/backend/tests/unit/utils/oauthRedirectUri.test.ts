@@ -111,39 +111,39 @@ describe('getOAuthRedirectUri', () => {
         const uri = getOAuthRedirectUri(
             createRequest({
                 'x-forwarded-proto': 'https',
-                'x-forwarded-host': 'lucky.lucassantana.tech',
+                'x-forwarded-host': 'vaded.lucassantana.tech',
             }),
         )
 
-        expect(uri).toBe('https://lucky.lucassantana.tech/api/auth/callback')
+        expect(uri).toBe('https://vaded.lucassantana.tech/api/auth/callback')
     })
 
     test('should normalize legacy /auth/callback from env', () => {
         process.env.NODE_ENV = 'production'
         process.env.WEBAPP_REDIRECT_URI =
-            'https://lucky.lucassantana.tech/auth/callback'
+            'https://vaded.lucassantana.tech/auth/callback'
 
         const uri = getOAuthRedirectUri(createRequest())
 
-        expect(uri).toBe('https://lucky.lucassantana.tech/api/auth/callback')
+        expect(uri).toBe('https://vaded.lucassantana.tech/api/auth/callback')
     })
 
     test('should keep configured callback when WEBAPP_BACKEND_URL is set', () => {
         process.env.NODE_ENV = 'production'
         process.env.WEBAPP_REDIRECT_URI =
-            'https://lucky.lucassantana.tech/api/auth/callback'
-        process.env.WEBAPP_BACKEND_URL = 'https://lucky-api.lucassantana.tech'
+            'https://vaded.lucassantana.tech/api/auth/callback'
+        process.env.WEBAPP_BACKEND_URL = 'https://vaded-api.lucassantana.tech'
 
         const uri = getOAuthRedirectUri(createRequest())
 
-        expect(uri).toBe('https://lucky.lucassantana.tech/api/auth/callback')
+        expect(uri).toBe('https://vaded.lucassantana.tech/api/auth/callback')
     })
 
     test('should prefer forwarded host over configured callback in production', () => {
         process.env.NODE_ENV = 'production'
         process.env.WEBAPP_REDIRECT_URI =
-            'https://lucky.lucassantana.tech/api/auth/callback'
-        process.env.WEBAPP_FRONTEND_URL = 'https://lucky.lucassantana.tech'
+            'https://vaded.lucassantana.tech/api/auth/callback'
+        process.env.WEBAPP_FRONTEND_URL = 'https://vaded.lucassantana.tech'
 
         const uri = getOAuthRedirectUri(
             createRequest({
@@ -160,13 +160,13 @@ describe('getOAuthRedirectUri', () => {
     test('should keep configured callback when frontend origins do not match redirect origin', () => {
         process.env.NODE_ENV = 'production'
         process.env.WEBAPP_REDIRECT_URI =
-            'https://lucky-api.lucassantana.tech/api/auth/callback'
-        process.env.WEBAPP_FRONTEND_URL = 'https://lucky.lucassantana.tech'
+            'https://vaded-api.lucassantana.tech/api/auth/callback'
+        process.env.WEBAPP_FRONTEND_URL = 'https://vaded.lucassantana.tech'
 
         const uri = getOAuthRedirectUri(createRequest())
 
         expect(uri).toBe(
-            'https://lucky-api.lucassantana.tech/api/auth/callback',
+            'https://vaded-api.lucassantana.tech/api/auth/callback',
         )
     })
 
@@ -190,14 +190,14 @@ describe('getOAuthRedirectUri', () => {
         const req = {
             headers: {
                 'x-forwarded-proto': 'http',
-                'x-forwarded-host': 'lucky.example.com',
+                'x-forwarded-host': 'vaded.example.com',
             },
             protocol: 'http',
             get: () => undefined,
         } as unknown as Request
 
         expect(getOAuthRedirectUri(req)).toBe(
-            'https://lucky.example.com/api/auth/callback',
+            'https://vaded.example.com/api/auth/callback',
         )
     })
 

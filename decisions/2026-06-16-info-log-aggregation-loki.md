@@ -9,7 +9,7 @@ Once homelab SSH access was available, inspection of the box reversed the plan's
 premise (the same "verify before building" lesson as the YouTube ADR):
 
 - **Loki + promtail + Grafana + Prometheus were already running** (6+ days uptime).
-  promtail already scrapes every container's logs to Loki, so **the lucky INFO logs
+  promtail already scrapes every container's logs to Loki, so **the vaded INFO logs
   were already in Loki** — the "ephemeral stdout only" premise was false. No Alloy
   needed; no greenfield stand-up.
 - **Retention was already 30 d** (`720h`) and **disk alerts already existed**
@@ -26,10 +26,10 @@ The real, verified gaps were two bugs, both now fixed:
    homelab PR #191. This is what actually delivered success criterion (c) "survives
    restart/redeploy."
 2. **No stable log identity.** `container_name` was empty because the json-file
-   driver only emits `attrs.tag` when given a `tag` log-opt, and the lucky services
+   driver only emits `attrs.tag` when given a `tag` log-opt, and the vaded services
    set none — so logs were findable only by ephemeral container-id `filename`. Fixed
    by adding `tag: "{{.Name}}"` to each service's `logging.options`
-   (Lucky #1476, merged) → promtail's existing `attrs.tag → container_name`
+   (Vaded Gaming #1476, merged) → promtail's existing `attrs.tag → container_name`
   extraction now populates `{container_name="vaded-gaming-bot"}` etc.
 
 Measured volume (with labels working): ~172 MB/day across **all** containers;

@@ -89,7 +89,7 @@ build --target` idiom. Vercel or Cloudflare Pages won't read this; if
 1. **Frontend ship cadence ≥ 5×/week and bot ≤ 2/month** for 4
    consecutive weeks → invalidation isolation matters more than cache
    reuse; revisit Turborepo prune.
-2. **Lucky moves off homelab to Vercel / Cloudflare Pages** → frontend
+2. **Vaded Gaming moves off homelab to Vercel / Cloudflare Pages** → frontend
    build becomes Vercel's problem; this consolidation is harmless to
    unwind.
 3. **Annual review on 2027-05-13.**

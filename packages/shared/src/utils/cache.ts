@@ -8,7 +8,7 @@
  * This is deliberately NOT a strict LRU: recency is refreshed on write only, not
  * on read, which is enough for short-TTL caches and keeps the implementation a
  * plain Map. Not safe to share across processes — single-instance only (revisit
- * if Lucky scales horizontally, per the Redis-removal ADRs).
+ * if Vaded Gaming scales horizontally, per the Redis-removal ADRs).
  */
 
 interface TtlEntry<V> {

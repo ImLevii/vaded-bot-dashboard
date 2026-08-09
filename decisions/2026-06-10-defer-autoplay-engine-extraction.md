@@ -6,7 +6,7 @@ Accepted (defer — re-open on the explicit triggers below). Decider: Lucas Sant
 
 ## Context
 
-An extract-product scan flagged the music recommendation capability as Lucky's strongest
+An extract-product scan flagged the music recommendation capability as Vaded Gaming's strongest
 spin-off candidate (standalone OSS library / Lavalink-ecosystem companion). A
 research-and-decide pass (5 parallel research units + critic review) was run to validate
 the bet before investing. Key evidence:
@@ -15,7 +15,7 @@ the bet before investing. Key evidence:
    Audio Analysis are permanently restricted for all Spotify apps created after
    2024-11-27; Feb 2026 tightened dev mode further (5 users, 1 client ID, Premium
    required); extended access requires a registered business + 250k MAU. A library whose
-   users register their own Spotify apps can never offer the Spotify path. Lucky's own
+   users register their own Spotify apps can never offer the Spotify path. Vaded Gaming's own
    pre-cutoff app retains grandfathered access — an advantage that is _not portable_.
 2. **The cleanly-extractable code is not the engine.** `services/musicRecommendation/`
    (`MusicRecommendationService`) is a metadata-only cosine re-ranker that production
@@ -29,9 +29,9 @@ the bet before investing. Key evidence:
    lavalink-client `autoPlayFunction`, DisTube `Queue#autoplay`, YouTube Mix fallback).
    Zero open autoplay issues in Lavalink core; addressable dev market ≈5–8k. Residual
    demand shifted to "smart autoplay" (preference learning) — which requires per-guild
-   state that a library can't own, and which is precisely Lucky's full-stack advantage.
-4. **ROI misalignment.** Lucky's strategic goal is full-stack adoption (self-hosted bot +
-   dashboard). A library funnel ("bot devs adopt the lib → discover Lucky") is weak;
+   state that a library can't own, and which is precisely Vaded Gaming's full-stack advantage.
+4. **ROI misalignment.** Vaded Gaming's strategic goal is full-stack adoption (self-hosted bot +
+   dashboard). A library funnel ("bot devs adopt the lib → discover Vaded Gaming") is weak;
    2–3 months of solo-operator time would come out of dashboard/preference-learning work.
 5. **Last.fm seed source is viable** (open registration, similar-track endpoints healthy,
    went independent May 2026, 5 req/s, non-commercial ToS) — so a Last.fm-based library
@@ -39,8 +39,8 @@ the bet before investing. Key evidence:
 
 ## Decision
 
-**Defer extraction.** Keep the autoplay/recommendation engine inside Lucky and market it
-as Lucky's differentiator ("smart autoplay that learns your server's taste"), not as a
+**Defer extraction.** Keep the autoplay/recommendation engine inside Vaded Gaming and market it
+as Vaded Gaming's differentiator ("smart autoplay that learns your server's taste"), not as a
 separate product.
 
 Optional zero-cost step (no commitment): expose the engine as a documented in-tree export
@@ -58,7 +58,7 @@ and learnable — convert to a published package only if adoption signals appear
 
 ## Consequences
 
-- Positive: 2–3 months of solo capacity stays on Lucky's actual funnel (dashboard,
+- Positive: 2–3 months of solo capacity stays on Vaded Gaming's actual funnel (dashboard,
   preference learning, invite optimization). No new maintenance tail.
 - Negative: if a real market window for a pluggable autoplay substrate opens, someone
   else may fill it first. Mitigated by revisit triggers.
@@ -67,12 +67,12 @@ and learnable — convert to a published package only if adoption signals appear
 
 ## Revisit when (any one trigger re-opens the decision)
 
-1. Organic demand signal: an issue/discussion asking to reuse Lucky's autoplay in another
+1. Organic demand signal: an issue/discussion asking to reuse Vaded Gaming's autoplay in another
    bot/framework reaches ≥50 reactions, or ≥3 independent inbound asks.
 2. Lavalink publishes an official plugin/SDK interface that makes a recommendation
    substrate higher-leverage.
 3. A lightweight OSS per-guild preference-storage standard emerges (makes a learning
    library differentiated and feasible).
-4. Operator has 2+ consecutive free weeks AND Lucky dashboard reaches its planned feature
+4. Operator has 2+ consecutive free weeks AND Vaded Gaming dashboard reaches its planned feature
    bar (extraction no longer cannibalizes the main quest).
 5. Spotify reverses or relaxes the 2024-11-27 API restrictions for small apps.

@@ -365,11 +365,11 @@ export default function ServerSettingsPage() {
     if (!selectedGuild) {
         return (
             <div className='flex flex-col items-center justify-center h-[60vh] text-center'>
-                <Settings className='w-16 h-16 text-lucky-text-tertiary mb-4' />
-                <h2 className='type-h2 text-lucky-text-primary mb-2'>
+                <Settings className='w-16 h-16 text-vaded-text-tertiary mb-4' />
+                <h2 className='type-h2 text-vaded-text-primary mb-2'>
                     {t('serverSettings.noServerSelected')}
                 </h2>
-                <p className='type-body text-lucky-text-secondary'>
+                <p className='type-body text-vaded-text-secondary'>
                     {t('serverSettings.selectServerDescription')}
                 </p>
             </div>
@@ -398,23 +398,23 @@ export default function ServerSettingsPage() {
         return (
             <div className='space-y-6'>
                 <header>
-                    <h1 className='type-h1 text-lucky-text-primary'>
+                    <h1 className='type-h1 text-vaded-text-primary'>
                         {t('serverSettings.title')}
                     </h1>
-                    <p className='type-body text-lucky-text-secondary mt-1'>
+                    <p className='type-body text-vaded-text-secondary mt-1'>
                         {t('serverSettings.description', {
                             name: selectedGuild.name,
                         })}
                     </p>
                 </header>
                 <Card className='p-5 space-y-4'>
-                    <div className='flex items-center gap-2 text-lucky-yellow'>
+                    <div className='flex items-center gap-2 text-vaded-yellow'>
                         <AlertTriangle className='w-5 h-5' />
-                        <h2 className='type-title text-lucky-text-primary'>
+                        <h2 className='type-title text-vaded-text-primary'>
                             {t('serverSettings.unableToLoadTitle')}
                         </h2>
                     </div>
-                    <p className='type-body text-lucky-text-secondary'>
+                    <p className='type-body text-vaded-text-secondary'>
                         {settingsLoadError.message}
                     </p>
                     <div className='flex items-center gap-3'>
@@ -433,7 +433,7 @@ export default function ServerSettingsPage() {
                             settingsLoadError.kind === 'forbidden') && (
                             <a
                                 href={api.auth.getDiscordLoginUrl()}
-                                className='type-body-sm text-lucky-text-secondary hover:text-lucky-text-primary'
+                                className='type-body-sm text-vaded-text-secondary hover:text-vaded-text-primary'
                             >
                                 {t('serverSettings.reAuthenticateLink')}
                             </a>
@@ -447,8 +447,8 @@ export default function ServerSettingsPage() {
     let rbacContent: ReactElement
     if (!canManageRbac) {
         rbacContent = (
-            <div className='rounded-xl border border-lucky-border bg-lucky-bg-tertiary/50 p-4'>
-                <p className='type-body text-lucky-text-secondary'>
+            <div className='rounded-xl border border-vaded-border bg-vaded-bg-tertiary/50 p-4'>
+                <p className='type-body text-vaded-text-secondary'>
                     {t('serverSettings.rbacCannotManage')}
                 </p>
             </div>
@@ -467,7 +467,7 @@ export default function ServerSettingsPage() {
         rbacContent = (
             <div className='space-y-3'>
                 {rbacRolesError && (
-                    <div className='rounded-xl border border-lucky-border bg-lucky-bg-tertiary/50 p-3 type-body-sm text-lucky-text-secondary'>
+                    <div className='rounded-xl border border-vaded-border bg-vaded-bg-tertiary/50 p-3 type-body-sm text-vaded-text-secondary'>
                         <div className='flex items-center justify-between gap-3'>
                             <span>{rbacRolesError}</span>
                             {selectedGuild?.id && (
@@ -490,24 +490,24 @@ export default function ServerSettingsPage() {
 
                 {/* Legend */}
                 {grantedRoleIds.length > 0 && (
-                    <div className='flex items-center gap-4 px-1 type-meta text-lucky-text-tertiary'>
+                    <div className='flex items-center gap-4 px-1 type-meta text-vaded-text-tertiary'>
                         <span className='flex items-center gap-1.5'>
                             <span className='inline-block w-3 h-3 rounded-sm bg-blue-500/20 border border-blue-500/30' />
                             View — read-only access
                         </span>
                         <span className='flex items-center gap-1.5'>
-                            <span className='inline-block w-3 h-3 rounded-sm bg-lucky-brand/20 border border-lucky-brand/30' />
+                            <span className='inline-block w-3 h-3 rounded-sm bg-vaded-brand/20 border border-vaded-brand/30' />
                             Manage — full read + write access
                         </span>
                         <span className='flex items-center gap-1.5'>
-                            <span className='inline-block w-3 h-3 rounded-sm bg-lucky-bg-active border border-lucky-border' />
+                            <span className='inline-block w-3 h-3 rounded-sm bg-vaded-bg-active border border-vaded-border' />
                             None — no access (role default)
                         </span>
                     </div>
                 )}
 
                 {grantedRoleIds.length === 0 ? (
-                    <p className='type-body-sm text-lucky-text-tertiary'>
+                    <p className='type-body-sm text-vaded-text-tertiary'>
                         {t('serverSettings.noRbacRules')}
                     </p>
                 ) : (
@@ -518,12 +518,12 @@ export default function ServerSettingsPage() {
                         return (
                             <div
                                 key={roleId}
-                                className='surface-card border border-lucky-border overflow-hidden'
+                                className='surface-card border border-vaded-border overflow-hidden'
                             >
                                 {/* Role header */}
-                                <div className='flex items-center justify-between gap-3 px-4 py-2.5 border-b border-lucky-border bg-lucky-bg-secondary/40'>
+                                <div className='flex items-center justify-between gap-3 px-4 py-2.5 border-b border-vaded-border bg-vaded-bg-secondary/40'>
                                     <div className='flex items-center gap-2'>
-                                        <Shield className='w-3.5 h-3.5 text-lucky-brand shrink-0' />
+                                        <Shield className='w-3.5 h-3.5 text-vaded-brand shrink-0' />
                                         <Select
                                             value={roleId}
                                             onValueChange={(newRoleId) => {
@@ -537,10 +537,10 @@ export default function ServerSettingsPage() {
                                                 )
                                             }}
                                         >
-                                            <SelectTrigger className='h-7 border-0 bg-transparent p-0 shadow-none text-lucky-text-primary font-semibold type-body-sm focus:ring-0 w-auto gap-1.5'>
+                                            <SelectTrigger className='h-7 border-0 bg-transparent p-0 shadow-none text-vaded-text-primary font-semibold type-body-sm focus:ring-0 w-auto gap-1.5'>
                                                 <SelectValue>{roleName}</SelectValue>
                                             </SelectTrigger>
-                                            <SelectContent className='bg-lucky-bg-secondary border-lucky-border'>
+                                            <SelectContent className='bg-vaded-bg-secondary border-vaded-border'>
                                                 {rbacRoles.map((r) => (
                                                     <SelectItem key={r.id} value={r.id}>
                                                         {r.name}
@@ -552,7 +552,7 @@ export default function ServerSettingsPage() {
                                     <button
                                         type='button'
                                         onClick={() => removeRoleGrants(roleId)}
-                                        className='text-lucky-text-tertiary hover:text-red-400 transition-colors p-1 rounded'
+                                        className='text-vaded-text-tertiary hover:text-red-400 transition-colors p-1 rounded'
                                         title='Remove all permissions for this role'
                                     >
                                         <X className='w-4 h-4' />
@@ -560,7 +560,7 @@ export default function ServerSettingsPage() {
                                 </div>
 
                                 {/* Module matrix */}
-                                <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 divide-x divide-y divide-lucky-border/50'>
+                                <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 divide-x divide-y divide-vaded-border/50'>
                                     {RBAC_MODULES.map((mod) => {
                                         const current = (mods.get(mod) ?? 'none') as 'view' | 'manage' | 'none'
                                         const moduleLabel: Record<string, string> = {
@@ -573,7 +573,7 @@ export default function ServerSettingsPage() {
                                         }
                                         return (
                                             <div key={mod} className='flex flex-col gap-1.5 p-3'>
-                                                <span className='type-meta text-lucky-text-secondary font-semibold uppercase tracking-wide text-[10px]'>
+                                                <span className='type-meta text-vaded-text-secondary font-semibold uppercase tracking-wide text-[10px]'>
                                                     {moduleLabel[mod] ?? mod}
                                                 </span>
                                                 <div className='flex flex-col gap-1'>
@@ -585,11 +585,11 @@ export default function ServerSettingsPage() {
                                                             className={`px-2 py-1 rounded text-[11px] font-medium border transition-all text-left ${
                                                                 current === mode
                                                                     ? mode === 'manage'
-                                                                        ? 'bg-lucky-brand/20 border-lucky-brand/40 text-lucky-brand'
+                                                                        ? 'bg-vaded-brand/20 border-vaded-brand/40 text-vaded-brand'
                                                                         : mode === 'view'
                                                                           ? 'bg-blue-500/20 border-blue-500/30 text-blue-400'
-                                                                          : 'bg-lucky-bg-active border-lucky-border text-lucky-text-secondary'
-                                                                    : 'bg-transparent border-transparent text-lucky-text-tertiary hover:bg-lucky-bg-active/50 hover:border-lucky-border'
+                                                                          : 'bg-vaded-bg-active border-vaded-border text-vaded-text-secondary'
+                                                                    : 'bg-transparent border-transparent text-vaded-text-tertiary hover:bg-vaded-bg-active/50 hover:border-vaded-border'
                                                             }`}
                                                         >
                                                             {mode === 'none' ? 'None' : mode === 'view' ? 'View' : 'Manage'}
@@ -644,17 +644,17 @@ export default function ServerSettingsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0 }}
             >
-                <Card className='p-5 space-y-5 border border-lucky-border'>
+                <Card className='p-5 space-y-5 border border-vaded-border'>
                     <div className='flex items-center gap-2'>
-                        <Settings className='w-5 h-5 text-lucky-text-secondary' />
-                        <h2 className='type-title text-lucky-text-primary'>
+                        <Settings className='w-5 h-5 text-vaded-text-secondary' />
+                        <h2 className='type-title text-vaded-text-primary'>
                             {t('serverSettings.general')}
                         </h2>
                     </div>
 
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                         <div className='space-y-2'>
-                            <Label className='type-meta text-lucky-text-secondary flex items-center gap-1.5'>
+                            <Label className='type-meta text-vaded-text-secondary flex items-center gap-1.5'>
                                 <UserCog className='w-3 h-3' />{' '}
                                 {t('serverSettings.botNickname')}
                             </Label>
@@ -666,11 +666,11 @@ export default function ServerSettingsPage() {
                                 placeholder={t(
                                     'serverSettings.botNicknamePlaceholder',
                                 )}
-                                className='bg-lucky-bg-tertiary border-lucky-border text-white'
+                                className='bg-vaded-bg-tertiary border-vaded-border text-white'
                             />
                         </div>
                         <div className='space-y-2'>
-                            <Label className='type-meta text-lucky-text-secondary flex items-center gap-1.5'>
+                            <Label className='type-meta text-vaded-text-secondary flex items-center gap-1.5'>
                                 <Hash className='w-3 h-3' />{' '}
                                 {t('serverSettings.commandPrefix')}
                             </Label>
@@ -683,7 +683,7 @@ export default function ServerSettingsPage() {
                                     'serverSettings.commandPrefixPlaceholder',
                                 )}
                                 maxLength={3}
-                                className='bg-lucky-bg-tertiary border-lucky-border text-white w-24'
+                                className='bg-vaded-bg-tertiary border-vaded-border text-white w-24'
                             />
                         </div>
                     </div>
@@ -696,17 +696,17 @@ export default function ServerSettingsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.05 }}
             >
-                <Card className='p-5 space-y-5 border border-lucky-border'>
+                <Card className='p-5 space-y-5 border border-vaded-border'>
                     <div className='flex items-center gap-2'>
-                        <Globe className='w-5 h-5 text-lucky-text-secondary' />
-                        <h2 className='type-title text-lucky-text-primary'>
+                        <Globe className='w-5 h-5 text-vaded-text-secondary' />
+                        <h2 className='type-title text-vaded-text-primary'>
                             {t('serverSettings.regionNotifications')}
                         </h2>
                     </div>
 
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                         <div className='space-y-2'>
-                            <Label className='type-meta text-lucky-text-secondary flex items-center gap-1.5'>
+                            <Label className='type-meta text-vaded-text-secondary flex items-center gap-1.5'>
                                 <Clock className='w-3 h-3' />{' '}
                                 {t('serverSettings.timezone')}
                             </Label>
@@ -716,10 +716,10 @@ export default function ServerSettingsPage() {
                                     update('timezone', v)
                                 }
                             >
-                                <SelectTrigger className='bg-lucky-bg-tertiary border-lucky-border text-white'>
+                                <SelectTrigger className='bg-vaded-bg-tertiary border-vaded-border text-white'>
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className='bg-lucky-bg-secondary border-lucky-border'>
+                                <SelectContent className='bg-vaded-bg-secondary border-vaded-border'>
                                     {TIMEZONES.map((tz) => (
                                         <SelectItem key={tz} value={tz}>
                                             {tz}
@@ -729,7 +729,7 @@ export default function ServerSettingsPage() {
                             </Select>
                         </div>
                         <div className='space-y-2'>
-                            <Label className='type-meta text-lucky-text-secondary flex items-center gap-1.5'>
+                            <Label className='type-meta text-vaded-text-secondary flex items-center gap-1.5'>
                                 <Bell className='w-3 h-3' />{' '}
                                 {t('serverSettings.updatesChannel')}
                             </Label>
@@ -745,16 +745,16 @@ export default function ServerSettingsPage() {
                                         )
                                     }
                                 >
-                                    <SelectTrigger className='bg-lucky-bg-tertiary border-lucky-border text-white'>
+                                    <SelectTrigger className='bg-vaded-bg-tertiary border-vaded-border text-white'>
                                         <SelectValue
                                             placeholder={t(
                                                 'serverSettings.selectChannelPlaceholder',
                                             )}
                                         />
                                     </SelectTrigger>
-                                    <SelectContent className='bg-lucky-bg-secondary border-lucky-border'>
+                                    <SelectContent className='bg-vaded-bg-secondary border-vaded-border'>
                                         <SelectItem value='__none__'>
-                                            <span className='text-lucky-text-tertiary'>
+                                            <span className='text-vaded-text-tertiary'>
                                                 {t('serverSettings.none')}
                                             </span>
                                         </SelectItem>
@@ -764,7 +764,7 @@ export default function ServerSettingsPage() {
                                                 value={ch.id}
                                             >
                                                 <span className='flex items-center gap-2'>
-                                                    <Hash className='w-3 h-3 text-lucky-text-tertiary' />
+                                                    <Hash className='w-3 h-3 text-vaded-text-tertiary' />
                                                     {ch.name}
                                                 </span>
                                             </SelectItem>
@@ -780,7 +780,7 @@ export default function ServerSettingsPage() {
                                     placeholder={t(
                                         'serverSettings.channelIdPlaceholder',
                                     )}
-                                    className='bg-lucky-bg-tertiary border-lucky-border text-white'
+                                    className='bg-vaded-bg-tertiary border-vaded-border text-white'
                                 />
                             )}
                         </div>
@@ -794,14 +794,14 @@ export default function ServerSettingsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.08 }}
             >
-                <Card className='p-5 space-y-4 border border-lucky-border'>
+                <Card className='p-5 space-y-4 border border-vaded-border'>
                     <div className='flex items-center gap-2'>
-                        <Shield className='w-5 h-5 text-lucky-text-secondary' />
+                        <Shield className='w-5 h-5 text-vaded-text-secondary' />
                         <div>
-                            <h2 className='type-title text-lucky-text-primary'>
+                            <h2 className='type-title text-vaded-text-primary'>
                                 {t('serverSettings.managerRoles')}
                             </h2>
-                            <p className='type-meta text-lucky-text-tertiary mt-0.5 uppercase tracking-wide font-semibold'>
+                            <p className='type-meta text-vaded-text-tertiary mt-0.5 uppercase tracking-wide font-semibold'>
                                 {t('serverSettings.managerRolesDescription')}
                             </p>
                         </div>
@@ -816,14 +816,14 @@ export default function ServerSettingsPage() {
                                     ])
                                 }}
                             >
-                                <SelectTrigger className='bg-lucky-bg-tertiary border-lucky-border text-white h-9 text-sm'>
+                                <SelectTrigger className='bg-vaded-bg-tertiary border-vaded-border text-white h-9 text-sm'>
                                     <SelectValue
                                         placeholder={t(
                                             'serverSettings.addManagerRolePlaceholder',
                                         )}
                                     />
                                 </SelectTrigger>
-                                <SelectContent className='bg-lucky-bg-secondary border-lucky-border'>
+                                <SelectContent className='bg-vaded-bg-secondary border-vaded-border'>
                                     {[...new Map(availableManagerRoles.map((r) => [r.id, r])).values()].map((role) => (
                                         <SelectItem
                                             key={role.id}
@@ -840,9 +840,9 @@ export default function ServerSettingsPage() {
                             {(settings.managerRoles ?? []).map((id) => (
                                 <Badge
                                     key={id}
-                                    className='bg-lucky-brand/15 border border-lucky-brand/40 text-lucky-text-primary text-xs gap-1.5 px-2.5 py-1.5 hover:bg-lucky-brand/20 transition-colors'
+                                    className='bg-vaded-brand/15 border border-vaded-brand/40 text-vaded-text-primary text-xs gap-1.5 px-2.5 py-1.5 hover:bg-vaded-brand/20 transition-colors'
                                 >
-                                    <Shield className='w-3 h-3 text-lucky-brand' />
+                                    <Shield className='w-3 h-3 text-vaded-brand' />
                                     <span className='font-medium'>
                                         {getManagerRoleName(id)}
                                     </span>
@@ -855,7 +855,7 @@ export default function ServerSettingsPage() {
                                                 ).filter((r) => r !== id),
                                             )
                                         }
-                                        className='ml-0.5 hover:text-lucky-error transition-colors'
+                                        className='ml-0.5 hover:text-vaded-error transition-colors'
                                         aria-label='Remove role'
                                     >
                                         <X className='w-3 h-3' />
@@ -864,7 +864,7 @@ export default function ServerSettingsPage() {
                             ))}
                         </div>
                     ) : (
-                        <p className='type-body-sm text-lucky-text-tertiary'>
+                        <p className='type-body-sm text-vaded-text-tertiary'>
                             {t('serverSettings.noManagerRoles')}
                         </p>
                     )}
@@ -877,17 +877,17 @@ export default function ServerSettingsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
             >
-                <Card className='p-5 border border-lucky-border'>
+                <Card className='p-5 border border-vaded-border'>
                     <div className='flex items-center justify-between'>
                         <div className='flex items-center gap-3'>
                             <div className='p-2 rounded-lg bg-yellow-500/15'>
                                 <AlertTriangle className='w-4 h-4 text-yellow-400' />
                             </div>
                             <div>
-                                <h3 className='type-body-sm font-semibold text-lucky-text-primary'>
+                                <h3 className='type-body-sm font-semibold text-vaded-text-primary'>
                                     {t('serverSettings.disableCommandWarnings')}
                                 </h3>
-                                <p className='type-meta text-lucky-text-tertiary mt-0.5 uppercase tracking-wide font-semibold'>
+                                <p className='type-meta text-vaded-text-tertiary mt-0.5 uppercase tracking-wide font-semibold'>
                                     {t(
                                         'serverSettings.disableWarningsDescription',
                                     )}
@@ -905,7 +905,7 @@ export default function ServerSettingsPage() {
             </motion.div>
 
             {/* Mobile Save Bar */}
-            <div className='lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-lucky-bg-primary/95 backdrop-blur-sm border-t border-lucky-border z-30'>
+            <div className='lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-vaded-bg-primary/95 backdrop-blur-sm border-t border-vaded-border z-30'>
                 <Button
                     onClick={handleSave}
                     disabled={saving}
@@ -925,17 +925,17 @@ export default function ServerSettingsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
             >
-                <Card className='p-5 space-y-5 border border-lucky-border'>
+                <Card className='p-5 space-y-5 border border-vaded-border'>
                     <div className='flex items-center justify-between gap-4'>
                         <div className='flex items-center gap-3'>
-                            <div className='p-2 rounded-lg bg-lucky-brand/10'>
-                                <Shield className='w-5 h-5 text-lucky-brand' />
+                            <div className='p-2 rounded-lg bg-vaded-brand/10'>
+                                <Shield className='w-5 h-5 text-vaded-brand' />
                             </div>
                             <div>
-                                <h2 className='type-title text-lucky-text-primary'>
+                                <h2 className='type-title text-vaded-text-primary'>
                                     {t('serverSettings.accessControl')}
                                 </h2>
-                                <p className='type-body-sm text-lucky-text-tertiary mt-0.5 uppercase tracking-wide font-semibold'>
+                                <p className='type-body-sm text-vaded-text-tertiary mt-0.5 uppercase tracking-wide font-semibold'>
                                     {t(
                                         'serverSettings.accessControlDescription',
                                     )}

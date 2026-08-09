@@ -50,7 +50,7 @@ function getBackendOrigin(): string | null {
 
 async function fetchVoteState(userId: string): Promise<VoteState | null> {
     const origin = getBackendOrigin()
-    const key = process.env.LUCKY_NOTIFY_API_KEY
+    const key = process.env.VADED_NOTIFY_API_KEY
     if (!origin || !key) return null
     try {
         const resp = await fetch(
@@ -87,7 +87,7 @@ export default new Command({
     data: new SlashCommandBuilder()
         .setName('voterewards')
         .setDescription(
-            '💛 Check your Lucky vote streak and upcoming perks on top.gg.',
+            '💛 Check your Vaded Gaming vote streak and upcoming perks on top.gg.',
         ),
     category: 'general',
     execute: async ({ interaction }) => {
@@ -99,8 +99,8 @@ export default new Command({
 
         if (!state) {
             const embed = new EmbedBuilder()
-                .setTitle('💛 Vote for Lucky on top.gg')
-                .setColor(COLOR.LUCKY_PURPLE)
+                .setTitle('💛 Vote for Vaded Gaming on top.gg')
+                .setColor(COLOR.VADED_PURPLE)
                 .setDescription(
                     [
                         'Your vote streak unlocks perks — custom autoplay weighting, a dashboard badge, and more.',
@@ -130,8 +130,8 @@ export default new Command({
             : `Vote to unlock your first perk at streak **1**.`
 
         const embed = new EmbedBuilder()
-            .setTitle('💛 Lucky Vote Rewards')
-            .setColor(COLOR.LUCKY_PURPLE)
+            .setTitle('💛 Vaded Gaming Vote Rewards')
+            .setColor(COLOR.VADED_PURPLE)
             .setDescription([voteLine, '', tierLine].join('\n'))
             .addFields(
                 {

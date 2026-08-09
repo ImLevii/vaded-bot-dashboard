@@ -6,7 +6,7 @@ import { timingSafeKeyCompare } from '../utils/timingSafeKeyCompare'
 
 function requireMembersKey(req: Request): void {
     const provided = req.header('x-members-key')?.trim()
-    const expected = process.env.LUCKY_MEMBERS_API_KEY?.trim()
+    const expected = process.env.VADED_MEMBERS_API_KEY?.trim()
     if (!timingSafeKeyCompare(provided, expected)) {
         throw AppError.unauthorized('invalid members key')
     }

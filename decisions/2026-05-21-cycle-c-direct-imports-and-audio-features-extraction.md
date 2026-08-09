@@ -77,7 +77,7 @@ Rollback: revert the commit. No downstream impact — `queueManipulation` and `q
 
 - **A new music utility accumulates >50 LOC in `queueManipulation.ts`** — pattern signal that something other than barrel re-exports is creeping back in. Re-evaluate whether `queueManipulation.ts` should still exist as a barrel at all, or whether it should be promoted to a thin orchestrator with explicit imports.
 - **`madge.yml` promotion to blocking gate is reverted** — the gate was the point of this refactor; if it's flaking enough to disable, revisit whether Cycle C should have been accepted (Option C) after all.
-- **The deferred type-only `CustomClient` cycle resolves** — at that point Lucky's `bot` package can claim "0 runtime cycles" for the first time. Revisit whether `madge.yml` should also enforce `--no-typescript-default` or equivalent stricter modes.
+- **The deferred type-only `CustomClient` cycle resolves** — at that point Vaded Gaming's `bot` package can claim "0 runtime cycles" for the first time. Revisit whether `madge.yml` should also enforce `--no-typescript-default` or equivalent stricter modes.
 - **Audio-feature cache moves to Redis or shared/services** — `audioFeatures.ts` is the natural seam for that migration. If that work happens, this ADR's extraction is the prep step.
 
 ## Related artefacts

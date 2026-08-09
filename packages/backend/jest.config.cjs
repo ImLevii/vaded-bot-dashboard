@@ -61,7 +61,7 @@ module.exports = {
     }]
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(chalk|#ansi-styles|uuid|@lucky)/)',
+    'node_modules/(?!(chalk|#ansi-styles|uuid|@vaded)/)',
     '<rootDir>/../shared/dist/'
   ],
   moduleFileExtensions: ['ts', 'js', 'json'],

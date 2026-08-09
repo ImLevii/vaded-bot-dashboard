@@ -1,5 +1,5 @@
 export const COLOR = {
-    LUCKY_PURPLE: 0xdc2626,
+    VADED_PURPLE: 0xdc2626,
     SPOTIFY_GREEN: 0x1db954,
     YOUTUBE_RED: 0xff0000,
     SOUNDCLOUD_ORANGE: 0xff5500,

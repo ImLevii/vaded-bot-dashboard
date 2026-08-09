@@ -9,7 +9,7 @@
   the Redis-removal ADRs. Subsumes the Discord-429 finding + converges with the
   Musical-Taste perf ADR's `withTimeout` work.
 - **Tracking:** per-track delivery status lives in umbrella issue
-  [#1286](https://github.com/LucasSantana-Dev/Lucky/issues/1286).
+  [#1286](https://github.com/LucasSantana-Dev/vaded-gaming/issues/1286).
 
 ## Context
 
@@ -111,9 +111,9 @@ escalation); the ESLint rule needs a tuning period; incremental sweep spans seve
   **failure-mode metrics** to P1 (per ADR 2026-05-30; otherwise revisit 2026-06-15).
 - The ESLint silent-catch rule produces excessive false positives → refine scope (error-level
   required, warn allowed for whitelisted best-effort).
-- Lucky scales to multiple instances → in-memory caches (guild-context, suggestions) move to
+- Vaded Gaming scales to multiple instances → in-memory caches (guild-context, suggestions) move to
   Postgres.
 
 ## Tracking
 
-Status and per-track delivery tracked in umbrella issue [#1286](https://github.com/LucasSantana-Dev/Lucky/issues/1286).
+Status and per-track delivery tracked in umbrella issue [#1286](https://github.com/LucasSantana-Dev/vaded-gaming/issues/1286).

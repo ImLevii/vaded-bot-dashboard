@@ -30,8 +30,8 @@ export default function LanguageSwitcher({
 
     const triggerClass =
         variant === 'compact'
-            ? 'lucky-focus-visible flex min-h-[32px] min-w-[32px] items-center justify-center rounded-md text-lucky-text-subtle transition-colors hover:bg-lucky-bg-tertiary hover:text-lucky-text-primary'
-            : 'lucky-focus-visible flex items-center gap-2 rounded-md border border-lucky-border bg-lucky-bg-secondary px-3 py-1.5 text-lucky-text-secondary transition-colors hover:border-lucky-border-strong hover:bg-lucky-bg-tertiary hover:text-lucky-text-primary'
+            ? 'vaded-focus-visible flex min-h-[32px] min-w-[32px] items-center justify-center rounded-md text-vaded-text-subtle transition-colors hover:bg-vaded-bg-tertiary hover:text-vaded-text-primary'
+            : 'vaded-focus-visible flex items-center gap-2 rounded-md border border-vaded-border bg-vaded-bg-secondary px-3 py-1.5 text-vaded-text-secondary transition-colors hover:border-vaded-border-strong hover:bg-vaded-bg-tertiary hover:text-vaded-text-primary'
 
     return (
         <DropdownMenu>
@@ -50,7 +50,7 @@ export default function LanguageSwitcher({
             </DropdownMenuTrigger>
             <DropdownMenuContent
                 align='end'
-                className='min-w-[160px] bg-lucky-bg-secondary border-lucky-border'
+                className='min-w-[160px] bg-vaded-bg-secondary border-vaded-border'
             >
                 <DropdownMenuRadioGroup
                     value={active}
@@ -62,7 +62,7 @@ export default function LanguageSwitcher({
                         <DropdownMenuRadioItem
                             key={lng}
                             value={lng}
-                            className='flex items-center justify-between gap-2 text-lucky-text-primary focus:bg-lucky-bg-tertiary'
+                            className='flex items-center justify-between gap-2 text-vaded-text-primary focus:bg-vaded-bg-tertiary'
                         >
                             <span className='type-body-sm'>
                                 {t(`languages.${lng}`)}

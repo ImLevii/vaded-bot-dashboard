@@ -164,7 +164,7 @@ describe('GuildService', () => {
             expect(result).toContain('discord.com/api/oauth2/authorize')
             expect(result).toContain(`guild_id=${guildId}`)
             expect(result).toContain('client_id=test-client-id')
-            // Was `permissions=8` (Administrator). The dashboard's "add Lucky
+            // Was `permissions=8` (Administrator). The dashboard's "add Vaded Gaming
             // to this server" flow must use the curated set, same as every
             // other invite entry point (#1923).
             expect(result).toContain(`permissions=${BOT_INVITE_PERMISSIONS}`)

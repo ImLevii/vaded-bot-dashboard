@@ -134,17 +134,17 @@ export function ImportDialog({
                     </div>
 
                     {validationErrors.length > 0 && (
-                        <Card className='border-lucky-error/30 bg-lucky-error/5 p-4'>
+                        <Card className='border-vaded-error/30 bg-vaded-error/5 p-4'>
                             <div className='flex gap-3'>
-                                <AlertCircle className='h-5 w-5 shrink-0 text-lucky-error' />
+                                <AlertCircle className='h-5 w-5 shrink-0 text-vaded-error' />
                                 <div className='space-y-1'>
-                                    <p className='type-body-sm font-medium text-lucky-error'>
+                                    <p className='type-body-sm font-medium text-vaded-error'>
                                         Validation errors
                                     </p>
                                     {validationErrors.map((error, i) => (
                                         <p
                                             key={i}
-                                            className='type-body-sm text-lucky-error/90'
+                                            className='type-body-sm text-vaded-error/90'
                                         >
                                             • {error}
                                         </p>
@@ -155,23 +155,23 @@ export function ImportDialog({
                     )}
 
                     {importProgress && (
-                        <Card className='bg-lucky-bg-active/50 p-4'>
-                            <p className='type-body-sm text-lucky-text-secondary'>
+                        <Card className='bg-vaded-bg-active/50 p-4'>
+                            <p className='type-body-sm text-vaded-text-secondary'>
                                 {importProgress}
                             </p>
                         </Card>
                     )}
 
                     {Object.keys(importErrors).length > 0 && (
-                        <Card className='border-lucky-error/30 bg-lucky-error/5 p-4'>
-                            <p className='type-body-sm font-medium text-lucky-error mb-2'>
+                        <Card className='border-vaded-error/30 bg-vaded-error/5 p-4'>
+                            <p className='type-body-sm font-medium text-vaded-error mb-2'>
                                 Import errors
                             </p>
                             {Object.entries(importErrors).map(
                                 ([index, error]) => (
                                     <p
                                         key={index}
-                                        className='type-body-sm text-lucky-error/90'
+                                        className='type-body-sm text-vaded-error/90'
                                     >
                                         • Item {index}: {error}
                                     </p>

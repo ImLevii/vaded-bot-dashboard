@@ -929,8 +929,8 @@
         "navSettings": "Settings",
         "recentlyActive": "Recently Active",
         "allOtherServers": "All Other Servers",
-        "luckyInstalled": "Vaded Gaming installed",
-        "inviteLucky": "Invite Vaded Gaming",
+        "vadedInstalled": "Vaded Gaming installed",
+        "inviteVaded": "Invite Vaded Gaming",
         "noServersTitle": "No servers yet",
         "noServersDescription": "Join a Discord server and Vaded Gaming will appear here."
     },

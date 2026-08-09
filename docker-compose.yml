@@ -27,7 +27,7 @@ x-common-app-env: &common-app-env
     SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-production}
     SENTRY_RELEASE: ${SENTRY_RELEASE:-}
     SENTRY_SERVER_NAME: ${SENTRY_SERVER_NAME:-}
-    SENTRY_APP_NAME: ${SENTRY_APP_NAME:-lucky}
+    SENTRY_APP_NAME: ${SENTRY_APP_NAME:-vaded}
     SENTRY_TRACES_SAMPLE_RATE: ${SENTRY_TRACES_SAMPLE_RATE:-}
     SENTRY_PROFILES_SAMPLE_RATE: ${SENTRY_PROFILES_SAMPLE_RATE:-}
     DATABASE_URL: postgresql://discordbot:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD_required}@postgres:5432/discordbot
@@ -51,7 +51,7 @@ services:
     postgres:
         <<: *large-svc
         image: postgres:18-alpine
-        container_name: lucky-postgres
+        container_name: vaded-postgres
         environment:
             POSTGRES_DB: discordbot
             POSTGRES_USER: discordbot
@@ -60,7 +60,7 @@ services:
         volumes:
             - postgres_data:/var/lib/postgresql/data
         networks:
-            - lucky-network
+            - vaded-network
         healthcheck:
             test: ["CMD-SHELL", "pg_isready -U discordbot -d discordbot"]
             interval: 30s
@@ -76,12 +76,12 @@ services:
     redis:
         <<: *medium-svc
         image: redis:8-alpine
-        container_name: lucky-redis
+        container_name: vaded-redis
         command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
         volumes:
             - redis_data:/data
         networks:
-            - lucky-network
+            - vaded-network
         healthcheck:
             test: ["CMD", "redis-cli", "ping"]
             interval: 30s
@@ -96,7 +96,7 @@ services:
 
     bot:
         <<: *large-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/lucky}-bot:${IMAGE_TAG:-latest}
+        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-bot:${IMAGE_TAG:-latest}
         build:
             context: .
             dockerfile: Dockerfile
@@ -115,7 +115,7 @@ services:
         environment:
             <<: *common-app-env
             SENTRY_SERVICE_NAME: ${SENTRY_SERVICE_NAME:-bot}
-            BOT_NAME: ${BOT_NAME:-Lucky}
+            BOT_NAME: ${BOT_NAME:-Vaded Gaming}
             HEARTBEAT_PING_URL: ${HEARTBEAT_PING_URL:-}
             HEARTBEAT_INTERVAL_MS: ${HEARTBEAT_INTERVAL_MS:-}
             LASTFM_SESSION_KEY: ${LASTFM_SESSION_KEY:-}
@@ -132,11 +132,11 @@ services:
             - ./downloads:/app/downloads
             - ./logs:/app/logs
         networks:
-            - lucky-network
+            - vaded-network
             # Shared monitoring network so the homelab Prometheus
             # container can scrape /metrics on port 9091 without
             # exposing it on the host. See homelab PR #135.
-            - lucky-monitoring
+            - vaded-monitoring
         logging:
             driver: "json-file"
             options:
@@ -146,7 +146,7 @@ services:
 
     backend:
         <<: *medium-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/lucky}-backend:${IMAGE_TAG:-latest}
+        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-backend:${IMAGE_TAG:-latest}
         build:
             context: .
             dockerfile: Dockerfile
@@ -154,7 +154,7 @@ services:
             args:
                 SERVICE: backend
                 NODE_ENV: production
-        container_name: lucky-backend
+        container_name: vaded-backend
         env_file:
             - .env
         depends_on:
@@ -165,18 +165,18 @@ services:
         environment:
             <<: *common-app-env
             SENTRY_SERVICE_NAME: ${SENTRY_SERVICE_NAME:-backend}
-            LUCKY_NOTIFY_API_KEY: ${LUCKY_NOTIFY_API_KEY:-}
+            VADED_NOTIFY_API_KEY: ${VADED_NOTIFY_API_KEY:-}
             CLIENT_SECRET: ${CLIENT_SECRET}
             WEBAPP_PORT: 3000
             DEVELOPER_USER_IDS: ${DEVELOPER_USER_IDS:-}
             WEBAPP_FRONTEND_URL: ${WEBAPP_FRONTEND_URL:-}
             WEBAPP_BACKEND_URL: ${WEBAPP_BACKEND_URL:-}
         networks:
-            - lucky-network
+            - vaded-network
             # Shared monitoring network so the homelab Prometheus
             # container can scrape /metrics on the backend without
             # exposing it on the host. See homelab PR #135.
-            - lucky-monitoring
+            - vaded-monitoring
         logging:
             driver: "json-file"
             options:
@@ -186,14 +186,14 @@ services:
 
     frontend:
         <<: *small-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/lucky}-frontend:${IMAGE_TAG:-latest}
+        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-frontend:${IMAGE_TAG:-latest}
         build:
             context: .
             dockerfile: Dockerfile
             target: production-frontend
-        container_name: lucky-frontend
+        container_name: vaded-frontend
         networks:
-            - lucky-network
+            - vaded-network
         logging:
             driver: "json-file"
             options:
@@ -203,21 +203,21 @@ services:
 
     nginx:
         <<: *small-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/lucky}-nginx:${IMAGE_TAG:-latest}
+        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-nginx:${IMAGE_TAG:-latest}
         build:
             context: .
             dockerfile: Dockerfile.nginx
-        container_name: lucky-nginx
+        container_name: vaded-nginx
         depends_on:
             - backend
             - frontend
         ports:
             # Container now listens on 8080 (non-root nginx).
-            # NOTE: update cloudflared config-lucky.yml service entry to
+            # NOTE: update cloudflared config-vaded.yml service entry to
             # `http://nginx:8080` after deploying this change.
             - "${NGINX_PORT:-8080}:8080"
         networks:
-            - lucky-network
+            - vaded-network
         healthcheck:
             test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
             interval: 30s
@@ -236,15 +236,15 @@ services:
         build:
             context: ./deploy
             dockerfile: Dockerfile
-        container_name: lucky-webhook
+        container_name: vaded-webhook
         command: >
-            -hooks /home/luk-server/Lucky/deploy/hooks.json
+            -hooks /home/luk-server/vaded-gaming/deploy/hooks.json
             -verbose
             -hotreload
         environment:
             - DEPLOY_WEBHOOK_SECRET=${DEPLOY_WEBHOOK_SECRET}
             - DISCORD_DEPLOY_WEBHOOK=${DISCORD_DEPLOY_WEBHOOK:-}
-            - DEPLOY_DIR=/home/luk-server/Lucky
+            - DEPLOY_DIR=/home/luk-server/Vaded Gaming
             - GITHUB_DEPLOY_STATUS_TOKEN=${GITHUB_DEPLOY_STATUS_TOKEN:-}
         volumes:
             # Read hooks.json from the directory-mounted repo (not a single-file
@@ -252,15 +252,15 @@ services:
             # a deploy's `git reset` that REPLACES the file is never seen, leaving
             # the webhook on a stale hooks.json. The directory mount updates live,
             # so -hotreload picks up changes (e.g. new pass-arguments entries).
-            - .:/home/luk-server/Lucky
+            - .:/home/luk-server/Vaded Gaming
             # Staging checkout, so the deploy-staging hook can build + run the
-            # isolated lucky-staging stack from this same webhook container.
-            - ${STAGING_DIR:-/home/luk-server/lucky-staging}:/home/luk-server/lucky-staging
+            # isolated vaded-staging stack from this same webhook container.
+            - ${STAGING_DIR:-/home/luk-server/vaded-staging}:/home/luk-server/vaded-staging
             - ${CLOUDFLARED_CONFIG_DIR:-/home/luk-server/.cloudflared}:${CLOUDFLARED_CONFIG_DIR:-/home/luk-server/.cloudflared}:ro
             - /var/run/docker.sock:/var/run/docker.sock
-        working_dir: /home/luk-server/Lucky
+        working_dir: /home/luk-server/Vaded Gaming
         networks:
-            - lucky-network
+            - vaded-network
         logging:
             driver: "json-file"
             options:
@@ -268,18 +268,18 @@ services:
                 max-file: "3"
                 tag: "{{.Name}}"
 
-    # Cloudflare Tunnel — exposes nginx to lucky.lucassantana.tech
+    # Cloudflare Tunnel — exposes nginx to vaded.lucassantana.tech
     cloudflared:
         <<: *small-svc
         image: cloudflare/cloudflared:2026.6.0
-        container_name: lucky-tunnel
-        command: tunnel --config /etc/cloudflared/config-lucky.yml run
+        container_name: vaded-tunnel
+        command: tunnel --config /etc/cloudflared/config-vaded.yml run
         volumes:
             - ${CLOUDFLARED_CONFIG_DIR:-/home/luk-server/.cloudflared}:/etc/cloudflared:ro
         depends_on:
             - nginx
         networks:
-            - lucky-network
+            - vaded-network
         profiles:
             - tunnel
         logging:
@@ -294,11 +294,11 @@ volumes:
     redis_data:
 
 networks:
-    lucky-network:
+    vaded-network:
         driver: bridge
     # External network shared with the homelab monitoring stack
-    # (Prometheus, Grafana). Lucky owns/creates it; homelab joins it
+    # (Prometheus, Grafana). Vaded Gaming owns/creates it; homelab joins it
     # as `external: true`. See homelab PR #135.
-    lucky-monitoring:
-        name: lucky-monitoring
+    vaded-monitoring:
+        name: vaded-monitoring
         driver: bridge

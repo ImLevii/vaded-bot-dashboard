@@ -110,7 +110,7 @@ export default function AutoplayGenres({ guildId }: AutoplayGenresProps) {
                     Autoplay Genre Preferences
                 </h3>
             </div>
-            <p className='text-lucky-text-secondary mb-6'>
+            <p className='text-vaded-text-secondary mb-6'>
                 Select genres to focus your autoplay recommendations on specific
                 music styles. Leave empty for no genre filtering.
             </p>
@@ -125,7 +125,7 @@ export default function AutoplayGenres({ guildId }: AutoplayGenresProps) {
             {/* Current genres */}
             {genres.length > 0 && (
                 <div className='mb-6'>
-                    <Label className='text-sm font-medium text-lucky-text-primary'>
+                    <Label className='text-sm font-medium text-vaded-text-primary'>
                         Selected Genres ({genres.length}/{MAX_GENRES})
                     </Label>
                     <div className='flex flex-wrap gap-2 mt-3'>
@@ -147,7 +147,7 @@ export default function AutoplayGenres({ guildId }: AutoplayGenresProps) {
 
             {/* Add new genre */}
             <div className='space-y-3'>
-                <Label className='text-sm font-medium text-lucky-text-primary'>
+                <Label className='text-sm font-medium text-vaded-text-primary'>
                     Add Genre
                 </Label>
                 <div className='flex gap-2'>
@@ -181,8 +181,8 @@ export default function AutoplayGenres({ guildId }: AutoplayGenresProps) {
 
             {/* Suggested genres */}
             {genres.length < MAX_GENRES && (
-                <div className='mt-6 pt-6 border-t border-lucky-border'>
-                    <Label className='text-sm font-medium text-lucky-text-primary'>
+                <div className='mt-6 pt-6 border-t border-vaded-border'>
+                    <Label className='text-sm font-medium text-vaded-text-primary'>
                         Suggested Genres
                     </Label>
                     <div className='flex flex-wrap gap-2 mt-3'>
@@ -195,7 +195,7 @@ export default function AutoplayGenres({ guildId }: AutoplayGenresProps) {
                                     setNewGenre(genre)
                                 }}
                                 disabled={isLoading}
-                                className='px-3 py-1 bg-lucky-border rounded-full text-lucky-text-secondary hover:bg-lucky-border/80 transition-colors disabled:opacity-50'
+                                className='px-3 py-1 bg-vaded-border rounded-full text-vaded-text-secondary hover:bg-vaded-border/80 transition-colors disabled:opacity-50'
                             >
                                 {genre}
                             </button>

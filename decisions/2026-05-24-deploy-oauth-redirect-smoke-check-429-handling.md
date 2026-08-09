@@ -33,7 +33,7 @@ A documented `ALLOW_DEPLOY_UNVERIFIED_OAUTH` flag (available as a `workflow_disp
 
 **Negative:**
 
-- A deploy can now fail due to Discord's rate-limiting rather than a Lucky-side issue. This requires operator intervention (wait ~5 min, redeploy).
+- A deploy can now fail due to Discord's rate-limiting rather than a Vaded Gaming-side issue. This requires operator intervention (wait ~5 min, redeploy).
 - If Discord's rate-limit window grows beyond ~3 min, the check will fail routinely and operator friction increases.
 
 **Neutral:**

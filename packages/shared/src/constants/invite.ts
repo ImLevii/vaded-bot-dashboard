@@ -19,7 +19,7 @@ import { TOP_GG_BOT_ID } from './topgg'
  *
  * This lives in shared because five copies had drifted apart (#1888, #1894,
  * #1923). The docs page shipped `8` (Administrator); so did the dashboard's
- * "add Lucky to this server" flow in `GuildService.generateBotInviteUrl`. The
+ * "add Vaded Gaming to this server" flow in `GuildService.generateBotInviteUrl`. The
  * backend redirect shipped `36970496` — Manage Messages, Use External Emojis,
  * Connect, Speak, Use Voice Activity — with no View Channels and no Send
  * Messages, so a bot invited with it could not read or post. The landing page

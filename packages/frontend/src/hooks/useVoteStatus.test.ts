@@ -34,14 +34,14 @@ describe('useVoteStatus', () => {
                 hasVoted: true,
                 streak: 7,
                 nextVoteInSeconds: 3600,
-                tier: { label: 'Lucky Fan', threshold: 7 },
-                nextTier: { label: 'Lucky Regular', threshold: 14 },
+                tier: { label: 'Vaded Gaming Fan', threshold: 7 },
+                nextTier: { label: 'Vaded Gaming Regular', threshold: 14 },
                 voteUrl: 'https://top.gg/bot/abc/vote',
             },
         })
         const { result } = renderHook(() => useVoteStatus())
         await waitFor(() => expect(result.current.status).not.toBeNull())
-        expect(result.current.status?.tier?.label).toBe('Lucky Fan')
+        expect(result.current.status?.tier?.label).toBe('Vaded Gaming Fan')
         expect(result.current.status?.streak).toBe(7)
         expect(apiGet).toHaveBeenCalledWith('/me/vote-status')
     })

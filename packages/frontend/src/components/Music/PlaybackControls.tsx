@@ -75,7 +75,7 @@ export function PlaybackControls({
             <button
                 onClick={onShuffle}
                 disabled={!canAux}
-                className='p-2.5 sm:p-2 rounded-lg hover:bg-lucky-bg-tertiary active:bg-lucky-bg-tertiary text-lucky-text-secondary hover:text-white transition-colors disabled:opacity-40'
+                className='p-2.5 sm:p-2 rounded-lg hover:bg-vaded-bg-tertiary active:bg-vaded-bg-tertiary text-vaded-text-secondary hover:text-white transition-colors disabled:opacity-40'
                 aria-label='Shuffle'
                 aria-busy={pendingAction === 'shuffle'}
             >
@@ -89,7 +89,7 @@ export function PlaybackControls({
             <div className='flex items-center gap-2 sm:gap-3'>
                 <button
                     onClick={onPrevious}
-                    className='p-2.5 sm:p-2 rounded-lg hover:bg-lucky-bg-tertiary active:bg-lucky-bg-tertiary text-lucky-text-secondary hover:text-white transition-colors rotate-180 disabled:opacity-40'
+                    className='p-2.5 sm:p-2 rounded-lg hover:bg-vaded-bg-tertiary active:bg-vaded-bg-tertiary text-vaded-text-secondary hover:text-white transition-colors rotate-180 disabled:opacity-40'
                     aria-label='Previous'
                     disabled={!canTrack}
                     aria-busy={pendingAction === 'previous'}
@@ -123,7 +123,7 @@ export function PlaybackControls({
                 </button>
                 <button
                     onClick={onSkip}
-                    className='p-2.5 sm:p-2 rounded-lg hover:bg-lucky-bg-tertiary active:bg-lucky-bg-tertiary text-lucky-text-secondary hover:text-white transition-colors disabled:opacity-40'
+                    className='p-2.5 sm:p-2 rounded-lg hover:bg-vaded-bg-tertiary active:bg-vaded-bg-tertiary text-vaded-text-secondary hover:text-white transition-colors disabled:opacity-40'
                     aria-label='Skip'
                     disabled={!canTrack}
                     aria-busy={pendingAction === 'skip'}
@@ -134,7 +134,7 @@ export function PlaybackControls({
                 </button>
                 <button
                     onClick={onStop}
-                    className='p-2.5 sm:p-2 rounded-lg hover:bg-lucky-bg-tertiary active:bg-lucky-bg-tertiary text-lucky-text-secondary hover:text-white transition-colors disabled:opacity-40'
+                    className='p-2.5 sm:p-2 rounded-lg hover:bg-vaded-bg-tertiary active:bg-vaded-bg-tertiary text-vaded-text-secondary hover:text-white transition-colors disabled:opacity-40'
                     aria-label='Stop'
                     disabled={!canTrack}
                     aria-busy={pendingAction === 'stop'}
@@ -150,7 +150,7 @@ export function PlaybackControls({
             <button
                 onClick={onRepeatCycle}
                 disabled={!canAux}
-                className={`p-2.5 sm:p-2 rounded-lg hover:bg-lucky-bg-tertiary active:bg-lucky-bg-tertiary transition-colors disabled:opacity-40 ${repeatMode !== 'off' ? 'text-primary' : 'text-lucky-text-secondary hover:text-white'}`}
+                className={`p-2.5 sm:p-2 rounded-lg hover:bg-vaded-bg-tertiary active:bg-vaded-bg-tertiary transition-colors disabled:opacity-40 ${repeatMode !== 'off' ? 'text-primary' : 'text-vaded-text-secondary hover:text-white'}`}
                 aria-label={`Repeat mode: ${repeatMode}`}
                 aria-busy={pendingAction === 'repeat'}
             >
@@ -222,7 +222,7 @@ export function VolumeSlider({ volume, onChange }: VolumeSliderProps) {
                     setLocalVol(v)
                     onChange(v)
                 }}
-                className='p-1.5 text-lucky-text-secondary hover:text-white active:text-white transition-colors'
+                className='p-1.5 text-vaded-text-secondary hover:text-white active:text-white transition-colors'
                 aria-label={volume === 0 ? 'Unmute' : 'Mute'}
             >
                 {volume === 0 ? (
@@ -244,7 +244,7 @@ export function VolumeSlider({ volume, onChange }: VolumeSliderProps) {
                 aria-valuenow={displayVol}
             />
             <span
-                className='type-meta text-lucky-text-secondary w-8 text-right tabular-nums'
+                className='type-meta text-vaded-text-secondary w-8 text-right tabular-nums'
                 aria-hidden='true'
             >
                 {displayVol}%

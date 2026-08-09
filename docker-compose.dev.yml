@@ -1,7 +1,7 @@
 services:
     postgres:
         image: postgres:18-alpine
-        container_name: lucky-postgres-dev
+        container_name: vaded-postgres-dev
         restart: unless-stopped
         environment:
             POSTGRES_DB: discordbot
@@ -12,7 +12,7 @@ services:
         volumes:
             - postgres_dev_data:/var/lib/postgresql/data
         networks:
-            - lucky-network
+            - vaded-network
         healthcheck:
             test: ["CMD-SHELL", "pg_isready -U discordbot -d discordbot"]
             interval: 30s
@@ -26,7 +26,7 @@ services:
 
     redis:
         image: redis:8-alpine
-        container_name: lucky-redis-dev
+        container_name: vaded-redis-dev
         restart: unless-stopped
         command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru
         ports:
@@ -34,7 +34,7 @@ services:
         volumes:
             - redis_dev_data:/data
         networks:
-            - lucky-network
+            - vaded-network
         healthcheck:
             test: ["CMD", "redis-cli", "ping"]
             interval: 30s
@@ -74,7 +74,7 @@ services:
             - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
             - SENTRY_RELEASE=${SENTRY_RELEASE:-}
             - SENTRY_SERVER_NAME=${SENTRY_SERVER_NAME:-}
-            - SENTRY_APP_NAME=${SENTRY_APP_NAME:-lucky}
+            - SENTRY_APP_NAME=${SENTRY_APP_NAME:-vaded}
             - SENTRY_SERVICE_NAME=${SENTRY_SERVICE_NAME:-bot}
             - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-}
             - SENTRY_PROFILES_SAMPLE_RATE=${SENTRY_PROFILES_SAMPLE_RATE:-}
@@ -127,7 +127,7 @@ services:
             # Unleash Configuration
             - UNLEASH_URL=${UNLEASH_URL:-}
             - UNLEASH_API_TOKEN=${UNLEASH_API_TOKEN:-}
-            - UNLEASH_APP_NAME=${UNLEASH_APP_NAME:-lucky}
+            - UNLEASH_APP_NAME=${UNLEASH_APP_NAME:-vaded}
             - UNLEASH_ENVIRONMENT=${UNLEASH_ENVIRONMENT:-development}
             - UNLEASH_BOOTSTRAP_DATA=${UNLEASH_BOOTSTRAP_DATA:-}
             # Web Application
@@ -156,7 +156,7 @@ services:
             - ./downloads:/app/downloads
             - ./logs:/app/logs
         networks:
-            - lucky-network
+            - vaded-network
         healthcheck:
             test: ["CMD", "node", "-e", "console.log('Bot is running')"]
             interval: 30s
@@ -174,5 +174,5 @@ volumes:
     redis_dev_data:
 
 networks:
-    lucky-network:
+    vaded-network:
         driver: bridge

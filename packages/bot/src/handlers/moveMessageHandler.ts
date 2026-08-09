@@ -75,7 +75,7 @@ export const buildMoveEmbed = (params: {
         params
 
     const embed = new EmbedBuilder()
-        .setColor(COLOR.LUCKY_PURPLE)
+        .setColor(COLOR.VADED_PURPLE)
         .setAuthor({
             name: author.username,
             iconURL: author.displayAvatarURL(),

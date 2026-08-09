@@ -6,8 +6,8 @@
 
 ## Context
 
-Lucky's `/invite` command (#1494) and landing "Add to Discord" CTA (#1495) request only
-**minimal music perms** (View/Send/Embed/Connect/Speak, integer 3165184). But Lucky is a
+Vaded Gaming's `/invite` command (#1494) and landing "Add to Discord" CTA (#1495) request only
+**minimal music perms** (View/Send/Embed/Connect/Speak, integer 3165184). But Vaded Gaming is a
 **multi-feature** bot — verified from code, it performs actions needing:
 `ModerateMembers` (timeout, 7), `ManageGuild` (settings/automod, 13), `ManageRoles` (3),
 `ManageChannels` (2), `BanMembers` (2), `KickMembers` (1), `ManageMessages` (1), and

@@ -74,10 +74,10 @@ function RoleGroups() {
     if (!selectedGuild) {
         return (
             <div className='flex-center min-h-[40vh] flex-col gap-2 text-center'>
-                <h2 className='type-title text-lucky-text-primary'>
+                <h2 className='type-title text-vaded-text-primary'>
                     {t('noServerSelected')}
                 </h2>
-                <p className='type-body-sm text-lucky-text-tertiary'>
+                <p className='type-body-sm text-vaded-text-tertiary'>
                     {t('selectServerToView')}
                 </p>
             </div>
@@ -96,11 +96,11 @@ function RoleGroups() {
 
     if (groups.length === 0) {
         return (
-            <Card className='border border-lucky-border p-8 text-center'>
-                <h2 className='type-title text-lucky-text-primary'>
+            <Card className='border border-vaded-border p-8 text-center'>
+                <h2 className='type-title text-vaded-text-primary'>
                     {t('noGroupsYet')}
                 </h2>
-                <p className='type-body-sm text-lucky-text-tertiary mt-2'>
+                <p className='type-body-sm text-vaded-text-tertiary mt-2'>
                     {t('noGroupsHint')}
                 </p>
             </Card>
@@ -180,14 +180,14 @@ function RoleGroupCard({
     }
 
     return (
-        <Card className='border border-lucky-border p-6 space-y-5'>
+        <Card className='border border-vaded-border p-6 space-y-5'>
             <div className='flex items-center gap-3 flex-wrap'>
                 <span
-                    className='inline-block w-4 h-4 rounded-full border border-lucky-border shrink-0'
+                    className='inline-block w-4 h-4 rounded-full border border-vaded-border shrink-0'
                     style={{ backgroundColor: toHexInput(group.color) }}
                     aria-hidden
                 />
-                <h3 className='type-title text-lucky-text-primary'>
+                <h3 className='type-title text-vaded-text-primary'>
                     {group.name}
                 </h3>
                 {group.hoist && <Badge variant='outline'>{t('hoist')}</Badge>}
@@ -195,14 +195,14 @@ function RoleGroupCard({
                     <Badge variant='outline'>{t('mentionable')}</Badge>
                 )}
                 {message && (
-                    <span className='type-body-sm text-lucky-text-tertiary ml-auto'>
+                    <span className='type-body-sm text-vaded-text-tertiary ml-auto'>
                         {t('linkedPanel')}: {message.title ?? message.messageId}
                     </span>
                 )}
             </div>
 
             <div>
-                <p className='type-body-sm text-lucky-text-secondary mb-2'>
+                <p className='type-body-sm text-vaded-text-secondary mb-2'>
                     {t('rolesInGroup')}
                 </p>
                 {message && message.mappings.length > 0 ? (
@@ -210,7 +210,7 @@ function RoleGroupCard({
                         {message.mappings.map((m) => (
                             <span
                                 key={m.roleId}
-                                className='inline-flex items-center gap-1.5 rounded-md bg-lucky-bg-tertiary/50 px-2 py-1 text-xs text-lucky-text-secondary'
+                                className='inline-flex items-center gap-1.5 rounded-md bg-vaded-bg-tertiary/50 px-2 py-1 text-xs text-vaded-text-secondary'
                             >
                                 {m.emoji && <span>{m.emoji}</span>}
                                 {m.label}
@@ -218,7 +218,7 @@ function RoleGroupCard({
                                     type='button'
                                     aria-label={t('removeRole')}
                                     onClick={() => void handleDetach(m.roleId)}
-                                    className='text-lucky-text-tertiary hover:text-red-400 transition-colors'
+                                    className='text-vaded-text-tertiary hover:text-red-400 transition-colors'
                                 >
                                     <X className='w-3 h-3' />
                                 </button>
@@ -226,7 +226,7 @@ function RoleGroupCard({
                         ))}
                     </div>
                 ) : (
-                    <p className='type-body-sm text-lucky-text-tertiary'>
+                    <p className='type-body-sm text-vaded-text-tertiary'>
                         {t('noRolesInGroup')}
                     </p>
                 )}
@@ -240,7 +240,7 @@ function RoleGroupCard({
                         type='color'
                         value={color}
                         onChange={(e) => setColor(e.target.value)}
-                        className='h-9 w-16 rounded border border-lucky-border bg-transparent cursor-pointer'
+                        className='h-9 w-16 rounded border border-vaded-border bg-transparent cursor-pointer'
                     />
                 </div>
                 <div className='space-y-1.5'>
@@ -251,7 +251,7 @@ function RoleGroupCard({
                         id={`style-${group.id}`}
                         value={buttonStyle}
                         onChange={(e) => setButtonStyle(e.target.value)}
-                        className='h-9 w-full rounded-md border border-lucky-border bg-lucky-bg-tertiary/50 px-3 text-sm text-lucky-text-primary'
+                        className='h-9 w-full rounded-md border border-vaded-border bg-vaded-bg-tertiary/50 px-3 text-sm text-vaded-text-primary'
                     >
                         {BUTTON_STYLES.map((s) => (
                             <option key={s} value={s}>

@@ -80,11 +80,11 @@ function timeAgo(dateStr: string): string {
 type CompactStatTone = 'brand' | 'accent' | 'success' | 'warning' | 'neutral'
 
 const compactToneClass: Record<CompactStatTone, string> = {
-    brand: 'bg-lucky-brand/15 text-lucky-brand',
-    accent: 'bg-lucky-brand/15 text-lucky-brand',
-    success: 'bg-lucky-success/15 text-lucky-success',
-    warning: 'bg-lucky-warning/15 text-lucky-warning',
-    neutral: 'bg-lucky-bg-active text-lucky-text-tertiary',
+    brand: 'bg-vaded-brand/15 text-vaded-brand',
+    accent: 'bg-vaded-brand/15 text-vaded-brand',
+    success: 'bg-vaded-success/15 text-vaded-success',
+    warning: 'bg-vaded-warning/15 text-vaded-warning',
+    neutral: 'bg-vaded-bg-active text-vaded-text-tertiary',
 }
 
 function CompactStat({
@@ -101,7 +101,7 @@ function CompactStat({
     delta?: number
 }) {
     return (
-        <div className='flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-lucky-bg-active/25'>
+        <div className='flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-vaded-bg-active/25'>
             <div className='flex items-center gap-2.5 min-w-0'>
                 {icon && (
                     <span
@@ -114,7 +114,7 @@ function CompactStat({
                         {icon}
                     </span>
                 )}
-                <p className='type-meta truncate text-lucky-text-tertiary uppercase tracking-wide'>
+                <p className='type-meta truncate text-vaded-text-tertiary uppercase tracking-wide'>
                     {label}
                 </p>
             </div>
@@ -124,15 +124,15 @@ function CompactStat({
                         className={cn(
                             'rounded-sm px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider',
                             delta >= 0
-                                ? 'bg-lucky-success/20 text-lucky-success'
-                                : 'bg-lucky-error/20 text-lucky-error',
+                                ? 'bg-vaded-success/20 text-vaded-success'
+                                : 'bg-vaded-error/20 text-vaded-error',
                         )}
                     >
                         {delta >= 0 ? '+' : ''}
                         {delta}%
                     </span>
                 )}
-                <p className='font-[var(--font-lucky-display)] text-lg font-semibold text-lucky-text-primary tabular-nums'>
+                <p className='font-[var(--font-vaded-display)] text-lg font-semibold text-vaded-text-primary tabular-nums'>
                     {typeof value === 'number' ? value.toLocaleString() : value}
                 </p>
             </div>
@@ -152,16 +152,16 @@ function CaseRow({ case: c, index }: { case: ModerationCase; index: number }) {
                 duration: 0.2,
                 delay: prefersReducedMotion ? 0 : index * 0.05,
             }}
-            className='grid grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-3 transition-colors hover:bg-lucky-bg-tertiary/50'
+            className='grid grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-3 transition-colors hover:bg-vaded-bg-tertiary/50'
         >
-            <p className='text-xs font-mono text-lucky-text-tertiary'>
+            <p className='text-xs font-mono text-vaded-text-tertiary'>
                 #{c.caseNumber}
             </p>
             <div className='min-w-0'>
-                <p className='type-body-sm truncate text-lucky-text-primary'>
+                <p className='type-body-sm truncate text-vaded-text-primary'>
                     {c.userName || c.userId}
                 </p>
-                <p className='type-body-sm truncate text-lucky-text-tertiary'>
+                <p className='type-body-sm truncate text-vaded-text-tertiary'>
                     {c.reason || 'No reason provided'}
                 </p>
             </div>
@@ -176,7 +176,7 @@ function CaseRow({ case: c, index }: { case: ModerationCase; index: number }) {
                     <ActionIcon className='mr-1 h-3 w-3' />
                     {c.type}
                 </Badge>
-                <span className='hidden text-xs text-lucky-text-tertiary sm:block'>
+                <span className='hidden text-xs text-vaded-text-tertiary sm:block'>
                     {timeAgo(c.createdAt)}
                 </span>
             </div>
@@ -216,7 +216,7 @@ function NowPlayingWidget({ guildId }: { guildId: string }) {
     return (
         <motion.section
             aria-label='Now Playing'
-            className='surface-panel relative overflow-hidden border border-lucky-brand/20'
+            className='surface-panel relative overflow-hidden border border-vaded-brand/20'
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25 }}
@@ -250,8 +250,8 @@ function NowPlayingWidget({ guildId }: { guildId: string }) {
                         }
                     />
                 ) : (
-                    <div className='flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-lucky-bg-active'>
-                        <Music2 className='h-6 w-6 text-lucky-text-tertiary' />
+                    <div className='flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-vaded-bg-active'>
+                        <Music2 className='h-6 w-6 text-vaded-text-tertiary' />
                     </div>
                 )}
 
@@ -259,7 +259,7 @@ function NowPlayingWidget({ guildId }: { guildId: string }) {
                 <div className='min-w-0 flex-1'>
                     <div className='flex items-center gap-2 mb-0.5'>
                         <span
-                            className='h-1.5 w-1.5 rounded-full bg-lucky-brand shrink-0'
+                            className='h-1.5 w-1.5 rounded-full bg-vaded-brand shrink-0'
                             aria-hidden='true'
                             style={
                                 state.isPlaying && !state.isPaused
@@ -267,34 +267,34 @@ function NowPlayingWidget({ guildId }: { guildId: string }) {
                                     : undefined
                             }
                         />
-                        <span className='type-meta font-bold tracking-widest uppercase text-lucky-brand text-[10px]'>
+                        <span className='type-meta font-bold tracking-widest uppercase text-vaded-brand text-[10px]'>
                             Now Playing
                         </span>
                         {state.voiceChannelName && (
-                            <span className='type-meta text-lucky-text-tertiary truncate'>
+                            <span className='type-meta text-vaded-text-tertiary truncate'>
                                 · {state.voiceChannelName}
                             </span>
                         )}
                         {isConnected && (
-                            <Wifi className='ml-auto h-3 w-3 shrink-0 text-lucky-success' aria-hidden='true' />
+                            <Wifi className='ml-auto h-3 w-3 shrink-0 text-vaded-success' aria-hidden='true' />
                         )}
                     </div>
-                    <p className='type-body font-semibold text-lucky-text-primary truncate leading-tight'>
+                    <p className='type-body font-semibold text-vaded-text-primary truncate leading-tight'>
                         {track.title}
                     </p>
-                    <p className='type-meta text-lucky-text-secondary truncate mb-2'>
+                    <p className='type-meta text-vaded-text-secondary truncate mb-2'>
                         {track.author}
                     </p>
 
                     {durationMs > 0 && (
                         <div>
-                            <div className='relative h-1 bg-lucky-bg-active rounded-full overflow-hidden'>
+                            <div className='relative h-1 bg-vaded-bg-active rounded-full overflow-hidden'>
                                 <div
-                                    className='h-full rounded-full bg-lucky-brand transition-[width] duration-1000'
+                                    className='h-full rounded-full bg-vaded-brand transition-[width] duration-1000'
                                     style={{ width: `${progress}%` }}
                                 />
                             </div>
-                            <div className='flex justify-between type-meta text-lucky-text-tertiary mt-1 tabular-nums'>
+                            <div className='flex justify-between type-meta text-vaded-text-tertiary mt-1 tabular-nums'>
                                 <span>{fmt(posMs / 1000)}</span>
                                 <span>{fmt(durationMs / 1000)}</span>
                             </div>
@@ -322,13 +322,13 @@ function NowPlayingWidget({ guildId }: { guildId: string }) {
                         onClick={() => skip()}
                         disabled={!!pendingAction}
                         aria-label='Skip'
-                        className='h-9 w-9 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/10 text-lucky-text-secondary hover:text-white transition-all disabled:opacity-40'
+                        className='h-9 w-9 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/10 text-vaded-text-secondary hover:text-white transition-all disabled:opacity-40'
                     >
                         <SkipForward className='h-4 w-4' />
                     </button>
                     <Link
                         to='/music'
-                        className='h-9 px-3 rounded-full flex items-center gap-1.5 bg-white/5 hover:bg-white/10 text-lucky-text-secondary hover:text-white transition-all type-meta font-medium'
+                        className='h-9 px-3 rounded-full flex items-center gap-1.5 bg-white/5 hover:bg-white/10 text-vaded-text-secondary hover:text-white transition-all type-meta font-medium'
                     >
                         <ArrowRight className='h-3.5 w-3.5' />
                         <span className='hidden sm:inline'>Full player</span>
@@ -461,7 +461,7 @@ export default function DashboardOverview() {
                             <Skeleton className='h-12 w-32' />
                             <Skeleton className='h-4 w-44' />
                         </div>
-                        <div className='surface-panel divide-y divide-lucky-border/40'>
+                        <div className='surface-panel divide-y divide-vaded-border/40'>
                             {Array.from({ length: 3 }).map((_, i) => (
                                 <div
                                     key={i}
@@ -475,12 +475,12 @@ export default function DashboardOverview() {
                     </>
                 ) : (
                     <>
-                        <article className='surface-panel flex flex-col justify-between gap-6 p-6 border border-lucky-border'>
+                        <article className='surface-panel flex flex-col justify-between gap-6 p-6 border border-vaded-border'>
                             <div className='flex items-center justify-between gap-3'>
-                                <p className='type-meta text-lucky-text-tertiary uppercase tracking-wide font-semibold'>
+                                <p className='type-meta text-vaded-text-tertiary uppercase tracking-wide font-semibold'>
                                     {t('dashboardOverview.totalMembers')}
                                 </p>
-                                <span className='flex h-8 w-8 items-center justify-center rounded-md bg-lucky-brand/15 text-lucky-brand'>
+                                <span className='flex h-8 w-8 items-center justify-center rounded-md bg-vaded-brand/15 text-vaded-brand'>
                                     <Users
                                         className='h-4 w-4'
                                         aria-hidden='true'
@@ -488,20 +488,20 @@ export default function DashboardOverview() {
                                 </span>
                             </div>
                             <div>
-                                <p className='font-[var(--font-lucky-display)] text-5xl font-semibold leading-none tracking-tight text-lucky-text-strong'>
+                                <p className='font-[var(--font-vaded-display)] text-5xl font-semibold leading-none tracking-tight text-vaded-text-strong'>
                                     {typeof selectedGuild.memberCount ===
                                     'number'
                                         ? selectedGuild.memberCount.toLocaleString()
                                         : '0'}
                                 </p>
                             </div>
-                            <p className='type-body-sm text-lucky-text-tertiary'>
+                            <p className='type-body-sm text-vaded-text-tertiary'>
                                 {t('dashboardOverview.activeMembersAcross', {
                                     name: selectedGuild.name,
                                 })}
                             </p>
                         </article>
-                        <div className='surface-panel divide-y divide-lucky-border/40 border border-lucky-border'>
+                        <div className='surface-panel divide-y divide-vaded-border/40 border border-vaded-border'>
                             <CompactStat
                                 label={t('dashboardOverview.activeCases')}
                                 value={stats?.activeCases || 0}
@@ -527,7 +527,7 @@ export default function DashboardOverview() {
 
             <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
                 <motion.section
-                    className='surface-panel overflow-hidden border border-lucky-border lg:col-span-2'
+                    className='surface-panel overflow-hidden border border-vaded-border lg:col-span-2'
                     initial={
                         prefersReducedMotion ? false : { opacity: 0, y: 12 }
                     }
@@ -537,25 +537,25 @@ export default function DashboardOverview() {
                         delay: prefersReducedMotion ? 0 : 0.2,
                     }}
                 >
-                    <div className='flex items-center justify-between border-b border-lucky-border px-4 py-3'>
+                    <div className='flex items-center justify-between border-b border-vaded-border px-4 py-3'>
                         <div>
-                            <h2 className='type-title text-lucky-text-primary uppercase tracking-wide'>
+                            <h2 className='type-title text-vaded-text-primary uppercase tracking-wide'>
                                 {t('dashboardOverview.recentCases')}
                             </h2>
-                            <p className='type-body-sm text-lucky-text-tertiary'>
+                            <p className='type-body-sm text-vaded-text-tertiary'>
                                 {t('dashboardOverview.latestModerationActions')}
                             </p>
                         </div>
                         <Link
                             to='/moderation'
-                            className='type-body-sm inline-flex items-center gap-1 text-lucky-brand transition-colors hover:text-lucky-brand-strong'
+                            className='type-body-sm inline-flex items-center gap-1 text-vaded-brand transition-colors hover:text-vaded-brand-strong'
                         >
                             {t('dashboardOverview.viewAll')}
                             <ArrowRight className='h-3.5 w-3.5' />
                         </Link>
                     </div>
 
-                    <div className='divide-y divide-lucky-border/50'>
+                    <div className='divide-y divide-vaded-border/50'>
                         {loading ? (
                             Array.from({ length: 5 }).map((_, index) => (
                                 <div
@@ -580,11 +580,11 @@ export default function DashboardOverview() {
                             ))
                         ) : (
                             <div className='px-4 py-10 text-center'>
-                                <Shield className='mx-auto mb-3 h-10 w-10 text-lucky-text-tertiary' />
-                                <p className='type-body text-lucky-text-secondary'>
+                                <Shield className='mx-auto mb-3 h-10 w-10 text-vaded-text-tertiary' />
+                                <p className='type-body text-vaded-text-secondary'>
                                     {t('dashboardOverview.noModerationCases')}
                                 </p>
-                                <p className='type-body-sm text-lucky-text-tertiary'>
+                                <p className='type-body-sm text-vaded-text-tertiary'>
                                     {t(
                                         'dashboardOverview.casesCasesWillAppear',
                                     )}
@@ -608,33 +608,33 @@ export default function DashboardOverview() {
                 >
                     <h2
                         id='quick-actions-heading'
-                        className='type-title text-lucky-text-primary'
+                        className='type-title text-vaded-text-primary'
                     >
                         {t('dashboardOverview.quickActions')}
                     </h2>
-                    <nav className='surface-panel divide-y divide-lucky-border/40 overflow-hidden border border-lucky-border'>
+                    <nav className='surface-panel divide-y divide-vaded-border/40 overflow-hidden border border-vaded-border'>
                         {visibleQuickActions.map((action) => (
                             <Link
                                 key={action.href}
                                 to={action.href}
-                                className='group flex items-center gap-3 border-l-2 border-l-transparent px-4 py-2.5 transition-all hover:border-l-lucky-brand hover:bg-lucky-bg-active/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-lucky-brand/60'
+                                className='group flex items-center gap-3 border-l-2 border-l-transparent px-4 py-2.5 transition-all hover:border-l-vaded-brand hover:bg-vaded-bg-active/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-vaded-brand/60'
                             >
                                 <span
-                                    className='flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-lucky-bg-tertiary text-lucky-text-secondary transition-colors group-hover:bg-lucky-brand/15 group-hover:text-lucky-brand'
+                                    className='flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-vaded-bg-tertiary text-vaded-text-secondary transition-colors group-hover:bg-vaded-brand/15 group-hover:text-vaded-brand'
                                     aria-hidden='true'
                                 >
                                     {action.icon}
                                 </span>
                                 <div className='min-w-0 flex-1'>
-                                    <p className='type-body-sm font-medium text-lucky-text-primary'>
+                                    <p className='type-body-sm font-medium text-vaded-text-primary'>
                                         {action.title}
                                     </p>
-                                    <p className='truncate text-xs text-lucky-text-tertiary'>
+                                    <p className='truncate text-xs text-vaded-text-tertiary'>
                                         {action.description}
                                     </p>
                                 </div>
                                 <ArrowRight
-                                    className='h-3.5 w-3.5 shrink-0 text-lucky-text-tertiary opacity-0 transition-all group-hover:opacity-100 group-hover:text-lucky-brand group-hover:translate-x-1'
+                                    className='h-3.5 w-3.5 shrink-0 text-vaded-text-tertiary opacity-0 transition-all group-hover:opacity-100 group-hover:text-vaded-brand group-hover:translate-x-1'
                                     aria-hidden='true'
                                 />
                             </Link>
@@ -645,7 +645,7 @@ export default function DashboardOverview() {
 
             {hasModuleAccess(effectiveAccess, 'music', 'view') && (
                 <motion.section
-                    className='surface-panel overflow-hidden border border-lucky-border'
+                    className='surface-panel overflow-hidden border border-vaded-border'
                     initial={
                         prefersReducedMotion ? false : { opacity: 0, y: 12 }
                     }
@@ -655,25 +655,25 @@ export default function DashboardOverview() {
                         delay: prefersReducedMotion ? 0 : 0.4,
                     }}
                 >
-                    <div className='flex items-center justify-between border-b border-lucky-border px-4 py-3'>
+                    <div className='flex items-center justify-between border-b border-vaded-border px-4 py-3'>
                         <div>
-                            <h2 className='type-title text-lucky-text-primary'>
+                            <h2 className='type-title text-vaded-text-primary'>
                                 {t('dashboardOverview.recentMusic')}
                             </h2>
-                            <p className='type-body-sm text-lucky-text-tertiary'>
+                            <p className='type-body-sm text-vaded-text-tertiary'>
                                 {t('dashboardOverview.latestTracksPlayed')}
                             </p>
                         </div>
                         <Link
                             to='/music/history'
-                            className='type-body-sm inline-flex items-center gap-1 text-lucky-brand transition-colors hover:text-lucky-brand-strong'
+                            className='type-body-sm inline-flex items-center gap-1 text-vaded-brand transition-colors hover:text-vaded-brand-strong'
                         >
                             {t('dashboardOverview.viewAll')}
                             <ArrowRight className='h-3.5 w-3.5' />
                         </Link>
                     </div>
 
-                    <div className='divide-y divide-lucky-border/50'>
+                    <div className='divide-y divide-vaded-border/50'>
                         {tracksLoading ? (
                             Array.from({ length: 4 }).map((_, index) => (
                                 <div
@@ -700,20 +700,20 @@ export default function DashboardOverview() {
                                             ? 0
                                             : index * 0.05,
                                     }}
-                                    className='grid grid-cols-1 gap-2 px-4 py-3 transition-colors hover:bg-lucky-bg-tertiary/50 sm:grid-cols-3'
+                                    className='grid grid-cols-1 gap-2 px-4 py-3 transition-colors hover:bg-vaded-bg-tertiary/50 sm:grid-cols-3'
                                 >
                                     <div className='min-w-0'>
-                                        <p className='type-body-sm truncate text-lucky-text-primary'>
+                                        <p className='type-body-sm truncate text-vaded-text-primary'>
                                             {track.title}
                                         </p>
-                                        <p className='type-body-sm truncate text-lucky-text-tertiary'>
+                                        <p className='type-body-sm truncate text-vaded-text-tertiary'>
                                             {track.author}
                                         </p>
                                     </div>
-                                    <p className='type-body-sm text-lucky-text-secondary'>
+                                    <p className='type-body-sm text-vaded-text-secondary'>
                                         {track.playedBy || 'Unknown'}
                                     </p>
-                                    <p className='text-xs text-lucky-text-tertiary text-right'>
+                                    <p className='text-xs text-vaded-text-tertiary text-right'>
                                         {timeAgo(
                                             new Date(
                                                 track.timestamp,
@@ -724,11 +724,11 @@ export default function DashboardOverview() {
                             ))
                         ) : (
                             <div className='px-4 py-10 text-center'>
-                                <Music className='mx-auto mb-3 h-10 w-10 text-lucky-text-tertiary' />
-                                <p className='type-body text-lucky-text-secondary'>
+                                <Music className='mx-auto mb-3 h-10 w-10 text-vaded-text-tertiary' />
+                                <p className='type-body text-vaded-text-secondary'>
                                     {t('dashboardOverview.noTracksPlayedYet')}
                                 </p>
-                                <p className='type-body-sm text-lucky-text-tertiary'>
+                                <p className='type-body-sm text-vaded-text-tertiary'>
                                     {t(
                                         'dashboardOverview.trackHistoryWillAppearWhenMusicPlayed',
                                     )}
@@ -751,21 +751,21 @@ export default function DashboardOverview() {
                         delay: prefersReducedMotion ? 0 : 0.5,
                     }}
                 >
-                    <h2 className='type-title text-lucky-text-primary'>
+                    <h2 className='type-title text-vaded-text-primary'>
                         {t('dashboardOverview.community')}
                     </h2>
                     <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
-                        <div className='surface-panel overflow-hidden border border-lucky-border'>
-                            <div className='border-b border-lucky-border px-4 py-3'>
-                                <h3 className='type-body-sm font-semibold text-lucky-text-primary uppercase tracking-wide'>
+                        <div className='surface-panel overflow-hidden border border-vaded-border'>
+                            <div className='border-b border-vaded-border px-4 py-3'>
+                                <h3 className='type-body-sm font-semibold text-vaded-text-primary uppercase tracking-wide'>
                                     {t('dashboardOverview.levelLeaderboard')}
                                 </h3>
-                                <p className='type-body-sm text-lucky-text-tertiary'>
+                                <p className='type-body-sm text-vaded-text-tertiary'>
                                     {t('dashboardOverview.topMembersByXP')}
                                 </p>
                             </div>
 
-                            <div className='divide-y divide-lucky-border/50'>
+                            <div className='divide-y divide-vaded-border/50'>
                                 {leaderboardLoading ? (
                                     Array.from({ length: 4 }).map(
                                         (_, index) => (
@@ -796,15 +796,15 @@ export default function DashboardOverview() {
                                                     ? 0
                                                     : index * 0.05,
                                             }}
-                                            className='grid grid-cols-3 items-center gap-2 px-4 py-3 transition-colors hover:bg-lucky-bg-tertiary/50'
+                                            className='grid grid-cols-3 items-center gap-2 px-4 py-3 transition-colors hover:bg-vaded-bg-tertiary/50'
                                         >
-                                            <p className='type-body-sm text-lucky-text-primary'>
+                                            <p className='type-body-sm text-vaded-text-primary'>
                                                 Lv{member.level}
                                             </p>
-                                            <p className='type-body-sm truncate text-lucky-text-secondary'>
+                                            <p className='type-body-sm truncate text-vaded-text-secondary'>
                                                 {member.userId}
                                             </p>
-                                            <p className='text-xs text-lucky-text-tertiary text-right'>
+                                            <p className='text-xs text-vaded-text-tertiary text-right'>
                                                 {member.xp.toLocaleString()}
                                                 XP
                                             </p>
@@ -812,8 +812,8 @@ export default function DashboardOverview() {
                                     ))
                                 ) : (
                                     <div className='px-4 py-8 text-center'>
-                                        <TrendingUp className='mx-auto mb-2 h-8 w-8 text-lucky-text-tertiary' />
-                                        <p className='type-body-sm text-lucky-text-secondary'>
+                                        <TrendingUp className='mx-auto mb-2 h-8 w-8 text-vaded-text-tertiary' />
+                                        <p className='type-body-sm text-vaded-text-secondary'>
                                             {t(
                                                 'dashboardOverview.noLeaderboardData',
                                             )}
@@ -823,17 +823,17 @@ export default function DashboardOverview() {
                             </div>
                         </div>
 
-                        <div className='surface-panel overflow-hidden border border-lucky-border'>
-                            <div className='border-b border-lucky-border px-4 py-3'>
-                                <h3 className='type-body-sm font-semibold text-lucky-text-primary uppercase tracking-wide'>
+                        <div className='surface-panel overflow-hidden border border-vaded-border'>
+                            <div className='border-b border-vaded-border px-4 py-3'>
+                                <h3 className='type-body-sm font-semibold text-vaded-text-primary uppercase tracking-wide'>
                                     {t('dashboardOverview.starboardHighlights')}
                                 </h3>
-                                <p className='type-body-sm text-lucky-text-tertiary'>
+                                <p className='type-body-sm text-vaded-text-tertiary'>
                                     {t('dashboardOverview.topStarredMessages')}
                                 </p>
                             </div>
 
-                            <div className='divide-y divide-lucky-border/50'>
+                            <div className='divide-y divide-vaded-border/50'>
                                 {starboardLoading ? (
                                     Array.from({ length: 3 }).map(
                                         (_, index) => (
@@ -863,9 +863,9 @@ export default function DashboardOverview() {
                                                     ? 0
                                                     : index * 0.05,
                                             }}
-                                            className='grid grid-cols-2 items-center gap-2 px-4 py-3 transition-colors hover:bg-lucky-bg-tertiary/50'
+                                            className='grid grid-cols-2 items-center gap-2 px-4 py-3 transition-colors hover:bg-vaded-bg-tertiary/50'
                                         >
-                                            <p className='type-body-sm truncate text-lucky-text-primary'>
+                                            <p className='type-body-sm truncate text-vaded-text-primary'>
                                                 {entry.content
                                                     ? entry.content.substring(
                                                           0,
@@ -873,7 +873,7 @@ export default function DashboardOverview() {
                                                       ) + '...'
                                                     : 'Message'}
                                             </p>
-                                            <div className='flex items-center justify-end gap-1 text-xs text-lucky-text-tertiary'>
+                                            <div className='flex items-center justify-end gap-1 text-xs text-vaded-text-tertiary'>
                                                 <Star className='h-3 w-3' />
                                                 {entry.starCount}
                                             </div>
@@ -881,8 +881,8 @@ export default function DashboardOverview() {
                                     ))
                                 ) : (
                                     <div className='px-4 py-8 text-center'>
-                                        <Star className='mx-auto mb-2 h-8 w-8 text-lucky-text-tertiary' />
-                                        <p className='type-body-sm text-lucky-text-secondary'>
+                                        <Star className='mx-auto mb-2 h-8 w-8 text-vaded-text-tertiary' />
+                                        <p className='type-body-sm text-vaded-text-secondary'>
                                             {t(
                                                 'dashboardOverview.noStarredMessages',
                                             )}
@@ -897,7 +897,7 @@ export default function DashboardOverview() {
 
             {Object.keys(stats?.casesByType ?? {}).length > 0 && (
                 <section className='space-y-4'>
-                    <h2 className='type-title text-lucky-text-primary'>
+                    <h2 className='type-title text-vaded-text-primary'>
                         {t('dashboardOverview.casesByType')}
                     </h2>
                     <div className='grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6'>

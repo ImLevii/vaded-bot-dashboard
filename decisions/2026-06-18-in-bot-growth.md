@@ -10,7 +10,7 @@
 (`decisions/2026-06-17-growth-channel-sequencing.md`). This ADR decides the **in-bot /
 product-led** question — should the bot _itself_ drive growth, and via which mechanics?
 
-Already shipped: `/invite` command + a one-line "• /invite to add Lucky" Now-Playing embed
+Already shipped: `/invite` command + a one-line "• /invite to add Vaded Gaming" Now-Playing embed
 footer CTA (#1495); a top.gg `/voterewards` loop; `guildCreate`/`guildDelete` telemetry
 (#1494 — the same handler an onboarding message reuses).
 

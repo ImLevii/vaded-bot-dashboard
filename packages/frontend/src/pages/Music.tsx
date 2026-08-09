@@ -76,14 +76,14 @@ export default function MusicPage() {
             <header className='flex items-center justify-between gap-3'>
                 <div className='flex items-center gap-3 min-w-0'>
                     <Music2
-                        className='h-6 w-6 sm:h-7 sm:w-7 text-lucky-brand shrink-0'
+                        className='h-6 w-6 sm:h-7 sm:w-7 text-vaded-brand shrink-0'
                         aria-hidden='true'
                     />
                     <div className='min-w-0'>
-                        <h1 className='type-h1 text-lucky-text-primary truncate'>
+                        <h1 className='type-h1 text-vaded-text-primary truncate'>
                             {t('music.musicPlayer')}
                         </h1>
-                        <p className='type-body-sm text-lucky-text-secondary truncate'>
+                        <p className='type-body-sm text-vaded-text-secondary truncate'>
                             {player.state.voiceChannelName
                                 ? t('music.connectedToVoiceChannel', {
                                       channel: player.state.voiceChannelName,
@@ -158,14 +158,14 @@ export default function MusicPage() {
 
             {player.error && (
                 <div
-                    className='type-body-sm text-lucky-error bg-lucky-error/10 border border-lucky-error/20 rounded-lg p-3 flex items-start justify-between gap-3'
+                    className='type-body-sm text-vaded-error bg-vaded-error/10 border border-vaded-error/20 rounded-lg p-3 flex items-start justify-between gap-3'
                     role='alert'
                 >
                     <span>{player.error}</span>
                     <button
                         type='button'
                         onClick={() => player.clearError()}
-                        className='shrink-0 type-meta text-lucky-error/80 hover:text-lucky-error underline'
+                        className='shrink-0 type-meta text-vaded-error/80 hover:text-vaded-error underline'
                     >
                         {t('music.dismissError')}
                     </button>
@@ -234,16 +234,16 @@ function NowPlayingHero({
 
     if (!currentTrack) {
         return (
-            <div className='surface-card rounded-2xl border border-lucky-border overflow-hidden'>
+            <div className='surface-card rounded-2xl border border-vaded-border overflow-hidden'>
                 <div className='flex items-center justify-center min-h-[300px] sm:min-h-[340px]'>
                     <div className='text-center'>
-                        <div className='w-20 h-20 rounded-full bg-lucky-bg-active border border-lucky-border flex items-center justify-center mx-auto mb-4'>
-                            <Music2 className='h-9 w-9 text-lucky-text-tertiary' aria-hidden='true' />
+                        <div className='w-20 h-20 rounded-full bg-vaded-bg-active border border-vaded-border flex items-center justify-center mx-auto mb-4'>
+                            <Music2 className='h-9 w-9 text-vaded-text-tertiary' aria-hidden='true' />
                         </div>
-                        <p className='type-body font-semibold text-lucky-text-secondary'>
+                        <p className='type-body font-semibold text-vaded-text-secondary'>
                             {t('music.nothingPlaying')}
                         </p>
-                        <p className='type-body-sm text-lucky-text-tertiary mt-1'>
+                        <p className='type-body-sm text-vaded-text-tertiary mt-1'>
                             {t('music.searchOrImportToGetStarted')}
                         </p>
                     </div>
@@ -258,7 +258,7 @@ function NowPlayingHero({
     const progress = durationMs > 0 ? (positionMs / durationMs) * 100 : 0
 
     return (
-        <div className='relative rounded-2xl border border-lucky-border overflow-hidden'>
+        <div className='relative rounded-2xl border border-vaded-border overflow-hidden'>
             {/* Blurred album art backdrop */}
             {currentTrack.thumbnail && (
                 <div
@@ -270,7 +270,7 @@ function NowPlayingHero({
                     aria-hidden='true'
                 />
             )}
-            <div className='absolute inset-0 bg-lucky-bg-primary/80' aria-hidden='true' />
+            <div className='absolute inset-0 bg-vaded-bg-primary/80' aria-hidden='true' />
 
             <div className='relative z-10 p-5 sm:p-8'>
                 {/* Main layout: art left, info right */}
@@ -279,7 +279,7 @@ function NowPlayingHero({
                     {/* Album art — spins when playing */}
                     <div className='shrink-0 relative'>
                         <div
-                            className='w-36 h-36 sm:w-44 sm:h-44 rounded-full overflow-hidden border-4 border-lucky-border shadow-[0_0_40px_rgb(220_38_38_/_0.25)]'
+                            className='w-36 h-36 sm:w-44 sm:h-44 rounded-full overflow-hidden border-4 border-vaded-border shadow-[0_0_40px_rgb(220_38_38_/_0.25)]'
                             style={{
                                 animation: state.isPlaying && !isStale
                                     ? 'vinyl-spin 8s linear infinite'
@@ -294,14 +294,14 @@ function NowPlayingHero({
                                     draggable={false}
                                 />
                             ) : (
-                                <div className='w-full h-full bg-lucky-bg-active flex items-center justify-center'>
-                                    <Music2 className='h-10 w-10 text-lucky-text-tertiary' />
+                                <div className='w-full h-full bg-vaded-bg-active flex items-center justify-center'>
+                                    <Music2 className='h-10 w-10 text-vaded-text-tertiary' />
                                 </div>
                             )}
                         </div>
                         {/* Centre spindle dot */}
                         <div className='absolute inset-0 flex items-center justify-center pointer-events-none'>
-                            <div className='w-4 h-4 rounded-full bg-lucky-bg-primary border-2 border-lucky-border' />
+                            <div className='w-4 h-4 rounded-full bg-vaded-bg-primary border-2 border-vaded-border' />
                         </div>
                     </div>
 
@@ -312,12 +312,12 @@ function NowPlayingHero({
                         <div className='flex items-center gap-2 justify-center sm:justify-start mb-2'>
                             {state.isPlaying && !isStale && (
                                 <span
-                                    className='w-2 h-2 rounded-full bg-lucky-brand block shrink-0'
+                                    className='w-2 h-2 rounded-full bg-vaded-brand block shrink-0'
                                     style={{ animation: 'live-pulse 1.4s ease-in-out infinite' }}
                                     aria-hidden='true'
                                 />
                             )}
-                            <span className='type-meta text-lucky-brand font-bold tracking-widest uppercase'>
+                            <span className='type-meta text-vaded-brand font-bold tracking-widest uppercase'>
                                 {t('music.nowPlaying')}
                             </span>
                         </div>
@@ -325,7 +325,7 @@ function NowPlayingHero({
                         {/* Title — marquee on overflow */}
                         <div className='overflow-hidden mb-1'>
                             <h2
-                                className='type-h2 text-lucky-text-primary whitespace-nowrap font-bold'
+                                className='type-h2 text-vaded-text-primary whitespace-nowrap font-bold'
                                 title={currentTrack.title}
                                 style={
                                     (currentTrack.title?.length ?? 0) > 36
@@ -336,7 +336,7 @@ function NowPlayingHero({
                                 {currentTrack.title || t('music.unknown')}
                             </h2>
                         </div>
-                        <p className='type-body text-lucky-text-secondary mb-5'>
+                        <p className='type-body text-vaded-text-secondary mb-5'>
                             {currentTrack.author || t('music.unknown')}
                         </p>
 
@@ -348,7 +348,7 @@ function NowPlayingHero({
                             >
                                 {/* Track fill with shimmer */}
                                 <div
-                                    className={`relative h-full rounded-full transition-[width] duration-1000 overflow-hidden ${isStale ? 'bg-lucky-warning' : 'bg-lucky-brand'}`}
+                                    className={`relative h-full rounded-full transition-[width] duration-1000 overflow-hidden ${isStale ? 'bg-vaded-warning' : 'bg-vaded-brand'}`}
                                     style={{
                                         width: `${progress}%`,
                                         boxShadow: isStale ? undefined : '0 0 12px rgba(220,38,38,0.6)',
@@ -371,16 +371,16 @@ function NowPlayingHero({
                                 {/* Scrubber thumb */}
                                 {progress > 0 && (
                                     <div
-                                        className='absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-white shadow-[0_0_8px_rgba(220,38,38,0.7)] border-2 border-lucky-brand opacity-0 group-hover:opacity-100 transition-opacity duration-150'
+                                        className='absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-white shadow-[0_0_8px_rgba(220,38,38,0.7)] border-2 border-vaded-brand opacity-0 group-hover:opacity-100 transition-opacity duration-150'
                                         style={{ left: `${progress}%` }}
                                         aria-hidden='true'
                                     />
                                 )}
                             </div>
-                            <div className='flex justify-between type-meta text-lucky-text-tertiary mt-2 tabular-nums font-medium tracking-wide'>
-                                <span className='text-lucky-text-secondary'>{formatSeconds(positionMs / 1000)}</span>
+                            <div className='flex justify-between type-meta text-vaded-text-tertiary mt-2 tabular-nums font-medium tracking-wide'>
+                                <span className='text-vaded-text-secondary'>{formatSeconds(positionMs / 1000)}</span>
                                 {isStale && (
-                                    <span role='status' className='text-lucky-warning text-center'>
+                                    <span role='status' className='text-vaded-warning text-center'>
                                         {t('music.progressMayBeOutdated')}
                                     </span>
                                 )}
@@ -415,7 +415,7 @@ function NowPlayingHero({
                             <button
                                 onClick={onPlayPause}
                                 disabled={!controlsEnabled}
-                                className='group relative h-14 w-14 rounded-xl btn-glass text-white flex items-center justify-center active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lucky-brand focus-visible:ring-offset-2 focus-visible:ring-offset-transparent overflow-hidden'
+                                className='group relative h-14 w-14 rounded-xl btn-glass text-white flex items-center justify-center active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vaded-brand focus-visible:ring-offset-2 focus-visible:ring-offset-transparent overflow-hidden'
                                 style={{ boxShadow: '0 4px 24px rgba(220,38,38,0.3), 0 0 0 1px rgba(220,38,38,0.35)' }}
                                 aria-label={state.isPlaying ? t('music.pause') : t('music.play')}
                                 aria-busy={pendingAction === 'pause' || pendingAction === 'resume'}
@@ -449,7 +449,7 @@ function NowPlayingHero({
 
                         {/* Volume */}
                         <div className='flex items-center gap-3 max-w-xs mx-auto sm:mx-0'>
-                            <Volume2 className='h-4 w-4 text-lucky-text-tertiary shrink-0' aria-hidden='true' />
+                            <Volume2 className='h-4 w-4 text-vaded-text-tertiary shrink-0' aria-hidden='true' />
                             <input
                                 type='range'
                                 min='0'
@@ -457,16 +457,16 @@ function NowPlayingHero({
                                 value={state.volume ?? 50}
                                 onChange={(e) => onVolumeChange(parseInt(e.target.value, 10))}
                                 disabled={!controlsEnabled}
-                                className='flex-1 h-1.5 bg-lucky-bg-active rounded-full appearance-none cursor-pointer accent-lucky-brand disabled:opacity-40 disabled:cursor-not-allowed'
+                                className='flex-1 h-1.5 bg-vaded-bg-active rounded-full appearance-none cursor-pointer accent-vaded-brand disabled:opacity-40 disabled:cursor-not-allowed'
                                 aria-label={t('music.volume')}
                             />
-                            <span className='type-meta text-lucky-text-tertiary w-8 text-right tabular-nums'>
+                            <span className='type-meta text-vaded-text-tertiary w-8 text-right tabular-nums'>
                                 {state.volume ?? 50}
                             </span>
                         </div>
 
                         {!controlsEnabled && (
-                            <p className='type-meta text-center sm:text-left text-lucky-text-tertiary mt-3'>
+                            <p className='type-meta text-center sm:text-left text-vaded-text-tertiary mt-3'>
                                 {busy ? t('music.commandInProgress') : t('music.notConnectedToVoiceChannel')}
                             </p>
                         )}
@@ -493,10 +493,10 @@ function ControlButton({
         <button
             onClick={onClick}
             disabled={disabled}
-            className={`group relative h-11 w-11 rounded-full flex items-center justify-center transition-all active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lucky-brand overflow-hidden ${
+            className={`group relative h-11 w-11 rounded-full flex items-center justify-center transition-all active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vaded-brand overflow-hidden ${
                 active
-                    ? 'text-lucky-brand border border-lucky-brand/40'
-                    : 'text-lucky-text-secondary hover:text-lucky-text-primary border border-white/8'
+                    ? 'text-vaded-brand border border-vaded-brand/40'
+                    : 'text-vaded-text-secondary hover:text-vaded-text-primary border border-white/8'
             }`}
             style={{
                 background: active
@@ -539,8 +539,8 @@ function ConnectionBadge({ connected }: { connected: boolean }) {
         <div
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full type-meta shrink-0 border transition-colors ${
                 connected
-                    ? 'bg-lucky-success/10 text-lucky-success border-lucky-success/20'
-                    : 'bg-lucky-warning/10 text-lucky-warning border-lucky-warning/20'
+                    ? 'bg-vaded-success/10 text-vaded-success border-vaded-success/20'
+                    : 'bg-vaded-warning/10 text-vaded-warning border-vaded-warning/20'
             }`}
             role='status'
             aria-label={

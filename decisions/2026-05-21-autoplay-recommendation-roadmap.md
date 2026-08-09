@@ -7,7 +7,7 @@
 
 ## Context
 
-Lucky's autoplay engine (`packages/bot/src/utils/music/autoplay/`) selects tracks and mounts a radio-like queue after every track ends. Over the last 60 days the system received **30+ commits**, including a 6-PR cluster fixing Spanish/gospel/sertanejo "drift" — autoplay surfacing cross-language or cross-genre tracks in non-matching sessions. The drift fixes have layered, building a stack of independent defenses:
+Vaded Gaming's autoplay engine (`packages/bot/src/utils/music/autoplay/`) selects tracks and mounts a radio-like queue after every track ends. Over the last 60 days the system received **30+ commits**, including a 6-PR cluster fixing Spanish/gospel/sertanejo "drift" — autoplay surfacing cross-language or cross-genre tracks in non-matching sessions. The drift fixes have layered, building a stack of independent defenses:
 
 - `GENRE_FAMILIES` hard-veto in `candidateScorer.ts` (scores → `-Infinity`)
 - Cross-locale Spanish veto (`detectSpanishMarkers()` + locale check)
@@ -103,7 +103,7 @@ In parallel with the above (separate PRs, not blocking the phases):
 ### Negative
 
 - Total scope is 4 PRs minimum (Phase A + B + C + retrospective ADRs). At 1 PR / 2-3 days, that's 1.5-2 weeks of intermittent work.
-- Phase A is a Prisma schema migration. Lucky has had lockfile fragility around schema/dep changes recently (see PR #919 cascade). The migration needs to land cleanly with `--package-lock-only --ignore-scripts` patterns established in PR #921.
+- Phase A is a Prisma schema migration. Vaded Gaming has had lockfile fragility around schema/dep changes recently (see PR #919 cascade). The migration needs to land cleanly with `--package-lock-only --ignore-scripts` patterns established in PR #921.
 - Phase D is conditional on Phase C data being conclusive. If the baseline shows current acceptance rates are already high (>85% per source), Phase D becomes a "nice-to-have refactor" that the user may correctly choose to defer indefinitely.
 
 ### Neutral
@@ -149,7 +149,7 @@ Rollback for any phase: revert the PR. Phases A and B are additive — old code 
 - **A new geographic/genre drift surfaces** (e.g., Korean ballad, J-pop, French chanson) **between Phase A and Phase D** → that drift gets a layered-veto patch in the existing style. Don't pre-emptively block on the coherence layer.
 - **`@discordjs/opus` or `discord-player` major bump** changes the queue/replenish event shapes → revisit Phase B's outcome-write integration points.
 - **`MUSIC_RECOMMENDATIONS` toggle flips ON** → revisit whether `/recommend` exposes the same engine (yes) or a separate one (no, currently). Likely just a wiring task at that point, but worth confirming in a follow-up ADR.
-- **Lucky adds OpenSearch / Elasticsearch / a real analytics store** → Phase C read path migrates from Prisma aggregation to that store; current per-Postgres-query approach is fine for the 7-day window and current scale (hundreds of guilds, not thousands).
+- **Vaded Gaming adds OpenSearch / Elasticsearch / a real analytics store** → Phase C read path migrates from Prisma aggregation to that store; current per-Postgres-query approach is fine for the 7-day window and current scale (hundreds of guilds, not thousands).
 
 ## Related artefacts
 
@@ -157,4 +157,4 @@ Rollback for any phase: revert the PR. Phases A and B are additive — old code 
 - PR #810 — structured telemetry on replenishment (informs Phase C dashboard shape)
 - PRs #780, #817, #818, #819, #820, #827 — the 6 drift-veto fixes that the layered defense layer is composed from. Retrospective ADRs (cross-cutting work item) should cover at minimum the rationale for #780 (hard-reject Spanish drift) and #827 (remove YouTube fallback).
 - Issue: `MUSIC_RECOMMENDATIONS` toggle (currently OFF in `packages/shared/src/config/featureToggles.ts:17`)
-- Memory: `~/.claude/projects/-Volumes-External-HD-Desenvolvimento-Lucky/memory/` — observation #3407 (PR #817 autoplay overhaul), #3410 (PR #818 locale filter), #3422 (PR #817 Spotify-genre fallback), #3448 (RecommendationBasis refactor PR #830), #3449 (PR #827 YouTube-fallback removal). The reactive-patch pattern these memories document is the load-bearing context for the telemetry-first sequencing.
+- Memory: `~/.claude/projects/-Volumes-External-HD-Desenvolvimento-vaded-gaming/memory/` — observation #3407 (PR #817 autoplay overhaul), #3410 (PR #818 locale filter), #3422 (PR #817 Spotify-genre fallback), #3448 (RecommendationBasis refactor PR #830), #3449 (PR #827 YouTube-fallback removal). The reactive-patch pattern these memories document is the load-bearing context for the telemetry-first sequencing.

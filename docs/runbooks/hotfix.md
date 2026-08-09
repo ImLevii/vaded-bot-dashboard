@@ -52,7 +52,7 @@ a forward-fix when reverting is safer. If the fix is already on `main`, skip her
 Do **not** assume `main` HEAD — confirm it has a successful `docker-publish` run:
 
 ```bash
-gh run list --repo LucasSantana-Dev/Lucky --workflow=docker-publish.yml \
+gh run list --repo LucasSantana-Dev/vaded-gaming --workflow=docker-publish.yml \
   --limit 20 --json headSha,status,conclusion,createdAt,displayTitle \
   --jq '.[] | select(.status=="completed" and .conclusion=="success")
         | "\(.headSha[0:8]) \(.createdAt) \(.displayTitle)"'
@@ -75,7 +75,7 @@ git merge-base --is-ancestor <fix-commit> <target-sha> && echo "fix is in target
 
 ```bash
 # (a) No un-applied prisma migrations between current prod and target?
-PROD_SHA=$(ssh homelab 'cat /home/luk-server/Lucky/.deploy-last-good-sha')
+PROD_SHA=$(ssh homelab 'cat /home/luk-server/vaded-gaming/.deploy-last-good-sha')
 git diff --name-only "$PROD_SHA".."<target-sha>" -- prisma/migrations/
 # Empty output = migration-free (lowest risk). If non-empty, the deploy WILL run
 # them via `prisma migrate deploy`; proceed only if they are forward-safe, and
@@ -94,7 +94,7 @@ echo "last-good (rollback target if this fails): $PROD_SHA"
 ### 4. Deploy
 
 ```bash
-gh workflow run deploy.yml --repo LucasSantana-Dev/Lucky --ref main \
+gh workflow run deploy.yml --repo LucasSantana-Dev/vaded-gaming --ref main \
   -f rollback_sha=<target-sha>
 ```
 
@@ -106,11 +106,11 @@ form is the safe default for any exact SHA.)
 
 ```bash
 # GH workflow
-gh run list --repo LucasSantana-Dev/Lucky --workflow=deploy.yml -L 1 \
+gh run list --repo LucasSantana-Dev/vaded-gaming --workflow=deploy.yml -L 1 \
   --json databaseId,status,conclusion --jq '.[]'
 
 # Box rollout (the deploy runs inside the webhook container)
-ssh homelab 'docker exec lucky-webhook tail -40 /tmp/lucky-deploy.log'
+ssh homelab 'docker exec vaded-webhook tail -40 /tmp/vaded-deploy.log'
 ```
 
 Wait for `Deploy complete!` (success), `Rolled Back` (auto-rollback fired — fix
@@ -121,9 +121,9 @@ success externally.
 ### 6. Verify live
 
 ```bash
-ssh homelab 'docker ps --filter name=vaded-gaming-bot --filter name=lucky-backend \
+ssh homelab 'docker ps --filter name=vaded-gaming-bot --filter name=vaded-backend \
   --format "{{.Names}} {{.Image}} {{.Status}}"   # all on :<target-sha>, healthy
-  && cat /home/luk-server/Lucky/.deploy-last-good-sha   # advanced to target'
+  && cat /home/luk-server/vaded-gaming/.deploy-last-good-sha   # advanced to target'
 ```
 
 Confirm in Sentry that the original issue stopped firing and no new issue

@@ -1,7 +1,7 @@
 import { describe, expect, it, jest, beforeEach } from '@jest/globals'
 
 jest.mock('@lucky/shared/constants', () => ({
-    COLOR: { LUCKY_PURPLE: '#7e5bc2' },
+    COLOR: { VADED_PURPLE: '#7e5bc2' },
 }))
 jest.mock('@lucky/shared/utils', () => ({
     errorLog: jest.fn(),

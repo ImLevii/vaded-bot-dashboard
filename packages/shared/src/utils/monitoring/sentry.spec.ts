@@ -70,7 +70,7 @@ describe('sentry monitoring', () => {
 
     it('initializes sentry with service metadata and overrides', () => {
         initializeSentry({
-            appName: 'lucky',
+            appName: 'vaded',
             serviceName: 'bot',
             release: '1.2.3',
             serverName: 'bot-01',
@@ -86,7 +86,7 @@ describe('sentry monitoring', () => {
                 serverName: 'bot-01',
                 initialScope: {
                     tags: {
-                        app: 'lucky',
+                        app: 'vaded',
                         service: 'bot',
                         runtime: 'discord-bot',
                     },

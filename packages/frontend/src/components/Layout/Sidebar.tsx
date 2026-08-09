@@ -235,11 +235,11 @@ function NavSections({
                     <div
                         key={section.titleKey}
                         className={cn(
-                            index > 0 && 'border-t border-lucky-border/70 pt-4',
+                            index > 0 && 'border-t border-vaded-border/70 pt-4',
                         )}
                     >
                         <p
-                            className='type-meta mb-2 px-2 text-lucky-text-subtle uppercase tracking-[0.22em] text-[10px] font-semibold'
+                            className='type-meta mb-2 px-2 text-vaded-text-subtle uppercase tracking-[0.22em] text-[10px] font-semibold'
                             aria-hidden='true'
                         >
                             {t(section.titleKey)}
@@ -266,17 +266,17 @@ function NavSections({
                                                     active ? 'page' : undefined
                                                 }
                                                 className={cn(
-                                                    'lucky-focus-visible group relative flex min-h-[38px] items-center gap-2.5 rounded-lg border px-2.5 py-2 transition-all duration-120',
+                                                    'vaded-focus-visible group relative flex min-h-[38px] items-center gap-2.5 rounded-lg border px-2.5 py-2 transition-all duration-120',
                                                     active
-                                                        ? 'border-lucky-brand/40 bg-lucky-bg-active text-lucky-text-primary shadow-[0_8px_24px_rgb(0_0_0/0.18)]'
-                                                        : 'border-transparent text-lucky-text-tertiary hover:border-lucky-border hover:bg-lucky-bg-tertiary hover:text-lucky-text-primary',
+                                                        ? 'border-vaded-brand/40 bg-vaded-bg-active text-vaded-text-primary shadow-[0_8px_24px_rgb(0_0_0/0.18)]'
+                                                        : 'border-transparent text-vaded-text-tertiary hover:border-vaded-border hover:bg-vaded-bg-tertiary hover:text-vaded-text-primary',
                                                 )}
                                             >
                                                 <span
                                                     className={cn(
                                                         'absolute left-0 top-1/2 h-4 w-[3px] -translate-y-1/2 rounded-r transition-all duration-120',
                                                         active
-                                                            ? 'bg-lucky-brand'
+                                                            ? 'bg-vaded-brand'
                                                             : 'bg-transparent',
                                                     )}
                                                     aria-hidden='true'
@@ -285,8 +285,8 @@ function NavSections({
                                                     className={cn(
                                                         'h-4 w-4 shrink-0 transition-colors duration-120',
                                                         active
-                                                            ? 'text-lucky-brand'
-                                                            : 'text-lucky-text-subtle group-hover:text-lucky-text-tertiary',
+                                                            ? 'text-vaded-brand'
+                                                            : 'text-vaded-text-subtle group-hover:text-vaded-text-tertiary',
                                                     )}
                                                     aria-hidden='true'
                                                 />
@@ -296,7 +296,7 @@ function NavSections({
                                                 {item.badge !== undefined &&
                                                     item.badge > 0 && (
                                                         <span
-                                                            className='ml-auto inline-flex min-h-[18px] min-w-[18px] items-center justify-center rounded-full bg-lucky-brand px-1 text-[11px] font-semibold text-white'
+                                                            className='ml-auto inline-flex min-h-[18px] min-w-[18px] items-center justify-center rounded-full bg-vaded-brand px-1 text-[11px] font-semibold text-white'
                                                             aria-label={`${item.badge} notifications`}
                                                         >
                                                             {item.badge > 99
@@ -312,9 +312,9 @@ function NavSections({
                     </div>
                 ))}
                 {isDeveloper && (
-                    <div className='border-t border-lucky-border/70 pt-4'>
+                    <div className='border-t border-vaded-border/70 pt-4'>
                         <p
-                            className='type-meta mb-2 px-2 text-lucky-text-subtle uppercase tracking-[0.22em] text-[10px] font-semibold'
+                            className='type-meta mb-2 px-2 text-vaded-text-subtle uppercase tracking-[0.22em] text-[10px] font-semibold'
                             aria-hidden='true'
                         >
                             Admin
@@ -330,17 +330,17 @@ function NavSections({
                                         isActive('/admin') ? 'page' : undefined
                                     }
                                     className={cn(
-                                        'lucky-focus-visible group relative flex min-h-[38px] items-center gap-2.5 rounded-lg border px-2.5 py-2 transition-all duration-120',
+                                        'vaded-focus-visible group relative flex min-h-[38px] items-center gap-2.5 rounded-lg border px-2.5 py-2 transition-all duration-120',
                                         isActive('/admin')
-                                            ? 'border-lucky-brand/40 bg-lucky-bg-active text-lucky-text-primary shadow-[0_8px_24px_rgb(0_0_0/0.18)]'
-                                            : 'border-transparent text-lucky-text-tertiary hover:border-lucky-border hover:bg-lucky-bg-tertiary hover:text-lucky-text-primary',
+                                            ? 'border-vaded-brand/40 bg-vaded-bg-active text-vaded-text-primary shadow-[0_8px_24px_rgb(0_0_0/0.18)]'
+                                            : 'border-transparent text-vaded-text-tertiary hover:border-vaded-border hover:bg-vaded-bg-tertiary hover:text-vaded-text-primary',
                                     )}
                                 >
                                     <span
                                         className={cn(
                                             'absolute left-0 top-1/2 h-4 w-[3px] -translate-y-1/2 rounded-r transition-all duration-120',
                                             isActive('/admin')
-                                                ? 'bg-lucky-brand'
+                                                ? 'bg-vaded-brand'
                                                 : 'bg-transparent',
                                         )}
                                         aria-hidden='true'
@@ -349,8 +349,8 @@ function NavSections({
                                         className={cn(
                                             'h-4 w-4 shrink-0 transition-colors duration-120',
                                             isActive('/admin')
-                                                ? 'text-lucky-brand'
-                                                : 'text-lucky-text-subtle group-hover:text-lucky-text-tertiary',
+                                                ? 'text-vaded-brand'
+                                                : 'text-vaded-text-subtle group-hover:text-vaded-text-tertiary',
                                         )}
                                         aria-hidden='true'
                                     />
@@ -404,14 +404,14 @@ function Sidebar() {
             {/* Brand header */}
             <div className='flex items-center gap-2.5 px-4 py-4 border-b border-white/6'>
                 <img
-                    src='/lucky-logo.png'
+                    src='/vaded-logo.png'
                     alt='Vaded Gaming'
                     width='32'
                     height='32'
                     className='h-8 w-8 rounded-lg object-cover object-center shrink-0'
                 />
                 <span className='font-black text-lg tracking-tight leading-none'>
-                    VADED<span className='text-lucky-brand'>GAMING</span>
+                    VADED<span className='text-vaded-brand'>GAMING</span>
                 </span>
             </div>
             <NavSections
@@ -426,7 +426,7 @@ function Sidebar() {
         <>
             <button
                 type='button'
-                className='lucky-focus-visible fixed left-3 top-3 z-50 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md border border-lucky-border bg-lucky-bg-secondary text-lucky-text-primary transition-colors hover:bg-lucky-bg-tertiary lg:hidden'
+                className='vaded-focus-visible fixed left-3 top-3 z-50 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md border border-vaded-border bg-vaded-bg-secondary text-vaded-text-primary transition-colors hover:bg-vaded-bg-tertiary lg:hidden'
                 onClick={() => setMobileOpen(true)}
                 aria-label='Open navigation menu'
                 aria-expanded={mobileOpen}
@@ -487,7 +487,7 @@ function Sidebar() {
             </AnimatePresence>
 
             <aside
-                className='hidden h-screen w-64 shrink-0 border-r border-white/6 bg-lucky-bg-secondary/60 backdrop-blur-2xl lg:flex lg:sticky lg:top-0 lg:flex-col'
+                className='hidden h-screen w-64 shrink-0 border-r border-white/6 bg-vaded-bg-secondary/60 backdrop-blur-2xl lg:flex lg:sticky lg:top-0 lg:flex-col'
                 aria-label='Navigation sidebar'
             >
                 {sidebarContent}

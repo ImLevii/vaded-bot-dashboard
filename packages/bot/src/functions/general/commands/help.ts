@@ -104,8 +104,8 @@ function createHelpEmbeds(
             embed
                 .setTitle(
                     pageCount > 1
-                        ? `📚 Lucky — Command Reference (1/${pageCount})`
-                        : '📚 Lucky — Command Reference',
+                        ? `📚 Vaded Gaming — Command Reference (1/${pageCount})`
+                        : '📚 Vaded Gaming — Command Reference',
                 )
                 .setDescription(
                     'All available slash commands grouped by category. Use `/` to start any command.',

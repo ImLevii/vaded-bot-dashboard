@@ -131,10 +131,10 @@ function Starboard() {
         return (
             <div className='flex flex-col items-center justify-center py-12'>
                 <div className='text-center'>
-                    <p className='text-lg font-semibold text-lucky-text-primary mb-2'>
+                    <p className='text-lg font-semibold text-vaded-text-primary mb-2'>
                         {t('noServerSelected')}
                     </p>
-                    <p className='text-sm text-lucky-text-secondary'>
+                    <p className='text-sm text-vaded-text-secondary'>
                         {t('selectServerToView')}
                     </p>
                 </div>
@@ -165,15 +165,15 @@ function Starboard() {
         <div className='space-y-6'>
             {/* Entries */}
             <section>
-                <h2 className='type-title text-lucky-text-primary uppercase tracking-wide mb-4'>
+                <h2 className='type-title text-vaded-text-primary uppercase tracking-wide mb-4'>
                     {t('topStarredMessages')}
                 </h2>
                 {entries.length === 0 ? (
-                    <Card className='border border-lucky-border p-8 text-center'>
-                        <p className='text-lg font-semibold text-lucky-text-primary mb-2'>
+                    <Card className='border border-vaded-border p-8 text-center'>
+                        <p className='text-lg font-semibold text-vaded-text-primary mb-2'>
                             {t('noStarredMessages')}
                         </p>
-                        <p className='text-sm text-lucky-text-secondary'>
+                        <p className='text-sm text-vaded-text-secondary'>
                             {t('noStarredMessagesDesc')}
                         </p>
                     </Card>
@@ -182,19 +182,19 @@ function Starboard() {
                         {entries.map((entry) => (
                             <Card
                                 key={entry.id}
-                                className='border border-lucky-border p-4'
+                                className='border border-vaded-border p-4'
                             >
                                 {entry.content && (
-                                    <p className='text-sm text-lucky-text-primary mb-3'>
+                                    <p className='text-sm text-vaded-text-primary mb-3'>
                                         {entry.content}
                                     </p>
                                 )}
-                                <div className='flex items-center justify-between pt-2 border-t border-lucky-border text-xs'>
+                                <div className='flex items-center justify-between pt-2 border-t border-vaded-border text-xs'>
                                     <div className='flex items-center gap-3'>
-                                        <span className='font-semibold text-lucky-brand'>
+                                        <span className='font-semibold text-vaded-brand'>
                                             {entry.starCount}
                                         </span>
-                                        <span className='text-lucky-text-secondary'>
+                                        <span className='text-vaded-text-secondary'>
                                             {formatDate(entry.createdAt)}
                                         </span>
                                     </div>
@@ -207,13 +207,13 @@ function Starboard() {
 
             {/* Settings */}
             <section>
-                <h2 className='type-title text-lucky-text-primary uppercase tracking-wide mb-4'>
+                <h2 className='type-title text-vaded-text-primary uppercase tracking-wide mb-4'>
                     {t('settings')}
                 </h2>
-                <Card className='border border-lucky-border p-6 space-y-4'>
+                <Card className='border border-vaded-border p-6 space-y-4'>
                     {config && (
                         <div className='mb-4'>
-                            <Badge className='rounded-sm bg-lucky-success text-lucky-text-primary uppercase font-semibold text-xs'>
+                            <Badge className='rounded-sm bg-vaded-success text-vaded-text-primary uppercase font-semibold text-xs'>
                                 {t('active')}
                             </Badge>
                         </div>
@@ -222,7 +222,7 @@ function Starboard() {
                     <div>
                         <Label
                             htmlFor='channel'
-                            className='type-meta text-lucky-text-tertiary uppercase tracking-wide font-semibold text-sm'
+                            className='type-meta text-vaded-text-tertiary uppercase tracking-wide font-semibold text-sm'
                         >
                             {t('channelId')}
                         </Label>
@@ -239,7 +239,7 @@ function Starboard() {
                     <div>
                         <Label
                             htmlFor='emoji'
-                            className='type-meta text-lucky-text-tertiary uppercase tracking-wide font-semibold text-sm'
+                            className='type-meta text-vaded-text-tertiary uppercase tracking-wide font-semibold text-sm'
                         >
                             {t('emoji')}
                         </Label>
@@ -256,7 +256,7 @@ function Starboard() {
                     <div>
                         <Label
                             htmlFor='threshold'
-                            className='type-meta text-lucky-text-tertiary uppercase tracking-wide font-semibold text-sm'
+                            className='type-meta text-vaded-text-tertiary uppercase tracking-wide font-semibold text-sm'
                         >
                             {t('starThreshold')}
                         </Label>
@@ -277,10 +277,10 @@ function Starboard() {
                         />
                     </div>
 
-                    <div className='flex items-center justify-between pt-2 border-t border-lucky-border'>
+                    <div className='flex items-center justify-between pt-2 border-t border-vaded-border'>
                         <Label
                             htmlFor='selfStar'
-                            className='type-meta text-lucky-text-tertiary uppercase tracking-wide font-semibold text-sm'
+                            className='type-meta text-vaded-text-tertiary uppercase tracking-wide font-semibold text-sm'
                         >
                             {t('allowSelfStar')}
                         </Label>

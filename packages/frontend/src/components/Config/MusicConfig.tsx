@@ -113,7 +113,7 @@ export default function MusicConfig({ guildId }: MusicConfigProps) {
                     Music Configuration
                 </h2>
             </div>
-            <p className='text-lucky-text-secondary mb-6'>
+            <p className='text-vaded-text-secondary mb-6'>
                 Configure music playback settings for your Discord bot
             </p>
 
@@ -128,7 +128,7 @@ export default function MusicConfig({ guildId }: MusicConfigProps) {
                             Volume
                         </Label>
                         <span
-                            className='text-sm font-medium text-lucky-text-secondary'
+                            className='text-sm font-medium text-vaded-text-secondary'
                             aria-live='polite'
                         >
                             {form.watch('volume')}%
@@ -144,17 +144,17 @@ export default function MusicConfig({ guildId }: MusicConfigProps) {
                         className='w-full'
                         aria-label='Volume level'
                     />
-                    <p className='text-xs text-lucky-text-secondary'>
+                    <p className='text-xs text-vaded-text-secondary'>
                         Set the default volume level (0-100)
                     </p>
                 </div>
 
-                <div className='flex items-center justify-between rounded-lg border border-lucky-border bg-lucky-bg-tertiary p-4'>
+                <div className='flex items-center justify-between rounded-lg border border-vaded-border bg-vaded-bg-tertiary p-4'>
                     <div className='space-y-0.5'>
                         <Label htmlFor='autoplay' className='text-base'>
                             Autoplay
                         </Label>
-                        <p className='text-xs text-lucky-text-secondary'>
+                        <p className='text-xs text-vaded-text-secondary'>
                             Automatically play next song in queue
                         </p>
                     </div>
@@ -197,12 +197,12 @@ export default function MusicConfig({ guildId }: MusicConfigProps) {
                             <SelectItem value='queue'>Repeat Queue</SelectItem>
                         </SelectContent>
                     </Select>
-                    <p className='text-xs text-lucky-text-secondary'>
+                    <p className='text-xs text-vaded-text-secondary'>
                         Choose how music should repeat
                     </p>
                 </div>
 
-                <div className='flex items-center justify-between rounded-lg border border-lucky-border bg-lucky-bg-tertiary p-4'>
+                <div className='flex items-center justify-between rounded-lg border border-vaded-border bg-vaded-bg-tertiary p-4'>
                     <div className='space-y-0.5'>
                         <Label
                             htmlFor='shuffle'
@@ -211,7 +211,7 @@ export default function MusicConfig({ guildId }: MusicConfigProps) {
                             <Shuffle className='h-4 w-4' aria-hidden='true' />
                             Shuffle
                         </Label>
-                        <p className='text-xs text-lucky-text-secondary'>
+                        <p className='text-xs text-vaded-text-secondary'>
                             Randomize playback order
                         </p>
                     </div>

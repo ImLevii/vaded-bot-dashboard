@@ -24,7 +24,7 @@ VERIFIED FACTS:
 
 - Discord allows up to **15 USER + 15 MESSAGE** context-menu commands per app
   (per guild and globally); 100 CHAT_INPUT. Source: Discord developer docs,
-  https://docs.discord.com/developers/interactions/application-commands. Lucky has
+  https://docs.discord.com/developers/interactions/application-commands. Vaded Gaming has
   **0** context-menu commands today, so the cap is **not** a binding constraint
   (an earlier assumption of a 5-command cap was checked and refuted).
 - Commands register per-guild on the bot `ready` event.

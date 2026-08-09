@@ -32,11 +32,11 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                     {
                     'btn-glass text-white':
                             variant === 'primary',
-                        'bg-lucky-bg-tertiary border border-lucky-border text-lucky-text-primary hover:border-lucky-border-strong hover:bg-lucky-bg-active':
+                        'bg-vaded-bg-tertiary border border-vaded-border text-vaded-text-primary hover:border-vaded-border-strong hover:bg-vaded-bg-active':
                             variant === 'secondary',
-                        'bg-transparent hover:bg-lucky-bg-tertiary text-lucky-text-secondary hover:text-lucky-text-primary':
+                        'bg-transparent hover:bg-vaded-bg-tertiary text-vaded-text-secondary hover:text-vaded-text-primary':
                             variant === 'ghost',
-                        'bg-lucky-error hover:bg-red-600 text-white':
+                        'bg-vaded-error hover:bg-red-600 text-white':
                             variant === 'destructive',
                         'px-3 py-1.5 text-sm': size === 'sm',
                         'px-4 py-2 text-sm': size === 'md',

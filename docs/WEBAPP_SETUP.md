@@ -183,7 +183,7 @@ The web interface supports two types of feature toggles:
 - System-wide toggles that affect all servers
 - Only visible to developers (users in `DEVELOPER_USER_IDS`)
 - Managed in Vercel Flags when `FLAGS` is configured
-- Read-only in Lucky; update global values in Vercel
+- Read-only in Vaded Gaming; update global values in Vercel
 - API endpoints: `/api/toggles/global`
 
 ### Per-Server Toggles
@@ -256,8 +256,8 @@ The frontend can be run in Docker for development:
 
 ```bash
 cd src/webapp/frontend
-docker build -f Dockerfile.dev -t lucky-frontend-dev .
-docker run -p 5173:5173 lucky-frontend-dev
+docker build -f Dockerfile.dev -t vaded-frontend-dev .
+docker run -p 5173:5173 vaded-frontend-dev
 ```
 
 ## Troubleshooting

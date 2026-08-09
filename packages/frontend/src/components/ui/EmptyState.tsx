@@ -36,13 +36,13 @@ export default function EmptyState({
                     className='mb-6 flex items-center justify-center'
                     aria-hidden='true'
                 >
-                    <div className='rounded-xl border border-lucky-border bg-lucky-bg-tertiary p-4 text-lucky-text-tertiary shadow-[0_1px_0_rgb(255_255_255/0.03)_inset]'>
+                    <div className='rounded-xl border border-vaded-border bg-vaded-bg-tertiary p-4 text-vaded-text-tertiary shadow-[0_1px_0_rgb(255_255_255/0.03)_inset]'>
                         {icon}
                     </div>
                 </div>
             )}
-            <h2 className='type-h2 text-lucky-text-primary'>{title}</h2>
-            <p className='mt-3 max-w-lg type-body text-lucky-text-secondary'>
+            <h2 className='type-h2 text-vaded-text-primary'>{title}</h2>
+            <p className='mt-3 max-w-lg type-body text-vaded-text-secondary'>
                 {description}
             </p>
             {action && <div className='mt-8 flex justify-center'>{action}</div>}

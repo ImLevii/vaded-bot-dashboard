@@ -1,15 +1,15 @@
-# Prisma Migration Guide — Lucky
+# Prisma Migration Guide — Vaded Gaming
 
-This document covers running Prisma migrations on the Lucky homelab database.
+This document covers running Prisma migrations on the Vaded Gaming homelab database.
 
 ## Setup
 
-Lucky uses **Prisma 7** with a PostgreSQL database. Schema lives at `prisma/schema.prisma`. Migrations are in `prisma/migrations/`.
+Vaded Gaming uses **Prisma 7** with a PostgreSQL database. Schema lives at `prisma/schema.prisma`. Migrations are in `prisma/migrations/`.
 
 Environment variable required:
 
 ```
-DATABASE_URL=postgresql://user:password@host:5432/lucky
+DATABASE_URL=postgresql://user:password@host:5432/vaded
 ```
 
 On the homelab this is set in the bot/backend Docker Compose env files or `.env`.
@@ -54,7 +54,7 @@ CREATE UNIQUE INDEX "global_feature_toggles_name_key" ON "global_feature_toggles
 
 ```bash
 # On the homelab server (or via SSH)
-cd /path/to/Lucky
+cd /path/to/Vaded Gaming
 DATABASE_URL="postgresql://..." npx prisma migrate deploy
 ```
 

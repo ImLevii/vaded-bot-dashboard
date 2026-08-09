@@ -7,7 +7,7 @@
 -- Run against PROD (homelab) Postgres:
 --   psql "$DATABASE_URL" -f scripts/autoplay-telemetry.sql
 -- or on the homelab host:
---   docker compose -p lucky exec -T postgres \
+--   docker compose -p vaded exec -T postgres \
 --     psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f - < scripts/autoplay-telemetry.sql
 --
 -- Acceptance rate mirrors recommendationTelemetryReadService:

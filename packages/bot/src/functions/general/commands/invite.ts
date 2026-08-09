@@ -34,7 +34,7 @@ function buildInviteUrl(
 export default new Command({
     data: new SlashCommandBuilder()
         .setName('invite')
-        .setDescription('🔗 Get the invite link to add Lucky to your server.'),
+        .setDescription('🔗 Get the invite link to add Vaded Gaming to your server.'),
     category: 'general',
     execute: async ({ client, interaction }) => {
         try {
@@ -58,21 +58,21 @@ export default new Command({
             }
 
             const embed = new EmbedBuilder()
-                .setTitle('🔗 Add Lucky to Your Server')
+                .setTitle('🔗 Add Vaded Gaming to Your Server')
                 .setColor(COLOR.INFO_GREEN)
                 .setDescription(
                     [
-                        'Click the link below to add Lucky to your Discord server. Lucky will bring music, autoplay, and moderation tools to your community.',
+                        'Click the link below to add Vaded Gaming to your Discord server. Vaded Gaming will bring music, autoplay, and moderation tools to your community.',
                         '',
-                        `[🎵 Invite Lucky](${inviteUrl})`,
+                        `[🎵 Invite Vaded Gaming](${inviteUrl})`,
                         '',
-                        'Already have Lucky in your server? Consider supporting us:',
+                        'Already have Vaded Gaming in your server? Consider supporting us:',
                         '',
-                        `[💛 Vote for Lucky on top.gg](${TOP_GG_VOTE_URL})`,
+                        `[💛 Vote for Vaded Gaming on top.gg](${TOP_GG_VOTE_URL})`,
                     ].join('\n'),
                 )
                 .setFooter({
-                    text: 'Lucky • Music Bot',
+                    text: 'Vaded Gaming • Music Bot',
                 })
                 .setTimestamp()
 

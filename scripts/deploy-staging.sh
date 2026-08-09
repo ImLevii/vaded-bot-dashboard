@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Staging deploy — builds + runs the isolated `lucky-staging` stack from an
+# Staging deploy — builds + runs the isolated `vaded-staging` stack from an
 # arbitrary branch/ref so a frontend/dashboard change can be visually verified
-# at https://lucky-staging.lucassantana.tech before it merges to main.
+# at https://vaded-staging.lucassantana.tech before it merges to main.
 #
 # Invoked by the homelab webhook (deploy/hooks.json → deploy-staging hook) with:
 #   $1 = X-Deploy-Ref        (branch name or commit SHA to deploy)
@@ -17,13 +17,13 @@ log() { echo "$LOG_PREFIX $(date '+%H:%M:%S') $1"; }
 
 DEPLOY_REF="${1:-main}"
 
-STAGING_DIR="${STAGING_DIR:-/home/luk-server/lucky-staging}"
+STAGING_DIR="${STAGING_DIR:-/home/luk-server/vaded-staging}"
 # Staging INFRA (compose) comes from the prod checkout (always main) so ANY
 # target branch can be staged even if it predates this file. The app SOURCE for
 # the build comes from STAGING_DIR via --project-directory.
-COMPOSE_FILE="${STAGING_COMPOSE_FILE:-/home/luk-server/Lucky/docker-compose.staging.yml}"
+COMPOSE_FILE="${STAGING_COMPOSE_FILE:-/home/luk-server/vaded-gaming/docker-compose.staging.yml}"
 ENV_FILE=".env.staging"
-PROJECT="lucky-staging"
+PROJECT="vaded-staging"
 HEALTH_PORT="${NGINX_PORT:-8093}"
 # Health-check via the host IP, not localhost: this runs inside the webhook
 # container, whose localhost is NOT the host where the staging nginx port is
@@ -37,7 +37,7 @@ if [[ -z "${DEPLOY_WEBHOOK_SECRET:-}" ]]; then
 fi
 
 # --- single-flight lock --------------------------------------------------------
-LOCK_DIR="/tmp/lucky-staging-deploy.lock"
+LOCK_DIR="/tmp/vaded-staging-deploy.lock"
 if ! mkdir "$LOCK_DIR" 2>/dev/null; then
     log "ERROR: another staging deploy is in progress ($LOCK_DIR) — aborting"
     exit 1
@@ -123,7 +123,7 @@ log "Rolling out staging services ($SERVICES)..."
 dc up -d --remove-orphans $SERVICES
 
 # Routing is via the published HOST PORT: the production cloudflared tunnel's
-# remote ingress routes lucky-staging.* -> http://100.95.204.103:8093 (this nginx's
+# remote ingress routes vaded-staging.* -> http://100.95.204.103:8093 (this nginx's
 # host port). Deliberately NOT attached to the tunnel's docker network — the
 # staging nginx service is named `nginx`, so sharing the tunnel's network would
 # make the `nginx` alias ambiguous between prod and staging and could misroute
@@ -151,4 +151,4 @@ if ! wget -q -O /dev/null --timeout=4 "http://${HEALTH_HOST}:${HEALTH_PORT}/api/
     log "WARN: auth-config endpoint not ready (dashboard login may fail)"
 fi
 
-log "STAGING DEPLOY OK — ${DEPLOY_REF} (${RESOLVED_SHA:0:7}) live at https://lucky-staging.lucassantana.tech"
+log "STAGING DEPLOY OK — ${DEPLOY_REF} (${RESOLVED_SHA:0:7}) live at https://vaded-staging.lucassantana.tech"

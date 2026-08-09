@@ -92,7 +92,7 @@ The Adapter does NOT absorb 429s. It throws `DiscordWriteError { code: 'RATE_LIM
 ### Negative
 
 - Two ports of code to keep aligned (`DiscordJsWriteAdapter`, `DiscordRestWriteAdapter`) when v2 methods are added. Mitigated by the contract suite.
-- Normalised return types add a mapping layer. Acceptable: Lucky already has the internal types in `packages/shared/src/services/guildAutomation/types.ts`.
+- Normalised return types add a mapping layer. Acceptable: Vaded Gaming already has the internal types in `packages/shared/src/services/guildAutomation/types.ts`.
 - Pass-through idempotency means the orchestrator does more retry bookkeeping. Acceptable: the drift-persistence ADR already commits to that posture.
 
 ### Trade-offs explicitly rejected
@@ -120,5 +120,5 @@ A separate PR — not landed with this ADR. Sequence:
 ## Related artefacts
 
 - `CONTEXT.md` — Domain Context section "Guild Automation" + the DiscordWriteAdapter entry under Cross-cutting.
-- Memory: `~/.claude/projects/-Volumes-External-HD-Desenvolvimento-Lucky/memory/project_executor_composition_2026-05-20.md`, `project_executor_port_pattern_2026-05-20.md`.
+- Memory: `~/.claude/projects/-Volumes-External-HD-Desenvolvimento-vaded-gaming/memory/project_executor_composition_2026-05-20.md`, `project_executor_port_pattern_2026-05-20.md`.
 - PR #906 — first executor (AutoMessages) currently lives without the port. The PR-A migration above pulls it through.

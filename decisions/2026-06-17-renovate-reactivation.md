@@ -32,7 +32,7 @@ un-versioned** (nothing in the repo surfaced that automation had stopped).
 unfinished step of #1069) — no config change required — **and add a version-controlled
 health guard** so a future silent lapse self-surfaces.
 
-- **Operator step:** install the Renovate App for `LucasSantana-Dev/Lucky` at
+- **Operator step:** install the Renovate App for `LucasSantana-Dev/vaded-gaming` at
   <https://github.com/apps/renovate>, then review/merge the onboarding PR.
 - **Code step (this ADR's PR):** `.github/workflows/renovate-health.yml` — a weekly
   scheduled job (Tuesday, after Renovate's Monday run) that asserts a Dependency

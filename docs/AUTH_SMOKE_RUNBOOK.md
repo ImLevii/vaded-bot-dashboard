@@ -5,14 +5,14 @@ Use this runbook after deploy changes that touch webhook/auth/deploy flow.
 ## Preconditions
 
 - Production deploy already completed successfully.
-- `https://lucky.lucassantana.tech` is reachable.
+- `https://vaded.lucassantana.tech` is reachable.
 - Discord app credentials are configured and `/api/health/auth-config` returns `status=ok`.
 
 ## Manual steps (real browser)
 
-1. Open `https://lucky.lucassantana.tech/api/auth/discord`.
+1. Open `https://vaded.lucassantana.tech/api/auth/discord`.
 2. Complete Discord login + authorization.
-3. Confirm redirect callback lands in Lucky dashboard.
+3. Confirm redirect callback lands in Vaded Gaming dashboard.
 4. Confirm dashboard bootstrap works:
     - guild selector loads
     - settings/features views render
@@ -44,10 +44,10 @@ Timestamp (UTC): `2026-03-14T23:52:15Z`
 Deployment and auth pre-check evidence captured:
 
 - Deploy workflow success: `23099053025` (`workflow_run`) and `23099053968` (`workflow_dispatch`)
-- `https://lucky.lucassantana.tech/api/health` -> `HTTP 200`, body includes `"status":"ok"`
-- `https://lucky.lucassantana.tech/api/health/auth-config` -> `HTTP 200`, body includes auth contract payload
-- `https://lucky.lucassantana.tech/api/auth/discord` -> `HTTP 302` to Discord authorize URL
-- `https://lucky.lucassantana.tech/api/auth/status` -> `{"authenticated":false}` before manual login
+- `https://vaded.lucassantana.tech/api/health` -> `HTTP 200`, body includes `"status":"ok"`
+- `https://vaded.lucassantana.tech/api/health/auth-config` -> `HTTP 200`, body includes auth contract payload
+- `https://vaded.lucassantana.tech/api/auth/discord` -> `HTTP 302` to Discord authorize URL
+- `https://vaded.lucassantana.tech/api/auth/status` -> `{"authenticated":false}` before manual login
 
 Manual browser-login evidence status:
 

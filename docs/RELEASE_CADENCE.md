@@ -1,10 +1,10 @@
-# Release Cadence — Lucky
+# Release Cadence — Vaded Gaming
 
 How this repo ships.
 
 ## Model — trunk-based development on `main`
 
-Lucky uses **trunk-based development**: `main` is the single integration branch
+Vaded Gaming uses **trunk-based development**: `main` is the single integration branch
 and is always releasable. Short-lived `feature/<slug>` and `fix/<slug>` branches
 are cut from `main`, reviewed via PR, and merged back to `main`. There are **no
 long-lived or versioned release branches** — versions are cut directly from

@@ -41,7 +41,7 @@ captures this.
 ## Decision
 
 **Option A — configure `GITHUB_DEPLOY_STATUS_TOKEN` on the homelab**, scoped to
-**Commit statuses: write** (fine-grained PAT on `LucasSantana-Dev/Lucky`) — classic
+**Commit statuses: write** (fine-grained PAT on `LucasSantana-Dev/vaded-gaming`) — classic
 equivalent `repo:status`. No code change; the wiring is already correct.
 
 This is chosen specifically because, with no other failure-awareness path, Option A is

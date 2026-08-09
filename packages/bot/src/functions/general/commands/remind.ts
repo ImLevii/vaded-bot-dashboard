@@ -186,7 +186,7 @@ async function createRecurring(
         .setDescription(
             `I'll remind you **${when} at ${hh}:${mm}** (${fuso}) with:\n\n${mensagem}`,
         )
-        .setColor(COLOR.LUCKY_PURPLE)
+        .setColor(COLOR.VADED_PURPLE)
         .setFooter({
             text: `ID: ${reminder.id.slice(0, 8)} · next: ${remindAt.toISOString()}`,
         })
@@ -425,7 +425,7 @@ export default new Command({
                     .setDescription(
                         `Got it! I'll remind you ${timeStr} with:\n\n${mensagem}`,
                     )
-                    .setColor(COLOR.LUCKY_PURPLE)
+                    .setColor(COLOR.VADED_PURPLE)
                     .setFooter({ text: `ID: ${reminder.id.slice(0, 8)}` })
 
                 await replyEmbed(embed)
@@ -492,7 +492,7 @@ export default new Command({
                     .setDescription(
                         `I'll remind ${target} with:\n\n${mensagem}`,
                     )
-                    .setColor(COLOR.LUCKY_PURPLE)
+                    .setColor(COLOR.VADED_PURPLE)
                     .setFooter({ text: `ID: ${reminder.id.slice(0, 8)}` })
 
                 await replyEmbed(embed)
@@ -538,7 +538,7 @@ export default new Command({
                 const embed = new EmbedBuilder()
                     .setTitle('⏰ Your reminders')
                     .setDescription(lines.join('\n'))
-                    .setColor(COLOR.LUCKY_PURPLE)
+                    .setColor(COLOR.VADED_PURPLE)
                     .setFooter({
                         text: `${reminders.length} reminder${reminders.length === 1 ? '' : 's'}`,
                     })

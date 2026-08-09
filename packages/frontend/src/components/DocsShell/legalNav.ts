@@ -20,12 +20,12 @@ export const LEGAL_NAV: DocsNavGroup[] = [
         items: [
             {
                 label: 'GitHub',
-                href: 'https://github.com/LucasSantana-Dev/Lucky',
+                href: 'https://github.com/LucasSantana-Dev/vaded-gaming',
                 external: true,
             },
             {
                 label: 'Issues',
-                href: 'https://github.com/LucasSantana-Dev/Lucky/issues',
+                href: 'https://github.com/LucasSantana-Dev/vaded-gaming/issues',
                 external: true,
             },
         ],

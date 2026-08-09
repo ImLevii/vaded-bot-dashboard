@@ -18,12 +18,12 @@ export interface StatusBandTile {
 }
 
 const TONE_TEXT: Record<StatusBandTone, string> = {
-    success: 'text-lucky-success',
-    brand: 'text-lucky-brand',
-    accent: 'text-lucky-brand-strong',
-    warning: 'text-lucky-warning',
-    error: 'text-lucky-error',
-    muted: 'text-lucky-text-tertiary',
+    success: 'text-vaded-success',
+    brand: 'text-vaded-brand',
+    accent: 'text-vaded-brand-strong',
+    warning: 'text-vaded-warning',
+    error: 'text-vaded-error',
+    muted: 'text-vaded-text-tertiary',
 }
 
 interface SectionHeaderProps {
@@ -50,10 +50,10 @@ export default function SectionHeader({
             <header className='flex flex-col gap-3 md:flex-row md:items-start md:justify-between md:gap-4'>
                 <div className='min-w-0 space-y-1'>
                     {eyebrow && (
-                        <p className='type-meta inline-flex items-center gap-2 text-lucky-text-subtle'>
+                        <p className='type-meta inline-flex items-center gap-2 text-vaded-text-subtle'>
                             {eyebrowIcon && (
                                 <span
-                                    className='inline-flex h-4 w-4 shrink-0 items-center justify-center text-lucky-text-tertiary'
+                                    className='inline-flex h-4 w-4 shrink-0 items-center justify-center text-vaded-text-tertiary'
                                     aria-hidden='true'
                                 >
                                     {eyebrowIcon}
@@ -62,9 +62,9 @@ export default function SectionHeader({
                             <span>{eyebrow}</span>
                         </p>
                     )}
-                    <h1 className='type-h1 text-lucky-text-primary'>{title}</h1>
+                    <h1 className='type-h1 text-vaded-text-primary'>{title}</h1>
                     {description && (
-                        <p className='type-body max-w-3xl text-lucky-text-secondary'>
+                        <p className='type-body max-w-3xl text-vaded-text-secondary'>
                             {description}
                         </p>
                     )}
@@ -98,7 +98,7 @@ export default function SectionHeader({
                                     </span>
                                 )}
                                 <div className='min-w-0'>
-                                    <p className='type-meta text-lucky-text-tertiary'>
+                                    <p className='type-meta text-vaded-text-tertiary'>
                                         {tile.label}
                                     </p>
                                     <p
