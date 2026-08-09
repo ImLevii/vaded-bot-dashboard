@@ -20,12 +20,12 @@ export const LEGAL_NAV: DocsNavGroup[] = [
         items: [
             {
                 label: 'GitHub',
-                href: 'https://github.com/LucasSantana-Dev/vaded-gaming',
+                href: 'https://github.com/imlevii/vaded-gaming',
                 external: true,
             },
             {
                 label: 'Issues',
-                href: 'https://github.com/LucasSantana-Dev/vaded-gaming/issues',
+                href: 'https://github.com/imlevii/vaded-gaming/issues',
                 external: true,
             },
         ],

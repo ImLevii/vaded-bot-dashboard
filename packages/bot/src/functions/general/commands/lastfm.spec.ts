@@ -77,80 +77,80 @@ describe('lastfm command link generation', () => {
     })
 
     it('prefers WEBAPP_BACKEND_URL over stale WEBAPP_REDIRECT_URI host', async () => {
-        process.env.WEBAPP_BACKEND_URL = 'https://vaded-api.lucassantana.tech/'
+        process.env.WEBAPP_BACKEND_URL = 'https://api.vadedgaming.com/'
         process.env.WEBAPP_REDIRECT_URI =
-            'https://nexus.lucassantana.tech/api/auth/callback'
+            'https://nexus.vadedgaming.com/api/auth/callback'
 
         await lastfmCommand.execute({
             interaction: createInteraction('link'),
         } as any)
 
         const url = getConnectUrlFromEmbed()
-        expect(url).toContain('https://vaded-api.lucassantana.tech/api/lastfm/connect')
-        expect(url).not.toContain('nexus.lucassantana.tech')
+        expect(url).toContain('https://api.vadedgaming.com/api/lastfm/connect')
+        expect(url).not.toContain('nexus.vadedgaming.com')
     })
 
     it('normalizes trailing slash from WEBAPP_BACKEND_URL', async () => {
-        process.env.WEBAPP_BACKEND_URL = 'https://vaded-api.lucassantana.tech/'
+        process.env.WEBAPP_BACKEND_URL = 'https://api.vadedgaming.com/'
 
         await lastfmCommand.execute({
             interaction: createInteraction('link'),
         } as any)
 
         const url = getConnectUrlFromEmbed()
-        expect(url).toContain('https://vaded-api.lucassantana.tech/api/lastfm/connect')
+        expect(url).toContain('https://api.vadedgaming.com/api/lastfm/connect')
         expect(url).not.toContain('//api/lastfm/connect')
     })
 
     it('ignores legacy nexus WEBAPP_BACKEND_URL and falls back to WEBAPP_REDIRECT_URI origin', async () => {
-        process.env.WEBAPP_BACKEND_URL = 'https://nexus.lucassantana.tech'
+        process.env.WEBAPP_BACKEND_URL = 'https://nexus.vadedgaming.com'
         process.env.WEBAPP_REDIRECT_URI =
-            'https://vaded.lucassantana.tech/api/auth/callback'
+            'https://vadedgaming.com/api/auth/callback'
 
         await lastfmCommand.execute({
             interaction: createInteraction('link'),
         } as any)
 
         const url = getConnectUrlFromEmbed()
-        expect(url).toContain('https://vaded.lucassantana.tech/api/lastfm/connect')
-        expect(url).not.toContain('nexus.lucassantana.tech')
+        expect(url).toContain('https://vadedgaming.com/api/lastfm/connect')
+        expect(url).not.toContain('nexus.vadedgaming.com')
     })
 
     it('ignores non-http WEBAPP_BACKEND_URL and falls back to WEBAPP_REDIRECT_URI origin', async () => {
-        process.env.WEBAPP_BACKEND_URL = 'ftp://vaded-api.lucassantana.tech' // NOSONAR: intentionally testing FTP rejection
+        process.env.WEBAPP_BACKEND_URL = 'ftp://api.vadedgaming.com' // NOSONAR: intentionally testing FTP rejection
         process.env.WEBAPP_REDIRECT_URI =
-            'https://vaded.lucassantana.tech/api/auth/callback'
+            'https://vadedgaming.com/api/auth/callback'
 
         await lastfmCommand.execute({
             interaction: createInteraction('link'),
         } as any)
 
         const url = getConnectUrlFromEmbed()
-        expect(url).toContain('https://vaded.lucassantana.tech/api/lastfm/connect')
+        expect(url).toContain('https://vadedgaming.com/api/lastfm/connect')
     })
 
     it('falls back to WEBAPP_REDIRECT_URI and normalizes /api/auth/callback', async () => {
         process.env.WEBAPP_REDIRECT_URI =
-            'https://vaded.lucassantana.tech/api/auth/callback'
+            'https://vadedgaming.com/api/auth/callback'
 
         await lastfmCommand.execute({
             interaction: createInteraction('link'),
         } as any)
 
         const url = getConnectUrlFromEmbed()
-        expect(url).toContain('https://vaded.lucassantana.tech/api/lastfm/connect')
+        expect(url).toContain('https://vadedgaming.com/api/lastfm/connect')
     })
 
     it('falls back to WEBAPP_REDIRECT_URI and normalizes legacy /auth/callback', async () => {
         process.env.WEBAPP_REDIRECT_URI =
-            'https://vaded.lucassantana.tech/auth/callback'
+            'https://vadedgaming.com/auth/callback'
 
         await lastfmCommand.execute({
             interaction: createInteraction('link'),
         } as any)
 
         const url = getConnectUrlFromEmbed()
-        expect(url).toContain('https://vaded.lucassantana.tech/api/lastfm/connect')
+        expect(url).toContain('https://vadedgaming.com/api/lastfm/connect')
     })
 
     it('returns configuration error when no valid base url is available', async () => {
@@ -166,7 +166,7 @@ describe('lastfm command link generation', () => {
 
     it('returns configuration error when WEBAPP_REDIRECT_URI still points to legacy nexus host', async () => {
         process.env.WEBAPP_REDIRECT_URI =
-            'https://nexus.lucassantana.tech/api/auth/callback'
+            'https://nexus.vadedgaming.com/api/auth/callback'
 
         await lastfmCommand.execute({
             interaction: createInteraction('link'),
@@ -183,7 +183,7 @@ describe('lastfm command link generation', () => {
     })
 
     it('returns configuration error when signing secret is missing', async () => {
-        process.env.WEBAPP_BACKEND_URL = 'https://vaded-api.lucassantana.tech'
+        process.env.WEBAPP_BACKEND_URL = 'https://api.vadedgaming.com'
         delete process.env.LASTFM_LINK_SECRET
         delete process.env.WEBAPP_SESSION_SECRET
 

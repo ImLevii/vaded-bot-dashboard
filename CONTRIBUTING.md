@@ -4,7 +4,7 @@ Thanks for working on Vaded Gaming. This file documents the small repo-specific 
 
 ## Reporting bugs and requesting features
 
-Use the GitHub issue tracker: https://github.com/LucasSantana-Dev/vaded-gaming/issues
+Use the GitHub issue tracker: https://github.com/imlevii/vaded-gaming/issues
 
 Issue templates guide you through the required information:
 
@@ -14,7 +14,7 @@ Issue templates guide you through the required information:
 ## Getting started
 
 ```bash
-git clone https://github.com/LucasSantana-Dev/vaded-gaming.git
+git clone https://github.com/imlevii/vaded-gaming.git
 cd Vaded Gaming
 pnpm install
 pnpm --filter @lucky/bot exec jest --testPathPatterns='your-area'
@@ -60,7 +60,7 @@ If your PR shows `mergeStateStatus: BLOCKED` while:
 ```bash
 gh api graphql -f query='
   query {
-    repository(owner:"LucasSantana-Dev", name:"Vaded Gaming") {
+    repository(owner:"imlevii", name:"Vaded Gaming") {
       pullRequest(number: <PR>) {
         reviewThreads(first: 50) {
           nodes { id isResolved comments(first: 1) { nodes { path body } } }
@@ -111,4 +111,4 @@ cubic is low-false-positive by design and does **not** flip PRs to `CHANGES_REQU
 
 ## Reporting security issues
 
-See `SECURITY.md` (when present) or open a private security advisory at https://github.com/LucasSantana-Dev/vaded-gaming/security/advisories/new.
+See `SECURITY.md` (when present) or open a private security advisory at https://github.com/imlevii/vaded-gaming/security/advisories/new.

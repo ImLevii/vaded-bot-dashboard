@@ -44,7 +44,7 @@ Bridge the async gap using GitHub commit statuses (`context: homelab-deploy`), p
 
 **Negative:**
 
-- Requires a new `GITHUB_DEPLOY_STATUS_TOKEN` secret configured on the homelab webhook container (GitHub PAT, `repo:statuses` scope on `LucasSantana-Dev/vaded-gaming`). Until configured, behavior degrades gracefully to the old HTTP 200 poll.
+- Requires a new `GITHUB_DEPLOY_STATUS_TOKEN` secret configured on the homelab webhook container (GitHub PAT, `repo:statuses` scope on `imlevii/vaded-gaming`). Until configured, behavior degrades gracefully to the old HTTP 200 poll.
 - `deploy.sh` gains a `curl` call per deploy. The call is fire-and-forget (`|| true`); a network failure does not abort the deploy.
 
 **Neutral:**

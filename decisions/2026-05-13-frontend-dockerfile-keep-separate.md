@@ -1,6 +1,6 @@
 # ADR — Keep `Dockerfile.frontend` separate (deferred consolidation)
 
-- **Status:** Superseded by [PR #851 — `refactor/dockerfile-frontend-consolidation`](https://github.com/LucasSantana-Dev/vaded-gaming/pull/851)
+- **Status:** Superseded by [PR #851 — `refactor/dockerfile-frontend-consolidation`](https://github.com/imlevii/vaded-gaming/pull/851)
 - **Date:** 2026-05-13
 - **Superseded:** 2026-05-14
 - **Decided by:** `/research-and-decide` composite

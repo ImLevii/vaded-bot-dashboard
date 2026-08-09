@@ -11,7 +11,7 @@
 
 A new visual redesign of the Vaded Gaming dashboard exists at:
 
-- Repo: `github.com/LucasSantana-Dev/vaded-gaming-redesign` (private; created 2026-04-21).
+- Repo: `github.com/imlevii/vaded-gaming-redesign` (private; created 2026-04-21).
 - AI Studio app: `https://ai.studio/apps/1fd5d19a-c793-4190-a354-777d6295bfd1`.
 
 The redesign is a **Next.js 15 App Router prototype** with mocked data only:

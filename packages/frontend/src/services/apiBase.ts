@@ -7,16 +7,7 @@ function isManagedFrontendHost(hostname: string): boolean {
     return (
         hostname === 'vaded-bot-dashboard.vercel.app' ||
         hostname === 'vadedgaming.com' ||
-        hostname.endsWith('.vadedgaming.com') ||
-        hostname === 'lucassantana.tech' ||
-        hostname.endsWith('.lucassantana.tech')
-    )
-}
-
-function isHomeServerHost(hostname: string): boolean {
-    return (
-        hostname === 'luk-homeserver.com.br' ||
-        hostname.endsWith('.luk-homeserver.com.br')
+        hostname.endsWith('.vadedgaming.com')
     )
 }
 
@@ -36,11 +27,6 @@ export function inferApiBase(
 
     if (isManagedFrontendHost(hostname)) {
         return '/api'
-    }
-
-    if (isHomeServerHost(hostname)) {
-        const protocol = location.protocol || 'https:'
-        return `${protocol}//api.luk-homeserver.com.br/api`
     }
 
     return '/api'

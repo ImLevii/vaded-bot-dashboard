@@ -1,6 +1,6 @@
 name: Review Tools
 
-# Calls the org-level reusable workflows in LucasSantana-Dev/.github
+# Calls the org-level reusable workflows in imlevii/.github
 # (single source of truth for the Claude review prompt + Danger runtime).
 #
 # Tag policy: pinned to the mutable `@v1` tag intentionally. We accept the
@@ -62,4 +62,4 @@ jobs:
   # AI review is currently covered by cubic and CodeRabbit, which run as apps
   # rather than workflow jobs.
   danger:
-    uses: LucasSantana-Dev/.github/.github/workflows/danger.yml@bf372e78b4d3ce9a4d25362b5c75c661039c48ba # v1
+    uses: imlevii/.github/.github/workflows/danger.yml@bf372e78b4d3ce9a4d25362b5c75c661039c48ba # v1

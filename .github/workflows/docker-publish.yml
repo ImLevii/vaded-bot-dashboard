@@ -94,7 +94,7 @@ jobs:
               if: matrix.service == 'bot'
               run: |
                 # Docker registry refs must be lowercase; IMAGE_PREFIX preserves
-                # the GitHub owner's case (LucasSantana-Dev), so normalize here.
+                # the GitHub owner's case (imlevii), so normalize here.
                 IMAGE="$(printf '%s' "${{ env.IMAGE_PREFIX }}-${{ matrix.service }}" | tr '[:upper:]' '[:lower:]')"
                 docker run --rm "$IMAGE:${{ steps.meta.outputs.version }}" yt-dlp --version
 

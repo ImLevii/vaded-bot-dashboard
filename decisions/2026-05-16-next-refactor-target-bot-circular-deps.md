@@ -103,7 +103,7 @@ Leading option flipped: **#871 bot circular-deps** (1 day, real structural block
 
 ## Related
 
-- Issue [#871](https://github.com/LucasSantana-Dev/vaded-gaming/issues/871) — the concrete target.
+- Issue [#871](https://github.com/imlevii/vaded-gaming/issues/871) — the concrete target.
 - `audit_deep_vaded_2026-05-13` (memory) — original HIGH finding.
 - [[2026-05-16-trivy-image-scan-vs-snyk-in-ci]] — same-week, same Phase A → B rollout pattern.
 - [[2026-05-15-no-ai-generated-docs-in-tracked-state]] — same-week decision style (delete + ADR + mechanical enforcement).

@@ -7,12 +7,12 @@ Copy-paste artifacts for filing Vaded Gaming on https://top.gg. Launch sequence 
 | Field          | Value                                                                            |
 | -------------- | -------------------------------------------------------------------------------- |
 | Client ID      | `962198089161134131`                                                             |
-| Invite URL     | `https://vaded.lucassantana.tech/invite`                                         |
-| Website        | `https://vaded.lucassantana.tech`                                                |
-| GitHub         | `https://github.com/LucasSantana-Dev/vaded-gaming`                                      |
+| Invite URL     | `https://vadedgaming.com/invite`                                         |
+| Website        | `https://vadedgaming.com`                                                |
+| GitHub         | `https://github.com/imlevii/vaded-gaming`                                      |
 | Support server | _Create a Vaded Gaming Discord server first (Phase 0 task #7), then paste invite here._ |
 
-**Note on the invite URL** — do not hardcode a `permissions=` integer here. `https://vaded.lucassantana.tech/invite` redirects to Discord via the backend, which builds the URL from `BOT_INVITE_PERMISSIONS` in `packages/shared/src/constants/invite.ts`, and logs the `utm_*` parameters on the way through so directory clicks are attributable.
+**Note on the invite URL** — do not hardcode a `permissions=` integer here. `https://vadedgaming.com/invite` redirects to Discord via the backend, which builds the URL from `BOT_INVITE_PERMISSIONS` in `packages/shared/src/constants/invite.ts`, and logs the `utm_*` parameters on the way through so directory clicks are attributable.
 
 The curated set is `3173504` — View Audit Log, View Channels, Send Messages, Manage Messages, Embed Links, Connect, Speak — per `decisions/2026-06-18-invite-permission-scope.md`. **Never Administrator.** High-alarm permissions (Ban/Kick/ManageRoles/ManageChannels/ManageGuild/ModerateMembers) are escalated on demand rather than requested up front.
 
@@ -37,7 +37,7 @@ Character count: 108.
 
 - 🎵 **Music**: YouTube + Spotify + SoundCloud · autoplay with diversity-aware recommendations · `/queue smartshuffle` · `/session save|restore`
 - 🛡️ **Moderation**: warn · mute · kick · ban · case tracking · `/digest` weekly reports · automod presets
-- 📊 **Dashboard**: Discord OAuth · RBAC · guild management · feature toggles at [vaded.lucassantana.tech](https://vaded.lucassantana.tech)
+- 📊 **Dashboard**: Discord OAuth · RBAC · guild management · feature toggles at [vadedgaming.com](https://vadedgaming.com)
 - 🎯 **Engagement**: leveling · starboard · Last.fm scrobbling · Twitch notifications
 - ⚡ **Reliability**: music watchdog auto-recovery · provider health cooldown · queue snapshot restore · cold-Redis survival
 
@@ -45,16 +45,16 @@ Character count: 108.
 
 - Real autoplay — uses Spotify Discover + genre graphs, not a static playlist loop
 - Self-hostable in Docker — no vendor lock-in, no hidden costs
-- Active development — [releases every few days](https://github.com/LucasSantana-Dev/vaded-gaming/releases)
+- Active development — [releases every few days](https://github.com/imlevii/vaded-gaming/releases)
 - Every PR runs lint, build, the full test suite and SonarCloud gates; a deploy that fails its health checks rolls back to the last good build
 
 ## Get started
 
-- [Invite Vaded Gaming](https://vaded.lucassantana.tech/invite) to your server
-- [Star on GitHub](https://github.com/LucasSantana-Dev/vaded-gaming) if you find it useful
-- Report issues on [GitHub Issues](https://github.com/LucasSantana-Dev/vaded-gaming/issues)
+- [Invite Vaded Gaming](https://vadedgaming.com/invite) to your server
+- [Star on GitHub](https://github.com/imlevii/vaded-gaming) if you find it useful
+- Report issues on [GitHub Issues](https://github.com/imlevii/vaded-gaming/issues)
 
-Made with ❤️ in Brazil · Open source under [ISC](https://github.com/LucasSantana-Dev/vaded-gaming/blob/main/LICENSE)
+Made with ❤️ in Brazil · Open source under [ISC](https://github.com/imlevii/vaded-gaming/blob/main/LICENSE)
 ```
 
 ## 4. Tags
@@ -66,7 +66,7 @@ Secondary (add up to 5): `typescript`, `open-source`, `self-hosted`, `autoplay`,
 
 - Size: 1000×500 px (top.gg recommendation)
 - Source: adapt existing `assets/vaded-social-preview.png` (currently 252 KB, 1280×640) — crop/resize
-- Must include: "Vaded Gaming" wordmark, bot avatar, one-line value prop, subtle link to `vaded.lucassantana.tech`
+- Must include: "Vaded Gaming" wordmark, bot avatar, one-line value prop, subtle link to `vadedgaming.com`
 - Keep text < 30% of canvas so Discord thumbnail still reads
 
 ## 6. Vote webhook wiring (prep)
@@ -135,6 +135,6 @@ Finally, in `packages/bot/src/functions/general/commands/`, add `/voterewards` t
 - [ ] Support server invite link added
 - [ ] GitHub URL added
 - [ ] Prefix: `/` (slash commands only)
-- [ ] Webhook URL set to `https://api.vaded.lucassantana.tech/webhooks/topgg-votes` (after deploy)
+- [ ] Webhook URL set to `https://api.vadedgaming.com/webhooks/topgg-votes` (after deploy)
 - [ ] Webhook auth token pasted in top.gg's field
 - [ ] Announce the listing in the support Discord + a GitHub release note

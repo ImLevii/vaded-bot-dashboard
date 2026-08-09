@@ -16,7 +16,7 @@ SCRIPT_DIR="$(CDPATH= cd -- "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 export COMPOSE_PROJECT_NAME
 GITHUB_DEPLOY_STATUS_TOKEN="${GITHUB_DEPLOY_STATUS_TOKEN:-}"
-GITHUB_REPO="${GITHUB_REPO:-LucasSantana-Dev/vaded-gaming}"
+GITHUB_REPO="${GITHUB_REPO:-imlevii/vaded-gaming}"
 DEPLOY_FINAL_STATE="failure"
 DEPLOY_FINAL_DESC="Deploy failed"
 DEPLOYED_SHA=""

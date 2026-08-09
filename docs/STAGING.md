@@ -5,8 +5,8 @@ dashboard/frontend changes on a real branch before they merge to `main`**. The
 dashboard is a live Discord OAuth client, so it can't be meaningfully reviewed
 without real auth + guild data — staging provides exactly that.
 
-- **Frontend:** https://vaded-staging.lucassantana.tech
-- **Backend:** https://vaded-staging-api.lucassantana.tech
+- **Frontend:** https://staging.vadedgaming.com
+- **Backend:** https://staging-api.vadedgaming.com
 - **Stack:** `docker-compose.staging.yml` (project `vaded-staging`) — postgres,
   redis, backend, frontend, nginx. **No bot** (the dashboard reads guild data via
   Discord REST; staging reuses the prod bot's presence in the test guild) and

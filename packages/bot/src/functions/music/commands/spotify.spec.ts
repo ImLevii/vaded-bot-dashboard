@@ -74,14 +74,14 @@ describe('spotify command', () => {
 
     describe('link subcommand', () => {
         it('generates connect link with WEBAPP_BACKEND_URL', async () => {
-            process.env.WEBAPP_BACKEND_URL = 'https://api.lucassantana.tech/'
+            process.env.WEBAPP_BACKEND_URL = 'https://api.vadedgaming.com/'
 
             await spotifyCommand.execute({
                 interaction: createInteraction('link'),
             } as any)
 
             const url = getConnectUrlFromEmbed()
-            expect(url).toContain('https://api.lucassantana.tech/api/spotify/connect')
+            expect(url).toContain('https://api.vadedgaming.com/api/spotify/connect')
         })
 
         it('shows error when not configured', async () => {

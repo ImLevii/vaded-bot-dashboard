@@ -15,7 +15,7 @@ Only the latest release is actively maintained. Older versions do not receive se
 
 Use one of these channels:
 
-1. **GitHub private advisory** (preferred): [Report a vulnerability](https://github.com/LucasSantana-Dev/vaded-gaming/security/advisories/new)
+1. **GitHub private advisory** (preferred): [Report a vulnerability](https://github.com/imlevii/vaded-gaming/security/advisories/new)
 2. **Email**: lucas.diassantana@gmail.com — subject line `[Vaded Gaming] Security`
 
 ### What to include

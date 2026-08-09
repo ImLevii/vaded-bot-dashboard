@@ -12,7 +12,7 @@ Dependabot opened six PRs against `main` on 2026-05-16:
 
 - `#891` trufflehog SHA bump
 - `#892` Codium-ai/pr-agent SHA bump
-- `#893` LucasSantana-Dev/.github quality.yml ref bump
+- `#893` imlevii/.github quality.yml ref bump
 - `#894` actions/checkout 4 → 6 (GHA major)
 - `#895` dev-dependencies group × 15 (patch/minor only)
 - `#896` production-dependencies group × 13 — **bundles `youtubei.js` 16 → 17 (major), `@npmcli/fs` 5 → 6 (major), and `unique-filename` 5 → 6 (major) alongside 10 patch/minor bumps**

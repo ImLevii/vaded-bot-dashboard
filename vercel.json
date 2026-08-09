@@ -38,15 +38,15 @@
     "rewrites": [
         {
             "source": "/invite",
-            "destination": "https://vaded-api.lucassantana.tech/invite"
+            "destination": "https://api.vadedgaming.com/invite"
         },
         {
             "source": "/api/:path*",
-            "destination": "https://vaded-api.lucassantana.tech/api/:path*"
+            "destination": "https://api.vadedgaming.com/api/:path*"
         },
         {
             "source": "/install",
-            "destination": "https://vaded-api.lucassantana.tech/api/auth/discord"
+            "destination": "https://api.vadedgaming.com/api/auth/discord"
         },
         {
             "source": "/:path*",

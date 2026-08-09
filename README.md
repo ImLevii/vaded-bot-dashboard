@@ -11,15 +11,15 @@
 </p>
 
 <p align="center">
-  <a href="https://vaded.lucassantana.tech/invite?utm_source=github&utm_medium=readme&utm_campaign=readme-badge"><strong>→ Invite Vaded Gaming to Your Server</strong></a> · 
-  <a href="https://vaded.lucassantana.tech"><strong>Dashboard</strong></a> · 
+  <a href="https://vadedgaming.com/invite?utm_source=github&utm_medium=readme&utm_campaign=readme-badge"><strong>→ Invite Vaded Gaming to Your Server</strong></a> · 
+  <a href="https://vadedgaming.com"><strong>Dashboard</strong></a> · 
   <a href="./docs/ARCHITECTURE.md"><strong>Architecture</strong></a> · 
   <a href="./CHANGELOG.md"><strong>Changelog</strong></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/LucasSantana-Dev/vaded-gaming/actions/workflows/ci.yml"><img src="https://github.com/LucasSantana-Dev/vaded-gaming/actions/workflows/ci.yml/badge.svg" alt="CI Status" /></a>
-  <a href="https://vaded.lucassantana.tech/invite?utm_source=github&utm_medium=readme&utm_campaign=readme-badge"><img src="https://img.shields.io/badge/Invite-Vaded Gaming%20Bot-5865F2?logo=discord&logoColor=white" alt="Invite Vaded Gaming" /></a>
+  <a href="https://github.com/imlevii/vaded-gaming/actions/workflows/ci.yml"><img src="https://github.com/imlevii/vaded-gaming/actions/workflows/ci.yml/badge.svg" alt="CI Status" /></a>
+  <a href="https://vadedgaming.com/invite?utm_source=github&utm_medium=readme&utm_campaign=readme-badge"><img src="https://img.shields.io/badge/Invite-Vaded Gaming%20Bot-5865F2?logo=discord&logoColor=white" alt="Invite Vaded Gaming" /></a>
   <a href="https://top.gg/bot/962198089161134131"><img src="https://img.shields.io/badge/top.gg-Vaded Gaming-FF3366?logo=topdotgg&logoColor=white" alt="Vaded Gaming on top.gg" /></a>
   <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-24.x-green.svg" alt="Node.js 24" /></a>
   <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.9-blue.svg" alt="TypeScript 5.9" /></a>
@@ -35,16 +35,16 @@ Vaded Gaming is a **production-grade, self-hosted Discord music bot** — built 
 
 Unlike Groovy, Rythm, or Hydra (all shut down by third-party enforcement), Vaded Gaming can't be taken offline because **you host it.** Every feature is included — no paywall, no premium tier.
 
-- **Live demo**: [vaded.lucassantana.tech](https://vaded.lucassantana.tech)  
-- **Invite to your server**: [Add Vaded Gaming now](https://vaded.lucassantana.tech/invite?utm_source=github&utm_medium=readme&utm_campaign=readme-badge)
+- **Live demo**: [vadedgaming.com](https://vadedgaming.com)  
+- **Invite to your server**: [Add Vaded Gaming now](https://vadedgaming.com/invite?utm_source=github&utm_medium=readme&utm_campaign=readme-badge)
 
 ---
 
 ## ✨ Features
 
 <p align="center">
-  <a href="https://vaded.lucassantana.tech"><img src="assets/screenshots/landing-features.png" alt="What Vaded Gaming does — feature overview" width="820" /></a>
-  <br /><sub><i>Everything most servers need, in one bot — <a href="https://vaded.lucassantana.tech">see it live</a>.</i></sub>
+  <a href="https://vadedgaming.com"><img src="assets/screenshots/landing-features.png" alt="What Vaded Gaming does — feature overview" width="820" /></a>
+  <br /><sub><i>Everything most servers need, in one bot — <a href="https://vadedgaming.com">see it live</a>.</i></sub>
 </p>
 
 ### 🎵 Music Player
@@ -130,7 +130,7 @@ Vaded Gaming solves this:
 One command gets you running:
 
 ```bash
-git clone https://github.com/LucasSantana-Dev/vaded-gaming.git
+git clone https://github.com/imlevii/vaded-gaming.git
 cd Vaded Gaming
 
 # Configure environment
@@ -353,8 +353,8 @@ Multiple admin IDs can be comma-separated: `DEVELOPER_USER_IDS=id1,id2,id3`
 
 **Where to start**
 
-- [`good first issue`](https://github.com/LucasSantana-Dev/vaded-gaming/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) — self-contained, scoped, and written so you can start without asking anything first.
-- [`ready-for-human`](https://github.com/LucasSantana-Dev/vaded-gaming/issues?q=is%3Aissue+is%3Aopen+label%3Aready-for-human) — specified and unclaimed, but assumes more repo context.
+- [`good first issue`](https://github.com/imlevii/vaded-gaming/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) — self-contained, scoped, and written so you can start without asking anything first.
+- [`ready-for-human`](https://github.com/imlevii/vaded-gaming/issues?q=is%3Aissue+is%3Aopen+label%3Aready-for-human) — specified and unclaimed, but assumes more repo context.
 - Found something broken? Open an issue. A reproduction case is a genuinely useful contribution on its own.
 - Not sure whether an idea fits? Open an issue before building it and we will figure it out together, rather than after you have spent a weekend on it.
 
@@ -383,7 +383,7 @@ CI runs the same gate on your PR, so a red check is information rather than a re
 
 ## 📄 License
 
-ISC © [Lucas Santana](https://github.com/LucasSantana-Dev)
+ISC © [Lucas Santana](https://github.com/imlevii)
 
 ---
 

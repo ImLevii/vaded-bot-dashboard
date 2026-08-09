@@ -6,7 +6,7 @@ Accepted (decision). Triggered by Snyk audit on 2026-05-15 surfacing 3 critical 
 
 ## Context
 
-The reusable `LucasSantana-Dev/.github/.github/workflows/quality.yml` runs Trivy with:
+The reusable `imlevii/.github/.github/workflows/quality.yml` runs Trivy with:
 
 ```yaml
 scan-type: fs
@@ -56,7 +56,7 @@ Estimated monthly quota use: 8 repos × ~4 PRs/week × (npm test + container tes
 2. **Sequenced rollout:**
     - **Phase A (this ADR):** Audit-only — `severity: MEDIUM,HIGH,CRITICAL`, `exit-code: "0"`, `ignore-unfixed: true`. Findings go to GitHub Security tab + workflow logs. No CI blocking.
     - **Phase B (≥ 2 weeks after Phase A):** Promote to blocking — `severity: HIGH,CRITICAL`, `exit-code: "1"`, only after the baseline is clean (no open HIGH/CRITICAL findings on `release/v2.12.0`).
-    - **Phase C (after Vaded Gaming's rollout proves stable):** Extract the trivy-image step into `LucasSantana-Dev/.github/templates/trivy-image.yml` as an opt-in snippet for other repos that build images.
+    - **Phase C (after Vaded Gaming's rollout proves stable):** Extract the trivy-image step into `imlevii/.github/templates/trivy-image.yml` as an opt-in snippet for other repos that build images.
 
 3. **Do NOT add Snyk to CI.** The Snyk GitHub App already provides daily dashboard monitoring for free. Adding `snyk` CLI to CI duplicates Trivy's coverage and burns a free-tier quota that won't last 8 repos.
 
@@ -120,4 +120,4 @@ Promote `exit-code` to `'1'` and drop MEDIUM from the severity list when enterin
 
 - PR #881 (Vaded Gaming) — fixed the 3C + 11H Alpine CVEs that triggered this ADR.
 - ADR [[2026-05-15-no-ai-generated-docs-in-tracked-state]] — same-week repo-hygiene decision; similar shape (mechanical enforcement + ADR + revisit triggers).
-- Org reusable workflow `LucasSantana-Dev/.github/.github/workflows/quality.yml` — left unchanged by this ADR; its existing `scan-type: fs` Trivy job is intentionally preserved.
+- Org reusable workflow `imlevii/.github/.github/workflows/quality.yml` — left unchanged by this ADR; its existing `scan-type: fs` Trivy job is intentionally preserved.

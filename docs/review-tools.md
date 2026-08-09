@@ -40,14 +40,14 @@ Replaced both gaps with:
 1. **`.coderabbit.yaml`** with `profile: chill` — fewer nits, same bug-finding.
 2. **Claude review action** — self-owned Sonnet-powered reviewer focused on
    correctness/security/semver/prod-risk. The runtime lives as a reusable
-   workflow in `LucasSantana-Dev/.github`; this repo's
+   workflow in `imlevii/.github`; this repo's
    `.github/workflows/review-tools.yml` calls it pinned at `@v1`.
 3. **Danger.js** — deterministic rules in `dangerfile.ts` (lockfile drift,
    console.log residue, missing CHANGELOG, .env leaks, branch naming,
    big PR warning). The runtime is also a reusable workflow in
-   `LucasSantana-Dev/.github`; rules are repo-specific by design.
+   `imlevii/.github`; rules are repo-specific by design.
 
-**Why one caller workflow + reusable workflows in `LucasSantana-Dev/.github`?**
+**Why one caller workflow + reusable workflows in `imlevii/.github`?**
 See ADR `ai-dev-toolkit:docs/decisions/2026-05-10-multi-repo-review-tools-rollout.md`.
 TL;DR: action SHA bumps and prompt tuning propagate centrally; repo-specific
 dangerfile rules stay local.
@@ -126,12 +126,12 @@ intent — paste these into the dashboard):
 
 - **Danger.js version** (2026-07-01): upgraded central workflow to danger@^13 + node 20
   to fix Node 24 incompatibility (node-fetch v2 → undici WHATWG fetch). See
-  `LucasSantana-Dev/.github/.github/workflows/danger.yml` for the pinned version.
+  `imlevii/.github/.github/workflows/danger.yml` for the pinned version.
   TODO: revert node pin to 22+ after danger@14+ ships and is stable (≥2 weeks wild).
 - Re-evaluate Greptile if they introduce per-org pricing
 - Tune cubic's custom rules in the dashboard if it proves too quiet/noisy;
   watch the revisit triggers in ADR `2026-05-21-replace-plan-limited-review-tools.md`
-- Update the centralized Claude review prompt in `LucasSantana-Dev/.github`
+- Update the centralized Claude review prompt in `imlevii/.github`
   (`.github/workflows/claude-review.yml`, referenced by
   `.github/workflows/review-tools.yml@v1`) when the `workflow.md` merge rule
   evolves — that's the single source of truth for the review prompt

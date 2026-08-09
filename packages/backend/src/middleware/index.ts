@@ -56,8 +56,7 @@ export function setupMiddleware(app: Express): void {
                     ],
                     'connect-src': [
                         "'self'",
-                        'https://vaded-api.lucassantana.tech',
-                        'https://api.luk-homeserver.com.br',
+                        'https://api.vadedgaming.com',
                         'https://*.sentry.io',
                     ],
                     'worker-src': ["'self'", 'blob:'],
@@ -104,11 +103,7 @@ export function setupMiddleware(app: Express): void {
                 host === 'vadedgaming.com' ||
                 host.endsWith('.vadedgaming.com') ||
                 host === 'vaded-bot-dashboard.vercel.app' ||
-                host.endsWith('.vercel.app') ||
-                host === 'lucassantana.tech' ||
-                host.endsWith('.lucassantana.tech') ||
-                host === 'luk-homeserver.com.br' ||
-                host.endsWith('.luk-homeserver.com.br')
+                host.endsWith('.vercel.app')
             )
         } catch {
             return false

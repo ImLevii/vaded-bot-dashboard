@@ -18,7 +18,7 @@ Scrobbling and updateNowPlaying require authentication; see [Last.fm Authenticat
 | `LASTFM_API_SECRET`   | Yes (when Last.fm enabled) | API secret from Last.fm API account                                                                   |
 | `LASTFM_SESSION_KEY`  | No                         | Optional global session key (fallback when a user has not linked)                                     |
 | `LASTFM_LINK_SECRET`  | No                         | Secret to sign connect links (defaults to `WEBAPP_SESSION_SECRET`)                                    |
-| `WEBAPP_BACKEND_URL`  | Recommended for /lastfm link | Canonical backend/API origin for Last.fm connect links (e.g. `https://vaded-api.lucassantana.tech`) |
+| `WEBAPP_BACKEND_URL`  | Recommended for /lastfm link | Canonical backend/API origin for Last.fm connect links (e.g. `https://api.vadedgaming.com`) |
 | `WEBAPP_REDIRECT_URI` | Fallback for /lastfm link  | Discord OAuth callback URL; its origin is used only when `WEBAPP_BACKEND_URL` is unset               |
 
 If `LASTFM_API_KEY` or `LASTFM_API_SECRET` are missing, Last.fm integration is disabled (no crash).

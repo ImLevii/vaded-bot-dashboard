@@ -96,7 +96,7 @@ services:
 
     bot:
         <<: *large-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-bot:${IMAGE_TAG:-latest}
+        image: ${IMAGE_PREFIX:-ghcr.io/imlevii/vaded}-bot:${IMAGE_TAG:-latest}
         build:
             context: .
             dockerfile: Dockerfile
@@ -146,7 +146,7 @@ services:
 
     backend:
         <<: *medium-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-backend:${IMAGE_TAG:-latest}
+        image: ${IMAGE_PREFIX:-ghcr.io/imlevii/vaded}-backend:${IMAGE_TAG:-latest}
         build:
             context: .
             dockerfile: Dockerfile
@@ -186,7 +186,7 @@ services:
 
     frontend:
         <<: *small-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-frontend:${IMAGE_TAG:-latest}
+        image: ${IMAGE_PREFIX:-ghcr.io/imlevii/vaded}-frontend:${IMAGE_TAG:-latest}
         build:
             context: .
             dockerfile: Dockerfile
@@ -203,7 +203,7 @@ services:
 
     nginx:
         <<: *small-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-nginx:${IMAGE_TAG:-latest}
+        image: ${IMAGE_PREFIX:-ghcr.io/imlevii/vaded}-nginx:${IMAGE_TAG:-latest}
         build:
             context: .
             dockerfile: Dockerfile.nginx
@@ -268,7 +268,7 @@ services:
                 max-file: "3"
                 tag: "{{.Name}}"
 
-    # Cloudflare Tunnel — exposes nginx to vaded.lucassantana.tech
+    # Cloudflare Tunnel — exposes nginx to vadedgaming.com
     cloudflared:
         <<: *small-svc
         image: cloudflare/cloudflared:2026.6.0

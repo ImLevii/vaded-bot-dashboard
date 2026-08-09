@@ -56,8 +56,7 @@ export function initSentry(): void {
         tracePropagationTargets: [
             'localhost',
             /^\//,
-            /^https:\/\/lucassantana\.tech\//,
-            /^https:\/\/luk-homeserver\.com\.br\//,
+            /^https:\/\/vadedgaming\.com\//,
         ],
     })
 

@@ -8,7 +8,7 @@ on:
 
 jobs:
     quality:
-        uses: LucasSantana-Dev/.github/.github/workflows/quality.yml@f7517f1f61cac7f4a09565a998d19e7b17e8e341
+        uses: imlevii/.github/.github/workflows/quality.yml@f7517f1f61cac7f4a09565a998d19e7b17e8e341
         with:
             node-version: '24'
             has-dockerfile: true

@@ -28,10 +28,10 @@ describe('Health Routes Integration', () => {
         process.env.CLIENT_ID = 'test-client-id'
         process.env.WEBAPP_SESSION_SECRET = 'test-session-secret'
         process.env.WEBAPP_FRONTEND_URL =
-            'https://vaded.lucassantana.tech,https://lukbot.vercel.app'
+            'https://vadedgaming.com,https://lukbot.vercel.app'
         process.env.WEBAPP_REDIRECT_URI =
-            'https://vaded-api.lucassantana.tech/api/auth/callback'
-        process.env.WEBAPP_BACKEND_URL = 'https://vaded-api.lucassantana.tech'
+            'https://api.vadedgaming.com/api/auth/callback'
+        process.env.WEBAPP_BACKEND_URL = 'https://api.vadedgaming.com'
         delete process.env.WEBAPP_EXPECTED_CLIENT_ID
     })
 
@@ -139,16 +139,16 @@ describe('Health Routes Integration', () => {
                 auth: {
                     clientId: 'test-client-id',
                     redirectUri:
-                        'https://vaded-api.lucassantana.tech/api/auth/callback',
+                        'https://api.vadedgaming.com/api/auth/callback',
                     frontendOrigins: [
-                        'https://vaded.lucassantana.tech',
+                        'https://vadedgaming.com',
                         'https://lukbot.vercel.app',
                     ],
                     clientIdConfigured: true,
                     sessionSecretConfigured: true,
                     redisHealthy: true,
                     authorizeUrlPreview:
-                        'https://discord.com/api/oauth2/authorize?client_id=test-client-id&redirect_uri=https%3A%2F%2Fvaded-api.lucassantana.tech%2Fapi%2Fauth%2Fcallback&response_type=code&scope=identify%20guilds',
+                        'https://discord.com/api/oauth2/authorize?client_id=test-client-id&redirect_uri=https%3A%2F%2Fapi.vadedgaming.com%2Fapi%2Fauth%2Fcallback&response_type=code&scope=identify%20guilds',
                 },
                 warnings: [],
             })
@@ -190,7 +190,7 @@ describe('Health Routes Integration', () => {
         test('should return degraded when redirect origin does not match configured frontend origins', async () => {
             mockRedis.isHealthy.mockReturnValue(true)
             process.env.WEBAPP_REDIRECT_URI =
-                'https://other.lucassantana.tech/api/auth/callback'
+                'https://other.vadedgaming.com/api/auth/callback'
 
             const response = await request(app)
                 .get('/api/health/auth-config')
@@ -223,13 +223,13 @@ describe('Health Routes Integration', () => {
             delete process.env.WEBAPP_BACKEND_URL
             process.env.WEBAPP_EXPECTED_CLIENT_ID = 'test-client-id'
             process.env.WEBAPP_REDIRECT_URI =
-                'https://vaded-api.lucassantana.tech/api/auth/callback'
+                'https://api.vadedgaming.com/api/auth/callback'
 
             const response = await request(app)
                 .get('/api/health/auth-config')
                 .set('x-forwarded-proto', 'https')
-                .set('x-forwarded-host', 'vaded-api.lucassantana.tech')
-                .set('Host', 'vaded-api.lucassantana.tech')
+                .set('x-forwarded-host', 'api.vadedgaming.com')
+                .set('Host', 'api.vadedgaming.com')
                 .expect(200)
 
             // warnings/status/sessionSecretConfigured/redisHealthy are
@@ -239,7 +239,7 @@ describe('Health Routes Integration', () => {
             expect(response.body.warnings).toBeUndefined()
             expect(response.body.status).toBeUndefined()
             expect(response.body.auth.redirectUri).toBe(
-                'https://vaded-api.lucassantana.tech/api/auth/callback',
+                'https://api.vadedgaming.com/api/auth/callback',
             )
         })
 

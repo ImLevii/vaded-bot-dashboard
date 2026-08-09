@@ -99,11 +99,11 @@ export default function TermsOfServicePage() {
             <p>
                 For support or legal requests, open an issue at{' '}
                 <a
-                    href='https://github.com/LucasSantana-Dev/vaded-gaming/issues'
+                    href='https://github.com/imlevii/vaded-gaming/issues'
                     target='_blank'
                     rel='noreferrer'
                 >
-                    github.com/LucasSantana-Dev/vaded-gaming/issues
+                    github.com/imlevii/vaded-gaming/issues
                 </a>
                 .
             </p>

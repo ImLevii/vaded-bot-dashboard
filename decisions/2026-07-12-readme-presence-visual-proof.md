@@ -14,7 +14,7 @@ of text. The mascot + logo threads already closed (see
 
 **Verified in a real browser (the critic demanded this; a fetcher had returned 403/404):**
 
-- `https://vaded.lucassantana.tech` is **UP** and **genuinely polished** — dark theme, neon-cat
+- `https://vadedgaming.com` is **UP** and **genuinely polished** — dark theme, neon-cat
   logo, hero + CTAs, a "What Vaded Gaming does" 6-card feature grid, "A real web dashboard" section,
   a dev/self-host architecture-card section, Apache-2.0 footer. Fully public (no auth).
 - The top.gg listing **exists** at bot id `962198089161134131` (the `839686019796811776` ref that
@@ -33,7 +33,7 @@ of text. The mascot + logo threads already closed (see
    feature grid). The hero shot is deferred pending #1818 (landing still renders "Apache 2.0"
    while the project is ISC) so the README doesn't advertise the wrong license.
 2. Fix the two verified plumbing bugs (trivial, not a blocker): the README live-demo link
-   (`href="https://lucassantana.tech"` → `https://vaded.lucassantana.tech`) and the wrong top.gg
+   (`href="https://vadedgaming.com"` → `https://vadedgaming.com`) and the wrong top.gg
    bot id (`839686019796811776` → `962198089161134131`); add a top.gg badge/link.
 3. **Optional operator follow-up (not a blocker):** a real authed-dashboard screenshot or a short
    Loom, if wanted — the landing already _claims_ "a real web dashboard"; a real shot would _prove_

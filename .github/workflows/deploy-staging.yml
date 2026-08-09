@@ -1,7 +1,7 @@
 name: Deploy Staging
 
 # Visually verify a branch on the shared homelab staging environment
-# (https://vaded-staging.lucassantana.tech) before it merges to main.
+# (https://staging.vadedgaming.com) before it merges to main.
 #
 # Staging is a SINGLE shared stack, so it hosts one PR at a time. Opt a PR in by
 # adding the `staging` label; every subsequent push to that PR redeploys it.
@@ -81,7 +81,7 @@ jobs:
               uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
               with:
                   script: |
-                      const url = 'https://vaded-staging.lucassantana.tech';
+                      const url = 'https://staging.vadedgaming.com';
                       const sha = context.payload.pull_request.head.sha.slice(0, 7);
                       const marker = '<!-- vaded-staging-deploy -->';
                       const body = `${marker}\n🧪 **Staging deploy triggered** — building \`${sha}\` on the homelab.\n\nOnce it's up (~2-3 min for the image build), review it at **${url}**.\n\n_Single shared environment — the most-recently-labeled PR occupies it. The build runs locally on the homelab; watch the deploy log there if it doesn't come up._`;

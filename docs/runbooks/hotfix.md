@@ -52,7 +52,7 @@ a forward-fix when reverting is safer. If the fix is already on `main`, skip her
 Do **not** assume `main` HEAD — confirm it has a successful `docker-publish` run:
 
 ```bash
-gh run list --repo LucasSantana-Dev/vaded-gaming --workflow=docker-publish.yml \
+gh run list --repo imlevii/vaded-gaming --workflow=docker-publish.yml \
   --limit 20 --json headSha,status,conclusion,createdAt,displayTitle \
   --jq '.[] | select(.status=="completed" and .conclusion=="success")
         | "\(.headSha[0:8]) \(.createdAt) \(.displayTitle)"'
@@ -94,7 +94,7 @@ echo "last-good (rollback target if this fails): $PROD_SHA"
 ### 4. Deploy
 
 ```bash
-gh workflow run deploy.yml --repo LucasSantana-Dev/vaded-gaming --ref main \
+gh workflow run deploy.yml --repo imlevii/vaded-gaming --ref main \
   -f rollback_sha=<target-sha>
 ```
 
@@ -106,7 +106,7 @@ form is the safe default for any exact SHA.)
 
 ```bash
 # GH workflow
-gh run list --repo LucasSantana-Dev/vaded-gaming --workflow=deploy.yml -L 1 \
+gh run list --repo imlevii/vaded-gaming --workflow=deploy.yml -L 1 \
   --json databaseId,status,conclusion --jq '.[]'
 
 # Box rollout (the deploy runs inside the webhook container)

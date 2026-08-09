@@ -9,7 +9,7 @@
   the Redis-removal ADRs. Subsumes the Discord-429 finding + converges with the
   Musical-Taste perf ADR's `withTimeout` work.
 - **Tracking:** per-track delivery status lives in umbrella issue
-  [#1286](https://github.com/LucasSantana-Dev/vaded-gaming/issues/1286).
+  [#1286](https://github.com/imlevii/vaded-gaming/issues/1286).
 
 ## Context
 
@@ -116,4 +116,4 @@ escalation); the ESLint rule needs a tuning period; incremental sweep spans seve
 
 ## Tracking
 
-Status and per-track delivery tracked in umbrella issue [#1286](https://github.com/LucasSantana-Dev/vaded-gaming/issues/1286).
+Status and per-track delivery tracked in umbrella issue [#1286](https://github.com/imlevii/vaded-gaming/issues/1286).

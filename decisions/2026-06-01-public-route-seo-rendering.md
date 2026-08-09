@@ -10,7 +10,7 @@
 
 ## Context
 
-`packages/frontend` (vaded-webapp, https://vaded.lucassantana.tech) is a
+`packages/frontend` (vaded-webapp, https://vadedgaming.com) is a
 **client-rendered SPA**: Vite 8 + React 19.2 + `react-router-dom` 7.15 in
 **declarative mode** (`<BrowserRouter><Routes><Route/>`), all pages `React.lazy()`
 code-split. A single static `index.html` `<head>` is served for **every** route;

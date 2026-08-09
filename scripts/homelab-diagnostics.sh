@@ -33,8 +33,8 @@ echo \"== local auth health ==\"
 curl -sS -m 8 -i http://127.0.0.1:3000/api/health/auth-config || true
 echo
 echo \"== public auth health ==\"
-curl -sS -m 12 -i https://vaded-api.lucassantana.tech/api/health/auth-config || true
+curl -sS -m 12 -i https://api.vadedgaming.com/api/health/auth-config || true
 echo
 echo \"== public oauth redirect ==\"
-curl -sS -m 12 -i https://vaded-api.lucassantana.tech/api/auth/discord || true
+curl -sS -m 12 -i https://api.vadedgaming.com/api/auth/discord || true
 " | redact

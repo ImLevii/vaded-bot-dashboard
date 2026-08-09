@@ -14,7 +14,7 @@ backend is a Discord-OAuth-session API consumed by a first-party React SPA.
 Verified current state:
 
 - Session cookie: `httpOnly: true`, `secure: <prod>`, **`sameSite: 'lax'`**, 7-day maxAge.
-- CORS: origin allowlist with `credentials: true`. Allowlist includes `lucassantana.tech`/`*.lucassantana.tech`, `luk-homeserver.com.br`/`*.luk-homeserver.com.br`, `localhost`/`127.0.0.1`, **and `*.replit.dev` / `*.repl.co` / `*.replit.app`**.
+- CORS: origin allowlist with `credentials: true`. Allowlist includes `vadedgaming.com`/`*.vadedgaming.com`, `localhost`/`127.0.0.1`, **and `*.replit.dev` / `*.repl.co` / `*.replit.app`**.
 - Mutations are POST/PUT/PATCH/DELETE with `application/json` (CORS-preflighted). **No state-changing GET routes.**
 - SPA↔API are same registrable domain (same-origin `/api` on the main host; `app.` ↔ `api.` subdomains on the homeserver = same-site).
 - `POST /api/support` is public + unauthenticated → CSRF N/A.

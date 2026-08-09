@@ -111,39 +111,39 @@ describe('getOAuthRedirectUri', () => {
         const uri = getOAuthRedirectUri(
             createRequest({
                 'x-forwarded-proto': 'https',
-                'x-forwarded-host': 'vaded.lucassantana.tech',
+                'x-forwarded-host': 'vadedgaming.com',
             }),
         )
 
-        expect(uri).toBe('https://vaded.lucassantana.tech/api/auth/callback')
+        expect(uri).toBe('https://vadedgaming.com/api/auth/callback')
     })
 
     test('should normalize legacy /auth/callback from env', () => {
         process.env.NODE_ENV = 'production'
         process.env.WEBAPP_REDIRECT_URI =
-            'https://vaded.lucassantana.tech/auth/callback'
+            'https://vadedgaming.com/auth/callback'
 
         const uri = getOAuthRedirectUri(createRequest())
 
-        expect(uri).toBe('https://vaded.lucassantana.tech/api/auth/callback')
+        expect(uri).toBe('https://vadedgaming.com/api/auth/callback')
     })
 
     test('should keep configured callback when WEBAPP_BACKEND_URL is set', () => {
         process.env.NODE_ENV = 'production'
         process.env.WEBAPP_REDIRECT_URI =
-            'https://vaded.lucassantana.tech/api/auth/callback'
-        process.env.WEBAPP_BACKEND_URL = 'https://vaded-api.lucassantana.tech'
+            'https://vadedgaming.com/api/auth/callback'
+        process.env.WEBAPP_BACKEND_URL = 'https://api.vadedgaming.com'
 
         const uri = getOAuthRedirectUri(createRequest())
 
-        expect(uri).toBe('https://vaded.lucassantana.tech/api/auth/callback')
+        expect(uri).toBe('https://vadedgaming.com/api/auth/callback')
     })
 
     test('should prefer forwarded host over configured callback in production', () => {
         process.env.NODE_ENV = 'production'
         process.env.WEBAPP_REDIRECT_URI =
-            'https://vaded.lucassantana.tech/api/auth/callback'
-        process.env.WEBAPP_FRONTEND_URL = 'https://vaded.lucassantana.tech'
+            'https://vadedgaming.com/api/auth/callback'
+        process.env.WEBAPP_FRONTEND_URL = 'https://vadedgaming.com'
 
         const uri = getOAuthRedirectUri(
             createRequest({
@@ -160,13 +160,13 @@ describe('getOAuthRedirectUri', () => {
     test('should keep configured callback when frontend origins do not match redirect origin', () => {
         process.env.NODE_ENV = 'production'
         process.env.WEBAPP_REDIRECT_URI =
-            'https://vaded-api.lucassantana.tech/api/auth/callback'
-        process.env.WEBAPP_FRONTEND_URL = 'https://vaded.lucassantana.tech'
+            'https://api.vadedgaming.com/api/auth/callback'
+        process.env.WEBAPP_FRONTEND_URL = 'https://vadedgaming.com'
 
         const uri = getOAuthRedirectUri(createRequest())
 
         expect(uri).toBe(
-            'https://vaded-api.lucassantana.tech/api/auth/callback',
+            'https://api.vadedgaming.com/api/auth/callback',
         )
     })
 

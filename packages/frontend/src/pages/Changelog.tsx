@@ -87,7 +87,7 @@ function renderInlineMd(text: string): React.ReactNode {
                 parts.push(
                     <a
                         key={`p-${ci}-${pi}`}
-                        href={`https://github.com/LucasSantana-Dev/vaded-gaming/pull/${m[1]}`}
+                        href={`https://github.com/imlevii/vaded-gaming/pull/${m[1]}`}
                         target='_blank'
                         rel='noreferrer'
                         className='font-mono text-vaded-brand hover:underline'
@@ -178,7 +178,7 @@ export default function ChangelogPage() {
                                 Notable changes per release. Source of truth:{' '}
                                 <a
                                     className='text-vaded-brand hover:underline'
-                                    href='https://github.com/LucasSantana-Dev/vaded-gaming/blob/main/CHANGELOG.md'
+                                    href='https://github.com/imlevii/vaded-gaming/blob/main/CHANGELOG.md'
                                     target='_blank'
                                     rel='noreferrer'
                                 >

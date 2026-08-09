@@ -18,7 +18,7 @@ Vaded Gaming's `release/v2.12.0` PR pipeline runs ~18 checks. On 2026-05-21 a 4-
 Meanwhile two AI-review actions already work and have **no** per-PR cap (just token spend on an Anthropic key the project already pays for):
 
 - **`Codium-ai/pr-agent`** in `.github/workflows/pr-agent.yml` — pinned action, Anthropic backend (`claude-sonnet-4-6`), `auto_review` + `auto_describe` + `auto_improve` all on. This is the "AI Code Review" check that consistently passes.
-- **`LucasSantana-Dev/.github/.github/workflows/claude-review.yml@v1`** reusable workflow, called from `review-tools.yml`.
+- **`imlevii/.github/.github/workflows/claude-review.yml@v1`** reusable workflow, called from `review-tools.yml`.
 
 Plus a healthy free baseline that already covers most non-AI signals:
 
@@ -88,7 +88,7 @@ Pilot scope: one PR drains the change.
 1. **Add OSV-Scanner workflow** at `.github/workflows/osv-scanner.yml` using `google/osv-scanner-action` pinned to a release SHA. Trigger on `pull_request` and `push` to `release/**`. Continue-on-error initially.
 2. **Open a test PR** (a no-op CHANGELOG entry on a side branch) to confirm OSV-Scanner SARIF posts to the Security tab and inline comments render.
 3. **After 1 week of clean OSV-Scanner signal**: flip to `continue-on-error: false`. Add to required-status-checks list on `release/**` branch protection.
-4. **Uninstall** Snyk, Greptile, CodeRabbit GitHub Apps from the LucasSantana-Dev org.
+4. **Uninstall** Snyk, Greptile, CodeRabbit GitHub Apps from the imlevii org.
 5. **Remove** `code/snyk` from required-status-checks (branch protection on `main` + `release/**`).
 6. **CHANGELOG** `[Unreleased] / ### Internal` entry: "ci: replace Snyk/Greptile/CodeRabbit (plan-limited) with OSV-Scanner; rely on existing PR-Agent + claude-review for AI review."
 

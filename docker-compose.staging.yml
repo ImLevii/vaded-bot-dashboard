@@ -107,7 +107,7 @@ services:
 
     backend:
         <<: *medium-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-backend:${IMAGE_TAG:-staging}
+        image: ${IMAGE_PREFIX:-ghcr.io/imlevii/vaded}-backend:${IMAGE_TAG:-staging}
         build:
             context: .
             dockerfile: Dockerfile
@@ -150,7 +150,7 @@ services:
     # Started only when the token is present (see scripts/deploy-staging.sh).
     bot:
         <<: *small-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-bot:${IMAGE_TAG:-staging}
+        image: ${IMAGE_PREFIX:-ghcr.io/imlevii/vaded}-bot:${IMAGE_TAG:-staging}
         build:
             context: .
             dockerfile: Dockerfile
@@ -184,7 +184,7 @@ services:
 
     frontend:
         <<: *small-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-frontend:${IMAGE_TAG:-staging}
+        image: ${IMAGE_PREFIX:-ghcr.io/imlevii/vaded}-frontend:${IMAGE_TAG:-staging}
         build:
             context: .
             dockerfile: Dockerfile
@@ -209,7 +209,7 @@ services:
 
     backend-blue:
         <<: *medium-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-backend:${IMAGE_TAG:-staging}
+        image: ${IMAGE_PREFIX:-ghcr.io/imlevii/vaded}-backend:${IMAGE_TAG:-staging}
         build:
             context: .
             dockerfile: Dockerfile
@@ -251,7 +251,7 @@ services:
 
     backend-green:
         <<: *medium-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-backend:${IMAGE_TAG:-staging}
+        image: ${IMAGE_PREFIX:-ghcr.io/imlevii/vaded}-backend:${IMAGE_TAG:-staging}
         build:
             context: .
             dockerfile: Dockerfile
@@ -293,7 +293,7 @@ services:
 
     frontend-blue:
         <<: *small-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-frontend:${IMAGE_TAG:-staging}
+        image: ${IMAGE_PREFIX:-ghcr.io/imlevii/vaded}-frontend:${IMAGE_TAG:-staging}
         build:
             context: .
             dockerfile: Dockerfile
@@ -318,7 +318,7 @@ services:
 
     frontend-green:
         <<: *small-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-frontend:${IMAGE_TAG:-staging}
+        image: ${IMAGE_PREFIX:-ghcr.io/imlevii/vaded}-frontend:${IMAGE_TAG:-staging}
         build:
             context: .
             dockerfile: Dockerfile
@@ -343,7 +343,7 @@ services:
 
     nginx:
         <<: *small-svc
-        image: ${IMAGE_PREFIX:-ghcr.io/lucassantana-dev/vaded}-nginx:${IMAGE_TAG:-staging}
+        image: ${IMAGE_PREFIX:-ghcr.io/imlevii/vaded}-nginx:${IMAGE_TAG:-staging}
         build:
             context: .
             dockerfile: Dockerfile.nginx

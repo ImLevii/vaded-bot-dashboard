@@ -128,7 +128,7 @@ From the repo root, with [GitHub CLI](https://cli.github.com/) installed and aut
 
 ```bash
 gh secret set DEPLOY_WEBHOOK_SECRET --body "your-random-secret"
-gh secret set DEPLOY_WEBHOOK_URL --body "https://vaded.lucassantana.tech/webhook/deploy"
+gh secret set DEPLOY_WEBHOOK_URL --body "https://vadedgaming.com/webhook/deploy"
 ```
 
 #### Discord deploy notifications (optional)
@@ -179,10 +179,10 @@ After this bootstrap, future deploys run without SSH through GitHub Actions.
 If deploy fails with curl exit code `6` (Could not resolve host):
 
 1. Confirm `DEPLOY_WEBHOOK_URL` points to an existing DNS host (Vaded Gaming):
-    - `gh secret set DEPLOY_WEBHOOK_URL --body "https://vaded.lucassantana.tech/webhook/deploy"`
-2. Ensure Cloudflare DNS has `vaded.lucassantana.tech` published to the active tunnel.
+    - `gh secret set DEPLOY_WEBHOOK_URL --body "https://vadedgaming.com/webhook/deploy"`
+2. Ensure Cloudflare DNS has `vadedgaming.com` published to the active tunnel.
 3. Verify from any machine:
-    - `curl -i -X POST https://vaded.lucassantana.tech/webhook/deploy`
+    - `curl -i -X POST https://vadedgaming.com/webhook/deploy`
 4. Re-run:
     - `npm run deploy:homelab`
 
@@ -246,9 +246,9 @@ If `Auth config smoke check` times out with repeated `HTTP 502`:
     - `upstream unavailable` counters in `Auth config smoke summary`
     - deploy-side service/log diagnostics from `scripts/deploy.sh`
 4. Confirm public probes recover:
-    - `https://vaded.lucassantana.tech/api/health` -> `200`
-    - `https://vaded.lucassantana.tech/api/health/auth-config` -> `200`
-    - `https://vaded.lucassantana.tech/api/auth/discord` -> `302`
+    - `https://vadedgaming.com/api/health` -> `200`
+    - `https://vadedgaming.com/api/health/auth-config` -> `200`
+    - `https://vadedgaming.com/api/auth/discord` -> `302`
 
 **Recommendation**: Configure branch protection for `main` so that the CI workflow must pass before merge. Deploy then runs only when CI has already succeeded.
 

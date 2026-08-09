@@ -87,12 +87,12 @@ describe('Auth Routes Integration', () => {
                 const response = await request(app)
                     .get('/api/auth/discord')
                     .set('x-forwarded-proto', 'https')
-                    .set('x-forwarded-host', 'vaded.lucassantana.tech')
+                    .set('x-forwarded-host', 'vadedgaming.com')
                     .expect(302)
 
                 expect(response.headers.location).toContain(
                     encodeURIComponent(
-                        'https://vaded.lucassantana.tech/api/auth/callback',
+                        'https://vadedgaming.com/api/auth/callback',
                     ),
                 )
             } finally {
@@ -112,12 +112,12 @@ describe('Auth Routes Integration', () => {
                 const response = await request(app)
                     .get('/api/auth/discord')
                     .set('x-forwarded-proto', 'https')
-                    .set('x-forwarded-host', 'vaded.lucassantana.tech')
+                    .set('x-forwarded-host', 'vadedgaming.com')
                     .expect(302)
 
                 expect(response.headers.location).toContain(
                     encodeURIComponent(
-                        'https://vaded.lucassantana.tech/api/auth/callback',
+                        'https://vadedgaming.com/api/auth/callback',
                     ),
                 )
             } finally {
@@ -141,7 +141,7 @@ describe('Auth Routes Integration', () => {
                 const response = await request(localApp)
                     .get('/api/auth/discord')
                     .set('x-forwarded-proto', 'https')
-                    .set('x-forwarded-host', 'vaded.lucassantana.tech')
+                    .set('x-forwarded-host', 'vadedgaming.com')
                     .expect(302)
 
                 const cookies = response.headers['set-cookie'] as
@@ -175,7 +175,7 @@ describe('Auth Routes Integration', () => {
                 const response = await request(localApp)
                     .get('/api/auth/discord')
                     .set('x-forwarded-proto', 'http')
-                    .set('x-forwarded-host', 'vaded.lucassantana.tech')
+                    .set('x-forwarded-host', 'vadedgaming.com')
                     .expect(302)
 
                 expect(response.headers['set-cookie']).toBeUndefined()
@@ -208,9 +208,9 @@ describe('Auth Routes Integration', () => {
 
             process.env.NODE_ENV = 'production'
             process.env.WEBAPP_REDIRECT_URI =
-                'https://vaded.lucassantana.tech/api/auth/callback'
+                'https://vadedgaming.com/api/auth/callback'
             process.env.WEBAPP_BACKEND_URL =
-                'https://vaded-api.lucassantana.tech'
+                'https://api.vadedgaming.com'
 
             const productionApp = express()
             productionApp.set('trust proxy', 1)
@@ -225,7 +225,7 @@ describe('Auth Routes Integration', () => {
 
             expect(response.headers.location).toContain(
                 encodeURIComponent(
-                    'https://vaded.lucassantana.tech/api/auth/callback',
+                    'https://vadedgaming.com/api/auth/callback',
                 ),
             )
 
@@ -304,14 +304,14 @@ describe('Auth Routes Integration', () => {
                 .get('/api/auth/callback')
                 .query({ code: MOCK_AUTH_CODE, state: MOCK_OAUTH_STATE })
                 .set('x-forwarded-proto', 'https')
-                .set('x-forwarded-host', 'vaded.lucassantana.tech')
+                .set('x-forwarded-host', 'vadedgaming.com')
                 .expect(302)
 
             expect(
                 getDiscordOAuthMock().exchangeCodeForToken,
             ).toHaveBeenCalledWith(
                 MOCK_AUTH_CODE,
-                'https://vaded.lucassantana.tech/api/auth/callback',
+                'https://vadedgaming.com/api/auth/callback',
             )
 
             if (originalRedirectUri) {
