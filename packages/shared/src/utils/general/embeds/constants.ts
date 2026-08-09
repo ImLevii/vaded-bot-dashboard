@@ -7,9 +7,9 @@ export const EMBED_COLORS = {
     INFO: '#2196F3', // Blue
     WARNING: '#FFC107', // Amber
     NEUTRAL: '#9E9E9E', // Grey
-    MUSIC: '#9C27B0', // Purple
-    QUEUE: '#3F51B5', // Indigo
-    AUTOPLAY: '#009688', // Teal
+    MUSIC: '#000000', // Black
+    QUEUE: '#111111', // Near-black
+    AUTOPLAY: '#dc2626', // Brand red
 } as const
 
 // Emoji constants for different types of messages
@@ -19,7 +19,7 @@ export const EMOJIS = {
     INFO: 'ℹ️',
     WARNING: '⚠️',
     NEUTRAL: '⚪',
-    MUSIC: '🎵',
+    MUSIC: '<a:music:741605543046807626>',
     AUDIO: '🎧',
     VIDEO: '🎥',
     QUEUE: '📋',

@@ -11,6 +11,9 @@ async function shutdown(exitCode: number): Promise<void> {
 
 export function setupErrorHandlers() {
     process.on('uncaughtException', (error) => {
+        // AbortError is a normal signal (voice connection timeout) — not a crash
+        if (error.name === 'AbortError') return
+
         void (async () => {
             const structuredError = handleError(error, {
                 correlationId: createCorrelationId(),
@@ -27,6 +30,9 @@ export function setupErrorHandlers() {
     })
 
     process.on('unhandledRejection', (reason, promise) => {
+        // AbortError is a normal signal (voice connection timeout) — not a crash
+        if (reason instanceof Error && reason.name === 'AbortError') return
+
         void (async () => {
             const structuredError = handleError(reason, {
                 correlationId: createCorrelationId(),

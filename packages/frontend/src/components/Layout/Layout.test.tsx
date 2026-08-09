@@ -11,8 +11,8 @@ vi.mock('./Sidebar', () => ({
 }))
 
 const mockGuild: Guild = {
-    id: '987654321',
-    name: 'Test Server',
+    id: '408731658204872725',
+    name: 'Vaded Gaming',
     icon: 'icon123',
     owner: true,
     permissions: '8',
@@ -96,7 +96,7 @@ describe('Layout', () => {
 
         renderLayout('/unknown')
 
-        expect(screen.getByText('Lucky Dashboard')).toBeInTheDocument()
+        expect(screen.getByText('Vaded Gaming Dashboard')).toBeInTheDocument()
         expect(
             screen.getByText(
                 'Configure modules, moderation, and engagement workflows.',

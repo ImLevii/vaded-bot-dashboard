@@ -1,23 +1,20 @@
-import { Heart, ThumbsUp } from 'lucide-react'
+import { Heart } from 'lucide-react'
 import { useVoteStatus } from '@/hooks/useVoteStatus'
 
 const TIER_STYLES: Record<string, string> = {
-    'Lucky Supporter':
+    'Vaded Supporter':
         'bg-lucky-bg-secondary text-lucky-text-secondary border-lucky-border',
-    'Lucky Fan':
+    'Vaded Fan':
         'bg-lucky-bg-tertiary text-lucky-text-primary border-lucky-border-strong',
-    'Lucky Regular':
-        'bg-[color:var(--color-lucky-purple-muted,#2a1633)] text-lucky-text-primary border-[color:var(--color-lucky-purple,#9c27b0)]',
-    'Lucky Legend':
+    'Vaded Regular':
+        'bg-lucky-brand/10 text-lucky-brand border-lucky-brand/30',
+    'Vaded Legend':
         'bg-gradient-to-r from-amber-500/20 to-amber-500/40 text-amber-200 border-amber-500/60',
 }
 
 export function VoteBadge() {
     const { status } = useVoteStatus()
 
-    // Hide until we have a loaded status. If the backend endpoint 404s
-    // (not yet deployed) or the user has zero streak, render a subtle
-    // "Vote" CTA instead of nothing.
     if (!status) return null
 
     if (!status.tier) {
@@ -26,17 +23,17 @@ export function VoteBadge() {
                 href={status.voteUrl}
                 target='_blank'
                 rel='noreferrer'
-                className='lucky-focus-visible hidden sm:inline-flex items-center gap-1.5 rounded-md border border-lucky-border bg-lucky-bg-secondary px-2.5 py-1.5 type-body-sm text-lucky-text-secondary hover:border-lucky-border-strong hover:bg-lucky-bg-tertiary hover:text-lucky-text-primary transition-colors'
-                title='Vote for Lucky on top.gg to unlock perks'
+                className='lucky-focus-visible hidden sm:inline-flex items-center gap-1 rounded-md border border-lucky-brand/25 bg-lucky-brand/8 px-2.5 py-1.5 font-black text-sm tracking-tight hover:bg-lucky-brand/15 transition-colors'
+                title='Vote for Vaded Gaming on top.gg'
             >
-                <ThumbsUp aria-hidden='true' className='h-3.5 w-3.5' />
-                <span>Vote</span>
+                <span>VADED</span>
+                <span className='text-lucky-brand'>GAMING</span>
             </a>
         )
     }
 
     const style =
-        TIER_STYLES[status.tier.label] ?? TIER_STYLES['Lucky Supporter']
+        TIER_STYLES[status.tier.label] ?? TIER_STYLES['Vaded Supporter']
 
     return (
         <a

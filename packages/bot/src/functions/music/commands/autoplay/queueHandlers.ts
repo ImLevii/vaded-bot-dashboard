@@ -1,4 +1,4 @@
-import { interactionReply } from '../../../../utils/general/interactionReply'
+﻿import { interactionReply } from '../../../../utils/general/interactionReply'
 import { replenishQueue } from '../../../../utils/music/queueOperations'
 import {
     createEmbed,
@@ -192,7 +192,7 @@ async function handleAutoplayStatus(
 
     const fields: Array<{ name: string; value: string; inline: boolean }> = [
         {
-            name: '🎵 Status',
+            name: '<a:music:741605543046807626> Status',
             value: autoplayEnabled ? `${EMOJIS.AUTOPLAY} Enabled` : 'Disabled',
             inline: true,
         },

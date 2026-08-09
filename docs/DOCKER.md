@@ -27,6 +27,7 @@ All services use the `json-file` driver with `max-size: "10m"` and `max-file: "3
 
 ## Scripts
 
+- `npm run start` – Starts the full compose stack from the repo root, including the bot, backend, frontend dashboard, Nginx, Postgres, and Redis.
 - `./scripts/discord-bot.sh build` – Builds bot image (production or development from `NODE_ENV`).
 - `./scripts/discord-bot.sh start` – Starts compose (prod or dev from `NODE_ENV`).
 - `./scripts/discord-bot.sh stop` – Stops both prod and dev compose stacks.

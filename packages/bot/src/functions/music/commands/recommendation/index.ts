@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from '@discordjs/builders'
+﻿import { SlashCommandBuilder } from '@discordjs/builders'
 import Command from '../../../../models/Command'
 import { requireGuild } from '../../../../utils/command/commandValidations'
 import { interactionReply } from '../../../../utils/general/interactionReply'
@@ -14,7 +14,7 @@ import {
 export default new Command({
     data: new SlashCommandBuilder()
         .setName('recommendation')
-        .setDescription('🎵 Manage music recommendation settings')
+        .setDescription('<a:music:741605543046807626> Manage music recommendation settings')
         .addSubcommand((subcommand) =>
             subcommand
                 .setName('show')

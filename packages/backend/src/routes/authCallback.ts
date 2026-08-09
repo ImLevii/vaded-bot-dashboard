@@ -151,7 +151,7 @@ export async function handleOAuthCallback(
             },
         })
 
-        res.redirect(`${frontendUrl}/?authenticated=true`)
+        res.redirect(`${frontendUrl}/music?authenticated=true`)
     } catch (error) {
         errorLog({ message: 'Error in Discord OAuth callback:', error })
         const frontendUrl = getPrimaryFrontendUrl()

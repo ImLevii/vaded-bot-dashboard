@@ -74,6 +74,10 @@ export function createEmbed(options: CreateEmbedOptions): EmbedBuilder {
         embed.setThumbnail(options.thumbnail)
     }
 
+    if (options.image) {
+        embed.setImage(options.image)
+    }
+
     if (options.url) {
         embed.setURL(options.url)
     }

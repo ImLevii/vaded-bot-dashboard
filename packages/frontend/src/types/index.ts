@@ -71,14 +71,18 @@ export interface Autorole {
     delay: number
 }
 
+export type AutoMessageType = 'welcome' | 'leave' | 'auto_response'
+
 export interface AutoMessage {
     id: string
-    name: string
-    channel: string
-    content: string
-    nextPost: Date
-    interval: number
-    isEmbed: boolean
+    type: AutoMessageType
+    channelId: string | null
+    message: string
+    trigger: string | null
+    exactMatch: boolean
+    enabled: boolean
+    createdAt: string
+    updatedAt: string
 }
 
 export interface Tag {

@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from '@discordjs/builders'
+﻿import { SlashCommandBuilder } from '@discordjs/builders'
 import Command from '../../../models/Command'
 import { interactionReply } from '../../../utils/general/interactionReply'
 import { createErrorEmbed, createSuccessEmbed } from '../../../utils/general/embeds'
@@ -65,7 +65,7 @@ async function handleNightcore(
         const message = enabled ? 'Nightcore enabled' : 'Nightcore disabled'
         await interactionReply({
             interaction,
-            content: { embeds: [createSuccessEmbed('Nightcore', `🎵 ${message}`)] },
+            content: { embeds: [createSuccessEmbed('Nightcore', `<a:music:741605543046807626> ${message}`)] },
         })
     } catch {
         await replyError(interaction, 'Failed to toggle nightcore effect.')
@@ -91,7 +91,7 @@ async function handleReset(
 export default new Command({
     data: new SlashCommandBuilder()
         .setName('effects')
-        .setDescription('🎵 Apply audio effects to the current track')
+        .setDescription('<a:music:741605543046807626> Apply audio effects to the current track')
         .addSubcommand((sub) =>
             sub
                 .setName('bassboost')

@@ -56,7 +56,7 @@ describe('Login', () => {
 
         renderLogin()
 
-        expect(screen.getByText('Lucky')).toBeInTheDocument()
+        expect(screen.getByText('Vaded Gaming')).toBeInTheDocument()
         expect(
             screen.getByText('Manage your Discord servers'),
         ).toBeInTheDocument()
@@ -114,7 +114,7 @@ describe('Login', () => {
             screen.getByText(/manage your discord servers/i),
         ).toBeInTheDocument()
         expect(
-            screen.getByText(/© 2026 Lucky. All rights reserved./i),
+            screen.getByText(/© 2026 Vaded Gaming. All rights reserved./i),
         ).toBeInTheDocument()
     })
 
@@ -126,6 +126,6 @@ describe('Login', () => {
 
         const section = container.querySelector('section')
         expect(section).not.toHaveStyle('animation-delay: 100ms')
-        expect(screen.getByText('Lucky')).toBeInTheDocument()
+        expect(screen.getByText('Vaded Gaming')).toBeInTheDocument()
     })
 })

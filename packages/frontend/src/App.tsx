@@ -61,6 +61,7 @@ const TwitchNotificationsPage = lazy(
 )
 const RolesPage = lazy(() => import('./pages/Roles'))
 const RoleGroupsPage = lazy(() => import('./pages/RoleGroups'))
+const MembersPage = lazy(() => import('./pages/Members'))
 const LastFmPage = lazy(() => import('./pages/LastFm'))
 const SpotifyPage = lazy(() => import('./pages/Spotify'))
 const BatchJobsPage = lazy(() => import('./pages/BatchJobs'))
@@ -165,6 +166,10 @@ function AuthenticatedRoutes() {
             <Route
                 path='/settings'
                 element={guardedRoute('settings', <ServerSettingsPage />)}
+            />
+            <Route
+                path='/members'
+                element={guardedRoute('settings', <MembersPage />)}
             />
             <Route
                 path='/moderation'

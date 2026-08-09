@@ -1,7 +1,20 @@
-import { EmbedBuilder } from 'discord.js'
+﻿import { EmbedBuilder, AttachmentBuilder } from 'discord.js'
 import type { Track } from 'discord-player'
 import type { User } from 'discord.js'
+import { join, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { existsSync } from 'node:fs'
 import { COLOR } from '@lucky/shared/constants'
+
+const VINYL_GIF_PATH = join(
+    dirname(fileURLToPath(import.meta.url)),
+    '../../../../../assets/vinyl.gif',
+)
+
+export function buildVinylAttachment(): AttachmentBuilder | null {
+    if (!existsSync(VINYL_GIF_PATH)) return null
+    return new AttachmentBuilder(VINYL_GIF_PATH, { name: 'vinyl.gif' })
+}
 
 export type PlayResponseKind = 'nowPlaying' | 'addedToQueue' | 'playlistQueued'
 
@@ -54,7 +67,7 @@ const SOURCE_BADGES: Record<string, SourceBadge> = {
 
 const DEFAULT_BADGE: SourceBadge = {
     label: 'Music',
-    emoji: '🎵',
+    emoji: '<a:music:741605543046807626>',
     color: COLOR.LUCKY_PURPLE,
 }
 
@@ -118,11 +131,15 @@ export function buildPlayResponseEmbed(
         .setColor(badge.color)
         .setTimestamp()
         .setFooter({
-            text: `Requested by ${requestedBy.tag}`,
+            text: `🎧 Requested by ${requestedBy.tag}`,
             iconURL: requestedBy.displayAvatarURL({ size: 64 }),
         })
 
-    if (track.thumbnail) {
+    if (kind === 'nowPlaying') {
+        // Vinyl GIF on the left (thumbnail slot); track art as the large bottom image
+        embed.setThumbnail('attachment://vinyl.gif')
+        if (track.thumbnail) embed.setImage(track.thumbnail)
+    } else if (track.thumbnail) {
         embed.setThumbnail(track.thumbnail)
     }
 
@@ -140,14 +157,18 @@ export function buildPlayResponseEmbed(
     embed.setDescription(`by **${track.author || 'Unknown artist'}**`)
 
     const fields: { name: string; value: string; inline: boolean }[] = []
-    if (track.duration && track.duration !== '0:00') {
-        fields.push({ name: 'Duration', value: track.duration, inline: true })
+    // Streams accumulate duration as HH:MM:SS:ff — 4 segments signals a live stream
+    const isLive = !track.duration ||
+        track.duration === '0:00' ||
+        track.duration.split(':').length > 3
+    if (!isLive) {
+        fields.push({ name: '⏱ Duration', value: `\`${track.duration}\``, inline: true })
     }
-    fields.push({ name: 'Source', value: badge.label, inline: true })
+    fields.push({ name: '📡 Source', value: `\`${badge.label}\``, inline: true })
     if (kind === 'addedToQueue' && typeof queuePosition === 'number') {
         fields.push({
-            name: 'Queue Position',
-            value: `#${queuePosition}`,
+            name: '📋 Position',
+            value: queuePosition === 0 ? '`Now`' : `\`#${queuePosition}\``,
             inline: true,
         })
     }

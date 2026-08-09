@@ -1,4 +1,4 @@
-export type CommandCategory =
+﻿export type CommandCategory =
     | 'music'
     | 'download'
     | 'general'
@@ -9,8 +9,8 @@ export type CommandCategory =
 export const COMMAND_CATEGORIES = {
     music: {
         key: 'music' as CommandCategory,
-        label: '🎵 Music',
-        emoji: '🎵',
+        label: '<a:music:741605543046807626> Music',
+        emoji: '<a:music:741605543046807626>',
         prefixes: [
             'play',
             'queue',

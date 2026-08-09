@@ -15,7 +15,7 @@ type DocsPage = {
     content: () => ReactElement
 }
 
-const REPO = 'https://github.com/LucasSantana-Dev/Lucky'
+const REPO = 'https://vadedgaming.com'
 const BOT_INVITE = getBotInviteUrl()
 
 const NAV: DocsNavGroup[] = [
@@ -64,7 +64,7 @@ const NAV: DocsNavGroup[] = [
             { label: 'Changelog', href: '/changelog' },
             {
                 label: 'Discord support',
-                href: 'https://discord.gg/lucky',
+                href: 'https://discord.gg/vadedgaming',
                 external: true,
             },
         ],
@@ -77,7 +77,7 @@ const PAGES: DocsPage[] = [
         title: 'Overview',
         breadcrumb: 'Docs / Overview',
         toc: [
-            { id: 'what-is-lucky', label: 'What is Lucky' },
+            { id: 'what-is-lucky', label: 'What is vadedgaming' },
             { id: 'two-ways-to-run-it', label: 'Two ways to run it' },
             { id: 'whats-included', label: "What's included" },
             { id: 'project-status', label: 'Project status' },
@@ -86,13 +86,13 @@ const PAGES: DocsPage[] = [
         content: () => (
             <>
                 <p>
-                    Lucky is an open-source Discord bot. Music, moderation,
+                    vadedgaming is an open-source Discord bot. Music, moderation,
                     custom commands, automation, and a web dashboard. Free
                     forever, with no premium tier paywalling the good parts.
                 </p>
-                <h2 id='what-is-lucky'>What is Lucky</h2>
+                <h2 id='what-is-lucky'>What is vadedgaming</h2>
                 <p>
-                    Lucky started as a music bot for a friend's server. It now
+                    vadedgaming started as a music bot for a friend's server. It now
                     also handles moderation, custom commands, leveling, reaction
                     roles, embed building, automation, and starboards. The web
                     dashboard at the same domain lets you configure everything
@@ -108,7 +108,7 @@ const PAGES: DocsPage[] = [
                 </p>
                 <h2 id='two-ways-to-run-it'>Two ways to run it</h2>
                 <p>
-                    You can use Lucky in either of two ways. Pick whichever fits
+                    You can use vadedgaming in either of two ways. Pick whichever fits
                     your situation.
                 </p>
                 <ol>

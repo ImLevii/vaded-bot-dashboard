@@ -1,19 +1,12 @@
-import { reportError } from '@/lib/sentry'
-import { getBotInviteUrl } from '@/lib/discord'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/authStore'
 import { usePageMetadata } from '@/hooks/usePageMetadata'
 import { motion, useReducedMotion } from 'framer-motion'
-import { api } from '@/services/api'
 import {
-    Star,
-    Scale,
     ArrowUpRight,
-    Copy,
-    Check,
+    ChevronRight,
     Server,
-    Users,
     Database,
     Layers,
     Music2,
@@ -22,77 +15,15 @@ import {
     SlidersHorizontal,
     LayoutDashboard,
     Sparkles,
+    Zap,
+    Users,
+    Radio,
 } from 'lucide-react'
-
-function GithubMark({
-    size = 16,
-    className,
-}: {
-    size?: number
-    className?: string
-}) {
-    return (
-        <svg
-            xmlns='http://www.w3.org/2000/svg'
-            viewBox='0 0 24 24'
-            fill='currentColor'
-            width={size}
-            height={size}
-            aria-hidden='true'
-            className={className}
-        >
-            <path d='M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2.16c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 5.79 0c2.21-1.49 3.18-1.18 3.18-1.18.62 1.58.23 2.75.11 3.04.74.8 1.18 1.82 1.18 3.08 0 4.42-2.69 5.39-5.25 5.68.41.35.78 1.04.78 2.11v3.13c0 .31.21.67.8.56 4.57-1.52 7.85-5.84 7.85-10.91C23.5 5.65 18.35.5 12 .5z' />
-        </svg>
-    )
-}
-
-const REPO_URL = 'https://github.com/LucasSantana-Dev/Lucky'
-const CLONE_URL = 'https://github.com/LucasSantana-Dev/Lucky.git'
-
-type RepoStats = {
-    servers: number
-    users: number
-    error: boolean
-    loading: boolean
-}
 
 export default function Landing() {
     const login = useAuthStore((s) => s.login)
     const prefersReducedMotion = useReducedMotion()
     const { t } = useTranslation()
-    const [repoStats, setRepoStats] = useState<RepoStats>({
-        servers: 0,
-        users: 0,
-        error: false,
-        loading: true,
-    })
-
-    useEffect(() => {
-        let active = true
-        const fetchStats = async () => {
-            try {
-                const res = await api.stats.getPublic()
-                if (!active) return
-                setRepoStats({
-                    servers: res.data.totalGuilds,
-                    users: res.data.totalUsers,
-                    error: false,
-                    loading: false,
-                })
-            } catch (error) {
-                if (!active) return
-                reportError('Failed to fetch bot stats:', error, {
-                    component: 'Landing',
-                    action: 'fetchBotStats',
-                })
-                setRepoStats((s) => ({ ...s, error: true, loading: false }))
-            }
-        }
-        fetchStats()
-        return () => {
-            active = false
-        }
-    }, [])
 
     usePageMetadata({
         title: t('landing.meta.title'),
@@ -102,224 +33,302 @@ export default function Landing() {
     return (
         <div className='lucky-shell min-h-screen dark text-white bg-lucky-surface-canvas'>
             <TopNav onOpenDashboard={login} />
-            <Hero
-                stats={repoStats}
-                prefersReducedMotion={prefersReducedMotion ?? false}
-            />
+            <Hero prefersReducedMotion={prefersReducedMotion ?? false} onOpenDashboard={login} />
+            <StatsStrip />
             <FeatureGrid />
             <CommandList />
             <WhySelfHost />
             <StackList />
-            <RepoFooterBanner />
             <FooterSection />
         </div>
     )
 }
 
 function TopNav({ onOpenDashboard }: { onOpenDashboard: () => void }) {
-    const botInviteUrl = getBotInviteUrl()
     return (
-        <header className='sticky top-0 z-30 border-b border-lucky-border-soft bg-lucky-surface-canvas/85 backdrop-blur supports-[backdrop-filter]:bg-lucky-surface-canvas/65'>
-            <div className='mx-auto flex h-14 max-w-6xl items-center justify-between px-4 md:px-8'>
+        <header className='sticky top-0 z-30 border-b border-lucky-border-soft/60 bg-lucky-surface-canvas/80 backdrop-blur-xl supports-[backdrop-filter]:bg-lucky-surface-canvas/60' style={{ boxShadow: '0 1px 0 rgba(220,38,38,0.08)' }}>
+            <div className='mx-auto flex h-16 max-w-6xl items-center justify-between px-4 md:px-8'>
                 <a
                     href='/'
-                    className='inline-flex items-center gap-2 text-lucky-text-strong hover:text-lucky-brand transition-colors'
+                    className='inline-flex items-center gap-3 text-lucky-text-strong hover:text-lucky-brand transition-colors'
                 >
-                    <img
-                        src='/lucky-logo.png'
-                        alt='Lucky'
-                        width='28'
-                        height='28'
-                        className='h-7 w-7 rounded-full'
-                        loading='eager'
-                    />
-                    <span className='font-mono text-sm font-semibold tracking-tight'>
-                        lucky<span className='text-lucky-brand'>.</span>
-                    </span>
+                    <div className='relative flex-shrink-0'>
+                        <img
+                            src='/lucky-logo.png'
+                            alt='Vaded Gaming'
+                            width='44'
+                            height='44'
+                            className='h-11 w-11 rounded-xl object-cover object-center'
+                            loading='eager'
+                        />
+                    </div>
+                    <div className='flex flex-col leading-none'>
+                        <span className='font-black text-xl tracking-tight leading-tight'>
+                            VADED<span className='text-lucky-brand'>GAMING</span>
+                        </span>
+                        <span className='font-mono text-[9px] text-lucky-text-muted tracking-widest uppercase opacity-70'>Discord Bot</span>
+                    </div>
                 </a>
-                <nav className='flex items-center gap-0.5 sm:gap-1 font-mono text-xs text-lucky-text-muted min-w-0'>
-                    <a
-                        href={REPO_URL}
-                        target='_blank'
-                        rel='noreferrer'
-                        className='inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 sm:px-2.5 hover:bg-lucky-surface-panel hover:text-lucky-text-strong transition-colors'
-                        aria-label='GitHub'
-                    >
-                        <GithubMark size={13} />
-                        <span className='hidden xs:inline'>github</span>
-                    </a>
-                    <a
-                        href='/docs'
-                        className='hidden sm:inline-flex items-center rounded-md px-2.5 py-1.5 hover:bg-lucky-surface-panel hover:text-lucky-text-strong transition-colors'
-                    >
-                        docs
-                    </a>
+                <nav className='flex items-center gap-1 font-mono text-xs text-lucky-text-muted'>
                     <button
                         onClick={onOpenDashboard}
-                        className='hidden sm:inline-flex items-center rounded-md px-2.5 py-1.5 hover:bg-lucky-surface-panel hover:text-lucky-text-strong transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lucky-brand'
+                        className='group btn-nav-demo inline-flex items-center gap-3 rounded-md px-3 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lucky-brand focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1117]'
                     >
-                        dashboard
+                        <span className='relative h-4 w-4 shrink-0'>
+                            <span
+                                aria-hidden
+                                className='absolute inset-0 rounded-sm border border-lucky-brand/70 bg-lucky-brand/10 shadow-[0_0_8px_rgba(239,68,68,0.6),inset_0_0_4px_rgba(239,68,68,0.2)]'
+                            />
+                            <span
+                                aria-hidden
+                                className='absolute left-0 right-0 top-0 h-1 rounded-t-sm border-b border-lucky-brand/50 bg-lucky-brand/30'
+                            />
+                            <span
+                                aria-hidden
+                                className='absolute left-1 right-1 top-2 h-0.5 rounded-full bg-lucky-brand/70'
+                            />
+                            <span
+                                aria-hidden
+                                className='absolute left-1 right-1 top-3 h-0.5 w-[70%] rounded-full bg-lucky-brand/70'
+                            />
+                        </span>
+                        <span className='flex flex-col items-start leading-none'>
+                            <span className='font-bold text-[10px] uppercase tracking-wider text-lucky-brand [text-shadow:0_0_8px_rgba(239,68,68,0.8)]'>
+                                Dashboard
+                            </span>
+                            <span className='mt-1 text-[9px] text-lucky-text-primary/85 transition-opacity group-hover:opacity-100 opacity-85'>
+                                Open control panel
+                            </span>
+                        </span>
+                        <ChevronRight
+                            size={12}
+                            aria-hidden
+                            className='ml-1 shrink-0 text-lucky-text-primary transition-transform duration-300 group-hover:translate-x-0.5'
+                        />
                     </button>
-                    {botInviteUrl ? (
-                        <a
-                            href={botInviteUrl}
-                            target='_blank'
-                            rel='noopener noreferrer'
-                            aria-label='Add to Discord'
-                            className='ml-1 inline-flex items-center gap-1 rounded-md bg-lucky-brand px-2.5 py-1.5 sm:px-3 font-semibold text-white hover:bg-lucky-brand-strong transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lucky-brand focus-visible:ring-offset-2 focus-visible:ring-offset-lucky-surface-canvas whitespace-nowrap'
-                        >
-                            <span className='xs:hidden' aria-hidden>
-                                add
-                            </span>
-                            <span className='hidden xs:inline' aria-hidden>
-                                add to discord
-                            </span>{' '}
-                            <ArrowUpRight size={12} aria-hidden />
-                        </a>
-                    ) : (
-                        <button
-                            disabled
-                            className='ml-1 inline-flex items-center gap-1 rounded-md bg-lucky-border-soft px-2.5 py-1.5 sm:px-3 font-semibold text-lucky-text-muted cursor-not-allowed opacity-50 whitespace-nowrap'
-                            aria-label='Add to Discord (not configured)'
-                        >
-                            <span className='xs:hidden' aria-hidden>
-                                add
-                            </span>
-                            <span className='hidden xs:inline' aria-hidden>
-                                add to discord
-                            </span>{' '}
-                            <ArrowUpRight size={12} aria-hidden />
-                        </button>
-                    )}
                 </nav>
             </div>
         </header>
     )
 }
 
-type HeroProps = {
-    stats: RepoStats
-    prefersReducedMotion: boolean
+function BlueprintGrid() {
+    return (
+        <>
+            {/* Dot grid — matches reference: visible red dots, slight fade at edges */}
+            <div
+                aria-hidden
+                className='pointer-events-none absolute inset-0'
+                style={{
+                    backgroundImage: 'radial-gradient(circle, rgba(220,38,38,0.7) 1.2px, transparent 1.2px)',
+                    backgroundSize: '28px 28px',
+                    opacity: 0.16,
+                }}
+            />
+            {/* Radial vignette — fades dots away from center, keeps headline area clean */}
+            <div
+                aria-hidden
+                className='pointer-events-none absolute inset-0'
+                style={{
+                    background:
+                        'radial-gradient(ellipse 70% 65% at 50% 50%, transparent 20%, #0f1117 85%)',
+                }}
+            />
+            {/* Bottom hard fade to section below */}
+            <div
+                aria-hidden
+                className='pointer-events-none absolute bottom-0 left-0 right-0 h-40'
+                style={{
+                    background: 'linear-gradient(to bottom, transparent, #0f1117)',
+                }}
+            />
+        </>
+    )
 }
 
-function Hero({ stats, prefersReducedMotion }: HeroProps) {
-    const { t, i18n } = useTranslation()
-    const locale = i18n.resolvedLanguage ?? i18n.language
-    const botInviteUrl = getBotInviteUrl()
+type HeroProps = { prefersReducedMotion: boolean; onOpenDashboard: () => void }
 
-    const animProps = prefersReducedMotion
-        ? {}
-        : {
-              initial: { opacity: 0, y: 16 },
-              animate: { opacity: 1, y: 0 },
-              transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] as const },
-          }
+function Hero({ prefersReducedMotion, onOpenDashboard }: HeroProps) {
+    const { t } = useTranslation()
 
-    const catFloat = prefersReducedMotion
+    const anim = prefersReducedMotion
         ? {}
-        : {
-              animate: { y: [0, -6, 0] },
-              transition: {
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: 'easeInOut' as const,
-              },
-          }
+        : { initial: { opacity: 0, y: 24 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as const } }
+
+    const animDelayed = prefersReducedMotion
+        ? {}
+        : { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] as const } }
 
     return (
-        <section className='relative overflow-hidden px-4 py-16 md:py-24 md:px-8'>
+        <section className='relative overflow-hidden px-4 py-24 md:py-40 md:px-8'>
+            {/* VG logo circuit board — deepest background layer */}
+            <div
+                aria-hidden
+                className='pointer-events-none absolute inset-0 flex items-center justify-center'
+            >
+                <img
+                    src='/vg-hero.png'
+                    alt=''
+                    className='w-full max-w-3xl object-contain select-none'
+                    style={{
+                        opacity: 0.13,
+                        mixBlendMode: 'luminosity',
+                        filter: 'saturate(0.4) brightness(1.2)',
+                        maskImage: 'radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%)',
+                        WebkitMaskImage: 'radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%)',
+                    }}
+                />
+            </div>
+            {/* Primary center glow */}
+            <div
+                aria-hidden
+                className='pointer-events-none absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2'
+                style={{
+                    width: '900px',
+                    height: '600px',
+                    background: 'radial-gradient(ellipse, rgba(220,38,38,0.22) 0%, rgba(220,38,38,0.06) 45%, transparent 70%)',
+                    filter: 'blur(2px)',
+                }}
+            />
+            {/* Wide ambient floor glow */}
+            <div
+                aria-hidden
+                className='pointer-events-none absolute bottom-0 left-0 right-0'
+                style={{
+                    height: '40%',
+                    background: 'radial-gradient(ellipse 100% 60% at 50% 100%, rgba(220,38,38,0.08) 0%, transparent 70%)',
+                }}
+            />
+            {/* Left accent glow */}
+            <div
+                aria-hidden
+                className='pointer-events-none absolute left-0 top-1/2 -translate-y-1/2'
+                style={{
+                    width: '320px',
+                    height: '400px',
+                    background: 'radial-gradient(ellipse, rgba(220,38,38,0.07) 0%, transparent 70%)',
+                }}
+            />
+            {/* Right accent glow */}
+            <div
+                aria-hidden
+                className='pointer-events-none absolute right-0 top-1/2 -translate-y-1/2'
+                style={{
+                    width: '320px',
+                    height: '400px',
+                    background: 'radial-gradient(ellipse, rgba(220,38,38,0.07) 0%, transparent 70%)',
+                }}
+            />
+
             <BlueprintGrid />
-            <div className='relative mx-auto grid max-w-6xl gap-12 lg:grid-cols-[1.05fr_1fr] lg:items-center'>
-                <motion.div className='min-w-0' {...animProps}>
-                    <motion.div {...catFloat} className='mb-6 inline-block'>
-                        <img
-                            src='/lucky-logo.png'
-                            alt='Lucky'
-                            width='88'
-                            height='88'
-                            className='h-20 w-20 md:h-22 md:w-22 rounded-full drop-shadow-[0_18px_36px_rgba(236,72,153,0.35)]'
-                            loading='eager'
-                            decoding='async'
-                            fetchPriority='high'
-                        />
-                    </motion.div>
-                    <p className='mb-5 inline-flex items-center gap-2 rounded-full border border-lucky-border-soft bg-lucky-surface-panel px-3 py-1 font-mono text-[11px] uppercase tracking-[0.18em] text-lucky-text-muted'>
-                        <span
-                            className='h-1.5 w-1.5 rounded-full bg-lucky-success'
-                            aria-hidden
-                        />
+
+            <div className='relative mx-auto max-w-3xl text-center'>
+                {/* Eyebrow */}
+                <motion.div {...anim}>
+                    <p className='mb-8 inline-flex items-center gap-2.5 rounded-full border border-lucky-brand/35 bg-lucky-brand/10 px-5 py-2 font-mono text-[11px] uppercase tracking-[0.22em] text-lucky-brand shadow-[0_0_24px_rgba(220,38,38,0.15)]'>
+                        <span className='h-1.5 w-1.5 rounded-full bg-lucky-brand shadow-[0_0_6px_rgba(220,38,38,0.8)]' aria-hidden />
                         {t('landing.hero.eyebrow')}
                     </p>
-                    <h1 className='mb-6 max-w-[16ch] text-[clamp(2rem,8vw,4.4rem)] font-black leading-[1.05] tracking-[-0.035em] text-lucky-text-strong break-words'>
-                        <span className='block'>
-                            {t('landing.hero.headlineLine1')}
+
+                    {/* Headline */}
+                    <h1 className='mx-auto mb-7 font-black leading-[0.96] tracking-[-0.05em]'
+                        style={{ fontSize: 'clamp(3rem,11vw,6.5rem)', fontFamily: "'Orbitron', sans-serif" }}>
+                        <span
+                            className='block text-white'
+                            style={{ textShadow: '0 0 80px rgba(255,255,255,0.08)' }}
+                        >
+                            VADED
                         </span>
-                        <span className='block text-lucky-brand'>
-                            {t('landing.hero.headlineLine2')}
+                        <span
+                            className='block text-lucky-brand'
+                            style={{
+                                textShadow: '0 0 60px rgba(220,38,38,0.5), 0 0 120px rgba(220,38,38,0.2)',
+                            }}
+                        >
+                            GAMING
                         </span>
                     </h1>
-                    <p className='mb-8 max-w-[52ch] text-base text-lucky-text-body leading-relaxed md:text-lg'>
+                </motion.div>
+
+                <motion.div {...animDelayed}>
+                    <p className='mx-auto mb-10 max-w-[44ch] text-base leading-relaxed text-lucky-text-body md:text-lg'>
                         {t('landing.hero.subtitle')}
                     </p>
-                    <div className='flex flex-col gap-2.5 sm:flex-row sm:items-center'>
-                        {botInviteUrl ? (
-                            <a
-                                href={botInviteUrl}
-                                target='_blank'
-                                rel='noopener noreferrer'
-                                className='group inline-flex h-11 items-center justify-center gap-2 rounded-md bg-lucky-brand px-5 font-semibold text-white shadow-[0_6px_24px_-8px_rgba(236,72,153,0.55)] hover:bg-lucky-brand-strong transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lucky-brand focus-visible:ring-offset-2 focus-visible:ring-offset-lucky-surface-canvas active:scale-[0.98]'
-                            >
-                                {t('landing.hero.ctaPrimary')}
-                                <ArrowUpRight
-                                    size={15}
-                                    className='transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5'
-                                    aria-hidden
-                                />
-                            </a>
-                        ) : (
-                            <button
-                                disabled
-                                className='inline-flex h-11 items-center justify-center gap-2 rounded-md bg-lucky-border-soft px-5 font-semibold text-lucky-text-muted cursor-not-allowed opacity-50 shadow-[0_6px_24px_-8px_rgba(236,72,153,0.0)]'
-                                aria-label='Add to Discord (not configured)'
-                            >
-                                {t('landing.hero.ctaPrimary')}
-                                <ArrowUpRight
-                                    size={15}
-                                    className='transition-transform'
-                                    aria-hidden
-                                />
-                            </button>
-                        )}
+
+                    {/* CTAs */}
+                    <div className='flex flex-col items-center gap-3 sm:flex-row sm:justify-center'>
+                        <button
+                            onClick={onOpenDashboard}
+                            className='group btn-glass inline-flex items-center gap-0 rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lucky-brand focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1117]'
+                        >
+                            <span className='flex h-full items-center justify-center px-4 py-3 text-lucky-brand/95'>
+                                <LayoutDashboard size={16} aria-hidden />
+                            </span>
+                            <span className='flex items-center gap-3 px-5 py-3'>
+                                <span className='flex flex-col items-start'>
+                                    <span className='font-mono text-xs font-black tracking-widest uppercase text-lucky-brand leading-none'>Dashboard</span>
+                                    <span className='text-[11px] text-lucky-text-tertiary leading-none mt-1 font-medium'>Open the control panel</span>
+                                </span>
+                                <ArrowUpRight size={14} className='text-lucky-text-tertiary group-hover:text-lucky-brand transition-colors shrink-0' aria-hidden />
+                            </span>
+                        </button>
                         <a
-                            href={REPO_URL}
+                            href='https://discord.gg/vadedgaming'
                             target='_blank'
                             rel='noreferrer'
-                            className='inline-flex h-11 items-center justify-center gap-2 rounded-md border border-lucky-border-strong bg-transparent px-5 font-semibold text-lucky-text-body hover:bg-lucky-surface-panel hover:text-lucky-text-strong transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lucky-brand focus-visible:ring-offset-2 focus-visible:ring-offset-lucky-surface-canvas active:scale-[0.98]'
+                            className='group btn-glass inline-flex items-center gap-0 rounded-xl overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lucky-brand focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1117]'
                         >
-                            <GithubMark size={14} />{' '}
-                            {t('landing.hero.ctaSecondary')}
+                            <span className='flex h-full items-center justify-center px-4 py-3 text-[#5865F2]'>
+                                <img
+                                    src='https://cdn.simpleicons.org/discord/5865F2'
+                                    alt=''
+                                    width='16'
+                                    height='16'
+                                    className='h-4 w-4 shrink-0 select-none'
+                                    loading='eager'
+                                    decoding='async'
+                                />
+                            </span>
+                            <span className='flex items-center gap-3 px-5 py-3'>
+                                <span className='flex flex-col items-start'>
+                                    <span className='font-mono text-xs font-black tracking-widest uppercase text-[#7289da] leading-none'>Discord</span>
+                                    <span className='text-[11px] text-lucky-text-tertiary leading-none mt-1 font-medium'>Join the community</span>
+                                </span>
+                                <ArrowUpRight size={14} className='text-lucky-text-tertiary group-hover:text-[#5865F2] transition-colors shrink-0' aria-hidden />
+                            </span>
                         </a>
                     </div>
                 </motion.div>
-
-                <motion.div
-                    className='min-w-0'
-                    {...(prefersReducedMotion
-                        ? {}
-                        : {
-                              initial: { opacity: 0, y: 24 },
-                              animate: { opacity: 1, y: 0 },
-                              transition: {
-                                  duration: 0.6,
-                                  delay: 0.12,
-                                  ease: [0.16, 1, 0.3, 1] as const,
-                              },
-                          })}
-                >
-                    <RepoCard stats={stats} locale={locale} />
-                </motion.div>
             </div>
         </section>
+    )
+}
+
+function StatsStrip() {
+    const stats = [
+        { icon: Music2, value: '10K+', label: 'Tracks played' },
+        { icon: Users, value: '1', label: 'Server strong' },
+        { icon: Zap, value: '100+', label: 'Commands' },
+        { icon: Radio, value: '24/7', label: 'Always on' },
+    ]
+    return (
+        <div className='border-y border-lucky-border-soft bg-lucky-surface-sidebar'>
+            <div className='mx-auto max-w-6xl'>
+                <ul className='grid grid-cols-2 divide-x divide-y divide-lucky-border-soft md:grid-cols-4 md:divide-y-0'>
+                    {stats.map(({ icon: Icon, value, label }) => (
+                        <li key={label} className='flex items-center gap-3 px-6 py-5 sm:px-8'>
+                            <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-lucky-brand/10 text-lucky-brand'>
+                                <Icon size={16} aria-hidden />
+                            </span>
+                            <div>
+                                <p className='font-black text-lg text-lucky-text-strong leading-none'>{value}</p>
+                                <p className='mt-0.5 text-xs text-lucky-text-muted'>{label}</p>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        </div>
     )
 }
 
@@ -328,11 +337,7 @@ function FeatureGrid() {
     const features = [
         { key: 'music', icon: Music2, span: 'md:col-span-2' },
         { key: 'moderation', icon: Shield, span: 'md:col-span-1' },
-        {
-            key: 'customCommands',
-            icon: SlidersHorizontal,
-            span: 'md:col-span-1',
-        },
+        { key: 'customCommands', icon: SlidersHorizontal, span: 'md:col-span-1' },
         { key: 'dashboard', icon: LayoutDashboard, span: 'md:col-span-2' },
         { key: 'embeds', icon: Sparkles, span: 'md:col-span-3' },
     ] as const
@@ -340,11 +345,14 @@ function FeatureGrid() {
     return (
         <section className='border-t border-lucky-border-soft px-4 py-20 md:px-8'>
             <div className='mx-auto max-w-6xl'>
-                <div className='mb-10 max-w-2xl'>
-                    <h2 className='mb-3 text-3xl font-semibold tracking-tight text-lucky-text-strong md:text-4xl'>
-                        {t('landing.features.heading')}
-                    </h2>
-                    <p className='text-base text-lucky-text-body leading-relaxed'>
+                <div className='mb-12 flex items-end justify-between gap-4 flex-wrap'>
+                    <div>
+                        <p className='mb-2 font-mono text-[11px] uppercase tracking-[0.2em] text-lucky-brand'>// Features</p>
+                        <h2 className='text-3xl font-black tracking-tight text-lucky-text-strong md:text-4xl'>
+                            {t('landing.features.heading')}
+                        </h2>
+                    </div>
+                    <p className='max-w-sm text-sm text-lucky-text-body leading-relaxed'>
                         {t('landing.features.subheading')}
                     </p>
                 </div>
@@ -353,22 +361,18 @@ function FeatureGrid() {
                         const isWide = span !== 'md:col-span-1'
                         return (
                             <li key={key} className={span}>
-                                <article className='surface-panel h-full flex flex-col gap-4 rounded-xl p-6 md:p-7'>
-                                    <span className='inline-flex h-10 w-10 items-center justify-center rounded-lg bg-lucky-surface-elevated text-lucky-brand'>
-                                        <Icon size={18} aria-hidden />
+                                <article className='group relative surface-panel h-full flex flex-col gap-5 rounded-xl p-6 md:p-8 overflow-hidden border border-lucky-border-soft hover:border-lucky-brand/40 transition-colors'>
+                                    {/* Subtle red corner glow on hover */}
+                                    <div className='pointer-events-none absolute -top-12 -left-12 h-32 w-32 rounded-full bg-lucky-brand/0 group-hover:bg-lucky-brand/6 transition-all duration-500 blur-2xl' aria-hidden />
+                                    <span className='inline-flex h-11 w-11 items-center justify-center rounded-xl bg-lucky-brand/10 text-lucky-brand border border-lucky-brand/20'>
+                                        <Icon size={20} aria-hidden />
                                     </span>
                                     <div>
-                                        <h3
-                                            className={`mb-2 font-semibold text-lucky-text-strong tracking-tight ${isWide ? 'text-lg md:text-xl' : 'text-base'}`}
-                                        >
-                                            {t(
-                                                `landing.features.items.${key}.title`,
-                                            )}
+                                        <h3 className={`mb-2.5 font-bold text-lucky-text-strong tracking-tight ${isWide ? 'text-lg md:text-xl' : 'text-base'}`}>
+                                            {t(`landing.features.items.${key}.title`)}
                                         </h3>
                                         <p className='text-sm text-lucky-text-body leading-relaxed'>
-                                            {t(
-                                                `landing.features.items.${key}.description`,
-                                            )}
+                                            {t(`landing.features.items.${key}.description`)}
                                         </p>
                                     </div>
                                 </article>
@@ -381,193 +385,30 @@ function FeatureGrid() {
     )
 }
 
-function BlueprintGrid() {
-    return (
-        <>
-            <div
-                aria-hidden
-                className='pointer-events-none absolute inset-0 opacity-[0.05]'
-                style={{
-                    backgroundImage:
-                        'radial-gradient(circle, #adbac7 1px, transparent 1px)',
-                    backgroundSize: '24px 24px',
-                }}
-            />
-            <div
-                aria-hidden
-                className='pointer-events-none absolute inset-0'
-                style={{
-                    background:
-                        'radial-gradient(ellipse 80% 65% at 50% 30%, transparent 50%, #0f1117 100%)',
-                }}
-            />
-        </>
-    )
-}
-
-function RepoCard({ stats, locale }: { stats: RepoStats; locale: string }) {
-    const { t } = useTranslation()
-    const [copied, setCopied] = useState(false)
-
-    const handleCopy = async () => {
-        try {
-            await navigator.clipboard.writeText(`git clone ${CLONE_URL}`)
-            setCopied(true)
-            setTimeout(() => setCopied(false), 1800)
-        } catch (error) {
-            reportError('Clipboard write failed:', error, {
-                component: 'Landing',
-                action: 'copy',
-            })
-        }
-    }
-
-    const fmt = (n: number) => n.toLocaleString(locale)
-    const loading = stats.loading
-
-    return (
-        <article
-            className='surface-panel font-mono text-sm overflow-hidden rounded-xl border border-lucky-border-soft bg-lucky-surface-sidebar shadow-[0_30px_80px_-40px_rgba(236,72,153,0.25)]'
-            aria-label={t('landing.repoCard.name')}
-        >
-            <header className='flex items-center justify-between gap-2 sm:gap-3 border-b border-lucky-border-soft bg-lucky-surface-elevated px-3 sm:px-4 py-3 min-w-0'>
-                <div className='flex items-center gap-2 text-lucky-text-strong min-w-0'>
-                    <GithubMark size={15} />
-                    <span className='font-semibold tracking-tight truncate'>
-                        {t('landing.repoCard.name')}
-                    </span>
-                </div>
-                <span className='inline-flex shrink-0 items-center gap-1 rounded-full border border-lucky-border-soft px-2 py-0.5 text-[11px] text-lucky-text-muted'>
-                    <Scale size={11} aria-hidden />{' '}
-                    {t('landing.repoCard.license')}
-                </span>
-            </header>
-
-            <div className='space-y-4 px-4 py-4'>
-                <p className='font-sans text-xs text-lucky-text-body leading-relaxed'>
-                    {t('landing.repoCard.description')}
-                </p>
-
-                <dl className='grid grid-cols-2 gap-3 text-[12px]'>
-                    <RepoStat
-                        icon={Server}
-                        value={
-                            loading
-                                ? '…'
-                                : stats.error
-                                  ? '—'
-                                  : fmt(stats.servers)
-                        }
-                        label={t('landing.repoCard.serversLabel')}
-                    />
-                    <RepoStat
-                        icon={Users}
-                        value={
-                            loading ? '…' : stats.error ? '—' : fmt(stats.users)
-                        }
-                        label={t('landing.repoCard.usersLabel')}
-                    />
-                </dl>
-
-                <div className='flex items-center gap-2 text-[11px] text-lucky-text-muted'>
-                    <span
-                        className='h-2 w-2 rounded-full bg-[#2b7489]'
-                        aria-hidden
-                    />
-                    {t('landing.repoCard.lang')}
-                    <span className='ml-auto inline-flex h-1 flex-1 max-w-[120px] overflow-hidden rounded-full bg-lucky-border-soft'>
-                        <span
-                            className='h-full bg-[#2b7489]'
-                            style={{ width: '96%' }}
-                        />
-                        <span
-                            className='h-full bg-lucky-brand'
-                            style={{ width: '4%' }}
-                        />
-                    </span>
-                </div>
-
-                <div className='rounded-md border border-lucky-border-soft bg-lucky-surface-canvas px-3 py-2.5 text-[12px] flex items-center justify-between gap-2 group min-w-0'>
-                    <code className='min-w-0 flex-1 truncate text-lucky-text-body'>
-                        <span className='text-lucky-text-muted select-none'>
-                            ${' '}
-                        </span>
-                        git clone {CLONE_URL}
-                    </code>
-                    <button
-                        onClick={handleCopy}
-                        aria-label={t('landing.repoCard.copyClone')}
-                        className='shrink-0 inline-flex h-7 w-7 items-center justify-center rounded text-lucky-text-muted hover:bg-lucky-surface-panel hover:text-lucky-text-strong transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lucky-brand'
-                    >
-                        {copied ? (
-                            <Check size={13} className='text-lucky-success' />
-                        ) : (
-                            <Copy size={13} />
-                        )}
-                    </button>
-                </div>
-
-                <a
-                    href={REPO_URL}
-                    target='_blank'
-                    rel='noreferrer'
-                    className='inline-flex w-full items-center justify-center gap-1.5 rounded-md border border-lucky-border-strong px-3 py-2 text-[12px] font-semibold text-lucky-text-strong hover:bg-lucky-surface-panel transition-colors'
-                >
-                    {t('landing.repoCard.viewOnGithub')}
-                    <ArrowUpRight size={12} aria-hidden />
-                </a>
-            </div>
-        </article>
-    )
-}
-
-function RepoStat({
-    icon: Icon,
-    value,
-    label,
-}: {
-    icon: typeof Star
-    value: string
-    label: string
-}) {
-    return (
-        <div className='flex items-baseline gap-1.5'>
-            <Icon
-                size={12}
-                className='translate-y-[1px] text-lucky-text-muted'
-                aria-hidden
-            />
-            <span className='font-semibold tabular-nums text-lucky-text-strong'>
-                {value}
-            </span>
-            <span className='text-lucky-text-muted'>{label}</span>
-        </div>
-    )
-}
-
 function WhySelfHost() {
     const { t } = useTranslation()
     const items = ['data', 'fork', 'free'] as const
     return (
         <section className='border-t border-lucky-border-soft px-4 py-20 md:px-8'>
             <div className='mx-auto max-w-6xl'>
-                <h2 className='mb-10 max-w-2xl font-mono text-xs uppercase tracking-[0.22em] text-lucky-text-muted'>
-                    <span className='mr-2 text-lucky-brand'>{'//'}</span>
+                <p className='mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-lucky-brand'>
+                    <span className='mr-2'>{'//'}</span>
                     {t('landing.whySelfHost.heading')}
+                </p>
+                <h2 className='mb-10 text-2xl font-black tracking-tight text-lucky-text-strong md:text-3xl'>
+                    No compromises. No paywalls. Just the bot.
                 </h2>
                 <ul className='grid gap-px overflow-hidden rounded-xl border border-lucky-border-soft bg-lucky-border-soft md:grid-cols-3'>
-                    {items.map((key) => (
-                        <li
-                            key={key}
-                            className='bg-lucky-surface-sidebar p-5 sm:p-7 min-w-0'
-                        >
-                            <h3 className='mb-2.5 text-base font-semibold text-lucky-text-strong tracking-tight'>
+                    {items.map((key, i) => (
+                        <li key={key} className='group relative bg-lucky-surface-sidebar p-6 sm:p-8 min-w-0 overflow-hidden'>
+                            <span className='mb-4 block font-mono text-2xl font-black text-lucky-brand/30 select-none'>
+                                0{i + 1}
+                            </span>
+                            <h3 className='mb-2.5 text-base font-bold text-lucky-text-strong tracking-tight'>
                                 {t(`landing.whySelfHost.items.${key}.title`)}
                             </h3>
                             <p className='text-sm text-lucky-text-body leading-relaxed break-words'>
-                                {t(
-                                    `landing.whySelfHost.items.${key}.description`,
-                                )}
+                                {t(`landing.whySelfHost.items.${key}.description`)}
                             </p>
                         </li>
                     ))}
@@ -583,9 +424,6 @@ function CommandList() {
         'play',
         'autoplay',
         'queue',
-        'ban',
-        'automod',
-        'custom',
     ] as const
 
     const kindColor: Record<string, string> = {
@@ -699,87 +537,66 @@ function StackList() {
     )
 }
 
-function RepoFooterBanner() {
-    const { t } = useTranslation()
-    return (
-        <section className='relative overflow-hidden border-t border-lucky-border-soft bg-lucky-surface-canvas px-4 py-16 md:px-8'>
-            <BlueprintGrid />
-            <div className='relative mx-auto max-w-3xl text-center'>
-                <h2 className='mb-3 text-2xl font-semibold tracking-tight text-lucky-text-strong md:text-3xl'>
-                    {t('landing.footerRepo.heading')}
-                </h2>
-                <p className='mx-auto mb-6 max-w-xl text-sm text-lucky-text-body md:text-base'>
-                    {t('landing.footerRepo.subheading')}
-                </p>
-                <a
-                    href={REPO_URL}
-                    target='_blank'
-                    rel='noreferrer'
-                    className='inline-flex h-11 items-center gap-2 rounded-md border border-lucky-border-strong bg-lucky-surface-panel px-5 font-mono text-sm font-semibold text-lucky-text-strong hover:bg-lucky-surface-elevated transition-colors'
-                >
-                    <GithubMark size={15} /> github.com/LucasSantana-Dev/Lucky{' '}
-                    <ArrowUpRight size={13} aria-hidden />
-                </a>
-            </div>
-        </section>
-    )
-}
-
 function FooterSection() {
     const { t } = useTranslation()
     return (
-        <footer className='border-t border-lucky-border-soft px-4 py-12 md:px-8'>
+        <footer className='border-t border-lucky-border-soft px-4 py-14 md:px-8'>
             <div className='mx-auto max-w-6xl'>
-                <div className='grid grid-cols-1 gap-10 md:grid-cols-[1.4fr_1fr_1fr] md:gap-12'>
+                {/* CTA banner above footer links */}
+                <div className='mb-14 rounded-2xl border border-lucky-brand/20 bg-lucky-brand/5 px-6 py-8 md:px-10 flex flex-col md:flex-row items-center justify-between gap-6'>
+                    <div>
+                        <h3 className='text-xl font-black text-lucky-text-strong mb-1'>Ready to run it in your server?</h3>
+                        <p className='text-sm text-lucky-text-muted'>Drop it in your Discord in under a minute.</p>
+                    </div>
+                    <a
+                        href='https://discord.gg/vadedgaming'
+                        target='_blank'
+                        rel='noreferrer'
+                            className='shrink-0 inline-flex h-11 items-center gap-2 rounded-xl btn-glass px-6 text-sm font-bold text-white'
+                    >
+                        {t('landing.footer.discord')}
+                        <ArrowUpRight size={14} aria-hidden />
+                    </a>
+                </div>
+
+                <div className='grid grid-cols-1 gap-10 md:grid-cols-[1.5fr_1fr_1fr] md:gap-12'>
                     <div className='space-y-3'>
-                        <div className='inline-flex items-baseline gap-1.5 font-mono text-sm font-semibold text-lucky-text-strong'>
-                            lucky<span className='text-lucky-brand'>.</span>
+                    <div className='flex items-center gap-2.5'>
+                            <img
+                                src='/lucky-logo.png'
+                                alt='Vaded Gaming'
+                                width='40'
+                                height='40'
+                                className='h-10 w-10 rounded-xl'
+                            />
+                            <div className='inline-flex items-baseline gap-1 font-black text-xl text-lucky-text-strong'>
+                                VADED<span className='text-lucky-brand'>GAMING</span>
+                            </div>
                         </div>
-                        <p className='max-w-xs text-sm text-lucky-text-muted'>
+                        <p className='max-w-xs text-sm text-lucky-text-muted leading-relaxed'>
                             {t('landing.footer.tagline')}
                         </p>
                     </div>
                     <FooterColumn
                         heading={t('landing.footer.links')}
                         links={[
-                            {
-                                href: REPO_URL,
-                                label: t('landing.footer.github'),
-                                external: true,
-                            },
                             { href: '/docs', label: t('landing.footer.docs') },
-                            {
-                                href: '/changelog',
-                                label: t('landing.footer.changelog'),
-                            },
+                            { href: '/changelog', label: t('landing.footer.changelog') },
                         ]}
                     />
                     <FooterColumn
                         heading={t('landing.footer.support')}
                         links={[
-                            {
-                                href: 'https://discord.gg/lucky',
-                                label: t('landing.footer.discord'),
-                                external: true,
-                            },
-                            {
-                                href: '/terms',
-                                label: t('landing.footer.terms'),
-                            },
-                            {
-                                href: '/privacy',
-                                label: t('landing.footer.privacy'),
-                            },
+                            { href: 'https://discord.gg/vadedgaming', label: t('landing.footer.discord'), external: true },
+                            { href: '/terms', label: t('landing.footer.terms') },
+                            { href: '/privacy', label: t('landing.footer.privacy') },
                         ]}
                     />
                 </div>
+
                 <div className='mt-10 flex flex-col items-start justify-between gap-3 border-t border-lucky-border-soft pt-6 md:flex-row md:items-center'>
-                    <p className='font-mono text-xs text-lucky-text-muted'>
-                        {t('landing.footer.copyright')}
-                    </p>
-                    <p className='text-xs text-lucky-text-muted'>
-                        {t('landing.footer.supportCopy')}
-                    </p>
+                    <p className='font-mono text-xs text-lucky-text-muted'>{t('landing.footer.copyright')}</p>
+                    <p className='text-xs text-lucky-text-muted'>{t('landing.footer.supportCopy')}</p>
                 </div>
             </div>
         </footer>

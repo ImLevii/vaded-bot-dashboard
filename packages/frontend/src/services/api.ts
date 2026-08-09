@@ -206,6 +206,28 @@ export const api = {
                 `/guilds/${id}/rbac`,
                 { grants },
             ),
+        getMembers: (id: string) =>
+            apiClient.get<{
+                members: Array<{
+                    id: string
+                    username: string
+                    displayName: string
+                    avatarUrl: string | null
+                    roles: Array<{ id: string; name: string; color: number }>
+                    userGrants: Array<{ module: string; mode: string }>
+                }>
+            }>(`/guilds/${id}/members`),
+        getMemberGrants: (guildId: string, userId: string) =>
+            apiClient.get<{ grants: Array<{ module: string; mode: string }> }>(
+                `/guilds/${guildId}/members/${userId}/grants`,
+            ),
+        updateMemberGrants: (
+            guildId: string,
+            userId: string,
+            grants: Array<{ module: string; mode: string }>,
+        ) => apiClient.put<{ ok: boolean }>(`/guilds/${guildId}/members/${userId}/grants`, { grants }),
+        clearMemberGrants: (guildId: string, userId: string) =>
+            apiClient.delete<{ ok: boolean }>(`/guilds/${guildId}/members/${userId}/grants`),
         getSettings: (id: string) =>
             apiClient.get<{ settings: ServerSettings }>(
                 `/guilds/${id}/settings`,

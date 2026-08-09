@@ -1,6 +1,6 @@
 import { createServer, type Server } from 'node:http'
 import type { Client } from 'discord.js'
-import { infoLog, errorLog } from '@lucky/shared/utils'
+import { infoLog, errorLog, warnLog } from '@lucky/shared/utils'
 import { parseIntEnv } from '@lucky/shared/utils/env'
 import {
     metricsContentType,
@@ -67,7 +67,15 @@ export function startMetricsServer(client: Client): Server | null {
         res.end('not found')
     })
 
-    server.on('error', (error) => {
+    server.on('error', (error: NodeJS.ErrnoException) => {
+        if (error.code === 'EADDRINUSE') {
+            warnLog({
+                message: `metricsServer: port ${port} already in use — metrics disabled for this session`,
+            })
+            server?.close()
+            server = null
+            return
+        }
         errorLog({ message: 'metricsServer: socket error', error })
     })
 

@@ -208,6 +208,7 @@ class GuildRoleAccessService {
         guildId: string,
         roleIds: string[],
         isAdminOverride: boolean,
+        userId?: string,
     ): Promise<EffectiveAccessMap> {
         if (isAdminOverride) {
             return createManageAccessMap()
@@ -232,7 +233,59 @@ class GuildRoleAccessService {
             }
         }
 
+        // Per-user grants override role-based grants
+        if (userId) {
+            try {
+                const userGrants = await prisma.guildUserGrant.findMany({
+                    where: { guildId, userId },
+                })
+                for (const grant of userGrants) {
+                    if (!isModuleKey(grant.module) || !isAccessMode(grant.mode)) continue
+                    access[grant.module as ModuleKey] = grant.mode as EffectiveAccess
+                }
+            } catch {
+                // Non-critical — fall back to role-based access if user grant query fails
+            }
+        }
+
         return access
+    }
+
+    /** Lists all user grants for a guild. */
+    async listUserGrants(guildId: string): Promise<Array<{ userId: string; module: string; mode: string }>> {
+        try {
+            return await prisma.guildUserGrant.findMany({
+                where: { guildId },
+                select: { userId: true, module: true, mode: true },
+                orderBy: [{ userId: 'asc' }, { module: 'asc' }],
+            })
+        } catch {
+            return []
+        }
+    }
+
+    /** Replaces all user grants for a specific user in a guild. */
+    async replaceUserGrants(
+        guildId: string,
+        userId: string,
+        grants: Array<{ module: ModuleKey; mode: AccessMode }>,
+    ): Promise<void> {
+        const valid = grants.filter(
+            (g) => isModuleKey(g.module) && isAccessMode(g.mode),
+        )
+        await prisma.$transaction(async (tx) => {
+            await tx.guildUserGrant.deleteMany({ where: { guildId, userId } })
+            if (valid.length > 0) {
+                await tx.guildUserGrant.createMany({
+                    data: valid.map((g) => ({ guildId, userId, module: g.module, mode: g.mode })),
+                })
+            }
+        })
+    }
+
+    /** Removes all user grants for a specific user in a guild. */
+    async clearUserGrants(guildId: string, userId: string): Promise<void> {
+        await prisma.guildUserGrant.deleteMany({ where: { guildId, userId } })
     }
 
     /** Checks if a user has the required access mode for a module. */

@@ -17,37 +17,41 @@ export function createMusicControlButtons(
     const previousButton = new ButtonBuilder()
         .setCustomId(MUSIC_BUTTON_IDS.PREVIOUS)
         .setEmoji('⏮️')
+        .setLabel('Previous')
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(!hasHistory)
 
     const pauseResumeButton = new ButtonBuilder()
         .setCustomId(MUSIC_BUTTON_IDS.PAUSE_RESUME)
         .setLabel(isPaused ? 'Resume' : 'Pause')
-        .setEmoji('⏯️')
+        .setEmoji(isPaused ? '▶️' : '⏸️')
         .setStyle(ButtonStyle.Primary)
+
+    const stopButton = new ButtonBuilder()
+        .setCustomId(MUSIC_BUTTON_IDS.STOP)
+        .setEmoji('⏹️')
+        .setLabel('Stop')
+        .setStyle(ButtonStyle.Danger)
 
     const skipButton = new ButtonBuilder()
         .setCustomId(MUSIC_BUTTON_IDS.SKIP)
         .setEmoji('⏭️')
+        .setLabel('Skip')
         .setStyle(ButtonStyle.Secondary)
 
     const shuffleButton = new ButtonBuilder()
         .setCustomId(MUSIC_BUTTON_IDS.SHUFFLE)
         .setEmoji('🔀')
+        .setLabel('Shuffle')
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(!canShuffle)
-
-    const loopButton = new ButtonBuilder()
-        .setCustomId(MUSIC_BUTTON_IDS.LOOP)
-        .setEmoji('🔁')
-        .setStyle(ButtonStyle.Secondary)
 
     return new ActionRowBuilder<ButtonBuilder>().addComponents(
         previousButton,
         pauseResumeButton,
+        stopButton,
         skipButton,
         shuffleButton,
-        loopButton,
     )
 }
 

@@ -19,6 +19,9 @@ import { createUserFriendlyError } from '@lucky/shared/utils/general/errorSaniti
 import { errorLog, debugLog, warnLog } from '@lucky/shared/utils'
 import { withTimeout } from '@lucky/shared/utils/async'
 import { assertDefined } from '@lucky/shared/utils/guards'
+import { isUrl } from './urlNormalization'
+
+export { isUrl, normalizeSoundCloudUrl, normalizeYoutubeUrl, normalizeSpotifyUrl, cleanQueryInput } from './urlNormalization'
 
 export const DISCORD_UNKNOWN_INTERACTION_CODE = 10062
 
@@ -31,18 +34,6 @@ export function isUnknownInteractionError(error: unknown): boolean {
     )
 }
 
-export function isUrl(query: string): boolean {
-    return query.startsWith('http://') || query.startsWith('https://')
-}
-
-/**
- * Expands SoundCloud short links (on.soundcloud.com) by following the HTTP redirect.
- * Returns the expanded URL if successful, or the original URL if expansion fails.
- * Uses a 5-second timeout to prevent hanging requests.
- *
- * Security: only expands on.soundcloud.com hosts and validates the resolved URL
- * is a soundcloud.com domain before returning it.
- */
 export async function expandSoundCloudShortUrl(url: string): Promise<string> {
     // Fast path: not a short link
     if (!url.includes('on.soundcloud.com')) {
@@ -107,21 +98,6 @@ export async function expandSoundCloudShortUrl(url: string): Promise<string> {
                 error: String(error),
             },
         })
-        return url
-    }
-}
-
-/**
- * Strips SoundCloud playlist-context query params (`?in=...`) that the
- * SoundCloud extractor cannot resolve. The bare track URL resolves correctly.
- */
-export function normalizeSoundCloudUrl(url: string): string {
-    if (!url.includes('soundcloud.com')) return url
-    try {
-        const parsed = new URL(url)
-        parsed.searchParams.delete('in')
-        return parsed.toString()
-    } catch {
         return url
     }
 }

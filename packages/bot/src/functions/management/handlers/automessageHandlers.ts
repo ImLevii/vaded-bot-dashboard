@@ -119,7 +119,7 @@ export async function handleAutoMessageList(
     }
 
     const embed = new EmbedBuilder()
-        .setColor(0x5865f2)
+        .setColor(0x111111)
         .setTitle('📋 Auto-Messages')
         .setDescription(
             allMessages

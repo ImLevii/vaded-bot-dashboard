@@ -179,8 +179,8 @@ function Layout({ children }: LayoutProps) {
                             </p>
                         </div>
                         <div className='flex items-center gap-2'>
-                            <VoteBadge />
-                            <LanguageSwitcher />
+                            {/* <VoteBadge /> */}
+                            {/* <LanguageSwitcher /> */}
                             <GuildChip />
                             <UserMenu />
                         </div>

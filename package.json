@@ -9,6 +9,7 @@
     "scripts": {
         "prepare": "husky || true",
         "build": "npm run db:generate && npm run build --workspace=packages/shared && npm run build --workspace=packages/bot && npm run build --workspace=packages/backend && npm run build --workspace=packages/frontend",
+        "start": "node scripts/start-stack.mjs",
         "build:shared": "npm run build --workspace=packages/shared",
         "build:bot": "npm run build --workspace=packages/bot",
         "build:backend": "npm run build --workspace=packages/backend",
@@ -115,7 +116,9 @@
         "discord-player-youtubei": "^3.0.0-beta.4",
         "file-type": "^21.3.4",
         "jintr": "^3.3.1",
+        "mediaplex": "^1.0.0",
         "minipass-flush": "^2.0.0",
+        "opusscript": "^0.1.1",
         "prisma": "^7.8.0",
         "prom-client": "^15.1.3",
         "ws": "^8.21.0"

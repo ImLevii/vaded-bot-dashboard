@@ -148,7 +148,7 @@ describe('ServerSettingsPage', () => {
         renderPage()
 
         await waitFor(() => {
-            expect(screen.getByPlaceholderText('Lucky')).toBeInTheDocument()
+            expect(screen.getByPlaceholderText('Vaded Gaming')).toBeInTheDocument()
         })
 
         expect(screen.getByPlaceholderText('!')).toBeInTheDocument()
@@ -639,7 +639,7 @@ describe('ServerSettingsPage', () => {
 
         renderPage()
 
-        const nicknameInput = await screen.findByPlaceholderText('Lucky')
+        const nicknameInput = await screen.findByPlaceholderText('Vaded Gaming')
         await user.clear(nicknameInput)
         await user.type(nicknameInput, 'BotName')
 

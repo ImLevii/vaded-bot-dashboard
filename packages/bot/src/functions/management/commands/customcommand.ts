@@ -195,7 +195,7 @@ export default new Command({
                 )
 
                 const embed = new EmbedBuilder()
-                    .setColor(0x5865f2)
+                    .setColor(0x111111)
                     .setTitle('✏️ Custom Command Updated')
                     .addFields({ name: 'Name', value: name })
                     .setTimestamp()
@@ -270,7 +270,7 @@ export default new Command({
                 }
 
                 const embed = new EmbedBuilder()
-                    .setColor(0x5865f2)
+                    .setColor(0x111111)
                     .setTitle('📋 Custom Commands')
                     .setDescription(
                         commands
@@ -311,7 +311,7 @@ export default new Command({
                 }
 
                 const embed = new EmbedBuilder()
-                    .setColor(0x5865f2)
+                    .setColor(0x111111)
                     .setTitle(`📋 Command: ${command.name}`)
                     .addFields(
                         {

@@ -16,8 +16,11 @@ import {
     isUnknownInteractionError,
     resolveSearchEngine,
     normalizeSoundCloudUrl,
+    normalizeYoutubeUrl,
+    normalizeSpotifyUrl,
     expandSoundCloudShortUrl,
 } from '../queryUtils'
+import { cleanQueryInput } from '../urlNormalization'
 import {
     resolveQueryWithFallbacks,
     emitPlayResolutionTelemetry,
@@ -54,11 +57,11 @@ export async function executePlayHandler({
         throw error
     }
 
-    const rawQuery = interaction.options.getString('query', true)
+    const rawQuery = cleanQueryInput(interaction.options.getString('query', true))
     // Expand SoundCloud short links first (on.soundcloud.com → full URL)
     const expandedQuery = await expandSoundCloudShortUrl(rawQuery)
-    // Then normalize (strip ?in= params)
-    const query = normalizeSoundCloudUrl(expandedQuery)
+    // Then normalize (strip ?in= params, strip unresolvable YouTube mix params)
+    const query = normalizeSpotifyUrl(normalizeYoutubeUrl(normalizeSoundCloudUrl(expandedQuery)))
     const provider = interaction.options.getString('provider')
     const collaborativeCheck = collaborativePlaylistService.canAddTracks(
         interaction.guildId,

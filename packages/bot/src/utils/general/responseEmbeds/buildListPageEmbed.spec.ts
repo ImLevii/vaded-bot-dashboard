@@ -112,7 +112,7 @@ describe('buildListPageEmbed', () => {
 
     it('uses default color when not specified', () => {
         const embed = buildListPageEmbed([], 1, { title: 'Test' })
-        expect(embed.data.color).toBe(0x5865f2)
+        expect(embed.data.color).toBe(0x111111)
     })
 
     it('includes title in all embeds', () => {

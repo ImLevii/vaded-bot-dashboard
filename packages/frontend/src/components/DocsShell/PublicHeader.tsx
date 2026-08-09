@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { ArrowUpRight, Menu, X } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 
 type NavKey = 'docs' | 'changelog' | 'github'
 
@@ -10,8 +10,6 @@ type Props = {
     /** Optional override for which top-nav item is highlighted. */
     activeNav?: NavKey
 }
-
-const GITHUB_URL = 'https://github.com/LucasSantana-Dev/Lucky'
 
 /**
  * Shared sticky header for /docs, /changelog, /terms, /privacy.
@@ -61,14 +59,14 @@ export default function PublicHeader({
                     >
                         <img
                             src='/lucky-logo.png'
-                            alt='Lucky'
+                            alt='Vaded Gaming'
                             width='24'
                             height='24'
-                            className='h-6 w-6 rounded-full'
+                            className='h-6 w-6 rounded-lg'
                             loading='eager'
                         />
                         <span className='font-mono text-sm font-semibold tracking-tight'>
-                            lucky<span className='text-lucky-brand'>.</span>
+                            VADED<span className='text-lucky-brand'>GAMING</span>
                         </span>
                     </Link>
                     <span className='ml-1 hidden text-lucky-border-strong md:inline'>
@@ -91,14 +89,6 @@ export default function PublicHeader({
                     >
                         changelog
                     </Link>
-                    <a
-                        href={GITHUB_URL}
-                        target='_blank'
-                        rel='noreferrer'
-                        className='inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 hover:bg-lucky-surface-panel hover:text-lucky-text-strong transition-colors'
-                    >
-                        github <ArrowUpRight size={11} aria-hidden />
-                    </a>
                 </nav>
             </div>
         </header>

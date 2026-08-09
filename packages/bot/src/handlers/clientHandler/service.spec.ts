@@ -180,7 +180,7 @@ describe('service', () => {
             const mockClient = {
                 login: jest.fn().mockResolvedValue('client'),
                 once: jest.fn((event, handler) => {
-                    if (event === 'ready') {
+                    if (event === 'clientReady') {
                         Promise.resolve().then(() => handler())
                     }
                 }),
@@ -214,7 +214,7 @@ describe('service', () => {
             const mockClient = {
                 login: jest.fn().mockResolvedValue('client'),
                 once: jest.fn((event: string, handler: () => void) => {
-                    if (event === 'ready') {
+                    if (event === 'clientReady') {
                         Promise.resolve().then(() => handler())
                     }
                 }),
@@ -267,7 +267,7 @@ describe('service', () => {
             const mockClient = {
                 login: jest.fn().mockResolvedValue('client'),
                 once: jest.fn((event, handler) => {
-                    if (event === 'ready') {
+                    if (event === 'clientReady') {
                         Promise.resolve().then(() => handler())
                     }
                 }),
@@ -287,7 +287,7 @@ describe('service', () => {
             await new Promise((resolve) => setImmediate(resolve))
 
             expect(mockClient.once).toHaveBeenCalledWith(
-                'ready',
+                'clientReady',
                 expect.any(Function),
             )
 
@@ -300,7 +300,7 @@ describe('service', () => {
             const mockClient = {
                 login: jest.fn().mockResolvedValue('client'),
                 once: jest.fn((event, handler) => {
-                    if (event === 'ready') {
+                    if (event === 'clientReady') {
                         Promise.resolve().then(() => handler())
                     }
                 }),
@@ -340,7 +340,7 @@ describe('service', () => {
             const mockClient = {
                 login: jest.fn().mockResolvedValue('client'),
                 once: jest.fn((event: string, handler: () => unknown) => {
-                    if (event === 'ready') {
+                    if (event === 'clientReady') {
                         Promise.resolve().then(() => handler())
                     }
                 }),
@@ -368,7 +368,7 @@ describe('service', () => {
             const mockClient = {
                 login: jest.fn().mockResolvedValue('client'),
                 once: jest.fn((event, handler) => {
-                    if (event === 'ready') {
+                    if (event === 'clientReady') {
                         Promise.resolve().then(() => handler())
                     }
                 }),
@@ -403,7 +403,7 @@ describe('service', () => {
             const mockClient = {
                 login: jest.fn().mockResolvedValue('client'),
                 once: jest.fn((event, handler) => {
-                    if (event === 'ready') {
+                    if (event === 'clientReady') {
                         Promise.resolve().then(() => handler())
                     }
                 }),
@@ -435,7 +435,7 @@ describe('service', () => {
             const mockClient = {
                 login: jest.fn().mockResolvedValue('client'),
                 once: jest.fn((event, handler) => {
-                    if (event === 'ready') {
+                    if (event === 'clientReady') {
                         Promise.resolve().then(() => handler())
                     }
                 }),
@@ -461,7 +461,7 @@ describe('service', () => {
             const mockClient = {
                 login: jest.fn().mockResolvedValue('client'),
                 once: jest.fn((event, handler) => {
-                    if (event === 'ready') {
+                    if (event === 'clientReady') {
                         Promise.resolve().then(() => handler())
                     }
                 }),
@@ -491,7 +491,7 @@ describe('service', () => {
             const mockClient = {
                 login: jest.fn().mockResolvedValue('client'),
                 once: jest.fn((event, handler) => {
-                    if (event === 'ready') {
+                    if (event === 'clientReady') {
                         Promise.resolve().then(() => handler())
                     }
                 }),

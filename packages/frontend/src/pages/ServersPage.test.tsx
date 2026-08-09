@@ -24,8 +24,8 @@ const translations: Record<string, string> = {
     navSettings: 'Settings',
     recentlyActive: 'Recently Active',
     allOtherServers: 'All Other Servers',
-    luckyInstalled: 'Lucky installed',
-    inviteLucky: 'Invite Lucky',
+    luckyInstalled: 'Vaded installed',
+    inviteLucky: 'Invite Vaded',
     noServersTitle: 'No servers yet',
     noServersDescription: 'Join a Discord server and Lucky will appear here.',
 }

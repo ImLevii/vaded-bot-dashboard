@@ -280,7 +280,7 @@ describe('eventsubSubscriptions', () => {
             const sendCall = jest.mocked(mockChannel.send).mock.calls[0]
             const embed = sendCall[0].embeds[0]
 
-            expect(embed.data.color).toBe(0x9146ff)
+            expect(embed.data.color).toBe(0xdc2626)
             expect(embed.data.title).toContain('Test User')
             expect(embed.data.title).toContain('live')
             expect(embed.data.url).toContain('testuser')
@@ -707,7 +707,7 @@ describe('eventsubSubscriptions', () => {
             const sendCall = jest.mocked(mockChannel.send).mock.calls[0]
             const embed = sendCall[0].embeds[0]
 
-            expect(embed.data.color).toBe(0x9146ff)
+            expect(embed.data.color).toBe(0xdc2626)
             expect(embed.data.title).toContain('Test User')
             expect(embed.data.title).toContain('updated')
             expect(embed.data.url).toBe('https://twitch.tv/testuser')
@@ -903,7 +903,7 @@ describe('eventsubSubscriptions', () => {
             const sendCall = jest.mocked(mockChannel.send).mock.calls[0]
             const embed = sendCall[0].embeds[0]
 
-            expect(embed.data.color).toBe(0x9146ff)
+            expect(embed.data.color).toBe(0xdc2626)
             expect(embed.data.title).toContain('To User')
             expect(embed.data.title).toContain('Raid')
             expect(embed.data.url).toBe('https://twitch.tv/touser')

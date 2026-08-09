@@ -1,4 +1,4 @@
-import {
+﻿import {
     Events,
     EmbedBuilder,
     ChannelType,
@@ -92,8 +92,8 @@ function handleClientReady(client: Client): void {
 // 2026-06-18-in-bot-growth). Helps a new server start using the bot; keeping it
 // utility-first avoids the Platform-Manipulation flags that jeopardize verification.
 const ONBOARDING_EMBED = new EmbedBuilder()
-    .setColor(0x5865f2)
-    .setTitle('🎵 Thanks for adding Lucky!')
+    .setColor(0x111111)
+    .setTitle('<a:music:741605543046807626> Thanks for adding Lucky!')
     .setDescription(
         [
             "Here's how to get started:",

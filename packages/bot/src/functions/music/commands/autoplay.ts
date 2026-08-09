@@ -1,4 +1,4 @@
-import { MessageFlags, SlashCommandBuilder } from 'discord.js'
+﻿import { MessageFlags, SlashCommandBuilder } from 'discord.js'
 import Command from '../../../models/Command'
 import { interactionReply } from '../../../utils/general/interactionReply'
 import { createErrorEmbed } from '../../../utils/general/embeds'
@@ -58,7 +58,7 @@ export default new Command({
                         )
                         .addChoices(
                             {
-                                name: "🎵 Similar — music like what's playing",
+                                name: "<a:music:741605543046807626> Similar — music like what's playing",
                                 value: 'similar',
                             },
                             {

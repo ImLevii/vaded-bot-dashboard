@@ -1,8 +1,8 @@
-# Lucky Design System
+# Vaded Gaming Design System
 
 ## Overview
 
-Lucky uses a clean, neutral dark design system inspired by professional developer tools and Discord bots like Dyno and Carl-bot. The palette is dark greys/near-black with a **dual accent**: Discord blurple as the primary CTA color and neon pink as the secondary accent. See `decisions/2026-04-21-redesign-port-target.md` for the rationale.
+Vaded Gaming uses a clean, neutral dark design system inspired by professional developer tools and Discord bots like Dyno and Carl-bot. The palette is dark greys/near-black with a red brand accent (see `packages/frontend/branding/BRANDING_GUIDE.md`).
 
 ## Color Palette
 
@@ -36,10 +36,10 @@ Lucky uses a clean, neutral dark design system inspired by professional develope
 
 | Token                     | Hex       | Usage                                                       |
 | ------------------------- | --------- | ----------------------------------------------------------- |
-| `--color-brand-discord`   | `#5865f2` | Primary CTA, active nav, focus rings                        |
-| `--lucky-brand-strong`    | `#4752c4` | Primary hover                                               |
-| `--color-brand-accent`    | `#ec4899` | Secondary accent, live pings, gradient highlights           |
-| `--color-lucky-neon-pink` | `#ec4899` | Alias for the secondary accent (used in token-bridge layer) |
+| `--color-lucky-brand`     | `#dc2626` | Primary CTA, active nav, focus rings, logo                  |
+| `--color-lucky-brand-strong` | `#b91c1c` | Primary hover                                            |
+| `--color-brand-accent`    | `#ef4444` | Secondary accent, live pings, gradient highlights           |
+| `--color-lucky-neon-pink` | `#ef4444` | Alias for the secondary accent (used in token-bridge layer) |
 
 Short-form `--color-*` aliases are added alongside the long-form `--lucky-*` tokens during the redesign migration; both names resolve to the same value, see `index.css`. Cleanup PR removing the duplicates is queued for after all page ports land.
 
@@ -84,23 +84,23 @@ All four fonts are loaded at the top of `packages/frontend/src/index.css`; Inter
 
 ## Interaction & Motion
 
-- Focus ring: 3px blurple ring (`--lucky-shadow-focus: 0 0 0 3px rgb(88 101 242 / 0.4)`)
+- Focus ring: 3px red ring (`--lucky-shadow-focus: 0 0 0 3px rgb(220 38 38 / 0.4)`)
 - Hover borders: upgrade from `border-soft` to `border-strong`
-- Active nav items: blurple left-accent bar (2px) + `surface-highlight` background
+- Active nav items: red left-accent bar (2px) + `surface-highlight` background
 - Allowed animations: `fade-up`, `fade-in`, `accordion-down/up`, `animate-spin` (loaders)
 - Removed: glow-pulse, float, shimmer, pulse-glow animations
 
 ## Component Rules
 
-- **Button primary/accent**: blurple background, white text, hover → `brand-strong`
+- **Button primary/accent**: red background, white text, hover → `brand-strong`
 - **Button secondary**: panel background, border, hover → active highlight
 - **Cards**: flat border, no gradient overlays, no box-shadow glow
-- **Nav items**: left accent bar on active (blurple), `type-meta` section labels in subtle color
-- **StatTile**: toned icon container (blurple/success/warning), no glow drop-shadow
+- **Nav items**: left accent bar on active (red), `type-meta` section labels in subtle color
+- **StatTile**: toned icon container (red/success/warning), no glow drop-shadow
 
 ## Principles
 
-1. **Dual accent**: Discord blurple `#5865f2` for primary CTAs + active states; neon pink `#ec4899` for secondary accents and gradient highlights. No gold, no legacy-purple gradients.
+1. **Red brand**: red `#dc2626` for primary CTAs, active states, and gradient highlights. No gold, no blurple, no legacy-purple gradients.
 2. **Flat panels**: No glassmorphism, no background radial gradients on pages.
 3. **Professional motion**: Only fade transitions. No glow-pulse, float, or shimmer.
 4. **Sora display + Manrope body + JetBrains Mono**: see Typography. Inter stays in the import list as a transitional fallback while pages port.

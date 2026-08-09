@@ -1,10 +1,9 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import Landing from './Landing'
 import { useAuthStore } from '@/stores/authStore'
 import { usePageMetadata } from '@/hooks/usePageMetadata'
 import { useReducedMotion } from 'framer-motion'
-import { api } from '@/services/api'
 
 vi.mock('@/stores/authStore')
 vi.mock('@/hooks/usePageMetadata')
@@ -20,32 +19,11 @@ vi.mock('framer-motion', async () => {
         useReducedMotion: vi.fn(() => false),
     }
 })
-vi.mock('@/services/api')
 
 const mockLogin = vi.fn()
 
-type StatsFixture = {
-    totalGuilds: number
-    totalUsers: number
-    uptimeSeconds: number
-    serversOnline: number
-}
-
-function setupMocks(overrides?: {
-    prefersReducedMotion?: boolean
-    statsData?: StatsFixture
-    statsError?: Error
-}) {
-    const {
-        prefersReducedMotion = false,
-        statsData = {
-            totalGuilds: 240,
-            totalUsers: 18_400,
-            uptimeSeconds: 86_400,
-            serversOnline: 1,
-        },
-        statsError,
-    } = overrides || {}
+function setupMocks(overrides?: { prefersReducedMotion?: boolean }) {
+    const { prefersReducedMotion = false } = overrides || {}
 
     vi.mocked(useAuthStore).mockImplementation(((
         selector?: (value: unknown) => unknown,
@@ -56,12 +34,6 @@ function setupMocks(overrides?: {
 
     vi.mocked(usePageMetadata).mockImplementation(() => undefined)
     vi.mocked(useReducedMotion).mockReturnValue(prefersReducedMotion)
-
-    vi.mocked(api).stats = {
-        getPublic: statsError
-            ? vi.fn().mockRejectedValue(statsError)
-            : vi.fn().mockResolvedValue({ data: statsData }),
-    } as any
 }
 
 describe('Landing', () => {
@@ -81,21 +53,15 @@ describe('Landing', () => {
         })
     })
 
-    test('renders top nav with brand wordmark and github link', () => {
+    test('renders top nav with brand wordmark', () => {
         render(<Landing />)
-        const wordmarks = screen.getAllByText('lucky')
+        const wordmarks = screen.getAllByText('VADED')
         expect(wordmarks.length).toBeGreaterThanOrEqual(1)
-        const githubLinks = screen.getAllByRole('link', { name: /github/i })
-        expect(githubLinks.length).toBeGreaterThanOrEqual(1)
-        expect(githubLinks[0]).toHaveAttribute(
-            'href',
-            'https://github.com/LucasSantana-Dev/Lucky',
-        )
     })
 
-    test('renders hero with cat logo, eyebrow and headline', () => {
+    test('renders hero with logo, eyebrow and headline', () => {
         render(<Landing />)
-        const logos = screen.getAllByAltText('Lucky')
+        const logos = screen.getAllByAltText('Vaded Gaming')
         expect(logos.length).toBeGreaterThanOrEqual(2)
         const eyebrows = screen.getAllByText(/Open source/i)
         expect(eyebrows.length).toBeGreaterThanOrEqual(1)
@@ -144,49 +110,10 @@ describe('Landing', () => {
         }
     })
 
-    test('renders Self-host on GitHub secondary CTA in hero', () => {
-        render(<Landing />)
-        const selfHost = screen.getByRole('link', {
-            name: /Self-host on GitHub/i,
-        })
-        expect(selfHost).toHaveAttribute(
-            'href',
-            'https://github.com/LucasSantana-Dev/Lucky',
-        )
-        expect(selfHost).toHaveAttribute('target', '_blank')
-    })
-
     test('dashboard nav button triggers login', () => {
         render(<Landing />)
         fireEvent.click(screen.getByRole('button', { name: /dashboard/i }))
         expect(mockLogin).toHaveBeenCalled()
-    })
-
-    test('renders repo card with name, license and language', async () => {
-        render(<Landing />)
-        expect(screen.getByText('LucasSantana-Dev / Lucky')).toBeInTheDocument()
-        expect(screen.getByText('ISC')).toBeInTheDocument()
-        expect(screen.getByText('TypeScript')).toBeInTheDocument()
-        await waitFor(() => {
-            expect(screen.getByText('servers')).toBeInTheDocument()
-            expect(screen.getByText('users')).toBeInTheDocument()
-        })
-    })
-
-    test('repo card fetches and displays stats from api', async () => {
-        render(<Landing />)
-        await waitFor(() => expect(api.stats.getPublic).toHaveBeenCalled())
-        await waitFor(() => expect(screen.getByText('240')).toBeInTheDocument())
-    })
-
-    test('repo card shows ellipsis while stats loading', () => {
-        setupMocks()
-        vi.mocked(api).stats = {
-            getPublic: vi.fn(() => new Promise(() => {})),
-        } as any
-        render(<Landing />)
-        const ellipses = screen.getAllByText('…')
-        expect(ellipses.length).toBeGreaterThanOrEqual(2)
     })
 
     test('renders features section with five user-facing items', () => {
@@ -202,48 +129,6 @@ describe('Landing', () => {
         ).toBeGreaterThanOrEqual(1)
         expect(screen.getByText(/A real web dashboard/i)).toBeInTheDocument()
         expect(screen.getByText(/Embed builder/i)).toBeInTheDocument()
-    })
-
-    test('repo card copy button writes clone command to clipboard', async () => {
-        const writeText = vi.fn().mockResolvedValue(undefined)
-        Object.defineProperty(navigator, 'clipboard', {
-            value: { writeText },
-            configurable: true,
-            writable: true,
-        })
-
-        render(<Landing />)
-        const copyBtn = screen.getByRole('button', { name: /Copy clone URL/i })
-        fireEvent.click(copyBtn)
-
-        await waitFor(() =>
-            expect(writeText).toHaveBeenCalledWith(
-                'git clone https://github.com/LucasSantana-Dev/Lucky.git',
-            ),
-        )
-    })
-
-    test('repo card handles clipboard failure gracefully', async () => {
-        const errorSpy = vi
-            .spyOn(console, 'error')
-            .mockImplementation(() => undefined)
-        const writeText = vi.fn().mockRejectedValue(new Error('denied'))
-        Object.defineProperty(navigator, 'clipboard', {
-            value: { writeText },
-            configurable: true,
-            writable: true,
-        })
-
-        try {
-            render(<Landing />)
-            const copyBtn = screen.getByRole('button', {
-                name: /Copy clone URL/i,
-            })
-            fireEvent.click(copyBtn)
-            await waitFor(() => expect(errorSpy).toHaveBeenCalled())
-        } finally {
-            errorSpy.mockRestore()
-        }
     })
 
     test('renders why-self-host section with three reason cards', () => {
@@ -282,10 +167,9 @@ describe('Landing', () => {
         expect(screen.getByText('nginx')).toBeInTheDocument()
     })
 
-    test('renders repo footer banner and footer copyright', () => {
+    test('renders footer copyright', () => {
         render(<Landing />)
-        expect(screen.getByText(/Open source under ISC/i)).toBeInTheDocument()
-        expect(screen.getByText(/© 2026 Lucky\. ISC\./)).toBeInTheDocument()
+        expect(screen.getByText(/© 2026 VADED GAMING\. ISC\./)).toBeInTheDocument()
     })
 
     test('renders footer with Terms, Privacy and Discord support links', () => {
@@ -305,19 +189,6 @@ describe('Landing', () => {
         expect(supportLink).toHaveAttribute('rel', 'noreferrer')
     })
 
-    test('logs and recovers when stats fetch rejects', async () => {
-        const errorSpy = vi
-            .spyOn(console, 'error')
-            .mockImplementation(() => undefined)
-        try {
-            setupMocks({ statsError: new Error('boom') })
-            render(<Landing />)
-            await waitFor(() => expect(errorSpy).toHaveBeenCalled())
-        } finally {
-            errorSpy.mockRestore()
-        }
-    })
-
     test('respects prefers-reduced-motion', () => {
         setupMocks({ prefersReducedMotion: true })
         render(<Landing />)
@@ -325,30 +196,5 @@ describe('Landing', () => {
             screen.getByText(/A Discord bot built right\./i),
         ).toBeInTheDocument()
     })
-
-    test('shows zero stats correctly when api returns zeros', async () => {
-        setupMocks({
-            statsData: {
-                totalGuilds: 0,
-                totalUsers: 0,
-                uptimeSeconds: 0,
-                serversOnline: 0,
-            },
-        })
-        render(<Landing />)
-        await waitFor(() => expect(api.stats.getPublic).toHaveBeenCalled())
-        const zeros = await screen.findAllByText('0')
-        // Two honest stat columns (servers/users): both come straight from the
-        // API, so totalGuilds=0 + totalUsers=0 → both render '0'.
-        expect(zeros.length).toBeGreaterThanOrEqual(2)
-    })
-
-    test('repo card shows an em-dash fallback when the stats fetch fails', async () => {
-        setupMocks({ statsError: new Error('stats unavailable') })
-        render(<Landing />)
-        await waitFor(() => expect(api.stats.getPublic).toHaveBeenCalled())
-        // No stale 0 / placeholder — unavailable stats render as '—'.
-        const dashes = await screen.findAllByText('—')
-        expect(dashes.length).toBeGreaterThanOrEqual(2)
-    })
 })
+

@@ -1,5 +1,6 @@
 import { Player } from 'discord-player'
 import type { BaseExtractor } from 'discord-player'
+import { FFmpeg } from '@discord-player/ffmpeg'
 import {
     SoundCloudExtractor,
     AppleMusicExtractor,
@@ -7,11 +8,35 @@ import {
     AttachmentExtractor,
 } from '@discord-player/extractor'
 import { SpotifyExtractor } from 'discord-player-spotify'
+import { existsSync, readdirSync } from 'fs'
+import { join } from 'path'
 import * as playdl from 'play-dl'
 import type { CustomClient } from '../../types'
 import { errorLog, infoLog, warnLog } from '@lucky/shared/utils'
 import { createResilientStream } from './streamBridge'
 import { withTimeout } from './withTimeout'
+
+function resolveWingetFfmpeg(): string | null {
+    if (process.platform !== 'win32' || !process.env.LOCALAPPDATA) return null
+    const packages = join(process.env.LOCALAPPDATA, 'Microsoft', 'WinGet', 'Packages')
+    if (!existsSync(packages)) return null
+    const dir = readdirSync(packages).find((d) => d.startsWith('yt-dlp.FFmpeg_'))
+    if (!dir) return null
+    // winget FFmpeg package layout: <name>\<build-name>\bin\ffmpeg.exe
+    const binDir = join(packages, dir)
+    const buildDir = readdirSync(binDir).find((d) => d.startsWith('ffmpeg-'))
+    if (!buildDir) return null
+    const exe = join(binDir, buildDir, 'bin', 'ffmpeg.exe')
+    return existsSync(exe) ? exe : null
+}
+
+function registerWingetFfmpeg(): void {
+    const exe = resolveWingetFfmpeg()
+    if (!exe) return
+    // Prepend the absolute path so it's tried before the generic 'ffmpeg' name.
+    FFmpeg.sources.unshift({ name: exe, module: false })
+    infoLog({ message: `Registered winget ffmpeg: ${exe}` })
+}
 
 type CreatePlayerParams = {
     client: CustomClient
@@ -21,6 +46,7 @@ export const createPlayer = ({ client }: CreatePlayerParams): Player => {
     try {
         infoLog({ message: 'Creating player...' })
 
+        registerWingetFfmpeg()
         const player = new Player(client)
         registerExtractors(player)
 

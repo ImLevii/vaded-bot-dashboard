@@ -38,7 +38,7 @@ export async function handleCaseView(
     }
 
     const embed = new EmbedBuilder()
-        .setColor(typeColors[moderationCase.type] || 0x5865f2)
+        .setColor(typeColors[moderationCase.type] || 0x111111)
         .setTitle(`📋 Case #${moderationCase.caseNumber}`)
         .addFields(
             {
@@ -120,7 +120,7 @@ export async function handleCaseUpdate(
     })
 
     const embed = new EmbedBuilder()
-        .setColor(0x5865f2)
+        .setColor(0x111111)
         .setTitle(`✏️ Case #${caseNumber} Updated`)
         .addFields(
             {

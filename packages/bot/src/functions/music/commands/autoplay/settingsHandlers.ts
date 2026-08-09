@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, ColorResolvable } from 'discord.js'
+﻿import { ChatInputCommandInteraction, ColorResolvable } from 'discord.js'
 import {
     createEmbed,
     createErrorEmbed,
@@ -37,7 +37,7 @@ async function handleAutoplayMode(
         const currentMode = settings?.autoplayMode ?? 'similar'
 
         const modeDescriptions: Record<string, string> = {
-            similar: "🎵 Music like what's playing",
+            similar: "<a:music:741605543046807626> Music like what's playing",
             discover: '🔭 Prioritize new artists',
             popular: '🔥 Favour your liked tracks',
         }
@@ -82,7 +82,7 @@ async function handleAutoplayMode(
     }
 
     const modeEmojis: Record<string, string> = {
-        similar: '🎵',
+        similar: '<a:music:741605543046807626>',
         discover: '🔭',
         popular: '🔥',
     }
@@ -306,7 +306,7 @@ async function handleAutoplayGenreList(
         content: {
             embeds: [
                 createEmbed({
-                    title: '🎵 Autoplay Genres',
+                    title: '<a:music:741605543046807626> Autoplay Genres',
                     description,
                     color: EMBED_COLORS.AUTOPLAY as ColorResolvable,
                     emoji: EMOJIS.AUTOPLAY,

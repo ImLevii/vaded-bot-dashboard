@@ -7,6 +7,7 @@ import {
 import { buildQueueState, repeatModeToEnum } from './mappers'
 import { resolveGuildQueue } from '../../utils/music/queueResolver'
 import { setReplenishSuppressed } from '../../utils/music/replenishSuppressionStore'
+import { normalizeYoutubeUrl, normalizeSpotifyUrl, cleanQueryInput } from '../../functions/music/commands/play/urlNormalization'
 
 type Result = MusicCommandResult
 
@@ -48,8 +49,9 @@ export async function handlePlay(
     client: CustomClient,
     cmd: MusicCommand,
 ): Promise<Result> {
-    const query = cmd.data?.query as string
-    if (!query) return fail(cmd.id, cmd.guildId, 'No query provided')
+    const rawQuery = cleanQueryInput(cmd.data?.query as string)
+    if (!rawQuery) return fail(cmd.id, cmd.guildId, 'No query provided')
+    const query = normalizeSpotifyUrl(normalizeYoutubeUrl(rawQuery))
 
     const guild = client.guilds.cache.get(cmd.guildId)
     if (!guild) return fail(cmd.id, cmd.guildId, 'Guild not found')
@@ -59,7 +61,8 @@ export async function handlePlay(
         return fail(cmd.id, cmd.guildId, 'Voice channel not found')
     }
 
-    const result = await client.player.search(query, { requestedBy: undefined })
+    const requestedBy = await client.users.fetch(cmd.userId).catch(() => undefined)
+    const result = await client.player.search(query, { requestedBy })
     if (!result?.tracks.length)
         return fail(cmd.id, cmd.guildId, 'No results found')
 
@@ -117,6 +120,7 @@ export async function handleSkip(
     const queue = getQueue(client, cmd.guildId)
     if (!queue) return fail(cmd.id, cmd.guildId, 'No active queue')
     await queue.node.skip()
+    if (!queue.node.isPlaying()) await queue.node.play()
     return publishAndOk(client, cmd)
 }
 
@@ -190,5 +194,6 @@ export async function handlePrevious(
         await queue.history.previous(true)
     }
 
+    if (!queue.node.isPlaying()) await queue.node.play()
     return publishAndOk(client, cmd)
 }

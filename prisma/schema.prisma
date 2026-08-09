@@ -76,6 +76,7 @@ model Guild {
   counter                      GuildCounter?
   trackFeedback                UserTrackFeedback[]
   roleGrants                   GuildRoleGrant[]
+  userGrants                   GuildUserGrant[]
   automationManifest           GuildAutomationManifest?
   automationRuns               GuildAutomationRun[]
   automationDrifts             GuildAutomationDrift[]
@@ -290,6 +291,23 @@ model GuildRoleGrant {
   @@unique([guildId, roleId, module])
   @@index([guildId])
   @@map("guild_role_grants")
+}
+
+model GuildUserGrant {
+  id      String @id @default(cuid())
+  guildId String
+  guild   Guild  @relation(fields: [guildId], references: [discordId], onDelete: Cascade)
+  userId  String
+  module  String
+  mode    String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([guildId, userId, module])
+  @@index([guildId])
+  @@index([guildId, userId])
+  @@map("guild_user_grants")
 }
 
 model GuildAutomationManifest {

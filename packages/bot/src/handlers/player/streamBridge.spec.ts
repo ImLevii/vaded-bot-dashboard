@@ -65,6 +65,7 @@ import {
     streamViaYtDlpSearch,
     createResilientStream,
     getStreamBridgeFallbackLabel,
+    resolveYtDlpExecutable,
     STREAM_BRIDGE_FALLBACK_METADATA_KEY,
 } from './streamBridge.js'
 
@@ -103,6 +104,22 @@ function makeTrack(
 }
 
 const fakeStream = new EventEmitter() as any
+
+// ---------------------------------------------------------------------------
+// yt-dlp executable resolution
+// ---------------------------------------------------------------------------
+
+describe('resolveYtDlpExecutable', () => {
+    it('uses the configured executable path when provided', () => {
+        const previousPath = process.env.YT_DLP_PATH
+        process.env.YT_DLP_PATH = 'C:\\tools\\yt-dlp.exe'
+
+        expect(resolveYtDlpExecutable()).toBe('C:\\tools\\yt-dlp.exe')
+
+        if (previousPath === undefined) delete process.env.YT_DLP_PATH
+        else process.env.YT_DLP_PATH = previousPath
+    })
+})
 
 // ---------------------------------------------------------------------------
 // streamViaYtDlp — URL validation

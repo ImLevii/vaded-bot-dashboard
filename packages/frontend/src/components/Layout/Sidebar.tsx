@@ -24,6 +24,7 @@ import {
     Trophy,
     Tv,
     Users,
+    UserCog,
     Disc3,
     Boxes,
 } from 'lucide-react'
@@ -63,6 +64,13 @@ const navSections: NavSection[] = [
                 labelKey: 'sidebar.nav.serverSettings',
                 icon: Settings,
                 module: 'settings',
+            },
+            {
+                path: '/members',
+                labelKey: 'sidebar.nav.members',
+                icon: UserCog,
+                module: 'settings',
+                requiredMode: 'manage',
             },
         ],
     },
@@ -393,6 +401,19 @@ function Sidebar() {
 
     const sidebarContent = (
         <div className='flex h-full flex-col'>
+            {/* Brand header */}
+            <div className='flex items-center gap-2.5 px-4 py-4 border-b border-white/6'>
+                <img
+                    src='/lucky-logo.png'
+                    alt='Vaded Gaming'
+                    width='32'
+                    height='32'
+                    className='h-8 w-8 rounded-lg object-cover object-center shrink-0'
+                />
+                <span className='font-black text-lg tracking-tight leading-none'>
+                    VADED<span className='text-lucky-brand'>GAMING</span>
+                </span>
+            </div>
             <NavSections
                 isActive={isActive}
                 canViewModule={canViewModule}
@@ -456,7 +477,8 @@ function Sidebar() {
                                       damping: 30,
                                   }
                         }
-                        className='fixed inset-y-0 left-0 z-50 w-64 bg-lucky-bg-secondary border-r border-lucky-border lg:hidden'
+                        className='fixed inset-y-0 left-0 z-50 w-64 border-r border-white/6 lg:hidden'
+                        style={{ background: 'rgba(15,17,23,0.85)', backdropFilter: 'blur(24px) saturate(1.6)' }}
                         aria-label='Navigation sidebar'
                     >
                         {sidebarContent}
@@ -465,7 +487,7 @@ function Sidebar() {
             </AnimatePresence>
 
             <aside
-                className='hidden h-screen w-64 shrink-0 border-r border-lucky-border bg-lucky-bg-secondary lg:flex lg:sticky lg:top-0 lg:flex-col'
+                className='hidden h-screen w-64 shrink-0 border-r border-white/6 bg-lucky-bg-secondary/60 backdrop-blur-2xl lg:flex lg:sticky lg:top-0 lg:flex-col'
                 aria-label='Navigation sidebar'
             >
                 {sidebarContent}

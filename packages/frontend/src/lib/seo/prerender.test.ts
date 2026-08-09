@@ -46,11 +46,11 @@ describe('renderRouteHtml', () => {
             TEMPLATE,
             ROUTE_META_BY_PATH['/changelog']!,
         )
-        expect(html).toContain('<title>Changelog · Lucky</title>')
+        expect(html).toContain('<title>Changelog · Vaded Gaming</title>')
         expect(getMeta(html, 'name', 'description')).toBe(
-            'Release notes and version history for Lucky.',
+            'Release notes and version history for Vaded Gaming.',
         )
-        expect(getMeta(html, 'property', 'og:title')).toBe('Changelog · Lucky')
+        expect(getMeta(html, 'property', 'og:title')).toBe('Changelog · Vaded Gaming')
         expect(getMeta(html, 'property', 'og:url')).toBe(
             'https://lucky.lucassantana.tech/changelog',
         )

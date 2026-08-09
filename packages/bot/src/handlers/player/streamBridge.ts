@@ -1,4 +1,6 @@
 import { spawn } from 'child_process'
+import { existsSync, readdirSync } from 'fs'
+import { join } from 'path'
 import { PassThrough } from 'stream'
 import type { Readable } from 'stream'
 import type { Track } from 'discord-player'
@@ -27,6 +29,61 @@ const ALLOWED_YTDLP_DOMAINS = new Set([
     'www.soundcloud.com',
 ])
 
+export function resolveYtDlpExecutable(): string {
+    const configuredPath = process.env.YT_DLP_PATH?.trim()
+    if (configuredPath) return configuredPath
+
+    if (process.platform === 'win32' && process.env.LOCALAPPDATA) {
+        const wingetPackages = join(
+            process.env.LOCALAPPDATA,
+            'Microsoft',
+            'WinGet',
+            'Packages',
+        )
+        if (existsSync(wingetPackages)) {
+            const packageDirectory = readdirSync(wingetPackages).find((entry) =>
+                entry.startsWith('yt-dlp.yt-dlp_'),
+            )
+            if (packageDirectory) {
+                const executable = join(
+                    wingetPackages,
+                    packageDirectory,
+                    'yt-dlp.exe',
+                )
+                if (existsSync(executable)) return executable
+            }
+        }
+    }
+
+    return 'yt-dlp'
+}
+
+/** Returns the directory containing ffmpeg.exe for --ffmpeg-location, or null. */
+function resolveWingetFfmpegBin(): string | null {
+    const configured = process.env.YT_DLP_FFMPEG_PATH?.trim()
+    if (configured) return configured
+
+    if (process.platform !== 'win32' || !process.env.LOCALAPPDATA) return null
+    const wingetPackages = join(
+        process.env.LOCALAPPDATA,
+        'Microsoft',
+        'WinGet',
+        'Packages',
+    )
+    if (!existsSync(wingetPackages)) return null
+    const pkgDir = readdirSync(wingetPackages).find((d) =>
+        d.startsWith('yt-dlp.FFmpeg_'),
+    )
+    if (!pkgDir) return null
+    // layout: <pkg>/<build-name>/bin/ffmpeg.exe
+    const buildDir = readdirSync(join(wingetPackages, pkgDir)).find((d) =>
+        d.startsWith('ffmpeg-'),
+    )
+    if (!buildDir) return null
+    const bin = join(wingetPackages, pkgDir, buildDir, 'bin')
+    return existsSync(join(bin, 'ffmpeg.exe')) ? bin : null
+}
+
 function validateYtDlpUrl(url: string): void {
     if (url.startsWith('ytsearch')) return
     let parsed: URL
@@ -43,16 +100,22 @@ function validateYtDlpUrl(url: string): void {
     }
 }
 
-export function streamViaYtDlp(url: string): Promise<Readable> {
+const LIVE_STREAM_ERROR_FRAGMENT = 'live stream recording is not available'
+
+/** `playerClient` defaults to 'android' for VODs; pass 'web' for live streams. */
+export function streamViaYtDlp(
+    url: string,
+    playerClient: string = 'android',
+): Promise<Readable> {
     try {
         validateYtDlpUrl(url)
     } catch (err) {
         return Promise.reject(err)
     }
     return new Promise<Readable>((resolve, reject) => {
+        const ffmpegBin = resolveWingetFfmpegBin()
         const proc = spawn(
-            // NOSONAR: S4036 — command is hardcoded, URL is validated by validateYtDlpUrl before this point
-            'yt-dlp',
+            resolveYtDlpExecutable(),
             [
                 '--no-playlist',
                 '-f',
@@ -62,8 +125,12 @@ export function streamViaYtDlp(url: string): Promise<Readable> {
                 '--quiet',
                 '--no-warnings',
                 '--no-progress',
+                '--extractor-args',
+                `youtube:player_client=${playerClient}`,
                 '--js-runtimes',
                 `node:${process.execPath}`,
+                // explicit ffmpeg path so HLS/m3u8 streams can be muxed
+                ...(ffmpegBin ? ['--ffmpeg-location', ffmpegBin] : []),
                 url,
             ],
             { stdio: ['ignore', 'pipe', 'pipe'] },
@@ -210,18 +277,32 @@ export async function createResilientStream(
             })
             return stream
         } catch (ytdlpError) {
+            const errMsg = (ytdlpError as Error).message
+            // android client cannot stream live content; retry with web client
+            if (errMsg.includes(LIVE_STREAM_ERROR_FRAGMENT)) {
+                try {
+                    const liveStream = await streamViaYtDlp(track.url, 'web')
+                    infoLog({
+                        message: 'Bridge: live stream resolved via web client',
+                        data: { url: track.url, title: cleanedTitle || track.title },
+                    })
+                    return liveStream
+                } catch {
+                    // fall through to SoundCloud stages below
+                }
+            }
             youtubeStage = 'yt-dlp-url'
             addBreadcrumb(
                 'YouTube extraction failed via yt-dlp URL',
                 'music.youtube-extraction',
                 'warning',
                 {
-                    error: scrubUrls((ytdlpError as Error).message),
+                    error: scrubUrls(errMsg),
                     url: safeUrlOrigin(track.url),
                 },
             )
             captureMessage(
-                `YouTube extraction failed: ${scrubUrls((ytdlpError as Error).message)}`,
+                `YouTube extraction failed: ${scrubUrls(errMsg)}`,
                 'warning',
                 {
                     url: safeUrlOrigin(track.url),
@@ -234,7 +315,7 @@ export async function createResilientStream(
             warnLog({
                 message: 'Bridge: yt-dlp failed, falling back to SoundCloud',
                 data: {
-                    error: (ytdlpError as Error).message,
+                    error: errMsg,
                     url: track.url,
                     cleanedTitle,
                 },

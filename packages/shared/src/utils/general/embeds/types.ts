@@ -8,6 +8,7 @@ export type CreateEmbedOptions = {
     emoji?: string
     footer?: string
     thumbnail?: string
+    image?: string
     url?: string
     fields?: EmbedField[]
     timestamp?: boolean

@@ -4,6 +4,7 @@ import {
     useEffect,
     useCallback,
     useRef,
+    useMemo,
     type ReactElement,
 } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -19,7 +20,6 @@ import {
     Bell,
     AlertTriangle,
     Plus,
-    Trash2,
     Shield,
     RotateCcw,
     X,
@@ -200,7 +200,15 @@ export default function ServerSettingsPage() {
             if (isStaleRequest()) {
                 return
             }
-            setSettings(response.data.settings ?? DEFAULT_SETTINGS)
+            const raw = response.data.settings
+            setSettings({
+                nickname: raw?.nickname ?? DEFAULT_SETTINGS.nickname,
+                commandPrefix: raw?.commandPrefix ?? DEFAULT_SETTINGS.commandPrefix,
+                managerRoles: raw?.managerRoles ?? DEFAULT_SETTINGS.managerRoles,
+                updatesChannel: raw?.updatesChannel ?? DEFAULT_SETTINGS.updatesChannel,
+                timezone: raw?.timezone ?? DEFAULT_SETTINGS.timezone,
+                disableWarnings: raw?.disableWarnings ?? DEFAULT_SETTINGS.disableWarnings,
+            })
         } catch (error) {
             if (isStaleRequest()) {
                 return
@@ -271,7 +279,18 @@ export default function ServerSettingsPage() {
         if (!selectedGuild?.id) return
         setSaving(true)
         try {
-            await api.guilds.updateSettings(selectedGuild.id, settings)
+            // Explicitly pick only the 6 schema-allowed keys — extra DB fields
+            // (id, guildId, createdAt…) in the state cause Zod .strict() to 400.
+            const { nickname, commandPrefix, managerRoles, updatesChannel, timezone, disableWarnings } = settings
+            const payload: ServerSettings = {
+                nickname: nickname ?? '',
+                commandPrefix: commandPrefix ?? '!',
+                managerRoles: managerRoles ?? [],
+                updatesChannel: updatesChannel ?? '',
+                timezone: timezone ?? 'UTC',
+                disableWarnings: disableWarnings ?? false,
+            }
+            await api.guilds.updateSettings(selectedGuild.id, payload)
             toast.success(t('serverSettings.settingsSaved'))
         } catch {
             toast.error(t('serverSettings.settingsSaveFailed'))
@@ -280,46 +299,47 @@ export default function ServerSettingsPage() {
         }
     }
 
+    // Role-centric model: Map<roleId, Map<module, mode>>
+    const roleGrantMap = useMemo(() => {
+        const map = new Map<string, Map<string, 'view' | 'manage' | 'none'>>()
+        for (const g of rbacGrants) {
+            let mods = map.get(g.roleId)
+            if (!mods) { mods = new Map(); map.set(g.roleId, mods) }
+            mods.set(g.module, g.mode)
+        }
+        return map
+    }, [rbacGrants])
+
+    // All unique roleIds currently in grants (ordered by first appearance)
+    const grantedRoleIds = useMemo(() => {
+        const seen = new Set<string>()
+        const out: string[] = []
+        for (const g of rbacGrants) {
+            if (!seen.has(g.roleId)) { seen.add(g.roleId); out.push(g.roleId) }
+        }
+        return out
+    }, [rbacGrants])
+
     const addRbacGrant = () => {
-        if (rbacLoading) {
-            toast.error(t('serverSettings.stillLoadingRoles'))
-            return
-        }
-
-        if (rbacRoles.length === 0) {
-            toast.error(
-                rbacRolesError ?? t('serverSettings.roleOptionsNotAvailable'),
-            )
-            return
-        }
-
-        setRbacGrants((prev) => [
-            ...prev,
-            {
-                roleId: rbacRoles[0].id,
-                module: 'overview',
-                mode: 'view',
-            },
-        ])
+        if (rbacLoading) { toast.error(t('serverSettings.stillLoadingRoles')); return }
+        if (rbacRoles.length === 0) { toast.error(rbacRolesError ?? t('serverSettings.roleOptionsNotAvailable')); return }
+        const unusedRole = rbacRoles.find((r) => !grantedRoleIds.includes(r.id))
+        if (!unusedRole) { toast.info('All roles already have permission rules.'); return }
+        // add one placeholder grant so the role appears
+        setRbacGrants((prev) => [...prev, { roleId: unusedRole.id, module: 'overview', mode: 'view' }])
     }
 
-    const updateRbacGrant = (index: number, updates: Partial<RoleGrant>) => {
-        setRbacGrants((prev) =>
-            prev.map((grant, currentIndex) =>
-                currentIndex === index
-                    ? {
-                          ...grant,
-                          ...updates,
-                      }
-                    : grant,
-            ),
-        )
+    const setRoleModuleMode = (roleId: string, module: string, mode: 'view' | 'manage' | 'none') => {
+        setRbacGrants((prev) => {
+            // remove existing entry for this role+module
+            const filtered = prev.filter((g) => !(g.roleId === roleId && g.module === module))
+            if (mode === 'none') return filtered
+            return [...filtered, { roleId, module: module as RoleGrant['module'], mode }]
+        })
     }
 
-    const removeRbacGrant = (index: number) => {
-        setRbacGrants((prev) =>
-            prev.filter((_, currentIndex) => currentIndex !== index),
-        )
+    const removeRoleGrants = (roleId: string) => {
+        setRbacGrants((prev) => prev.filter((g) => g.roleId !== roleId))
     }
 
     const handleSaveRbac = async () => {
@@ -467,104 +487,122 @@ export default function ServerSettingsPage() {
                         </div>
                     </div>
                 )}
-                {rbacGrants.length === 0 ? (
+
+                {/* Legend */}
+                {grantedRoleIds.length > 0 && (
+                    <div className='flex items-center gap-4 px-1 type-meta text-lucky-text-tertiary'>
+                        <span className='flex items-center gap-1.5'>
+                            <span className='inline-block w-3 h-3 rounded-sm bg-blue-500/20 border border-blue-500/30' />
+                            View — read-only access
+                        </span>
+                        <span className='flex items-center gap-1.5'>
+                            <span className='inline-block w-3 h-3 rounded-sm bg-lucky-brand/20 border border-lucky-brand/30' />
+                            Manage — full read + write access
+                        </span>
+                        <span className='flex items-center gap-1.5'>
+                            <span className='inline-block w-3 h-3 rounded-sm bg-lucky-bg-active border border-lucky-border' />
+                            None — no access (role default)
+                        </span>
+                    </div>
+                )}
+
+                {grantedRoleIds.length === 0 ? (
                     <p className='type-body-sm text-lucky-text-tertiary'>
                         {t('serverSettings.noRbacRules')}
                     </p>
                 ) : (
-                    rbacGrants.map((grant, index) => (
-                        <div
-                            key={`${grant.roleId}:${grant.module}:${grant.mode}:${index}`}
-                            className='surface-card grid grid-cols-1 gap-3 p-4 md:grid-cols-[1.5fr_1.2fr_1fr_48px]'
-                        >
-                            <Select
-                                value={grant.roleId}
-                                onValueChange={(value: string) =>
-                                    updateRbacGrant(index, {
-                                        roleId: value,
-                                    })
-                                }
+                    grantedRoleIds.map((roleId) => {
+                        const role = rbacRoles.find((r) => r.id === roleId)
+                        const roleName = role?.name ?? roleId
+                        const mods = roleGrantMap.get(roleId) ?? new Map()
+                        return (
+                            <div
+                                key={roleId}
+                                className='surface-card border border-lucky-border overflow-hidden'
                             >
-                                <SelectTrigger className='bg-lucky-bg-tertiary border-lucky-border/60 text-lucky-text-primary text-sm'>
-                                    <SelectValue
-                                        placeholder={t(
-                                            'serverSettings.roleSelectPlaceholder',
-                                        )}
-                                    />
-                                </SelectTrigger>
-                                <SelectContent className='bg-lucky-bg-secondary border-lucky-border'>
-                                    {rbacRoles.map((role) => (
-                                        <SelectItem
-                                            key={role.id}
-                                            value={role.id}
+                                {/* Role header */}
+                                <div className='flex items-center justify-between gap-3 px-4 py-2.5 border-b border-lucky-border bg-lucky-bg-secondary/40'>
+                                    <div className='flex items-center gap-2'>
+                                        <Shield className='w-3.5 h-3.5 text-lucky-brand shrink-0' />
+                                        <Select
+                                            value={roleId}
+                                            onValueChange={(newRoleId) => {
+                                                if (newRoleId === roleId) return
+                                                setRbacGrants((prev) =>
+                                                    prev.map((g) =>
+                                                        g.roleId === roleId
+                                                            ? { ...g, roleId: newRoleId }
+                                                            : g,
+                                                    ),
+                                                )
+                                            }}
                                         >
-                                            {role.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                                            <SelectTrigger className='h-7 border-0 bg-transparent p-0 shadow-none text-lucky-text-primary font-semibold type-body-sm focus:ring-0 w-auto gap-1.5'>
+                                                <SelectValue>{roleName}</SelectValue>
+                                            </SelectTrigger>
+                                            <SelectContent className='bg-lucky-bg-secondary border-lucky-border'>
+                                                {rbacRoles.map((r) => (
+                                                    <SelectItem key={r.id} value={r.id}>
+                                                        {r.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <button
+                                        type='button'
+                                        onClick={() => removeRoleGrants(roleId)}
+                                        className='text-lucky-text-tertiary hover:text-red-400 transition-colors p-1 rounded'
+                                        title='Remove all permissions for this role'
+                                    >
+                                        <X className='w-4 h-4' />
+                                    </button>
+                                </div>
 
-                            <Select
-                                value={grant.module}
-                                onValueChange={(value: string) =>
-                                    updateRbacGrant(index, {
-                                        module: value as RoleGrant['module'],
-                                    })
-                                }
-                            >
-                                <SelectTrigger className='bg-lucky-bg-tertiary border-lucky-border/60 text-lucky-text-primary text-sm'>
-                                    <SelectValue
-                                        placeholder={t(
-                                            'serverSettings.moduleSelectPlaceholder',
-                                        )}
-                                    />
-                                </SelectTrigger>
-                                <SelectContent className='bg-lucky-bg-secondary border-lucky-border'>
-                                    {RBAC_MODULES.map((module) => (
-                                        <SelectItem key={module} value={module}>
-                                            {module}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-
-                            <Select
-                                value={grant.mode}
-                                onValueChange={(value: string) =>
-                                    updateRbacGrant(index, {
-                                        mode: value as RoleGrant['mode'],
-                                    })
-                                }
-                            >
-                                <SelectTrigger className='bg-lucky-bg-tertiary border-lucky-border/60 text-lucky-text-primary text-sm'>
-                                    <SelectValue
-                                        placeholder={t(
-                                            'serverSettings.modeSelectPlaceholder',
-                                        )}
-                                    />
-                                </SelectTrigger>
-                                <SelectContent className='bg-lucky-bg-secondary border-lucky-border'>
-                                    <SelectItem value='view'>
-                                        {t('serverSettings.modeView')}
-                                    </SelectItem>
-                                    <SelectItem value='manage'>
-                                        {t('serverSettings.modeManage')}
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-
-                            <Button
-                                type='button'
-                                variant='ghost'
-                                size='sm'
-                                className='text-lucky-text-tertiary hover:text-lucky-error hover:bg-lucky-error/10 transition-colors'
-                                onClick={() => removeRbacGrant(index)}
-                                title={t('serverSettings.removeRuleTitle')}
-                            >
-                                <Trash2 className='w-4 h-4' />
-                            </Button>
-                        </div>
-                    ))
+                                {/* Module matrix */}
+                                <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 divide-x divide-y divide-lucky-border/50'>
+                                    {RBAC_MODULES.map((mod) => {
+                                        const current = (mods.get(mod) ?? 'none') as 'view' | 'manage' | 'none'
+                                        const moduleLabel: Record<string, string> = {
+                                            overview: 'Overview',
+                                            settings: 'Settings',
+                                            moderation: 'Moderation',
+                                            automation: 'Automation',
+                                            music: 'Music',
+                                            integrations: 'Integrations',
+                                        }
+                                        return (
+                                            <div key={mod} className='flex flex-col gap-1.5 p-3'>
+                                                <span className='type-meta text-lucky-text-secondary font-semibold uppercase tracking-wide text-[10px]'>
+                                                    {moduleLabel[mod] ?? mod}
+                                                </span>
+                                                <div className='flex flex-col gap-1'>
+                                                    {(['none', 'view', 'manage'] as const).map((mode) => (
+                                                        <button
+                                                            key={mode}
+                                                            type='button'
+                                                            onClick={() => setRoleModuleMode(roleId, mod, mode)}
+                                                            className={`px-2 py-1 rounded text-[11px] font-medium border transition-all text-left ${
+                                                                current === mode
+                                                                    ? mode === 'manage'
+                                                                        ? 'bg-lucky-brand/20 border-lucky-brand/40 text-lucky-brand'
+                                                                        : mode === 'view'
+                                                                          ? 'bg-blue-500/20 border-blue-500/30 text-blue-400'
+                                                                          : 'bg-lucky-bg-active border-lucky-border text-lucky-text-secondary'
+                                                                    : 'bg-transparent border-transparent text-lucky-text-tertiary hover:bg-lucky-bg-active/50 hover:border-lucky-border'
+                                                            }`}
+                                                        >
+                                                            {mode === 'none' ? 'None' : mode === 'view' ? 'View' : 'Manage'}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                        )
+                    })
                 )}
             </div>
         )
@@ -786,7 +824,7 @@ export default function ServerSettingsPage() {
                                     />
                                 </SelectTrigger>
                                 <SelectContent className='bg-lucky-bg-secondary border-lucky-border'>
-                                    {availableManagerRoles.map((role) => (
+                                    {[...new Map(availableManagerRoles.map((r) => [r.id, r])).values()].map((role) => (
                                         <SelectItem
                                             key={role.id}
                                             value={role.id}
@@ -871,7 +909,7 @@ export default function ServerSettingsPage() {
                 <Button
                     onClick={handleSave}
                     disabled={saving}
-                    className='w-full bg-lucky-red hover:bg-lucky-red/90 gap-2'
+                    className='w-full btn-glass rounded-xl text-white gap-2'
                 >
                     {saving ? (
                         <Loader2 className='w-4 h-4 animate-spin' />
@@ -928,7 +966,7 @@ export default function ServerSettingsPage() {
                                     type='button'
                                     onClick={handleSaveRbac}
                                     disabled={rbacSaving || rbacLoading}
-                                    className='gap-2 bg-lucky-red hover:bg-lucky-red/90'
+                                    className='gap-2 btn-glass rounded-xl text-white'
                                 >
                                     {rbacSaving ? (
                                         <Loader2 className='w-4 h-4 animate-spin' />

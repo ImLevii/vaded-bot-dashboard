@@ -88,17 +88,19 @@ export default memo(function QueueList({
     return (
         <Card className='p-4 sm:p-6'>
             <div className='flex items-center justify-between mb-3 sm:mb-4'>
-                <div className='flex items-center gap-2'>
+                <div className='flex items-center gap-2.5'>
                     <ListMusic
-                        className='h-5 w-5 text-primary shrink-0'
+                        className='h-5 w-5 text-lucky-brand shrink-0'
                         aria-hidden='true'
                     />
-                    <h3 className='type-title text-lucky-text-primary'>
+                    <h3 className='type-title text-lucky-text-primary font-bold'>
                         Queue
                     </h3>
-                    <span className='type-body-sm text-lucky-text-secondary tabular-nums'>
-                        ({tracks.length} track{tracks.length !== 1 ? 's' : ''})
-                    </span>
+                    {tracks.length > 0 && (
+                        <span className='inline-flex items-center rounded-full bg-lucky-brand/15 border border-lucky-brand/25 px-2 py-0.5 text-[11px] font-bold text-lucky-brand tabular-nums'>
+                            {tracks.length}
+                        </span>
+                    )}
                 </div>
                 {tracks.length > 0 && (
                     <Button
@@ -110,11 +112,11 @@ export default memo(function QueueList({
                             onClear()
                             toast.success('Queue cleared')
                         }}
-                        className='text-red-400 hover:text-red-300 hover:bg-red-500/10 h-9 px-3'
+                        className='text-lucky-text-tertiary hover:text-red-400 hover:bg-red-500/10 h-8 px-2.5 text-xs gap-1.5 rounded-lg border border-transparent hover:border-red-500/20'
                         aria-label='Clear queue'
                     >
-                        <Trash2 className='h-4 w-4 mr-1' aria-hidden='true' />
-                        <span className='hidden sm:inline'>Clear</span>
+                        <Trash2 className='h-3.5 w-3.5' aria-hidden='true' />
+                        <span className='hidden sm:inline font-medium'>Clear all</span>
                     </Button>
                 )}
             </div>
@@ -243,9 +245,24 @@ const QueueItem = memo(function QueueItem({
 
             <div className='flex-1 min-w-0'>
                 <p className='type-body text-lucky-text-primary truncate'>{track.title}</p>
-                <p className='type-meta text-lucky-text-secondary truncate'>
-                    {track.author}
-                </p>
+                <div className='flex items-center gap-2 mt-0.5 flex-wrap'>
+                    <p className='type-meta text-lucky-text-secondary truncate'>
+                        {track.author}
+                    </p>
+                    {track.requestedBy && (
+                        <span className='inline-flex items-center gap-1 shrink-0'>
+                            <span
+                                className='flex h-4 w-4 rounded-full items-center justify-center text-[9px] font-black bg-lucky-brand/20 text-lucky-brand border border-lucky-brand/30 shrink-0'
+                                aria-hidden='true'
+                            >
+                                {track.requestedBy.charAt(0).toUpperCase()}
+                            </span>
+                            <span className='type-meta text-lucky-text-tertiary truncate max-w-[120px]'>
+                                {track.requestedBy}
+                            </span>
+                        </span>
+                    )}
+                </div>
                 {track.recommendationReason ? (
                     <p
                         className='type-meta text-lucky-text-tertiary truncate'

@@ -11,7 +11,7 @@ export function useModerationStats(guildId: string | undefined) {
         queryFn: async () => {
             if (!guildId) throw new Error('Guild ID is required')
             const response = await api.moderation.getStats(guildId)
-            return response.data.stats as ModerationStats
+            return (response.data.stats ?? null) as ModerationStats | null
         },
         enabled: !!guildId,
     })

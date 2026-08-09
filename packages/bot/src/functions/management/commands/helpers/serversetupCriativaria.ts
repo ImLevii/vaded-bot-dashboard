@@ -547,7 +547,7 @@ async function applyGuildSettings(
 
     await guildSettingsService.setGuildSettings(guild.id, {
         prefix: '/',
-        embedColor: '0x8B5CF6',
+        embedColor: '0xdc2626',
         language: 'pt-BR',
         defaultVolume: 50,
         maxQueueSize: 150,

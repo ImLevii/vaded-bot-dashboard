@@ -68,7 +68,9 @@ Object.defineProperty(global, 'fetch', {
 
 import {
     normalizeSoundCloudUrl,
+    normalizeYoutubeUrl,
     isUrl,
+    cleanQueryInput,
     executePlayAtTop,
     expandSoundCloudShortUrl,
 } from './queryUtils'
@@ -102,11 +104,58 @@ describe('normalizeSoundCloudUrl', () => {
         expect(normalizeSoundCloudUrl(bad)).toBe(bad)
     })
 
-    it('handles malformed soundcloud URLs (no protocol) gracefully', () => {
-        // new URL('soundcloud.com/...') throws — catch block must return input
-        const bad = 'soundcloud.com/artist/track-no-protocol'
-        expect(normalizeSoundCloudUrl(bad)).toBe(bad)
+    it('adds a scheme to a protocol-less soundcloud URL', () => {
+        const bare = 'soundcloud.com/artist/track-no-protocol'
+        expect(normalizeSoundCloudUrl(bare)).toBe(
+            'https://soundcloud.com/artist/track-no-protocol',
+        )
     })
+})
+
+describe('normalizeYoutubeUrl', () => {
+    it('strips list=RD.../start_radio from a "Start Radio" mix URL', () => {
+        const url =
+            'https://www.youtube.com/watch?v=6_oRaS6jD5E&list=RD6_oRaS6jD5E&start_radio=1'
+        expect(normalizeYoutubeUrl(url)).toBe(
+            'https://www.youtube.com/watch?v=6_oRaS6jD5E',
+        )
+    })
+
+    it('leaves real (non-mix) playlist URLs unchanged', () => {
+        const url = 'https://www.youtube.com/watch?v=abc123&list=PLxxx'
+        expect(normalizeYoutubeUrl(url)).toBe(url)
+    })
+
+    it('leaves youtu.be short links unchanged when there is no list param', () => {
+        const url = 'https://youtu.be/abc123'
+        expect(normalizeYoutubeUrl(url)).toBe(url)
+    })
+
+    it('leaves non-YouTube URLs unchanged', () => {
+        const url = 'https://soundcloud.com/artist/track'
+        expect(normalizeYoutubeUrl(url)).toBe(url)
+    })
+
+    it('leaves plain text queries unchanged', () => {
+        const query = 'bohemian rhapsody queen'
+        expect(normalizeYoutubeUrl(query)).toBe(query)
+    })
+
+    it('adds a scheme to a protocol-less youtube URL', () => {
+        const bare = 'youtube.com/watch?v=abc-no-protocol'
+        expect(normalizeYoutubeUrl(bare)).toBe(
+            'https://youtube.com/watch?v=abc-no-protocol',
+        )
+    })
+
+    it('strips list=RD.../start_radio from a protocol-less mix URL', () => {
+        const bare =
+            'youtube.com/watch?v=6_oRaS6jD5E&list=RD6_oRaS6jD5E&start_radio=1'
+        expect(normalizeYoutubeUrl(bare)).toBe(
+            'https://youtube.com/watch?v=6_oRaS6jD5E',
+        )
+    })
+})
 
     it('preserves other SoundCloud query params while stripping ?in=', () => {
         const url =
@@ -128,6 +177,41 @@ describe('isUrl', () => {
 
     it('returns false for plain text', () => {
         expect(isUrl('some song title')).toBe(false)
+    })
+
+    it('returns true for a protocol-less youtube link', () => {
+        expect(isUrl('youtube.com/watch?v=abc123')).toBe(true)
+    })
+
+    it('returns true for a protocol-less soundcloud link', () => {
+        expect(isUrl('soundcloud.com/artist/track')).toBe(true)
+    })
+})
+
+describe('cleanQueryInput', () => {
+    it('strips search:query: prefix pasted from a discord-player error message', () => {
+        expect(
+            cleanQueryInput('search:query:https://www.youtube.com/watch?v=6_oRaS6jD5E'),
+        ).toBe('https://www.youtube.com/watch?v=6_oRaS6jD5E')
+    })
+
+    it('strips ytsearch prefix', () => {
+        expect(cleanQueryInput('ytsearch:daft punk')).toBe('daft punk')
+    })
+
+    it('strips ytsearch1 prefix', () => {
+        expect(cleanQueryInput('ytsearch1:daft punk')).toBe('daft punk')
+    })
+
+    it('leaves a normal URL unchanged', () => {
+        const url = 'https://www.youtube.com/watch?v=6_oRaS6jD5E'
+        expect(cleanQueryInput(url)).toBe(url)
+    })
+
+    it('leaves a plain text search query unchanged', () => {
+        expect(cleanQueryInput('bohemian rhapsody queen')).toBe(
+            'bohemian rhapsody queen',
+        )
     })
 })
 

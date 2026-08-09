@@ -62,7 +62,7 @@ export default new Command({
             const recentCases = cases.slice(0, 10)
 
             const embed = new EmbedBuilder()
-                .setColor(0x5865f2)
+                .setColor(0x111111)
                 .setTitle(`📋 Moderation History - ${user.tag}`)
                 .setThumbnail(user.displayAvatarURL())
                 .addFields(

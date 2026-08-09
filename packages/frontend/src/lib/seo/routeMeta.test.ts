@@ -88,8 +88,8 @@ describe('routeMeta', () => {
 
     it('metaFor returns title+description for a known route', () => {
         expect(metaFor('/changelog')).toEqual({
-            title: 'Changelog · Lucky',
-            description: 'Release notes and version history for Lucky.',
+            title: 'Changelog · Vaded Gaming',
+            description: 'Release notes and version history for Vaded Gaming.',
         })
     })
 

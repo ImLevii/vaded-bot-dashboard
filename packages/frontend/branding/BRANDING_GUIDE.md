@@ -1,9 +1,9 @@
-# Lucky Branding Guide
+# Vaded Gaming Branding Guide
 
 ## Brand Name
 
-- Primary product name: `Lucky`
-- Dashboard: `Lucky Dashboard`
+- Primary product name: `Vaded Gaming`
+- Dashboard: `Vaded Gaming Dashboard`
 
 ## Logo Source
 
@@ -21,19 +21,19 @@
 
 ## Color System
 
-**Dual accent** (resolved 2026-04-21, see `decisions/2026-04-21-redesign-port-target.md`):
+**Red brand** (VadedHosting reference design):
 
-- **Primary** (CTAs, active nav, focus rings): Discord Blurple `#5865f2`, hover `#4752c4`.
-- **Secondary** (live pings, highlights, gradient accents): Neon Pink `#ec4899`.
+- **Primary** (CTAs, active nav, focus rings, logo): Red `#dc2626`, hover/strong `#b91c1c`.
+- **Accent** (gradient ends, highlights): Lighter red `#ef4444`, soft `#f87171`.
 
-Removed gold family (`#d4a017`, etc.) and old purple (`#8b5cf6`, etc.) — not part of the brand palette.
+Removed the neon pink/orange and Discord blurple primaries — not part of the current brand palette (Discord blurple assets kept only where they literally represent the Discord brand, e.g. `--color-brand-discord`).
 
 | Purpose                  | Color                                  |
 | ------------------------ | -------------------------------------- |
-| Primary accent / CTAs    | `#5865f2` (blurple)                    |
-| Primary hover            | `#4752c4` (blurple-strong)             |
-| Secondary accent         | `#ec4899` (neon pink)                  |
-| Landing gradient end     | `#fb923c` (neon orange — landing only) |
+| Primary accent / CTAs    | `#dc2626` (red-600)                    |
+| Primary hover            | `#b91c1c` (red-700)                    |
+| Secondary accent         | `#ef4444` (red-500)                    |
+| Landing gradient end     | `#b91c1c` (red-700)                    |
 | Success                  | `#23a55a`                              |
 | Error                    | `#f23f42`                              |
 | Warning                  | `#f0b232`                              |

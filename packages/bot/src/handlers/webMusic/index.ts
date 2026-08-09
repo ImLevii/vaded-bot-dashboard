@@ -113,6 +113,61 @@ export async function setupWebMusicHandler(
             },
         )
 
+        client.player.events.on(
+            'emptyQueue',
+            async (q: { guild: { id: string } }) => {
+                const state = await buildQueueState(client, q.guild.id)
+                await musicControlService.publishState(state)
+            },
+        )
+
+        client.player.events.on(
+            'error',
+            async (q: { guild: { id: string } }) => {
+                setTimeout(() => {
+                    void (async () => {
+                        const state = await buildQueueState(client, q.guild.id)
+                        await musicControlService.publishState(state)
+                    })().catch(() => {})
+                }, 500)
+            },
+        )
+
+        // queueDelete fires when queue.delete() is called (e.g. /stop from Discord).
+        // The queue is gone by the time the handler runs, so publish empty state directly.
+        client.player.events.on(
+            'queueDelete',
+            async (q: { guild: { id: string } }) => {
+                await musicControlService.publishState({
+                    guildId: q.guild.id,
+                    currentTrack: null,
+                    tracks: [],
+                    isPlaying: false,
+                    isPaused: false,
+                    volume: 50,
+                    repeatMode: 'off',
+                    shuffled: false,
+                    position: 0,
+                    voiceChannelId: null,
+                    voiceChannelName: null,
+                    timestamp: Date.now(),
+                })
+            },
+        )
+
+        // disconnect fires when the bot leaves the voice channel.
+        client.player.events.on(
+            'disconnect',
+            async (q: { guild: { id: string } }) => {
+                setTimeout(() => {
+                    void (async () => {
+                        const state = await buildQueueState(client, q.guild.id)
+                        await musicControlService.publishState(state)
+                    })().catch(() => {})
+                }, 300)
+            },
+        )
+
         // Periodically publish state for all active queues to keep SSE clients in sync.
         // Clear any prior handle first — a second setup() call (e.g. reconnect) would
         // otherwise orphan the previous interval and double-publish forever.
@@ -140,7 +195,7 @@ export async function setupWebMusicHandler(
                     },
                 })
             }
-        }, 30000)
+        }, 5000)
 
         infoLog({ message: 'Web music handler initialized' })
     } catch (error) {

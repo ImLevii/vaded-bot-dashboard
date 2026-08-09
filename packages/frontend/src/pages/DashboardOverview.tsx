@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react'
+import { useState, useEffect, type ReactElement } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import {
@@ -9,12 +9,17 @@ import {
     Clock,
     MessageSquare,
     Music,
+    Music2,
+    Pause,
+    Play,
     ScrollText,
     Shield,
     ShieldAlert,
+    SkipForward,
     Star,
     TrendingUp,
     Users,
+    Wifi,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
@@ -30,6 +35,7 @@ import {
     useModerationStats,
 } from '@/hooks/useModerationQueries'
 import { useRecentTracks } from '@/hooks/useTrackHistoryQueries'
+import { useMusicPlayer } from '@/hooks/useMusicPlayer'
 import { useLevelLeaderboard } from '@/hooks/useLevelQueries'
 import { useStarboardTop } from '@/hooks/useStarboardQueries'
 import type { ModerationCase, ModuleKey } from '@/types'
@@ -178,6 +184,161 @@ function CaseRow({ case: c, index }: { case: ModerationCase; index: number }) {
     )
 }
 
+function fmt(seconds: number): string {
+    const m = Math.floor(seconds / 60)
+    const s = Math.floor(seconds % 60)
+    return `${m}:${s.toString().padStart(2, '0')}`
+}
+
+function NowPlayingWidget({ guildId }: { guildId: string }) {
+    const { state, commands, pendingAction, isConnected } =
+        useMusicPlayer(guildId)
+    const [localMs, setLocalMs] = useState(state.position)
+
+    useEffect(() => {
+        setLocalMs(state.position)
+    }, [state.position])
+
+    useEffect(() => {
+        if (!state.isPlaying || state.isPaused) return
+        const id = setInterval(() => setLocalMs((p) => p + 1000), 1000)
+        return () => clearInterval(id)
+    }, [state.isPlaying, state.isPaused])
+
+    const track = state.currentTrack
+    if (!track) return null
+
+    const durationMs = track.duration || 0
+    const posMs = Math.min(localMs, durationMs || Infinity)
+    const progress = durationMs > 0 ? (posMs / durationMs) * 100 : 0
+    const isPaused = state.isPaused || !state.isPlaying
+
+    return (
+        <motion.section
+            aria-label='Now Playing'
+            className='surface-panel relative overflow-hidden border border-lucky-brand/20'
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
+        >
+            {/* blurred backdrop */}
+            {track.thumbnail && (
+                <div
+                    className='pointer-events-none absolute inset-0'
+                    aria-hidden='true'
+                    style={{
+                        backgroundImage: `url(${track.thumbnail})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        filter: 'blur(40px) brightness(0.12) saturate(1.5)',
+                        transform: 'scale(1.1)',
+                    }}
+                />
+            )}
+
+            <div className='relative flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:gap-5'>
+                {/* thumbnail */}
+                {track.thumbnail ? (
+                    <img
+                        src={track.thumbnail}
+                        alt=''
+                        className='h-14 w-14 shrink-0 rounded-lg object-cover shadow-lg'
+                        style={
+                            state.isPlaying && !state.isPaused
+                                ? { animation: '8s linear infinite vinyl-spin' }
+                                : undefined
+                        }
+                    />
+                ) : (
+                    <div className='flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-lucky-bg-active'>
+                        <Music2 className='h-6 w-6 text-lucky-text-tertiary' />
+                    </div>
+                )}
+
+                {/* track info + progress */}
+                <div className='min-w-0 flex-1'>
+                    <div className='flex items-center gap-2 mb-0.5'>
+                        <span
+                            className='h-1.5 w-1.5 rounded-full bg-lucky-brand shrink-0'
+                            aria-hidden='true'
+                            style={
+                                state.isPlaying && !state.isPaused
+                                    ? { animation: '1.4s ease-in-out infinite live-pulse' }
+                                    : undefined
+                            }
+                        />
+                        <span className='type-meta font-bold tracking-widest uppercase text-lucky-brand text-[10px]'>
+                            Now Playing
+                        </span>
+                        {state.voiceChannelName && (
+                            <span className='type-meta text-lucky-text-tertiary truncate'>
+                                · {state.voiceChannelName}
+                            </span>
+                        )}
+                        {isConnected && (
+                            <Wifi className='ml-auto h-3 w-3 shrink-0 text-lucky-success' aria-hidden='true' />
+                        )}
+                    </div>
+                    <p className='type-body font-semibold text-lucky-text-primary truncate leading-tight'>
+                        {track.title}
+                    </p>
+                    <p className='type-meta text-lucky-text-secondary truncate mb-2'>
+                        {track.author}
+                    </p>
+
+                    {durationMs > 0 && (
+                        <div>
+                            <div className='relative h-1 bg-lucky-bg-active rounded-full overflow-hidden'>
+                                <div
+                                    className='h-full rounded-full bg-lucky-brand transition-[width] duration-1000'
+                                    style={{ width: `${progress}%` }}
+                                />
+                            </div>
+                            <div className='flex justify-between type-meta text-lucky-text-tertiary mt-1 tabular-nums'>
+                                <span>{fmt(posMs / 1000)}</span>
+                                <span>{fmt(durationMs / 1000)}</span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* controls */}
+                <div className='flex items-center gap-2 shrink-0'>
+                    <button
+                        onClick={() =>
+                            isPaused ? commands.resume() : commands.pause()
+                        }
+                        disabled={!!pendingAction}
+                        aria-label={isPaused ? 'Resume' : 'Pause'}
+                        className='h-10 w-10 rounded-xl btn-glass text-white flex items-center justify-center active:scale-95 transition-all disabled:opacity-40'
+                    >
+                        {isPaused ? (
+                            <Play className='h-4 w-4' />
+                        ) : (
+                            <Pause className='h-4 w-4' />
+                        )}
+                    </button>
+                    <button
+                        onClick={() => commands.skip()}
+                        disabled={!!pendingAction}
+                        aria-label='Skip'
+                        className='h-9 w-9 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/10 text-lucky-text-secondary hover:text-white transition-all disabled:opacity-40'
+                    >
+                        <SkipForward className='h-4 w-4' />
+                    </button>
+                    <Link
+                        to='/music'
+                        className='h-9 px-3 rounded-full flex items-center gap-1.5 bg-white/5 hover:bg-white/10 text-lucky-text-secondary hover:text-white transition-all type-meta font-medium'
+                    >
+                        <ArrowRight className='h-3.5 w-3.5' />
+                        <span className='hidden sm:inline'>Full player</span>
+                    </Link>
+                </div>
+            </div>
+        </motion.section>
+    )
+}
+
 export default function DashboardOverview() {
     const { t } = useTranslation()
     const prefersReducedMotion = useReducedMotion()
@@ -287,6 +448,10 @@ export default function DashboardOverview() {
                 })}
                 eyebrow={t('dashboardOverview.serverAnalytics')}
             />
+
+            {hasModuleAccess(effectiveAccess, 'music', 'view') && (
+                <NowPlayingWidget guildId={selectedGuild.id} />
+            )}
 
             <div className='grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]'>
                 {loading ? (
@@ -522,7 +687,7 @@ export default function DashboardOverview() {
                         ) : recentTracksData && recentTracksData.length > 0 ? (
                             recentTracksData.map((track, index) => (
                                 <motion.div
-                                    key={track.trackId}
+                                    key={`${track.trackId}-${index}`}
                                     initial={
                                         prefersReducedMotion
                                             ? false

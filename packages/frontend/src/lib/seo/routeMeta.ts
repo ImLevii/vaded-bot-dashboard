@@ -36,46 +36,46 @@ export interface RouteMeta {
 export const PUBLIC_ROUTES: RouteMeta[] = [
     {
         path: '/',
-        title: 'Lucky — Free Discord music bot with autoplay & dashboard',
+        title: 'Vaded Gaming — Free Discord music bot with autoplay & dashboard',
         description:
             'YouTube, Spotify, SoundCloud music bot with genre-aware autoplay, smart radio, moderation, and web dashboard. Open-source, self-hostable, free forever.',
     },
     {
         path: '/docs',
-        title: 'Documentation — Lucky',
+        title: 'Documentation — Vaded Gaming',
         description:
-            'Setup, configuration, music, moderation, and dashboard documentation for Lucky, the open-source self-hostable Discord bot.',
+            'Setup, configuration, music, moderation, and dashboard documentation for Vaded Gaming, the open-source self-hostable Discord bot.',
     },
     {
         path: '/changelog',
-        title: 'Changelog · Lucky',
-        description: 'Release notes and version history for Lucky.',
+        title: 'Changelog · Vaded Gaming',
+        description: 'Release notes and version history for Vaded Gaming.',
     },
     {
         path: '/terms-of-service',
-        title: 'Terms of Service · Lucky',
+        title: 'Terms of Service · Vaded Gaming',
         description:
-            'Terms governing your use of the Lucky Discord bot and web dashboard.',
+            'Terms governing your use of the Vaded Gaming Discord bot and web dashboard.',
     },
     {
         path: '/terms',
-        title: 'Terms of Service · Lucky',
+        title: 'Terms of Service · Vaded Gaming',
         description:
-            'Terms governing your use of the Lucky Discord bot and web dashboard.',
+            'Terms governing your use of the Vaded Gaming Discord bot and web dashboard.',
         canonical: '/terms-of-service',
         sitemap: false,
     },
     {
         path: '/privacy-policy',
-        title: 'Privacy Policy · Lucky',
+        title: 'Privacy Policy · Vaded Gaming',
         description:
-            'How Lucky collects, uses, and protects data for the bot and dashboard.',
+            'How Vaded Gaming collects, uses, and protects data for the bot and dashboard.',
     },
     {
         path: '/privacy',
-        title: 'Privacy Policy · Lucky',
+        title: 'Privacy Policy · Vaded Gaming',
         description:
-            'How Lucky collects, uses, and protects data for the bot and dashboard.',
+            'How Vaded Gaming collects, uses, and protects data for the bot and dashboard.',
         canonical: '/privacy-policy',
         sitemap: false,
     },

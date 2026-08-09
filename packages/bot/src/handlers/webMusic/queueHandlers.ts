@@ -6,6 +6,7 @@ import {
 } from '@lucky/shared/services'
 import { buildQueueState } from './mappers'
 import { resolveGuildQueue } from '../../utils/music/queueResolver'
+import { normalizeSpotifyUrl, normalizeYoutubeUrl } from '../../functions/music/commands/play/urlNormalization'
 
 type Result = MusicCommandResult
 
@@ -86,24 +87,66 @@ export async function handleImportPlaylist(
     client: CustomClient,
     cmd: MusicCommand,
 ): Promise<Result> {
-    const url = cmd.data?.url as string
-    if (!url) return fail(cmd.id, cmd.guildId, 'No URL provided')
+    const rawUrl = cmd.data?.url as string
+    if (!rawUrl) return fail(cmd.id, cmd.guildId, 'No URL provided')
 
-    const queue = resolveGuildQueue(client, cmd.guildId).queue
-    if (!queue)
-        return fail(
-            cmd.id,
-            cmd.guildId,
-            'No active queue. Start playing from Discord first.',
-        )
+    // Strip tracking params that cause Spotify/YouTube extractors to reject the URL
+    const url = normalizeSpotifyUrl(normalizeYoutubeUrl(rawUrl))
 
-    const result = await client.player.search(url, { requestedBy: undefined })
+    const voiceChannelId = cmd.data?.voiceChannelId as string | undefined
+    const guild = client.guilds.cache.get(cmd.guildId)
+    if (!guild) return fail(cmd.id, cmd.guildId, 'Guild not found')
+
+    const requestedBy = await client.users.fetch(cmd.userId).catch(() => undefined)
+    const result = await client.player.search(url, { requestedBy })
     if (!result?.tracks.length)
         return fail(cmd.id, cmd.guildId, 'No tracks found in playlist')
 
-    for (const track of result.tracks) queue.addTrack(track)
-    if (!queue.node.isPlaying() && !queue.node.isPaused())
-        await queue.node.play()
+    let queue = resolveGuildQueue(client, cmd.guildId).queue
+
+    if (!queue) {
+        // No active queue — try to create one by joining the provided voice channel
+        if (!voiceChannelId)
+            return fail(
+                cmd.id,
+                cmd.guildId,
+                'Bot is not in a voice channel. Join a voice channel and try again.',
+            )
+
+        const channel = guild.channels.cache.get(voiceChannelId)
+        if (!channel?.isVoiceBased())
+            return fail(cmd.id, cmd.guildId, 'Voice channel not found')
+
+        // Play the first track to establish the queue and connection
+        await client.player.play(channel, result.tracks[0], {
+            requestedBy,
+            nodeOptions: {
+                metadata: { channel: null, requestedBy: null, vcMemberIds: [] },
+                leaveOnEmpty: true,
+                leaveOnEmptyCooldown: 30_000,
+                leaveOnEnd: true,
+                leaveOnEndCooldown: 300_000,
+            },
+        })
+        // Add remaining tracks to the newly created queue
+        queue = resolveGuildQueue(client, cmd.guildId).queue
+        if (queue && result.tracks.length > 1) {
+            for (const track of result.tracks.slice(1)) queue.addTrack(track)
+        }
+    } else {
+        // Deduplicate against tracks already in the queue by URL
+        const existingUrls = new Set(
+            queue.tracks.toArray().map((t: { url: string }) => t.url),
+        )
+        for (const track of result.tracks) {
+            if (!existingUrls.has(track.url)) {
+                queue.addTrack(track)
+                existingUrls.add(track.url)
+            }
+        }
+        if (!queue.node.isPlaying() && !queue.node.isPaused())
+            await queue.node.play()
+    }
 
     const state = await buildQueueState(client, cmd.guildId)
     await musicControlService.publishState(state)

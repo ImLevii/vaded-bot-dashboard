@@ -290,7 +290,7 @@ export async function handleStreamOnline(
 
     const streamUrl = `https://twitch.tv/${login}`
     const embed = new EmbedBuilder()
-        .setColor(0x9146ff)
+        .setColor(0xdc2626)
         .setTitle(`${name} is live`)
         .setURL(streamUrl)
         .setDescription(`**${name}** is now streaming on Twitch.`)
@@ -335,7 +335,7 @@ export async function handleChannelUpdate(
     } = payload.event
 
     const embed = new EmbedBuilder()
-        .setColor(0x9146ff)
+        .setColor(0xdc2626)
         .setTitle(`${name} updated their stream`)
         .setURL(`https://twitch.tv/${login}`)
         .addFields(
@@ -361,7 +361,7 @@ export async function handleChannelRaid(
     } = payload.event
 
     const embed = new EmbedBuilder()
-        .setColor(0x9146ff)
+        .setColor(0xdc2626)
         .setTitle(`Raid incoming on ${toName}!`)
         .setURL(`https://twitch.tv/${toLogin}`)
         .setDescription(

@@ -1,5 +1,7 @@
 import type { Track, GuildQueue } from 'discord-player'
 import { QueueRepeatMode } from 'discord-player'
+import { ActivityType } from 'discord.js'
+import type { Client } from 'discord.js'
 import { LRUCache } from 'lru-cache'
 import { infoLog, debugLog, errorLog, warnLog } from '@lucky/shared/utils'
 import { addTrackToHistory } from '../../utils/music/duplicateDetection'
@@ -11,6 +13,7 @@ import {
     sendNowPlayingEmbed,
     updateLastFmNowPlaying,
     scrobbleCurrentTrackIfLastFm,
+    deleteSongInfoMessage,
 } from './trackNowPlaying'
 import { musicWatchdogService } from '../../utils/music/watchdog'
 import { musicSessionSnapshotService } from '../../utils/music/sessionSnapshots'
@@ -126,7 +129,7 @@ type PlayerEvents = {
 }
 type SetupTrackHandlersParams = {
     player: PlayerEvents
-    client: { user?: { id: string } | null }
+    client: Client
 }
 
 export const setupTrackHandlers = ({
@@ -156,6 +159,11 @@ export const setupTrackHandlers = ({
     })
     player.events.on('emptyQueue', (queue: GuildQueue) => {
         scheduleIdleDisconnect(queue)
+        client.user?.setPresence({ activities: [], status: 'online' })
+    })
+    // also clear presence when the bot is forcibly disconnected
+    player.events.on('disconnect', () => {
+        client.user?.setPresence({ activities: [], status: 'online' })
     })
 }
 
@@ -224,7 +232,7 @@ async function handleQueueReplenishment(
 const handlePlayerStart = async (
     queue: GuildQueue,
     track: Track,
-    client: { user?: { id: string } | null },
+    client: Client,
 ): Promise<void> => {
     try {
         evictOldEntries()
@@ -242,6 +250,10 @@ const handlePlayerStart = async (
         await handleQueueReplenishment(queue, track)
 
         try {
+            // set "Listening to <track>" bot status
+            client.user?.setActivity(track.title, { type: ActivityType.Listening })
+            // always post a fresh embed so every track gets its own message
+            deleteSongInfoMessage(queue.guild.id)
             await sendNowPlayingEmbed(queue, track, isAutoplay)
             await updateLastFmNowPlaying(queue, track)
             await voiceStatus.setTrackStatus(queue)

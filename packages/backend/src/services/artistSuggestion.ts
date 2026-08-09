@@ -313,21 +313,51 @@ export class ArtistSuggestionService {
         suggestions: Map<string, ArtistSuggestion>,
     ): Promise<void> {
         try {
-            let fallback = this.fallbackCache.get(this.fallbackCacheKey) ?? []
+            const cached = this.fallbackCache.get(this.fallbackCacheKey)
 
-            if (fallback.length === 0) {
-                fallback = await this.fetchPopularArtists()
-                if (fallback.length > 0) {
-                    this.fallbackCache.set(this.fallbackCacheKey, fallback)
+            if (cached && cached.length > 0) {
+                // Fast path: warm cache — just fill from it.
+                for (const artist of cached) {
+                    if (suggestions.size >= this.maxSuggestions) break
+                    if (!suggestions.has(artist.id)) {
+                        suggestions.set(artist.id, artist)
+                    }
                 }
+                return
             }
 
-            for (const artist of fallback) {
+            // Cache miss: return the static list immediately so the response
+            // is never blocked. Use name-based synthetic IDs so the caller gets
+            // something usable right away.
+            for (const name of POPULAR_ARTISTS) {
                 if (suggestions.size >= this.maxSuggestions) break
-                if (!suggestions.has(artist.id)) {
-                    suggestions.set(artist.id, artist)
+                const syntheticId = `static:${name.toLowerCase().replace(/\s+/g, '-')}`
+                if (!suggestions.has(syntheticId)) {
+                    suggestions.set(syntheticId, {
+                        id: syntheticId,
+                        name,
+                        imageUrl: null,
+                        popularity: 50,
+                        genres: [],
+                    })
                 }
             }
+
+            // Fire Spotify enrichment in the background so the *next* request
+            // gets proper Spotify IDs and images without blocking this one.
+            void this.fetchPopularArtists()
+                .then((artists) => {
+                    if (artists.length > 0) {
+                        this.fallbackCache.set(this.fallbackCacheKey, artists)
+                    }
+                })
+                .catch((error) => {
+                    debugLog({
+                        message:
+                            'Background Spotify popular-artist enrichment failed',
+                        data: { error: String(error) },
+                    })
+                })
         } catch (error) {
             errorLog({
                 message: 'Failed to load popular artists fallback',

@@ -49,7 +49,7 @@ export default function LoginPage() {
                         <div className='flex items-center gap-3 mb-8'>
                             <img
                                 src='/lucky-logo.png'
-                                alt='Lucky'
+                                alt='Vaded Gaming'
                                 className='h-12 w-12 rounded-lg object-cover border border-lucky-border'
                             />
                             <h1
@@ -58,7 +58,7 @@ export default function LoginPage() {
                                     fontFamily: 'var(--font-lucky-display)',
                                 }}
                             >
-                                Lucky
+                                Vaded Gaming
                             </h1>
                         </div>
 

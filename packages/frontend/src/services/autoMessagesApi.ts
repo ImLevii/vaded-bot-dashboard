@@ -1,20 +1,19 @@
 import type { AxiosInstance } from 'axios'
-import type { AutoMessage } from '@/types'
+import type { AutoMessage, AutoMessageType } from '@/types'
 
 export interface CreateAutoMessageInput {
-    name: string
-    channel: string
-    content: string
-    interval: number
-    isEmbed?: boolean
+    type: AutoMessageType
+    message: string
+    channelId?: string
+    trigger?: string
+    exactMatch?: boolean
 }
 
 export interface UpdateAutoMessageInput {
-    name?: string
-    channel?: string
-    content?: string
-    interval?: number
-    isEmbed?: boolean
+    message?: string
+    channelId?: string
+    trigger?: string
+    exactMatch?: boolean
     enabled?: boolean
 }
 

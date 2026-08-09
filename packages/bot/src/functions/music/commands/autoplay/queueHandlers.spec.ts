@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals'
+﻿import { jest } from '@jest/globals'
 import type { ChatInputCommandInteraction } from 'discord.js'
 import type { GuildQueue } from 'discord-player'
 
@@ -105,7 +105,7 @@ describe('handleAutoplayStatus', () => {
                 title: '📻 Autoplay Status',
                 fields: expect.arrayContaining([
                     expect.objectContaining({ name: '📊 Queue', value: '2 / 3 tracks' }),
-                    expect.objectContaining({ name: '🎵 Status', value: expect.stringContaining('Enabled') }),
+                    expect.objectContaining({ name: '<a:music:741605543046807626> Status', value: expect.stringContaining('Enabled') }),
                 ]),
             }),
         )
@@ -119,7 +119,7 @@ describe('handleAutoplayStatus', () => {
         expect(mockCreateEmbed).toHaveBeenCalledWith(
             expect.objectContaining({
                 fields: expect.arrayContaining([
-                    expect.objectContaining({ name: '🎵 Status', value: 'Disabled' }),
+                    expect.objectContaining({ name: '<a:music:741605543046807626> Status', value: 'Disabled' }),
                 ]),
             }),
         )

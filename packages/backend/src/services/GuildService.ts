@@ -287,6 +287,41 @@ class GuildService {
         return roleService.getGuildRoleOptions(guildId)
     }
 
+    async getGuildMembers(guildId: string): Promise<Array<{
+        id: string
+        username: string
+        displayName: string
+        avatarUrl: string | null
+        roles: Array<{ id: string; name: string; color: number }>
+        isBot: boolean
+    }>> {
+        const client = this.getBotClient()
+        if (!client) return []
+
+        try {
+            const guild = client.guilds.cache.get(guildId) ?? await client.guilds.fetch(guildId)
+            const members = await guild.members.fetch({ limit: 1000 })
+            const roles = await guild.roles.fetch()
+
+            return [...members.values()]
+                .filter((m) => !m.user.bot)
+                .sort((a, b) => (a.displayName).localeCompare(b.displayName))
+                .map((m) => ({
+                    id: m.user.id,
+                    username: m.user.username,
+                    displayName: m.displayName,
+                    avatarUrl: m.user.displayAvatarURL({ size: 64 }) ?? null,
+                    roles: m.roles.cache
+                        .filter((r) => r.id !== guild.id) // exclude @everyone
+                        .sort((a, b) => b.position - a.position)
+                        .map((r) => ({ id: r.id, name: r.name, color: r.color })),
+                    isBot: m.user.bot,
+                }))
+        } catch {
+            return []
+        }
+    }
+
     async getGuildTextChannelOptions(
         guildId: string,
     ): Promise<GuildChannelOption[]> {

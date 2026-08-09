@@ -62,9 +62,16 @@ class SessionService {
     async getSession(sessionId: string): Promise<SessionData | null> {
         try {
             const key = this.getSessionKey(sessionId)
-            const data = this.useRedis()
-                ? await redisClient.get(key)
-                : (this.memoryStore.get(key) ?? null)
+            // Redis health is re-checked live on every call, so a health flip
+            // between the original write and this read must not make an
+            // existing session invisible — always fall back to the mirror.
+            let data: string | null = null
+            if (this.useRedis()) {
+                data = await redisClient.get(key)
+            }
+            if (!data) {
+                data = this.memoryStore.get(key) ?? null
+            }
 
             if (!data) {
                 return null
@@ -92,11 +99,15 @@ class SessionService {
             const key = this.getSessionKey(sessionId)
             const data = JSON.stringify(sessionData)
 
+            // Always mirror to the local store, not just when Redis looks
+            // unhealthy — protects against a health-check flip erasing the
+            // only copy of the data (see getSession).
+            this.memoryStore.set(key, data)
+            this.persistToFile()
+
             if (this.useRedis()) {
                 await redisClient.setex(key, this.sessionTtl, data)
             } else {
-                this.memoryStore.set(key, data)
-                this.persistToFile()
                 debugLog({
                     message: 'Session persisted to disk (Redis unavailable)',
                 })
@@ -116,11 +127,11 @@ class SessionService {
         try {
             const key = this.getSessionKey(sessionId)
 
+            this.memoryStore.delete(key)
+            this.persistToFile()
+
             if (this.useRedis()) {
                 await redisClient.del(key)
-            } else {
-                this.memoryStore.delete(key)
-                this.persistToFile()
             }
 
             debugLog({

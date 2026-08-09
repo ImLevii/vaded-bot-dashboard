@@ -44,7 +44,7 @@
         },
         "subtitle": {
             "selectServer": "Choose a community to unlock guild tools.",
-            "needsSetup": "Lucky is not installed in this server yet.",
+            "needsSetup": "Vaded Gaming is not installed in this server yet.",
             "ready": "Guild command center is ready for operations."
         },
         "sections": {
@@ -58,6 +58,7 @@
         "nav": {
             "dashboard": "Dashboard",
             "serverSettings": "Server Settings",
+            "members": "Members",
             "modCases": "Mod Cases",
             "autoModeration": "Auto-Moderation",
             "serverLogs": "Server Logs",
@@ -170,7 +171,7 @@
                 "subtitle": "Link or unlink Spotify to power autoplay matching."
             },
             "fallback": {
-                "title": "Lucky Dashboard",
+                "title": "Vaded Gaming Dashboard",
                 "subtitle": "Configure modules, moderation, and engagement workflows."
             },
             "roleGroups": {
@@ -181,158 +182,148 @@
     },
     "landing": {
         "meta": {
-            "title": "Lucky — Free Discord music bot with autoplay & dashboard",
-            "description": "YouTube, Spotify, SoundCloud music bot with genre-aware autoplay, smart radio, moderation, and web dashboard. Open-source, self-hostable, free forever."
+            "title": "Vaded Gaming — The bot built for our community",
+            "description": "Music, moderation, custom commands, and a full web dashboard. Built for Vaded Gaming. Powered by the community."
         },
         "hero": {
-            "eyebrow": "Open source · ISC",
-            "headlineLine1": "A Discord bot built right.",
-            "headlineLine2": "And yours to run.",
-            "subtitle": "Music, moderation, custom commands, and a full web dashboard. Use the hosted version in two clicks, or run it on your own box if you'd rather.",
-            "ctaPrimary": "Add to Discord",
-            "ctaSecondary": "Self-host on GitHub"
+            "eyebrow": "Built for Vaded Gaming",
+            "headlineLine1": "The bot our server",
+            "headlineLine2": "actually runs on.",
+            "subtitle": "Music from YouTube, Spotify, and SoundCloud. Moderation that works. A real dashboard — no bots-as-a-service, no paywalls, no fluff.",
+            "ctaPrimary": "Add to Discord"
         },
-        "repoCard": {
-            "name": "LucasSantana-Dev / Lucky",
-            "description": "Self-hosted Discord music bot — Spotify + YouTube + SoundCloud, autoplay recommendations, React dashboard, moderation suite.",
-            "license": "ISC",
-            "lang": "TypeScript",
-            "serversLabel": "servers",
-            "usersLabel": "users",
-            "viewOnGithub": "View on GitHub",
-            "copyClone": "Copy clone URL"
+        "stats": {
+            "music": "Tracks played",
+            "commands": "Commands ready",
+            "uptime": "Uptime target",
+            "latency": "Avg latency"
         },
         "whySelfHost": {
-            "heading": "Why self-host",
+            "heading": "Why we built our own",
             "items": {
                 "data": {
-                    "title": "Your guild data stays yours",
-                    "description": "Postgres, Redis, your hardware. No third-party ToS over your community. Export and migrate any time."
+                    "title": "Our server, our rules",
+                    "description": "No third-party hosting decisions over VADED GAMING. Our data stays on our hardware. Full control, always."
                 },
                 "fork": {
-                    "title": "Fork the source",
-                    "description": "TypeScript monorepo. Add commands, change behavior, swap providers without waiting on a roadmap or paying for an API tier."
+                    "title": "Built for us, by us",
+                    "description": "TypeScript monorepo. We add the commands we actually want, change anything, ship features for our community — not a random roadmap."
                 },
                 "free": {
-                    "title": "Free, with no premium tier",
-                    "description": "No feature paywall, no Patreon, no rate-limited tier. ISC licensed. The hosted version exists for people who don't want to run a box."
+                    "title": "Zero paywalls, ever",
+                    "description": "Every feature is free. No premium tier. No rate-limited commands. If it's in the bot, every member can use it."
                 }
             }
         },
         "commands": {
-            "heading": "100+ commands, scoped to what you actually run",
+            "heading": "100+ commands — built for gaming communities",
             "rows": {
                 "play": {
                     "name": "/play",
-                    "description": "Queue a track from Spotify, YouTube, or SoundCloud",
+                    "description": "Queue a track from YouTube, Spotify, or SoundCloud",
                     "kbd": "music"
                 },
                 "autoplay": {
                     "name": "/autoplay",
-                    "description": "Genre-aware recommendations, won't drift languages",
+                    "description": "Smart genre-aware radio that stays on vibe",
                     "kbd": "music"
                 },
                 "queue": {
                     "name": "/queue",
-                    "description": "Inspect or reorder the current queue",
+                    "description": "See, reorder, or clear the current music queue",
                     "kbd": "music"
                 },
                 "ban": {
                     "name": "/mod ban",
-                    "description": "Tempban with reason, auto-DM, audit-log entry",
+                    "description": "Tempban with reason, auto-DM, and audit log",
                     "kbd": "mod"
                 },
                 "automod": {
                     "name": "/automod",
-                    "description": "Spam, caps, links, invites — per-guild rules",
+                    "description": "Auto-flag spam, caps, links — per-server rules",
                     "kbd": "mod"
                 },
                 "custom": {
                     "name": "/cc create",
-                    "description": "Custom commands with variable interpolation",
+                    "description": "Build server-specific commands without touching code",
                     "kbd": "custom"
                 }
             },
-            "more": "+ 100 more in the dashboard"
+            "more": "+ 100 more available in the dashboard"
         },
         "stack": {
-            "heading": "For developers — what you're running",
-            "subheading": "Standard Node + Postgres stack. Nothing exotic. `docker compose up` and you're online. Skip this if you're using the hosted version.",
+            "heading": "What's running under the hood",
+            "subheading": "Node + Postgres. Nothing exotic. Self-hosted on our own box — full ownership, zero lock-in.",
             "items": {
                 "bot": {
-                    "name": "lucky-bot",
-                    "description": "discord.js client, Lavalink-free audio via yt-dlp + Opus"
+                    "name": "vaded-bot",
+                    "description": "discord.js client, audio via yt-dlp + Opus"
                 },
                 "backend": {
-                    "name": "lucky-backend",
+                    "name": "vaded-backend",
                     "description": "Express API, OAuth, Prisma to Postgres"
                 },
                 "frontend": {
-                    "name": "lucky-frontend",
-                    "description": "React 19 + Vite + Tailwind, Discord OAuth dashboard"
+                    "name": "vaded-frontend",
+                    "description": "React 19 + Vite + Tailwind dashboard"
                 },
                 "postgres": {
                     "name": "postgres",
-                    "description": "Guild config, custom commands, moderation log"
+                    "description": "Guild config, commands, moderation log"
                 },
                 "redis": {
                     "name": "redis",
-                    "description": "Session cache, rate-limit buckets, autoplay state"
+                    "description": "Sessions, rate-limiting, autoplay state"
                 },
                 "nginx": {
                     "name": "nginx",
-                    "description": "Reverse proxy, /webhook → /hooks rewrite for deploy"
+                    "description": "Reverse proxy, webhook routing"
                 }
             }
         },
-        "footerRepo": {
-            "heading": "Open source under ISC",
-            "subheading": "Fork it, contribute, run it, deploy your own. The code is the spec."
-        },
         "footer": {
-            "tagline": "Open-source Discord bot. Run it yourself or use the hosted version.",
+            "tagline": "The official bot of Vaded Gaming. Built by the community, for the community.",
             "links": "Product",
             "support": "Community",
-            "supportCopy": "Issues and PRs welcome on GitHub. Or hop in the Discord support server.",
+            "supportCopy": "Got questions? Drop into the Discord. We actually respond.",
             "terms": "Terms",
             "privacy": "Privacy",
-            "github": "GitHub",
             "docs": "Docs",
             "changelog": "Changelog",
-            "discord": "Support server",
-            "copyright": "© 2026 Lucky. ISC."
+            "discord": "Join the Discord",
+            "copyright": "© 2026 Vaded Gaming."
         },
         "features": {
-            "heading": "What Lucky does",
-            "subheading": "Everything most servers need, in one bot. No premium tier paywalling the good parts.",
+            "heading": "Built for VADED GAMING",
+            "subheading": "Everything our server needs, in one bot. No premium gating, no missing features, no compromises.",
             "items": {
                 "music": {
-                    "title": "Music with smart autoplay",
-                    "description": "Queue from Spotify, YouTube, or SoundCloud. Autoplay matches the mood and won't drift into the wrong language."
+                    "title": "Music — the way it should work",
+                    "description": "YouTube, Spotify, SoundCloud. Smart autoplay that matches the vibe and never drifts. Queue controls in Discord and the dashboard."
                 },
                 "moderation": {
-                    "title": "Moderation that doesn't sleep",
-                    "description": "Auto-mod for spam, caps, links, and invites. Tempbans with reasons, audit log entries, and per-server rules."
+                    "title": "Moderation that doesn't miss",
+                    "description": "Auto-mod for spam, caps, and bad links. Tempbans with reasons, full audit log, and per-server rule sets."
                 },
                 "customCommands": {
-                    "title": "Custom commands",
-                    "description": "Build replies, role-toggles, embeds, and shortcuts without writing code. Variable interpolation included."
+                    "title": "Server-specific commands",
+                    "description": "Build the commands our server actually uses. Role toggles, responses, embeds — without touching code."
                 },
                 "dashboard": {
                     "title": "A real web dashboard",
-                    "description": "Configure everything from your browser. Discord OAuth login, no JSON files, no SSH."
+                    "description": "Control everything from a browser. Discord OAuth, real-time music controls, no config files."
                 },
                 "embeds": {
                     "title": "Embed builder",
-                    "description": "Compose rich Discord embeds with a live preview. Save templates, send on schedule, edit in place."
+                    "description": "Design rich Discord embeds with live preview. Save as templates, schedule sends, edit in place."
                 }
             }
         }
     },
     "login": {
         "meta": {
-            "title": "Login - Lucky",
-            "description": "Login to Lucky Dashboard to manage your Discord servers"
+            "title": "Login - Vaded Gaming",
+            "description": "Login to Vaded Gaming Dashboard to manage your Discord servers"
         },
         "brand": "Discord Bot Dashboard",
         "headline": "Manage your Discord servers",
@@ -350,7 +341,7 @@
             "fastSetup": "Fast setup",
             "liveControls": "Live controls"
         },
-        "copyright": "© 2026 Lucky. All rights reserved."
+        "copyright": "© 2026 Vaded Gaming. All rights reserved."
     },
     "support": {
         "title": "Report a problem",
@@ -431,14 +422,21 @@
         "subtitle": "Schedule automatic messages for {{name}}",
         "editAutoMessage": "Edit Auto Message",
         "newAutoMessage": "New Auto Message",
-        "name": "Name",
-        "namePlaceholder": "e.g. Daily Reminder",
+        "type": "Type",
+        "types": {
+            "welcome": "Welcome",
+            "leave": "Leave",
+            "auto_response": "Auto Response"
+        },
         "channelId": "Channel ID",
         "channelIdPlaceholder": "Discord channel ID",
-        "content": "Content",
-        "contentPlaceholder": "Message content...",
-        "intervalSeconds": "Interval (seconds)",
-        "sendAsEmbed": "Send as embed",
+        "message": "Message",
+        "messagePlaceholder": "Message content...",
+        "trigger": "Trigger",
+        "triggerPlaceholder": "Word or phrase that triggers this response",
+        "exactMatch": "Require exact match",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
         "cancel": "Cancel",
         "saving": "Saving…",
         "save": "Save",
@@ -640,7 +638,7 @@
         "connectAccountDescription": "Link your Last.fm account so tracks you play through the bot are automatically scrobbled to your profile.",
         "connectWithLastFm": "Connect with Last.fm",
         "scrobbleCoverage": "Scrobble coverage",
-        "scrobbleCoverageDescription": "Lucky tracks requested songs and forwards play activity once linked.",
+        "scrobbleCoverageDescription": "Vaded Gaming tracks requested songs and forwards play activity once linked.",
         "privacyControl": "Privacy control",
         "privacyControlDescription": "Disconnect anytime without affecting server playback.",
         "howItWorks": "How it works",
@@ -777,7 +775,7 @@
         "selectServerToManageArtists": "Select a server to manage preferred artists",
         "musicPersonalization": "Music personalization",
         "musicalTaste": "Musical Taste",
-        "chooseArtistsDescription": "Choose artists to guide autoplay recommendations. When multiple people are in voice, Lucky blends everyone's preferences.",
+        "chooseArtistsDescription": "Choose artists to guide autoplay recommendations. When multiple people are in voice, Vaded Gaming blends everyone's preferences.",
         "discoverTab": "Discover",
         "preferredTab": "Preferred",
         "blockedTab": "Blocked",
@@ -789,7 +787,7 @@
         "noPreferredArtistsYet": "No preferred artists yet",
         "addFromDiscover": "Add some from Discover.",
         "noBlockedArtists": "No blocked artists",
-        "blockArtistsDescription": "Block artists you don't want Lucky to autoplay.",
+        "blockArtistsDescription": "Block artists you don't want Vaded Gaming to autoplay.",
         "savePreferences": "Save Preferences ({{count}})",
         "saving": "Saving...",
         "prefer": "Prefer",
@@ -883,7 +881,7 @@
         "networkError": "Unable to reach API. Check your connection and retry.",
         "general": "General",
         "botNickname": "Bot Nickname",
-        "botNicknamePlaceholder": "Lucky",
+        "botNicknamePlaceholder": "Vaded Gaming",
         "commandPrefix": "Command Prefix",
         "commandPrefixPlaceholder": "!",
         "regionNotifications": "Region & Notifications",
@@ -925,16 +923,16 @@
         "totalServers": "Total Servers",
         "serversLabel": "Servers",
         "yourServers": "Your Servers",
-        "serversWithBot": "{{count}} servers — {{count2}} with Lucky installed",
+        "serversWithBot": "{{count}} servers — {{count2}} with Vaded Gaming installed",
         "navServers": "Servers",
         "navPremium": "Premium",
         "navSettings": "Settings",
         "recentlyActive": "Recently Active",
         "allOtherServers": "All Other Servers",
-        "luckyInstalled": "Lucky installed",
-        "inviteLucky": "Invite Lucky",
+        "luckyInstalled": "Vaded Gaming installed",
+        "inviteLucky": "Invite Vaded Gaming",
         "noServersTitle": "No servers yet",
-        "noServersDescription": "Join a Discord server and Lucky will appear here."
+        "noServersDescription": "Join a Discord server and Vaded Gaming will appear here."
     },
     "spotify": {
         "eyebrow": "Music personalization",
@@ -947,19 +945,19 @@
         "connected": "Connected",
         "linkedAs": "Linked as",
         "active": "Active",
-        "accessExplanation": "Lucky can access your library and listening history to provide personalized autoplay recommendations.",
+        "accessExplanation": "Vaded Gaming can access your library and listening history to provide personalized autoplay recommendations.",
         "disconnect": "Disconnect",
         "connectYourAccount": "Connect Your Account",
-        "connectDescription": "Link your Spotify account so Lucky can learn your music preferences and provide personalized autoplay recommendations.",
+        "connectDescription": "Link your Spotify account so Vaded Gaming can learn your music preferences and provide personalized autoplay recommendations.",
         "connectWithSpotify": "Connect with Spotify",
         "smarterAutoplay": "Smarter autoplay",
-        "smarterAutoplayDesc": "Lucky learns from your library, top tracks, and recent listening.",
+        "smarterAutoplayDesc": "Vaded Gaming learns from your library, top tracks, and recent listening.",
         "privacyControl": "Privacy control",
         "privacyControlDesc": "Disconnect anytime without affecting server playback.",
         "howItWorks": "How it works",
         "step1": "Connect your Spotify account above",
-        "step2": "Lucky accesses your library, top tracks, and recent listening",
-        "step3": "When autoplay is active, Lucky recommends similar tracks based on your preferences",
+        "step2": "Vaded Gaming accesses your library, top tracks, and recent listening",
+        "step3": "When autoplay is active, Vaded Gaming recommends similar tracks based on your preferences",
         "step4": "Your library stays private and is only used for recommendations",
         "failedToLoadStatus": "Failed to load Spotify status",
         "failedToUnlink": "Failed to unlink account",

@@ -26,6 +26,14 @@ export class MusicControlService {
             const config = createRedisConfig()
             this.publisher = new RedisClientClass(config) as Redis
             this.subscriber = new RedisClientClass(config) as Redis
+            // Without these, ioredis logs unhandled 'error' events as raw
+            // console dumps instead of through the app logger.
+            this.publisher.on('error', (error) =>
+                errorLog({ message: 'MusicControlService publisher error:', error }),
+            )
+            this.subscriber.on('error', (error) =>
+                errorLog({ message: 'MusicControlService subscriber error:', error }),
+            )
             await Promise.all([
                 this.publisher.connect(),
                 this.subscriber.connect(),

@@ -37,6 +37,7 @@ import { setupInviteRoute } from './invite'
 import { setupSupportRoutes } from './support'
 import { setupSecurityRoutes } from './security'
 import { setupBatchJobRoutes } from './batchJobs'
+import { setupMembersRoutes } from './members'
 
 type GuildGuardConfig = {
     path: string
@@ -59,6 +60,7 @@ const guildGuardConfigs: GuildGuardConfig[] = [
     { path: '/api/guilds/:guildId/settings', module: 'settings' },
     { path: '/api/guilds/:guildId/modules', module: 'settings' },
     { path: '/api/guilds/:guildId/rbac', module: 'settings', mode: 'manage' },
+    { path: '/api/guilds/:guildId/members', module: 'settings', mode: 'manage' },
     {
         path: '/api/guilds/:guildId/automation',
         module: 'settings',
@@ -92,6 +94,7 @@ const routeSetups = [
     setupRolesRoutes,
     setupRoleGroupsRoutes,
     setupRbacRoutes,
+    setupMembersRoutes,
     setupGuildAutomationRoutes,
     setupLevelsRoutes,
     setupStarboardRoutes,

@@ -1,8 +1,10 @@
 import type { Track, GuildQueue } from 'discord-player'
+import { QueueRepeatMode } from 'discord-player'
 import type { ColorResolvable } from 'discord.js'
+import { EmbedBuilder } from 'discord.js'
 import { LRUCache } from 'lru-cache'
 import { debugLog, errorLog, warnLog } from '@lucky/shared/utils'
-import { createEmbed, EMBED_COLORS } from '../../utils/general/embeds'
+import { EMBED_COLORS } from '../../utils/general/embeds'
 import { getAutoplayCount } from '../../utils/music/autoplayManager'
 import { constants } from '@lucky/shared/config'
 import {
@@ -18,13 +20,9 @@ import {
     updateNowPlaying as lastFmUpdateNowPlaying,
     scrobble as lastFmScrobble,
 } from '../../lastfm'
-import { getSkipReasonEmojis } from '../../utils/music/skipReasonMap'
 import { getStreamBridgeFallbackLabel } from './streamBridge'
+import { buildVinylAttachment as _unused } from '../../utils/music/nowPlayingEmbed'
 
-/**
- * Track which guilds have logged a skip-reason prefill failure in this session.
- * Used to emit a ONCE-per-guild warning (not per-emoji spam) when emoji reactions fail.
- */
 const prefillFailureLoggedGuilds = new Set<string>()
 
 /**
@@ -212,6 +210,28 @@ async function appendAcceptanceRate(
     }
 }
 
+function buildProgressBar(posMs: number, durMs: number): string {
+    const width = 18
+    if (!durMs || durMs <= 0) return `${'▬'.repeat(width)}◉`
+    const ratio = Math.min(posMs / durMs, 1)
+    const filled = Math.round(ratio * width)
+    return '▬'.repeat(filled) + '◉' + '─'.repeat(Math.max(0, width - filled))
+}
+
+function msToTimestamp(ms: number): string {
+    const secs = Math.floor(ms / 1000)
+    return `${Math.floor(secs / 60)}:${(secs % 60).toString().padStart(2, '0')}`
+}
+
+function repeatModeLabel(mode: QueueRepeatMode): string {
+    switch (mode) {
+        case QueueRepeatMode.TRACK: return 'Track'
+        case QueueRepeatMode.QUEUE: return 'Queue'
+        case QueueRepeatMode.AUTOPLAY: return 'Autoplay'
+        default: return 'Off'
+    }
+}
+
 export async function sendNowPlayingEmbed(
     queue: GuildQueue,
     track: Track,
@@ -224,7 +244,7 @@ export async function sendNowPlayingEmbed(
     const requesterInfo = requester
         ? `Added by ${requester.username}`
         : 'Added automatically'
-    const requestedByInfo = requester ? requester.username : 'Autoplay'
+    const requestedByDisplay = requester ? `**${requester.username}**` : '🤖 Autoplay'
     const trackMetadata = (track.metadata ?? {}) as {
         recommendationReason?: string
         recommendationSource?: string
@@ -233,25 +253,32 @@ export async function sendNowPlayingEmbed(
         ? await getAutoplayCount(queue.guild.id)
         : null
     const baseFooter = isAutoplay
-        ? `Autoplay • ${autoplayCount ?? 0}/${constants.MAX_AUTOPLAY_TRACKS ?? 50} songs`
-        : requesterInfo
-    let footer =
-        baseFooter && !baseFooter.includes('/invite')
-            ? `${baseFooter} • /invite to add Lucky`
-            : baseFooter
-    // Subtle footnote when the streamBridge resolved via a fallback stage
-    // instead of the primary yt-dlp source (#1769).
+        ? `🤖 Autoplay • ${autoplayCount ?? 0}/${constants.MAX_AUTOPLAY_TRACKS ?? 50} tracks`
+        : `🎧 ${requesterInfo}`
+    let footer = baseFooter
     const fallbackLabel = getStreamBridgeFallbackLabel(track)
     if (fallbackLabel) footer = `${footer} • via fallback: ${fallbackLabel}`
 
-    const fields = [
-        {
-            name: '⏱️ Duration',
-            value: formatDuration(track.duration),
-            inline: true,
-        },
-        { name: '🌐 Source', value: getSource(track.url), inline: true },
-        { name: '👤 Requested', value: requestedByInfo, inline: true },
+    // Progress bar
+    const posMs = queue.node.streamTime ?? 0
+    const durMs = track.durationMS ?? 0
+    const progressBar = buildProgressBar(posMs, durMs)
+    const timestamp = `\`${msToTimestamp(posMs)} / ${msToTimestamp(durMs)}\``
+
+    // Status line matching image: Volume | Mode | Shuffle
+    const vol = `${queue.node.volume}%`
+    const mode = repeatModeLabel(queue.repeatMode)
+    const shuffle = queue.shuffled ? 'On' : 'Off'
+
+    const descLines = [
+        `[**${track.title}**](${track.url})`,
+        '',
+        `**Artist:** ${track.author}`,
+        `**Requested by:** ${requestedByDisplay}`,
+        `**Volume:** ${vol} | **Mode:** ${mode} | **Shuffle:** ${shuffle}`,
+        '',
+        progressBar,
+        timestamp,
     ]
 
     if (isAutoplay && trackMetadata.recommendationReason) {
@@ -260,24 +287,16 @@ export async function sendNowPlayingEmbed(
             trackMetadata.recommendationSource,
             queue.guild.id,
         )
-        fields.push({
-            name: '🤖 Why this track',
-            value: reasonWithRate,
-            inline: false,
-        })
+        descLines.push('', `*${reasonWithRate}*`)
     }
 
-    const embed = createEmbed({
-        title: '🎵 Now Playing',
-        description: `[**${track.title}**](${track.url}) by **${track.author}**`,
-        color: EMBED_COLORS.MUSIC as ColorResolvable,
-        thumbnail: track.thumbnail,
-        timestamp: true,
-        fields,
-        footer,
-    })
-
-    const skipReasonEmojis = getSkipReasonEmojis()
+    const embed = new EmbedBuilder()
+        .setColor(EMBED_COLORS.MUSIC as ColorResolvable)
+        .setTitle('<a:music:741605543046807626> Now Playing')
+        .setDescription(descLines.join('\n'))
+        .setThumbnail(track.thumbnail ?? null)
+        .setFooter({ text: footer })
+        .setTimestamp()
 
     const previousMessage = getSongInfoMessage(queue.guild.id)
     if (previousMessage && previousMessage.channelId === metadata.channel.id) {
@@ -288,36 +307,13 @@ export async function sendNowPlayingEmbed(
             await message.edit({
                 content: null,
                 embeds: [embed],
+                files: [],
                 components: [
                     createMusicControlButtons(queue),
                     createMusicActionButtons(queue),
                 ],
             })
-            // Add skip-reason emoji reactions
-            let successCount = 0
-            const attemptedCount = skipReasonEmojis.length
-            for (const emoji of skipReasonEmojis) {
-                try {
-                    await message.react(emoji)
-                    successCount++
-                } catch (error) {
-                    logEmojiPrefillFailure(queue.guild.id, error)
-                }
-            }
-            if (successCount > 0 && successCount < attemptedCount) {
-                debugLog({
-                    message:
-                        'Partial emoji prefill: some emojis failed to react',
-                    data: {
-                        guildId: queue.guild.id,
-                        successCount,
-                        attemptedCount,
-                    },
-                })
-            }
-            // Refresh the cached trackUrl — the message is reused but now points
-            // at a new track, so skip-reason reactions must resolve to it, not
-            // the previous track's recommendation.
+            // Refresh the cached trackUrl
             registerNowPlayingMessage(
                 queue.guild.id,
                 previousMessage.messageId,
@@ -348,23 +344,12 @@ export async function sendNowPlayingEmbed(
 
     const message = await metadata.channel.send({
         embeds: [embed],
+        files: [],
         components: [
             createMusicControlButtons(queue),
             createMusicActionButtons(queue),
         ],
     })
-
-    // Add skip-reason emoji reactions
-    let successCount = 0
-    const attemptedCount = skipReasonEmojis.length
-    for (const emoji of skipReasonEmojis) {
-        try {
-            await message.react(emoji)
-            successCount++
-        } catch (error) {
-            logEmojiPrefillFailure(queue.guild.id, error)
-        }
-    }
 
     registerNowPlayingMessage(
         queue.guild.id,
@@ -373,19 +358,9 @@ export async function sendNowPlayingEmbed(
         track.url,
     )
 
-    // Log first-message diagnostic: track successful vs attempted emoji prefills
     debugLog({
         message: 'Sent now playing message to channel',
-        data: {
-            guildId: queue.guild.id,
-            trackTitle: track.title,
-            isAutoplay,
-            emojiPrefill: {
-                successCount,
-                attemptedCount,
-                allSuccessful: successCount === attemptedCount,
-            },
-        },
+        data: { guildId: queue.guild.id, trackTitle: track.title, isAutoplay },
     })
 }
 

@@ -1,4 +1,4 @@
-import { describe, it, expect } from '@jest/globals'
+﻿import { describe, it, expect } from '@jest/globals'
 import { EMBED_COLORS, EMOJIS, type EmbedColor, type EmbedEmoji } from './constants'
 
 describe('Embed Constants', () => {
@@ -34,7 +34,7 @@ describe('Embed Constants', () => {
             expect(EMOJIS.INFO).toBe('ℹ️')
             expect(EMOJIS.WARNING).toBe('⚠️')
             expect(EMOJIS.NEUTRAL).toBe('⚪')
-            expect(EMOJIS.MUSIC).toBe('🎵')
+            expect(EMOJIS.MUSIC).toBe('<a:music:741605543046807626>')
             expect(EMOJIS.AUDIO).toBe('🎧')
             expect(EMOJIS.VIDEO).toBe('🎥')
             expect(EMOJIS.QUEUE).toBe('📋')

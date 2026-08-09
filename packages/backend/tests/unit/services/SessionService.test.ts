@@ -28,6 +28,10 @@ describe('SessionService', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         mockRedisClient.isHealthy.mockReturnValue(true)
+        // setSession now always mirrors into the in-memory fallback store
+        // (resilience fix); clear it so tests stay isolated across cases
+        // that reuse MOCK_SESSION_ID.
+        ;(sessionService as any).memoryStore.clear()
     })
 
     describe('getSession', () => {

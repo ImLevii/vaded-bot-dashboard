@@ -221,6 +221,7 @@ class GuildAccessService {
                 guild.id,
                 memberContext.roleIds,
                 isAdmin,
+                userId,
             )
 
         return {

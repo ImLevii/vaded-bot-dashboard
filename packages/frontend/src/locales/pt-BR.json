@@ -44,7 +44,7 @@
         },
         "subtitle": {
             "selectServer": "Escolha uma comunidade para desbloquear as ferramentas do servidor.",
-            "needsSetup": "O Lucky ainda não está instalado neste servidor.",
+            "needsSetup": "O Vaded Gaming ainda não está instalado neste servidor.",
             "ready": "A central de comando do servidor está pronta para operar."
         },
         "sections": {
@@ -58,6 +58,7 @@
         "nav": {
             "dashboard": "Painel",
             "serverSettings": "Configurações do servidor",
+            "members": "Membros",
             "modCases": "Casos de moderação",
             "autoModeration": "Auto-moderação",
             "serverLogs": "Logs do servidor",
@@ -166,7 +167,7 @@
                 "subtitle": "Vincule ou desvincule o Spotify para alimentar o autoplay."
             },
             "fallback": {
-                "title": "Painel Lucky",
+                "title": "Painel Vaded Gaming",
                 "subtitle": "Configure módulos, moderação e fluxos de engajamento."
             },
             "roleGroups": {
@@ -177,7 +178,7 @@
     },
     "landing": {
         "meta": {
-            "title": "Lucky — Um bot do Discord que você pode hospedar",
+            "title": "Vaded Gaming — Um bot do Discord que você pode hospedar",
             "description": "Bot do Discord open source com música, moderação, comandos personalizados e painel web. Grátis para sempre. Rode na sua própria máquina."
         },
         "hero": {
@@ -185,18 +186,7 @@
             "headlineLine1": "Um bot do Discord bem feito.",
             "headlineLine2": "E você que manda.",
             "subtitle": "Música, moderação, comandos personalizados e um painel web completo. Use a versão hospedada em dois cliques, ou rode no seu próprio box se preferir.",
-            "ctaPrimary": "Adicionar ao Discord",
-            "ctaSecondary": "Auto-hospedar no GitHub"
-        },
-        "repoCard": {
-            "name": "LucasSantana-Dev / Lucky",
-            "description": "Bot de música do Discord auto-hospedável — Spotify + YouTube + SoundCloud, autoplay com recomendações, painel React, suíte de moderação.",
-            "license": "ISC",
-            "lang": "TypeScript",
-            "serversLabel": "servidores",
-            "usersLabel": "usuários",
-            "viewOnGithub": "Ver no GitHub",
-            "copyClone": "Copiar URL de clone"
+            "ctaPrimary": "Adicionar ao Discord"
         },
         "whySelfHost": {
             "heading": "Por que auto-hospedar",
@@ -256,15 +246,15 @@
             "subheading": "Stack padrão Node + Postgres. Nada exótico. `docker compose up` e você está online. Pule esta seção se está usando a versão hospedada.",
             "items": {
                 "bot": {
-                    "name": "lucky-bot",
+                    "name": "vaded-bot",
                     "description": "Cliente discord.js, áudio sem Lavalink via yt-dlp + Opus"
                 },
                 "backend": {
-                    "name": "lucky-backend",
+                    "name": "vaded-backend",
                     "description": "API Express, OAuth, Prisma com Postgres"
                 },
                 "frontend": {
-                    "name": "lucky-frontend",
+                    "name": "vaded-frontend",
                     "description": "React 19 + Vite + Tailwind, painel com OAuth do Discord"
                 },
                 "postgres": {
@@ -281,10 +271,6 @@
                 }
             }
         },
-        "footerRepo": {
-            "heading": "Open source sob ISC",
-            "subheading": "Fork, contribua, rode, faça o deploy. O código é a especificação."
-        },
         "footer": {
             "tagline": "Bot do Discord open source. Rode você mesmo ou use a versão hospedada.",
             "links": "Produto",
@@ -292,14 +278,13 @@
             "supportCopy": "Issues e PRs são bem-vindos no GitHub. Ou entre no servidor de suporte do Discord.",
             "terms": "Termos",
             "privacy": "Privacidade",
-            "github": "GitHub",
             "docs": "Docs",
             "changelog": "Changelog",
             "discord": "Servidor de suporte",
-            "copyright": "© 2026 Lucky. ISC."
+            "copyright": "© 2026 Vaded Gaming. ISC."
         },
         "features": {
-            "heading": "O que o Lucky faz",
+            "heading": "O que o Vaded Gaming faz",
             "subheading": "Tudo que a maioria dos servidores precisa, em um bot só. Sem tier premium escondendo o que importa.",
             "items": {
                 "music": {
@@ -327,8 +312,8 @@
     },
     "login": {
         "meta": {
-            "title": "Entrar - Lucky",
-            "description": "Entre no painel do Lucky para gerenciar seus servidores do Discord"
+            "title": "Entrar - Vaded Gaming",
+            "description": "Entre no painel do Vaded Gaming para gerenciar seus servidores do Discord"
         },
         "brand": "Painel do Bot do Discord",
         "headline": "Gerencie seus servidores do Discord",
@@ -346,7 +331,7 @@
             "fastSetup": "Configuração rápida",
             "liveControls": "Controles em tempo real"
         },
-        "copyright": "© 2026 Lucky. Todos os direitos reservados."
+        "copyright": "© 2026 Vaded Gaming. Todos os direitos reservados."
     },
     "support": {
         "title": "Relatar um problema",
@@ -427,14 +412,21 @@
         "subtitle": "Agende mensagens automáticas para {{name}}",
         "editAutoMessage": "Editar Mensagem Automática",
         "newAutoMessage": "Nova Mensagem Automática",
-        "name": "Nome",
-        "namePlaceholder": "ex. Lembrete Diário",
+        "type": "Tipo",
+        "types": {
+            "welcome": "Boas-vindas",
+            "leave": "Saída",
+            "auto_response": "Resposta Automática"
+        },
         "channelId": "ID do Canal",
         "channelIdPlaceholder": "ID do canal do Discord",
-        "content": "Conteúdo",
-        "contentPlaceholder": "Conteúdo da mensagem...",
-        "intervalSeconds": "Intervalo (segundos)",
-        "sendAsEmbed": "Enviar como embed",
+        "message": "Mensagem",
+        "messagePlaceholder": "Conteúdo da mensagem...",
+        "trigger": "Gatilho",
+        "triggerPlaceholder": "Palavra ou frase que aciona esta resposta",
+        "exactMatch": "Exigir correspondência exata",
+        "enabled": "Ativado",
+        "disabled": "Desativado",
         "cancel": "Cancelar",
         "saving": "Salvando…",
         "save": "Salvar",
@@ -636,7 +628,7 @@
         "connectAccountDescription": "Vincule sua conta Last.fm para que as faixas que você toca através do bot sejam scrobbladas automaticamente para seu perfil.",
         "connectWithLastFm": "Conectar com Last.fm",
         "scrobbleCoverage": "Cobertura de scrobble",
-        "scrobbleCoverageDescription": "Lucky rastreia músicas solicitadas e encaminha atividade de reprodução uma vez vinculado.",
+        "scrobbleCoverageDescription": "Vaded Gaming rastreia músicas solicitadas e encaminha atividade de reprodução uma vez vinculado.",
         "privacyControl": "Controle de privacidade",
         "privacyControlDescription": "Desconecte a qualquer momento sem afetar a reprodução do servidor.",
         "howItWorks": "Como funciona",
@@ -773,7 +765,7 @@
         "selectServerToManageArtists": "Selecione um servidor para gerenciar artistas preferidos",
         "musicPersonalization": "Personalização de música",
         "musicalTaste": "Gosto Musical",
-        "chooseArtistsDescription": "Escolha artistas para guiar as recomendações de autoplay. Quando várias pessoas estão em um canal de voz, Lucky mistura as preferências de todos.",
+        "chooseArtistsDescription": "Escolha artistas para guiar as recomendações de autoplay. Quando várias pessoas estão em um canal de voz, Vaded Gaming mistura as preferências de todos.",
         "discoverTab": "Descobrir",
         "preferredTab": "Preferidos",
         "blockedTab": "Bloqueados",
@@ -785,7 +777,7 @@
         "noPreferredArtistsYet": "Ainda nenhum artista preferido",
         "addFromDiscover": "Adicione alguns da aba Descobrir.",
         "noBlockedArtists": "Nenhum artista bloqueado",
-        "blockArtistsDescription": "Bloqueie artistas que não deseja que o Lucky reproduza automaticamente.",
+        "blockArtistsDescription": "Bloqueie artistas que não deseja que o Vaded Gaming reproduza automaticamente.",
         "savePreferences": "Salvar Preferências ({{count}})",
         "saving": "Salvando...",
         "prefer": "Preferir",
@@ -879,7 +871,7 @@
         "networkError": "Não foi possível alcançar a API. Verifique sua conexão e tente novamente.",
         "general": "Geral",
         "botNickname": "Apelido do Bot",
-        "botNicknamePlaceholder": "Lucky",
+        "botNicknamePlaceholder": "Vaded Gaming",
         "commandPrefix": "Prefixo de Comando",
         "commandPrefixPlaceholder": "!",
         "regionNotifications": "Região e Notificações",
@@ -921,16 +913,16 @@
         "totalServers": "Total de Servidores",
         "serversLabel": "Servidores",
         "yourServers": "Seus Servidores",
-        "serversWithBot": "{{count}} servidores — {{count2}} com Lucky instalado",
+        "serversWithBot": "{{count}} servidores — {{count2}} com Vaded Gaming instalado",
         "navServers": "Servidores",
         "navPremium": "Premium",
         "navSettings": "Configurações",
         "recentlyActive": "Ativo Recentemente",
         "allOtherServers": "Todos os Outros Servidores",
-        "luckyInstalled": "Lucky instalado",
-        "inviteLucky": "Convidar Lucky",
+        "luckyInstalled": "Vaded Gaming instalado",
+        "inviteLucky": "Convidar Vaded Gaming",
         "noServersTitle": "Nenhum servidor ainda",
-        "noServersDescription": "Junte-se a um servidor Discord e Lucky aparecerá aqui."
+        "noServersDescription": "Junte-se a um servidor Discord e Vaded Gaming aparecerá aqui."
     },
     "spotify": {
         "eyebrow": "Personalização de música",
@@ -943,19 +935,19 @@
         "connected": "Conectado",
         "linkedAs": "Conectado como",
         "active": "Ativo",
-        "accessExplanation": "Lucky pode acessar sua biblioteca e histórico de reprodução para fornecer recomendações de reprodução automática personalizadas.",
+        "accessExplanation": "Vaded Gaming pode acessar sua biblioteca e histórico de reprodução para fornecer recomendações de reprodução automática personalizadas.",
         "disconnect": "Desconectar",
         "connectYourAccount": "Conecte Sua Conta",
-        "connectDescription": "Conecte sua conta Spotify para que Lucky aprenda suas preferências musicais e forneça recomendações de reprodução automática personalizadas.",
+        "connectDescription": "Conecte sua conta Spotify para que Vaded Gaming aprenda suas preferências musicais e forneça recomendações de reprodução automática personalizadas.",
         "connectWithSpotify": "Conectar com Spotify",
         "smarterAutoplay": "Reprodução automática mais inteligente",
-        "smarterAutoplayDesc": "Lucky aprende com sua biblioteca, faixas principais e histórico de reprodução recente.",
+        "smarterAutoplayDesc": "Vaded Gaming aprende com sua biblioteca, faixas principais e histórico de reprodução recente.",
         "privacyControl": "Controle de privacidade",
         "privacyControlDesc": "Desconecte a qualquer momento sem afetar a reprodução do servidor.",
         "howItWorks": "Como funciona",
         "step1": "Conecte sua conta Spotify acima",
-        "step2": "Lucky acessa sua biblioteca, faixas principais e histórico de reprodução recente",
-        "step3": "Quando a reprodução automática está ativa, Lucky recomenda faixas similares baseado em suas preferências",
+        "step2": "Vaded Gaming acessa sua biblioteca, faixas principais e histórico de reprodução recente",
+        "step3": "Quando a reprodução automática está ativa, Vaded Gaming recomenda faixas similares baseado em suas preferências",
         "step4": "Sua biblioteca permanece privada e é usada apenas para recomendações",
         "failedToLoadStatus": "Falha ao carregar status do Spotify",
         "failedToUnlink": "Falha ao desconectar conta",

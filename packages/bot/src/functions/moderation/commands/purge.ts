@@ -98,7 +98,7 @@ export default new Command({
             await interaction.channel.bulkDelete(filtered, true)
 
             const embed = new EmbedBuilder()
-                .setColor(0x9c27b0)
+                .setColor(0xdc2626)
                 .setTitle('🗑️ Messages Purged')
                 .addFields({
                     name: 'Deleted',
