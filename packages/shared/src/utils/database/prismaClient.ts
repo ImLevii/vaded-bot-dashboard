@@ -1,25 +1,11 @@
 import { PrismaPg } from '@prisma/adapter-pg'
-import type { PrismaClient } from '../../generated/prisma/client.js'
-import { createRequire } from 'module'
-
-let _require: NodeRequire
-try {
-    _require = createRequire(import.meta.url)
-} catch {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    _require = require
-}
+import { PrismaClient } from '../../generated/prisma/client.js'
 
 let prismaInstance: PrismaClient | null = null
 
 /** Returns a singleton Prisma client instance, initializing if necessary. */
 export function getPrismaClient(): PrismaClient {
     if (!prismaInstance) {
-        const { PrismaClient: PrismaClientConstructor } = _require(
-            '../../generated/prisma/client.js',
-        ) as {
-            PrismaClient: new (options?: unknown) => PrismaClient
-        }
         const databaseUrl = process.env.DATABASE_URL ?? process.env.DIRECT_URL
         if (!databaseUrl) {
             throw new Error(
@@ -29,7 +15,7 @@ export function getPrismaClient(): PrismaClient {
         const adapter = new PrismaPg({
             connectionString: databaseUrl,
         })
-        prismaInstance = new PrismaClientConstructor({ adapter })
+        prismaInstance = new PrismaClient({ adapter })
     }
     return prismaInstance
 }
