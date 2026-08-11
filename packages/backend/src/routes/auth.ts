@@ -15,61 +15,63 @@ const getFrontendUrl = (): string => {
     return getPrimaryFrontendUrl()
 }
 
-export function setupAuthRoutes(app: Express): void {
-    app.get(
-        '/api/auth/discord',
-        authLimiter,
-        async (req: Request, res: Response) => {
-            try {
-                req.session.oauthInitiated = true
-                req.session.oauthRedirectUri = getOAuthRedirectUri(req)
-                const stateBuffer = randomBytes(32)
-                req.session.oauthState = stateBuffer.toString('hex')
+async function handleDiscordLogin(req: Request, res: Response): Promise<void> {
+    try {
+        req.session.oauthInitiated = true
+        req.session.oauthRedirectUri = getOAuthRedirectUri(req)
+        const stateBuffer = randomBytes(32)
+        req.session.oauthState = stateBuffer.toString('hex')
 
-                await new Promise<void>((resolve) => {
-                    req.session.save((err) => {
-                        if (err) {
-                            errorLog({
-                                message: 'Error saving session on OAuth init:',
-                                error: err,
-                            })
-                        } else {
-                            debugLog({
-                                message: 'Session initialized for OAuth',
-                                data: { sessionId: req.sessionID },
-                            })
-                        }
-                        resolve()
+        await new Promise<void>((resolve) => {
+            req.session.save((err) => {
+                if (err) {
+                    errorLog({
+                        message: 'Error saving session on OAuth init:',
+                        error: err,
                     })
-                })
-
-                const clientId = process.env.CLIENT_ID
-                const redirectUri = req.session.oauthRedirectUri
-                const scope = 'identify guilds'
-                const state = req.session.oauthState
-
-                if (!clientId) {
-                    const frontendUrl = getFrontendUrl()
-                    return res.redirect(
-                        `${frontendUrl}/?error=auth_failed&message=client_id_not_configured`,
-                    )
+                } else {
+                    debugLog({
+                        message: 'Session initialized for OAuth',
+                        data: { sessionId: req.sessionID },
+                    })
                 }
+                resolve()
+            })
+        })
 
-                const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scope}&state=${state}`
+        const clientId = process.env.CLIENT_ID
+        const redirectUri = req.session.oauthRedirectUri
+        const scope = 'identify guilds'
+        const state = req.session.oauthState
 
-                res.redirect(authUrl)
-            } catch (error) {
-                errorLog({
-                    message: 'Error in Discord OAuth redirect:',
-                    error,
-                })
-                const frontendUrl = getFrontendUrl()
-                res.redirect(
-                    `${frontendUrl}/?error=auth_failed&message=redirect_error`,
-                )
-            }
-        },
-    )
+        if (!clientId) {
+            const frontendUrl = getFrontendUrl()
+            res.redirect(
+                `${frontendUrl}/?error=auth_failed&message=client_id_not_configured`,
+            )
+            return
+        }
+
+        const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scope}&state=${state}`
+
+        res.redirect(authUrl)
+    } catch (error) {
+        errorLog({
+            message: 'Error in Discord OAuth redirect:',
+            error,
+        })
+        const frontendUrl = getFrontendUrl()
+        res.redirect(`${frontendUrl}/?error=auth_failed&message=redirect_error`)
+    }
+}
+
+export function setupAuthRoutes(app: Express): void {
+    app.get('/api/auth/discord', authLimiter, handleDiscordLogin)
+    // /install is a short public alias for the same login link (README,
+    // Top.gg listing). Registered directly (not just via a vercel.json
+    // rewrite) so it works regardless of whether Vercel's rewrite preserves
+    // the original request path or the rewritten destination for req.url.
+    app.get('/install', authLimiter, handleDiscordLogin)
 
     app.get('/api/auth/callback', handleOAuthCallback)
     app.get('/auth/callback', handleOAuthCallback)

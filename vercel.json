@@ -37,12 +37,16 @@
     "redirects": [],
     "rewrites": [
         {
+            "source": "/api/:match*",
+            "destination": "/api"
+        },
+        {
             "source": "/invite",
-            "destination": "/api/invite"
+            "destination": "/api"
         },
         {
             "source": "/install",
-            "destination": "/api/auth/discord"
+            "destination": "/api"
         },
         {
             "source": "/((?!api/).*)",
