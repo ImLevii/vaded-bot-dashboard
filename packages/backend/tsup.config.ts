@@ -17,6 +17,5 @@ export default defineConfig({
         'cors',
         'cookie-parser',
         'express-rate-limit',
-        'session-file-store',
     ],
 })

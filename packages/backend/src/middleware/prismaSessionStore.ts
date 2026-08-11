@@ -25,18 +25,26 @@ function isRecordNotFound(error: unknown): boolean {
  * and by an unref'd periodic sweep.
  */
 export class PrismaSessionStore extends session.Store {
-    private readonly pruneTimer: ReturnType<typeof setInterval>
+    private readonly pruneTimer: ReturnType<typeof setInterval> | undefined
 
     constructor(
         private readonly db: PrismaClientLike = getPrismaClient(),
         private readonly ttlMs: number = DEFAULT_TTL_MS,
     ) {
         super()
-        this.pruneTimer = setInterval(() => {
-            void this.prune()
-        }, PRUNE_INTERVAL_MS)
-        // Don't keep the event loop alive just for session pruning.
-        this.pruneTimer.unref?.()
+        // On Vercel each invocation is its own short-lived process — a
+        // self-scheduled interval would almost never fire and just adds
+        // per-invocation overhead. Pruning instead runs via a Vercel Cron
+        // hitting POST /api/internal/prune-sessions (routes/internalCron.ts).
+        // Long-lived hosts (Docker/homelab backend, the music relay) keep the
+        // interval as before.
+        if (!process.env.VERCEL) {
+            this.pruneTimer = setInterval(() => {
+                void this.prune()
+            }, PRUNE_INTERVAL_MS)
+            // Don't keep the event loop alive just for session pruning.
+            this.pruneTimer.unref?.()
+        }
     }
 
     private expiresAtFor(sessionData: session.SessionData): Date {

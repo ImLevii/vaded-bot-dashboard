@@ -21,26 +21,6 @@ jest.mock('ioredis', () => {
     }))
 })
 
-jest.mock('session-file-store', () =>
-    jest.fn(
-        () =>
-            class MockFileStore {
-                get(
-                    _sid: string,
-                    cb: (err?: Error | null, sess?: unknown) => void,
-                ) {
-                    cb(null, null)
-                }
-                set(_sid: string, _sess: unknown, cb?: (err?: Error) => void) {
-                    cb?.()
-                }
-                destroy(_sid: string, cb?: (err?: Error) => void) {
-                    cb?.()
-                }
-            },
-    ),
-)
-
 jest.mock('express-session', () => {
     class MockStore {}
 

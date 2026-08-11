@@ -1,7 +1,4 @@
-import { join } from 'node:path'
-import { mkdirSync } from 'node:fs'
 import session from 'express-session'
-import sessionFileStoreFactory from 'session-file-store'
 import { debugLog, errorLog } from '@lucky/shared/utils'
 import type { Express } from 'express'
 import { PrismaSessionStore } from './prismaSessionStore'
@@ -138,30 +135,6 @@ function createPrimaryStore(): session.Store | undefined {
     }
 }
 
-function createFileStore(sessionPath: string): session.Store | undefined {
-    try {
-        mkdirSync(sessionPath, { recursive: true })
-        const FileStore = sessionFileStoreFactory(session)
-        return new FileStore({
-            path: sessionPath,
-            ttl: 7 * 24 * 60 * 60,
-            retries: 1,
-            logFn: () => {},
-        })
-    } catch {
-        return undefined
-    }
-}
-
-function createLocalFallbackStore(sessionPath: string): session.Store {
-    const fileStore = createFileStore(sessionPath)
-    if (fileStore) {
-        return fileStore
-    }
-
-    return new session.MemoryStore()
-}
-
 export function setupSessionMiddleware(app: Express): void {
     const sessionSecret = process.env.WEBAPP_SESSION_SECRET?.trim()
 
@@ -172,14 +145,15 @@ export function setupSessionMiddleware(app: Express): void {
     }
 
     const isProduction = process.env.NODE_ENV === 'production'
-    const sessionPath = join(process.cwd(), '.data', 'sessions')
-    const fallbackStore = createLocalFallbackStore(sessionPath)
+    // No local-disk fallback: serverless instances have no shared,
+    // persistent filesystem, so a file-backed store would silently diverge
+    // per instance. Fall back straight to in-memory (single-instance-only,
+    // same as before when the file store itself failed to initialize).
+    const fallbackStore = new session.MemoryStore()
     const primaryStore = createPrimaryStore()
     const store = primaryStore
         ? new ResilientSessionStore(primaryStore, fallbackStore)
         : fallbackStore
-
-    const isMemoryFallback = fallbackStore.constructor.name === 'MemoryStore'
 
     app.use(
         session({
@@ -210,12 +184,7 @@ export function setupSessionMiddleware(app: Express): void {
     debugLog({
         message: 'Session middleware configured',
         data: {
-            sessionPath,
-            store: primaryStore
-                ? `postgres+fallback:${isMemoryFallback ? 'memory' : 'file'}`
-                : isMemoryFallback
-                  ? 'memory'
-                  : 'file',
+            store: primaryStore ? 'postgres+fallback:memory' : 'memory',
         },
     })
 }

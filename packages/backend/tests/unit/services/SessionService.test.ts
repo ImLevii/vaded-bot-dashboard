@@ -28,10 +28,6 @@ describe('SessionService', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         mockRedisClient.isHealthy.mockReturnValue(true)
-        // setSession now always mirrors into the in-memory fallback store
-        // (resilience fix); clear it so tests stay isolated across cases
-        // that reuse MOCK_SESSION_ID.
-        ;(sessionService as any).memoryStore.clear()
     })
 
     describe('getSession', () => {
@@ -101,10 +97,12 @@ describe('SessionService', () => {
             )
         })
 
-        test('should not store when Redis is unavailable', async () => {
+        test('should throw when Redis is unavailable', async () => {
             mockRedisClient.isHealthy.mockReturnValue(false)
 
-            await sessionService.setSession(MOCK_SESSION_ID, MOCK_SESSION_DATA)
+            await expect(
+                sessionService.setSession(MOCK_SESSION_ID, MOCK_SESSION_DATA),
+            ).rejects.toThrow('Redis is unavailable')
 
             expect(mockRedisClient.setex).not.toHaveBeenCalled()
         })

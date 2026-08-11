@@ -15,22 +15,29 @@ function toUtmString(value: unknown): string | undefined {
     return typeof value === 'string' ? value : undefined
 }
 
+function handleInvite(req: Request, res: Response): void {
+    const utm_source = toUtmString(req.query.utm_source)
+    const utm_medium = toUtmString(req.query.utm_medium)
+    const utm_campaign = toUtmString(req.query.utm_campaign)
+    const utm_content = toUtmString(req.query.utm_content)
+
+    try {
+        infoLog({
+            message: '[invite] click',
+            data: { utm_source, utm_medium, utm_campaign, utm_content },
+        })
+    } catch (err) {
+        logAndSwallow(err, 'invite.infoLog')
+    }
+
+    res.redirect(302, DISCORD_INVITE_URL)
+}
+
 export function setupInviteRoute(app: Express): void {
-    app.get('/invite', apiLimiter, (req: Request, res: Response) => {
-        const utm_source = toUtmString(req.query.utm_source)
-        const utm_medium = toUtmString(req.query.utm_medium)
-        const utm_campaign = toUtmString(req.query.utm_campaign)
-        const utm_content = toUtmString(req.query.utm_content)
-
-        try {
-            infoLog({
-                message: '[invite] click',
-                data: { utm_source, utm_medium, utm_campaign, utm_content },
-            })
-        } catch (err) {
-            logAndSwallow(err, 'invite.infoLog')
-        }
-
-        res.redirect(302, DISCORD_INVITE_URL)
-    })
+    // /invite is the canonical public URL, proxied as-is by nginx for the
+    // Docker/homelab deployment. /api/invite is the same handler under the
+    // /api prefix so Vercel's rewrite for it (vercel.json) reaches the
+    // catch-all serverless function, which only handles /api/*.
+    app.get('/invite', apiLimiter, handleInvite)
+    app.get('/api/invite', apiLimiter, handleInvite)
 }

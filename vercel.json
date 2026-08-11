@@ -1,5 +1,5 @@
 {
-    "buildCommand": "npm run db:generate && npm run build:shared && npm run build:frontend",
+    "buildCommand": "npm run db:generate && npm run build:shared && npm run build:backend && npm run build:frontend",
     "outputDirectory": "packages/frontend/dist",
     "installCommand": "YOUTUBE_DL_SKIP_DOWNLOAD=true npm ci",
     "framework": "vite",
@@ -38,19 +38,21 @@
     "rewrites": [
         {
             "source": "/invite",
-            "destination": "https://api.vadedgaming.com/invite"
-        },
-        {
-            "source": "/api/:path*",
-            "destination": "https://api.vadedgaming.com/api/:path*"
+            "destination": "/api/invite"
         },
         {
             "source": "/install",
-            "destination": "https://api.vadedgaming.com/api/auth/discord"
+            "destination": "/api/auth/discord"
         },
         {
             "source": "/:path*",
             "destination": "/index.html"
+        }
+    ],
+    "crons": [
+        {
+            "path": "/api/internal/prune-sessions",
+            "schedule": "0 * * * *"
         }
     ]
 }

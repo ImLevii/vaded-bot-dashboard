@@ -18,8 +18,10 @@ import { setupGuildAutomationRoutes } from './guildAutomation'
 import { setupLevelsRoutes } from './levels'
 import { setupStarboardRoutes } from './starboard'
 import { setupMusicRoutes } from './music'
+import { setupMusicRelayProxy } from './musicRelayProxy'
 import { setupArtistsRoutes } from './artists'
 import { setupInternalNotifyRoutes } from './internalNotify'
+import { setupInternalCronRoutes } from './internalCron'
 import { setupServiceGuildRoutes } from './serviceGuild'
 import { setupServiceAnnounceRoutes } from './serviceAnnounce'
 import { setupWebhookApiRoutes, setupWebhookPublicRoutes } from './webhooks'
@@ -60,7 +62,11 @@ const guildGuardConfigs: GuildGuardConfig[] = [
     { path: '/api/guilds/:guildId/settings', module: 'settings' },
     { path: '/api/guilds/:guildId/modules', module: 'settings' },
     { path: '/api/guilds/:guildId/rbac', module: 'settings', mode: 'manage' },
-    { path: '/api/guilds/:guildId/members', module: 'settings', mode: 'manage' },
+    {
+        path: '/api/guilds/:guildId/members',
+        module: 'settings',
+        mode: 'manage',
+    },
     {
         path: '/api/guilds/:guildId/automation',
         module: 'settings',
@@ -98,19 +104,35 @@ const routeSetups = [
     setupGuildAutomationRoutes,
     setupLevelsRoutes,
     setupStarboardRoutes,
-    setupMusicRoutes,
     setupArtistsRoutes,
     setupSupportRoutes,
     setupBatchJobRoutes,
 ]
 
-export function setupRoutes(app: Express): void {
+export interface SetupRoutesOptions {
+    /**
+     * The music subtree (playback/queue/state + its SSE stream) needs a
+     * long-lived process (Redis pub/sub bridge, in-memory SSE client
+     * registry), so it doesn't run inline on the Vercel serverless function
+     * — set to false there and requests are forwarded to the standalone
+     * relay process instead (see `musicRelayServer.ts` /
+     * `musicRelayProxy.ts`). Defaults to true for the Docker/homelab
+     * all-in-one app, which runs the routes directly.
+     */
+    includeMusic?: boolean
+}
+
+export function setupRoutes(
+    app: Express,
+    { includeMusic = true }: SetupRoutesOptions = {},
+): void {
     setupInviteRoute(app)
     setupHealthRoutes(app)
     setupMetricsRoute(app)
     setupStatsRoutes(app)
     setupForumsRoutes(app)
     setupInternalNotifyRoutes(app)
+    setupInternalCronRoutes(app)
     setupServiceGuildRoutes(app)
     setupServiceAnnounceRoutes(app)
     setupWebhookPublicRoutes(app)
@@ -133,6 +155,12 @@ export function setupRoutes(app: Express): void {
 
     for (const setupRoute of routeSetups) {
         setupRoute(app)
+    }
+
+    if (includeMusic) {
+        setupMusicRoutes(app)
+    } else {
+        setupMusicRelayProxy(app)
     }
 
     app.use(errorHandler)

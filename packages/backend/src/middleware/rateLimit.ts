@@ -1,6 +1,28 @@
 import type { Request, Response } from 'express'
 import rateLimit from 'express-rate-limit'
+import { RedisStore, type RedisReply } from 'rate-limit-redis'
+import { redisClient } from '@lucky/shared/services'
 import { recordWithCooldown, emitAlert } from '@lucky/shared/utils/alerts'
+
+// A default in-memory store only enforces limits per-instance, which is
+// meaningless once the backend runs as multiple concurrent serverless
+// invocations — a client spread across instances would never actually hit
+// the limit. Back it with Redis so counts are shared; `passOnStoreError`
+// lets requests through (falling back to no rate limiting for that request)
+// if Redis is unreachable, rather than 500ing or blocking everyone.
+function createRedisStore(prefix: string): RedisStore {
+    return new RedisStore({
+        prefix,
+        sendCommand: (...args: string[]): Promise<RedisReply> => {
+            const client = redisClient.getClient()
+            if (!client) {
+                return Promise.reject(new Error('Redis client unavailable'))
+            }
+            const [command, ...rest] = args
+            return client.call(command, ...rest) as Promise<RedisReply>
+        },
+    })
+}
 
 export function maskIp(ip: string): string {
     // IPv4-mapped IPv6 (::ffff:a.b.c.d) — extract and mask as IPv4
@@ -25,6 +47,8 @@ export const apiLimiter = rateLimit({
     standardHeaders: 'draft-7',
     legacyHeaders: false,
     message: { error: 'Too many requests, please try again later' },
+    store: createRedisStore('rl:api:'),
+    passOnStoreError: true,
 })
 
 export function authRateLimitHandler(req: Request, res: Response): void {
@@ -52,6 +76,8 @@ export const authLimiter = rateLimit({
     legacyHeaders: false,
     message: { error: 'Too many auth attempts, please try again later' },
     handler: authRateLimitHandler,
+    store: createRedisStore('rl:auth:'),
+    passOnStoreError: true,
 })
 
 export const writeLimiter = rateLimit({
@@ -60,4 +86,6 @@ export const writeLimiter = rateLimit({
     standardHeaders: 'draft-7',
     legacyHeaders: false,
     message: { error: 'Too many write requests, please try again later' },
+    store: createRedisStore('rl:write:'),
+    passOnStoreError: true,
 })

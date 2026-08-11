@@ -1,9 +1,9 @@
-import express from 'express'
+import express, { type Express } from 'express'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { infoLog, errorLog } from '@lucky/shared/utils'
 import { parseIntEnv } from '@lucky/shared/utils/env'
-import { setupRoutes } from './routes'
+import { setupRoutes, type SetupRoutesOptions } from './routes'
 import { setupMiddleware } from './middleware'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -13,7 +13,12 @@ const WEBAPP_PORT = parseIntEnv('PORT', parseIntEnv('WEBAPP_PORT', 3000))
 const WEBAPP_HOST = process.env.WEBAPP_HOST ?? '0.0.0.0'
 const isProduction = process.env.NODE_ENV === 'production'
 
-export function startWebApp(): void {
+/**
+ * Builds the Express app without binding a port. Used both by
+ * `startWebApp()` (Docker/homelab, below) and by the Vercel serverless
+ * entrypoint (`api/[...path].ts`), which needs the bare request handler.
+ */
+export function createApp(routeOptions?: SetupRoutesOptions): Express {
     const app = express()
 
     if (isProduction) {
@@ -21,7 +26,7 @@ export function startWebApp(): void {
     }
 
     setupMiddleware(app)
-    setupRoutes(app)
+    setupRoutes(app, routeOptions)
 
     if (isProduction) {
         const frontendDistPath = path.join(__dirname, 'frontend', 'dist')
@@ -34,6 +39,12 @@ export function startWebApp(): void {
             res.sendFile(path.join(frontendDistPath, 'index.html'))
         })
     }
+
+    return app
+}
+
+export function startWebApp(): void {
+    const app = createApp()
 
     const server = app.listen(WEBAPP_PORT, WEBAPP_HOST, () => {
         infoLog({
