@@ -45,7 +45,7 @@
             "destination": "/api/auth/discord"
         },
         {
-            "source": "/:path*",
+            "source": "/((?!api/).*)",
             "destination": "/index.html"
         }
     ],
