@@ -35,7 +35,8 @@ export class PrismaSessionStore extends session.Store {
         // On Vercel each invocation is its own short-lived process — a
         // self-scheduled interval would almost never fire and just adds
         // per-invocation overhead. Pruning instead runs via a Vercel Cron
-        // hitting POST /api/internal/prune-sessions (routes/internalCron.ts).
+        // hitting GET /api/internal/prune-sessions (routes/internalCron.ts),
+        // once daily — the Hobby plan's cron limit (vercel.json).
         // Long-lived hosts (Docker/homelab backend, the music relay) keep the
         // interval as before.
         if (!process.env.VERCEL) {
