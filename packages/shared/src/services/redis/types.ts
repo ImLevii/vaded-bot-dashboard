@@ -7,6 +7,7 @@ export type RedisConfig = {
     port: number
     password?: string
     db: number
+    tls?: Record<string, never>
     retryDelayOnFailover: number
     maxRetriesPerRequest: number
     lazyConnect: boolean
