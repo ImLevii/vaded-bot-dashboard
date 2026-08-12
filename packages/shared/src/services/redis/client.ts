@@ -46,6 +46,26 @@ export class RedisClient implements IRedisClient {
             return false
         }
 
+        // A command issued before connect() is called (e.g. a Redis-backed
+        // rate limiter's store loading its Lua scripts at module import
+        // time) can already have kicked off ioredis's lazyConnect. Calling
+        // .connect() again in that case throws "already connecting/
+        // connected" even though the connection is proceeding normally, so
+        // wait for the in-flight attempt to settle instead of starting — and
+        // misreporting — a new one.
+        if (this.client.status === 'ready') {
+            return true
+        }
+        if (
+            this.client.status === 'connecting' ||
+            this.client.status === 'connect'
+        ) {
+            return new Promise((resolve) => {
+                this.client?.once('ready', () => resolve(true))
+                this.client?.once('error', () => resolve(false))
+            })
+        }
+
         try {
             await this.client.connect()
             return true
