@@ -42,6 +42,32 @@ import type {
 } from '@/types'
 import { useTranslation } from 'react-i18next'
 
+/**
+ * Exactly the keys the PATCH endpoint accepts (its Zod body is `.strict()`,
+ * so an unrecognized key fails the whole request with a 400).
+ *
+ * The payload is built by picking these rather than spreading state minus a
+ * few known-readonly fields: GET returns the raw DB row, so any column the
+ * UI does not model still lands in state and would be echoed back on save.
+ * That is what broke saving — `linkExemptChannels` exists on the row but in
+ * no schema, so every save 400'd. An allowlist keeps future columns harmless.
+ */
+const SETTABLE_AUTOMOD_KEYS = [
+    'enabled',
+    'spamEnabled',
+    'spamThreshold',
+    'spamTimeWindow',
+    'capsEnabled',
+    'capsThreshold',
+    'linksEnabled',
+    'allowedDomains',
+    'invitesEnabled',
+    'wordsEnabled',
+    'bannedWords',
+    'exemptChannels',
+    'exemptRoles',
+] as const satisfies readonly (keyof AutoModSettings)[]
+
 interface FilterRowProps {
     title: string
     description: string
@@ -549,13 +575,12 @@ export default function AutoModPage() {
         if (!selectedGuild?.id) return
         setSaving(true)
         try {
-            const {
-                id: _id,
-                guildId: _guildId,
-                createdAt: _createdAt,
-                updatedAt: _updatedAt,
-                ...payload
-            } = settings
+            const payload: Partial<AutoModSettings> = {}
+            for (const key of SETTABLE_AUTOMOD_KEYS) {
+                if (settings[key] !== undefined) {
+                    Object.assign(payload, { [key]: settings[key] })
+                }
+            }
             await api.automod.updateSettings(selectedGuild.id, payload)
             toast.success('Auto-moderation settings saved!')
         } catch {
