@@ -18,23 +18,46 @@ function isDevelopmentMode(): boolean {
 }
 
 /**
- * Load environment files in order of priority
+ * Load environment files, layered: `.env` first (defaults), then in
+ * development mode `.env.local` on top with override:true (local
+ * overrides). Earlier this picked whichever file it found first and
+ * stopped there, so a `.env.local` holding only an unrelated var (e.g.
+ * VERCEL_OIDC_TOKEN) silently prevented `.env` — and everything in it,
+ * including DATABASE_URL — from ever loading.
  */
 function loadEnvironmentFiles(): { result: unknown; loadedFile: string } {
     const isDevelopment = isDevelopmentMode()
-    const envFiles = isDevelopment ? ['.env.local', '.env'] : ['.env']
-
     const rootDir = findProjectRoot()
+    const loadedFiles: string[] = []
+    let lastResult: unknown
 
-    for (const envFile of envFiles) {
-        const envPath = path.resolve(rootDir, envFile)
-        if (fs.existsSync(envPath)) {
-            const result = config({ path: envPath, quiet: true })
-            return { result, loadedFile: envFile }
+    const baseEnvPath = path.resolve(rootDir, '.env')
+    if (fs.existsSync(baseEnvPath)) {
+        lastResult = config({ path: baseEnvPath, quiet: true })
+        handleEnvironmentErrors(lastResult)
+        loadedFiles.push('.env')
+    }
+
+    if (isDevelopment) {
+        const localEnvPath = path.resolve(rootDir, '.env.local')
+        if (fs.existsSync(localEnvPath)) {
+            lastResult = config({
+                path: localEnvPath,
+                override: true,
+                quiet: true,
+            })
+            handleEnvironmentErrors(lastResult)
+            loadedFiles.push('.env.local')
         }
     }
 
-    return { result: config({ quiet: true }), loadedFile: '.env (default)' }
+    if (loadedFiles.length > 0) {
+        return { result: lastResult, loadedFile: loadedFiles.join(' + ') }
+    }
+
+    const fallback = config({ quiet: true })
+    handleEnvironmentErrors(fallback)
+    return { result: fallback, loadedFile: '.env (default)' }
 }
 
 function findProjectRoot(): string {
@@ -143,7 +166,7 @@ function isMissingVariable(value: unknown): boolean {
  */
 function assertEnvVarsPresent(
     getter: () => string[],
-    contextLabel: string
+    contextLabel: string,
 ): void {
     const required = getter()
     const missingVars: string[] = []
@@ -167,7 +190,7 @@ function assertEnvVarsPresent(
 function assertRequiredEnvironmentVariables(): void {
     assertEnvVarsPresent(
         getRequiredEnvironmentVariables,
-        'Missing required environment variables'
+        'Missing required environment variables',
     )
 }
 
@@ -178,7 +201,7 @@ function assertRequiredEnvironmentVariables(): void {
 function assertBackendRequiredEnvironmentVariables(): void {
     assertEnvVarsPresent(
         getBackendRequiredEnvironmentVariables,
-        'Missing required backend environment variables'
+        'Missing required backend environment variables',
     )
 }
 
@@ -227,11 +250,23 @@ async function loadInfisicalSecrets(): Promise<void> {
         const siteUrl = process.env.INFISICAL_SITE_URL
         const client = new InfisicalSDK(siteUrl ? { siteUrl } : undefined)
         await client.auth().universalAuth.login({
-            clientId: assertDefined(process.env.INFISICAL_CLIENT_ID, 'INFISICAL_CLIENT_ID required when isInfisicalConfigured'),
-            clientSecret: assertDefined(process.env.INFISICAL_CLIENT_SECRET, 'INFISICAL_CLIENT_SECRET required when isInfisicalConfigured'),
+            clientId: assertDefined(
+                process.env.INFISICAL_CLIENT_ID,
+                'INFISICAL_CLIENT_ID required when isInfisicalConfigured',
+            ),
+            clientSecret: assertDefined(
+                process.env.INFISICAL_CLIENT_SECRET,
+                'INFISICAL_CLIENT_SECRET required when isInfisicalConfigured',
+            ),
         })
-        const projectId = assertDefined(process.env.INFISICAL_PROJECT_ID, 'INFISICAL_PROJECT_ID required when isInfisicalConfigured')
-        const environment = assertDefined(process.env.INFISICAL_ENV, 'INFISICAL_ENV required when isInfisicalConfigured')
+        const projectId = assertDefined(
+            process.env.INFISICAL_PROJECT_ID,
+            'INFISICAL_PROJECT_ID required when isInfisicalConfigured',
+        )
+        const environment = assertDefined(
+            process.env.INFISICAL_ENV,
+            'INFISICAL_ENV required when isInfisicalConfigured',
+        )
         const secretPath = process.env.INFISICAL_SECRET_PATH ?? '/'
         const response = (await client.secrets().listSecrets({
             projectId,

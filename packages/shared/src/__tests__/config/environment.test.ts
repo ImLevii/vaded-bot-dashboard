@@ -10,8 +10,19 @@ import {
 // Mock dotenv so loadEnvironmentFiles() cannot re-populate process.env from
 // the repo's real .env — without this, deleting a required var in a test is
 // undone by the loader and the missing-vars branch never executes (#1262).
+const mockDotenvConfig = jest.fn((..._args: unknown[]) => ({ parsed: {} }))
 jest.mock('dotenv', () => ({
-    config: jest.fn(() => ({ parsed: {} })),
+    config: (...args: unknown[]) => mockDotenvConfig(...args),
+}))
+
+// Mock fs.existsSync so findProjectRoot()/loadEnvironmentFiles() don't
+// depend on the real repo's .env/.env.local presence — node's fs module
+// exports aren't configurable, so jest.spyOn(fs, 'existsSync') can't
+// redefine it; replacing the module is the reliable path.
+const mockExistsSync = jest.fn((..._args: unknown[]) => false)
+jest.mock('fs', () => ({
+    ...(jest.requireActual('fs') as object),
+    existsSync: (...args: unknown[]) => mockExistsSync(...args),
 }))
 
 import {
@@ -189,6 +200,75 @@ describe('environment.ts - cubic findings verification', () => {
             expect(() => {
                 validateBackendEnvironment()
             }).toThrow(/SPOTIFY_CLIENT_ID/)
+        })
+    })
+
+    // Regression: loadEnvironmentFiles() used to pick whichever of
+    // .env/.env.local it found first and stop there, so a .env.local
+    // holding only an unrelated var silently prevented .env (and everything
+    // in it, e.g. DATABASE_URL) from ever loading — reproduced via
+    // `npm run dev:bot`, which has no separate pre-loader unlike start.mjs.
+    describe('.env + .env.local layering', () => {
+        beforeEach(() => {
+            mockDotenvConfig.mockClear()
+            mockExistsSync.mockReset()
+            mockExistsSync.mockImplementation((target: unknown) => {
+                const p = String(target)
+                if (p.endsWith('.env.local')) return true
+                if (p.endsWith('.env')) return true
+                if (p.endsWith('package.json')) return true
+                return false
+            })
+        })
+
+        afterEach(() => {
+            mockExistsSync.mockReset()
+            mockExistsSync.mockImplementation(() => false)
+        })
+
+        it('loads both .env and .env.local in development mode, with .env.local overriding', async () => {
+            process.env.NODE_ENV = 'development'
+            process.env.DISCORD_TOKEN = 'token'
+            process.env.CLIENT_ID = 'id'
+            process.env.DATABASE_URL = 'url'
+
+            await ensureEnvironment()
+
+            const paths = mockDotenvConfig.mock.calls.map(
+                (call) => (call[0] as { path?: string }).path,
+            )
+            expect(paths.some((p) => p?.endsWith('.env.local'))).toBe(true)
+            expect(
+                paths.some(
+                    (p) => p?.endsWith('.env') && !p?.endsWith('.env.local'),
+                ),
+            ).toBe(true)
+
+            const localCall = mockDotenvConfig.mock.calls.find((call) =>
+                (call[0] as { path?: string }).path?.endsWith('.env.local'),
+            )
+            expect((localCall?.[0] as { override?: boolean })?.override).toBe(
+                true,
+            )
+        })
+
+        it('loads only .env in production mode, ignoring .env.local', async () => {
+            process.env.NODE_ENV = 'production'
+            process.env.DISCORD_TOKEN = 'token'
+            process.env.CLIENT_ID = 'id'
+            process.env.DATABASE_URL = 'url'
+
+            await ensureEnvironment()
+
+            const paths = mockDotenvConfig.mock.calls.map(
+                (call) => (call[0] as { path?: string }).path,
+            )
+            expect(paths.some((p) => p?.endsWith('.env.local'))).toBe(false)
+            expect(
+                paths.some(
+                    (p) => p?.endsWith('.env') && !p?.endsWith('.env.local'),
+                ),
+            ).toBe(true)
         })
     })
 })
