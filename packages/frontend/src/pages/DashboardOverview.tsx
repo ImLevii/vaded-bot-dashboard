@@ -41,12 +41,12 @@ import { useStarboardTop } from '@/hooks/useStarboardQueries'
 import type { ModerationCase, ModuleKey } from '@/types'
 
 const ACTION_COLORS: Record<string, string> = {
-    warn: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30',
-    mute: 'bg-orange-500/15 text-orange-400 border-orange-500/30',
-    kick: 'bg-red-500/15 text-red-400 border-red-500/30',
-    ban: 'bg-red-600/15 text-red-300 border-red-600/30',
-    unban: 'bg-green-500/15 text-green-400 border-green-500/30',
-    unmute: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
+    warn: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30 shadow-[0_0_8px_rgba(234,179,8,0.35)]',
+    mute: 'bg-orange-500/15 text-orange-400 border-orange-500/30 shadow-[0_0_8px_rgba(249,115,22,0.35)]',
+    kick: 'bg-red-500/15 text-red-400 border-red-500/30 shadow-[0_0_8px_rgba(239,68,68,0.35)]',
+    ban: 'bg-red-600/15 text-red-300 border-red-600/30 shadow-[0_0_8px_rgba(220,38,38,0.4)]',
+    unban: 'bg-green-500/15 text-green-400 border-green-500/30 shadow-[0_0_8px_rgba(34,197,94,0.35)]',
+    unmute: 'bg-blue-500/15 text-blue-400 border-blue-500/30 shadow-[0_0_8px_rgba(59,130,246,0.35)]',
 }
 
 const ACTION_ICONS: Record<
@@ -263,7 +263,10 @@ function NowPlayingWidget({ guildId }: { guildId: string }) {
                             aria-hidden='true'
                             style={
                                 state.isPlaying && !state.isPaused
-                                    ? { animation: '1.4s ease-in-out infinite live-pulse' }
+                                    ? {
+                                          animation:
+                                              '1.4s ease-in-out infinite live-pulse',
+                                      }
                                     : undefined
                             }
                         />
@@ -276,7 +279,10 @@ function NowPlayingWidget({ guildId }: { guildId: string }) {
                             </span>
                         )}
                         {isConnected && (
-                            <Wifi className='ml-auto h-3 w-3 shrink-0 text-vaded-success' aria-hidden='true' />
+                            <Wifi
+                                className='ml-auto h-3 w-3 shrink-0 text-vaded-success'
+                                aria-hidden='true'
+                            />
                         )}
                     </div>
                     <p className='type-body font-semibold text-vaded-text-primary truncate leading-tight'>
@@ -305,9 +311,7 @@ function NowPlayingWidget({ guildId }: { guildId: string }) {
                 {/* controls */}
                 <div className='flex items-center gap-2 shrink-0'>
                     <button
-                        onClick={() =>
-                            isPaused ? resume() : pause()
-                        }
+                        onClick={() => (isPaused ? resume() : pause())}
                         disabled={!!pendingAction}
                         aria-label={isPaused ? 'Resume' : 'Pause'}
                         className='h-10 w-10 rounded-xl btn-glass text-white flex items-center justify-center active:scale-95 transition-all disabled:opacity-40'
@@ -475,12 +479,18 @@ export default function DashboardOverview() {
                     </>
                 ) : (
                     <>
-                        <article className='surface-panel flex flex-col justify-between gap-6 p-6 border border-vaded-border'>
+                        <article
+                            className='surface-panel group flex flex-col justify-between gap-6 overflow-hidden border border-vaded-border p-6 transition-all duration-200 motion-safe:hover:-translate-y-1 hover:border-vaded-brand/30 hover:shadow-card-hover'
+                            style={{
+                                backgroundImage:
+                                    'radial-gradient(circle at 92% 4%, rgb(220 38 38 / 0.1), transparent 42%)',
+                            }}
+                        >
                             <div className='flex items-center justify-between gap-3'>
                                 <p className='type-meta text-vaded-text-tertiary uppercase tracking-wide font-semibold'>
                                     {t('dashboardOverview.totalMembers')}
                                 </p>
-                                <span className='flex h-8 w-8 items-center justify-center rounded-md bg-vaded-brand/15 text-vaded-brand'>
+                                <span className='flex h-8 w-8 items-center justify-center rounded-md bg-vaded-brand/15 text-vaded-brand transition-shadow duration-200 group-hover:shadow-glow-red-sm'>
                                     <Users
                                         className='h-4 w-4'
                                         aria-hidden='true'
@@ -488,7 +498,7 @@ export default function DashboardOverview() {
                                 </span>
                             </div>
                             <div>
-                                <p className='font-[var(--font-vaded-display)] text-5xl font-semibold leading-none tracking-tight text-vaded-text-strong'>
+                                <p className='font-[var(--font-vaded-hero)] text-5xl font-bold leading-none tracking-tight text-vaded-text-strong tabular-nums'>
                                     {typeof selectedGuild.memberCount ===
                                     'number'
                                         ? selectedGuild.memberCount.toLocaleString()
