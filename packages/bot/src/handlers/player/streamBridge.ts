@@ -58,6 +58,18 @@ export function resolveYtDlpExecutable(): string {
     return 'yt-dlp'
 }
 
+/**
+ * Path to a Netscape-format cookies.txt (exported from a real, logged-in
+ * YouTube session) for hosts where YouTube's bot-check blocks anonymous
+ * requests from the IP (common on datacenter/hosting-provider IPs, e.g. most
+ * Pterodactyl panels). Returns null when unset or the file doesn't exist.
+ */
+function resolveYtDlpCookiesPath(): string | null {
+    const configured = process.env.YT_DLP_COOKIES_PATH?.trim()
+    if (!configured) return null
+    return existsSync(configured) ? configured : null
+}
+
 /** Returns the directory containing ffmpeg.exe for --ffmpeg-location, or null. */
 function resolveWingetFfmpegBin(): string | null {
     const configured = process.env.YT_DLP_FFMPEG_PATH?.trim()
@@ -84,6 +96,39 @@ function resolveWingetFfmpegBin(): string | null {
     return existsSync(join(bin, 'ffmpeg.exe')) ? bin : null
 }
 
+/**
+ * YouTube's oembed endpoint is a lightweight, unauthenticated metadata
+ * lookup (the same one Discord itself uses for link embeds) — it isn't
+ * covered by the bot-check that blocks yt-dlp's streaming pipeline. Used as
+ * a last resort to recover a title when the extractor handed us an empty
+ * one, so the SoundCloud fallback below still has something to search for.
+ */
+async function fetchYoutubeOembedTitle(
+    url: string,
+): Promise<{ title: string; author: string } | null> {
+    try {
+        const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 5_000)
+        try {
+            const response = await fetch(oembedUrl, {
+                signal: controller.signal,
+            })
+            if (!response.ok) return null
+            const data = (await response.json()) as {
+                title?: string
+                author_name?: string
+            }
+            if (!data.title) return null
+            return { title: data.title, author: data.author_name ?? '' }
+        } finally {
+            clearTimeout(timeout)
+        }
+    } catch {
+        return null
+    }
+}
+
 function validateYtDlpUrl(url: string): void {
     if (url.startsWith('ytsearch')) return
     let parsed: URL
@@ -101,6 +146,8 @@ function validateYtDlpUrl(url: string): void {
 }
 
 const LIVE_STREAM_ERROR_FRAGMENT = 'live stream recording is not available'
+// yt-dlp's message for this varies in punctuation ("you're"/"you’re"); match the stable prefix.
+const BOT_CHECK_ERROR_FRAGMENT = 'sign in to confirm'
 
 /** `playerClient` defaults to 'android' for VODs; pass 'web' for live streams. */
 export function streamViaYtDlp(
@@ -114,6 +161,7 @@ export function streamViaYtDlp(
     }
     return new Promise<Readable>((resolve, reject) => {
         const ffmpegBin = resolveWingetFfmpegBin()
+        const cookiesPath = resolveYtDlpCookiesPath()
         const proc = spawn(
             resolveYtDlpExecutable(),
             [
@@ -131,6 +179,9 @@ export function streamViaYtDlp(
                 `node:${process.execPath}`,
                 // explicit ffmpeg path so HLS/m3u8 streams can be muxed
                 ...(ffmpegBin ? ['--ffmpeg-location', ffmpegBin] : []),
+                // authenticated cookies work around YouTube's bot-check on
+                // datacenter/hosting IPs ("Sign in to confirm you're not a bot")
+                ...(cookiesPath ? ['--cookies', cookiesPath] : []),
                 url,
             ],
             { stdio: ['ignore', 'pipe', 'pipe'] },
@@ -245,8 +296,8 @@ export async function createResilientStream(
     track: Pick<Track, 'title' | 'author' | 'duration' | 'url'>,
     _ext?: unknown,
 ): Promise<Readable> {
-    const cleanedTitle = cleanTitle(track.title)
-    const cleanedAuthor = cleanAuthor(track.author)
+    let cleanedTitle = cleanTitle(track.title)
+    let cleanedAuthor = cleanAuthor(track.author)
     const isSpotifyUrl = track.url?.includes('open.spotify.com') ?? false
 
     debugLog({
@@ -278,17 +329,44 @@ export async function createResilientStream(
             return stream
         } catch (ytdlpError) {
             const errMsg = (ytdlpError as Error).message
+            const lowerErrMsg = errMsg.toLowerCase()
             // android client cannot stream live content; retry with web client
-            if (errMsg.includes(LIVE_STREAM_ERROR_FRAGMENT)) {
+            if (lowerErrMsg.includes(LIVE_STREAM_ERROR_FRAGMENT)) {
                 try {
                     const liveStream = await streamViaYtDlp(track.url, 'web')
                     infoLog({
                         message: 'Bridge: live stream resolved via web client',
-                        data: { url: track.url, title: cleanedTitle || track.title },
+                        data: {
+                            url: track.url,
+                            title: cleanedTitle || track.title,
+                        },
                     })
                     return liveStream
                 } catch {
                     // fall through to SoundCloud stages below
+                }
+            }
+            // YouTube's bot-check ("Sign in to confirm you're not a bot") is
+            // usually IP-based, but each client is validated differently from
+            // android and sometimes still gets through without cookies.
+            if (lowerErrMsg.includes(BOT_CHECK_ERROR_FRAGMENT)) {
+                for (const retryClient of ['tv', 'ios'] as const) {
+                    try {
+                        const retryStream = await streamViaYtDlp(
+                            track.url,
+                            retryClient,
+                        )
+                        infoLog({
+                            message: `Bridge: bot-check bypassed via ${retryClient} client`,
+                            data: {
+                                url: track.url,
+                                title: cleanedTitle || track.title,
+                            },
+                        })
+                        return retryStream
+                    } catch {
+                        // try the next client, then fall through to SoundCloud stages below
+                    }
                 }
             }
             youtubeStage = 'yt-dlp-url'
@@ -368,6 +446,19 @@ export async function createResilientStream(
                     query: ytQuery,
                     cleanedTitle,
                 },
+            })
+        }
+    }
+
+    if (!cleanedTitle && track.url && !isSpotifyUrl) {
+        const oembed = await fetchYoutubeOembedTitle(track.url)
+        if (oembed?.title) {
+            cleanedTitle = cleanTitle(oembed.title)
+            cleanedAuthor = cleanAuthor(oembed.author)
+            infoLog({
+                message:
+                    'Bridge: recovered title via YouTube oembed for fallback search',
+                data: { url: track.url, title: cleanedTitle },
             })
         }
     }

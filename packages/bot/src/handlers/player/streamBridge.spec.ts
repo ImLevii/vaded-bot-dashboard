@@ -15,6 +15,8 @@ const mockWarnLog = jest.fn()
 const mockErrorLog = jest.fn()
 const mockAddBreadcrumb = jest.fn()
 const mockCaptureMessage = jest.fn()
+const mockFetch = jest.fn()
+global.fetch = mockFetch as unknown as typeof fetch
 
 jest.mock('child_process', () => ({
     spawn: (...args: unknown[]) => mockSpawn(...args),
@@ -196,6 +198,59 @@ describe('streamViaYtDlp – process lifecycle', () => {
 // streamViaYtDlpSearch
 // ---------------------------------------------------------------------------
 
+describe('streamViaYtDlp – cookies', () => {
+    const validUrl = 'https://www.youtube.com/watch?v=abc123'
+
+    it('passes --cookies when YT_DLP_COOKIES_PATH points at an existing file', async () => {
+        const previous = process.env.YT_DLP_COOKIES_PATH
+        // this test file itself is guaranteed to exist on disk
+        process.env.YT_DLP_COOKIES_PATH = __filename
+
+        const proc = makeFakeProc()
+        mockSpawn.mockReturnValue(proc)
+        setImmediate(() => proc.stdout.emit('data', Buffer.from('bytes')))
+        await streamViaYtDlp(validUrl)
+
+        const args = mockSpawn.mock.calls[0][1] as string[]
+        expect(args).toEqual(expect.arrayContaining(['--cookies', __filename]))
+
+        if (previous === undefined) delete process.env.YT_DLP_COOKIES_PATH
+        else process.env.YT_DLP_COOKIES_PATH = previous
+    })
+
+    it('omits --cookies when YT_DLP_COOKIES_PATH is unset', async () => {
+        const previous = process.env.YT_DLP_COOKIES_PATH
+        delete process.env.YT_DLP_COOKIES_PATH
+
+        const proc = makeFakeProc()
+        mockSpawn.mockReturnValue(proc)
+        setImmediate(() => proc.stdout.emit('data', Buffer.from('bytes')))
+        await streamViaYtDlp(validUrl)
+
+        const args = mockSpawn.mock.calls[0][1] as string[]
+        expect(args).not.toContain('--cookies')
+
+        if (previous === undefined) delete process.env.YT_DLP_COOKIES_PATH
+        else process.env.YT_DLP_COOKIES_PATH = previous
+    })
+
+    it('omits --cookies when YT_DLP_COOKIES_PATH points at a missing file', async () => {
+        const previous = process.env.YT_DLP_COOKIES_PATH
+        process.env.YT_DLP_COOKIES_PATH = 'C:\\does\\not\\exist.txt'
+
+        const proc = makeFakeProc()
+        mockSpawn.mockReturnValue(proc)
+        setImmediate(() => proc.stdout.emit('data', Buffer.from('bytes')))
+        await streamViaYtDlp(validUrl)
+
+        const args = mockSpawn.mock.calls[0][1] as string[]
+        expect(args).not.toContain('--cookies')
+
+        if (previous === undefined) delete process.env.YT_DLP_COOKIES_PATH
+        else process.env.YT_DLP_COOKIES_PATH = previous
+    })
+})
+
 describe('streamViaYtDlpSearch', () => {
     it.each(['', '   '])('rejects on empty/whitespace: %p', async (query) => {
         await expect(streamViaYtDlpSearch(query)).rejects.toThrow(
@@ -215,6 +270,8 @@ describe('createResilientStream', () => {
         mockCleanAuthor.mockReturnValue('Test Artist')
         mockCleanSearchQuery.mockReturnValue('test track test artist')
         mockIsAvailable.mockReturnValue(true)
+        // default: oembed rescue unavailable unless a test opts in
+        mockFetch.mockRejectedValue(new Error('network unavailable in test'))
     })
 
     it('falls back to SoundCloud when yt-dlp fails', async () => {
@@ -225,6 +282,34 @@ describe('createResilientStream', () => {
         const result = await createResilientStream(makeTrack())
         expect(result).toBe(fakeStream)
         expect(mockStreamViaSoundCloud).toHaveBeenCalled()
+    })
+
+    it('retries with the tv client and succeeds when yt-dlp hits the bot-check', async () => {
+        const androidProc = makeFakeProc()
+        const tvProc = makeFakeProc()
+        mockSpawn.mockReturnValueOnce(androidProc).mockReturnValueOnce(tvProc)
+        setImmediate(() => {
+            androidProc.stderr.emit(
+                'data',
+                Buffer.from(
+                    "ERROR: [youtube] abc123: Sign in to confirm you're not a bot.",
+                ),
+            )
+            androidProc.emit('close', 1)
+        })
+        setImmediate(() => tvProc.stdout.emit('data', Buffer.from('bytes')))
+
+        const result = await createResilientStream(makeTrack())
+
+        expect(result).toBeDefined()
+        expect(mockSpawn).toHaveBeenCalledTimes(2)
+        expect(mockSpawn.mock.calls[1][1] as string[]).toEqual(
+            expect.arrayContaining([
+                '--extractor-args',
+                'youtube:player_client=tv',
+            ]),
+        )
+        expect(mockStreamViaSoundCloud).not.toHaveBeenCalled()
     })
 
     it('throws Bridge exhausted when all stages fail', async () => {
@@ -245,7 +330,7 @@ describe('createResilientStream', () => {
         expect(mockErrorLog).not.toHaveBeenCalled()
     })
 
-    it('throws immediately when cleanedTitle is empty after yt-dlp fails', async () => {
+    it('throws immediately when cleanedTitle is empty after yt-dlp fails and oembed recovery fails too', async () => {
         mockCleanTitle.mockReturnValue('')
         mockCleanAuthor.mockReturnValue('')
         const proc = makeFakeProc()
@@ -255,6 +340,39 @@ describe('createResilientStream', () => {
             createResilientStream(makeTrack({ title: '' })),
         ).rejects.toThrow('Bridge exhausted: no stream for empty title')
         expect(mockStreamViaSoundCloud).not.toHaveBeenCalled()
+    })
+
+    it('recovers the title via YouTube oembed and retries SoundCloud when yt-dlp returns no title', async () => {
+        mockCleanTitle
+            .mockReturnValueOnce('') // initial cleanTitle(track.title)
+            .mockReturnValueOnce('Recovered Title') // cleanTitle(oembed.title)
+        mockCleanAuthor
+            .mockReturnValueOnce('') // initial cleanAuthor(track.author)
+            .mockReturnValueOnce('Recovered Author') // cleanAuthor(oembed.author)
+        const proc = makeFakeProc()
+        mockSpawn.mockReturnValue(proc)
+        setImmediate(() => proc.emit('close', 1))
+        mockFetch.mockResolvedValue({
+            ok: true,
+            json: () =>
+                Promise.resolve({
+                    title: 'Recovered Title',
+                    author_name: 'Recovered Author',
+                }),
+        })
+        mockStreamViaSoundCloud.mockResolvedValue(fakeStream)
+
+        const result = await createResilientStream(makeTrack({ title: '' }))
+
+        expect(result).toBe(fakeStream)
+        expect(mockFetch).toHaveBeenCalledWith(
+            expect.stringContaining('youtube.com/oembed'),
+            expect.any(Object),
+        )
+        expect(mockStreamViaSoundCloud).toHaveBeenCalledWith(
+            'test track test artist',
+            expect.anything(),
+        )
     })
 
     it('captures breadcrumb on successful YouTube yt-dlp URL stream', async () => {
