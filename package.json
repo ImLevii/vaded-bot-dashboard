@@ -11,6 +11,7 @@
         "build": "npm run db:generate && npm run build --workspace=packages/shared && npm run build --workspace=packages/bot && npm run build --workspace=packages/backend && npm run build --workspace=packages/frontend",
         "start": "node scripts/start-stack.mjs",
         "start:pterodactyl": "npm run start --workspace=packages/bot",
+        "start:pterodactyl:relay": "npm run start:music-relay:tsx --workspace=packages/backend",
         "start:panel": "node scripts/start-panel.mjs",
         "build:shared": "npm run build --workspace=packages/shared",
         "build:bot": "npm run build --workspace=packages/bot",
