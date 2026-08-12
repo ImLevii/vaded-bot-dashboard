@@ -53,6 +53,12 @@ export function setupMiddleware(app: Express): void {
                         'blob:',
                         'https://cdn.discordapp.com',
                         'https://cdn.discord.com',
+                        // Track artwork the bridge can resolve tracks through
+                        // (see streamBridge.ts) — thumbnails render directly
+                        // from whichever source matched.
+                        'https://i.ytimg.com',
+                        'https://*.sndcdn.com',
+                        'https://i.scdn.co',
                     ],
                     'connect-src': [
                         "'self'",
