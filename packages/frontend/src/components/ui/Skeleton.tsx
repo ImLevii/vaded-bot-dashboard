@@ -6,10 +6,7 @@ interface SkeletonProps extends HTMLAttributes<HTMLDivElement> {}
 function Skeleton({ className, ...props }: SkeletonProps) {
     return (
         <div
-            className={cn(
-                'skeleton-shimmer motion-reduce:animate-pulse rounded',
-                className,
-            )}
+            className={cn('skeleton-shimmer animate-pulse rounded', className)}
             {...props}
         />
     )

@@ -42,37 +42,37 @@ const ACTION_STYLES: Record<
         bg: 'bg-yellow-500/10',
         text: 'text-yellow-400',
         border: 'border-yellow-500/20',
-        dot: 'bg-yellow-400',
+        dot: 'bg-yellow-400 shadow-[0_0_6px_rgba(250,204,21,0.7)]',
     },
     mute: {
         bg: 'bg-orange-500/10',
         text: 'text-orange-400',
         border: 'border-orange-500/20',
-        dot: 'bg-orange-400',
+        dot: 'bg-orange-400 shadow-[0_0_6px_rgba(251,146,60,0.7)]',
     },
     kick: {
         bg: 'bg-red-500/10',
         text: 'text-red-400',
         border: 'border-red-500/20',
-        dot: 'bg-red-400',
+        dot: 'bg-red-400 shadow-[0_0_6px_rgba(248,113,113,0.7)]',
     },
     ban: {
         bg: 'bg-red-600/10',
         text: 'text-red-300',
         border: 'border-red-600/20',
-        dot: 'bg-red-500',
+        dot: 'bg-red-500 shadow-glow-red-sm',
     },
     unban: {
         bg: 'bg-green-500/10',
         text: 'text-green-400',
         border: 'border-green-500/20',
-        dot: 'bg-green-400',
+        dot: 'bg-green-400 shadow-glow-green',
     },
     unmute: {
         bg: 'bg-blue-500/10',
         text: 'text-blue-400',
         border: 'border-blue-500/20',
-        dot: 'bg-blue-400',
+        dot: 'bg-blue-400 shadow-glow-info',
     },
 }
 
@@ -252,7 +252,7 @@ function CaseDetailPanel({
                                         className={cn(
                                             'w-1.5 h-1.5 rounded-full',
                                             caseData.active
-                                                ? 'bg-green-400'
+                                                ? 'bg-green-400 shadow-glow-green motion-safe:animate-pulse'
                                                 : 'bg-vaded-text-disabled',
                                         )}
                                     />
@@ -603,7 +603,7 @@ export default function ModerationPage() {
                                                 className={cn(
                                                     'w-1.5 h-1.5 rounded-full shrink-0',
                                                     c.active
-                                                        ? 'bg-green-400'
+                                                        ? 'bg-green-400 shadow-glow-green'
                                                         : 'bg-vaded-text-disabled',
                                                 )}
                                             />

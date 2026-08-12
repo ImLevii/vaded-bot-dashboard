@@ -33,10 +33,10 @@ export default function EmptyState({
         >
             {icon && (
                 <div
-                    className='mb-6 flex items-center justify-center'
+                    className='mb-6 flex items-center justify-center motion-safe:animate-float'
                     aria-hidden='true'
                 >
-                    <div className='rounded-xl border border-vaded-border bg-vaded-bg-tertiary p-4 text-vaded-text-tertiary shadow-[0_1px_0_rgb(255_255_255/0.03)_inset]'>
+                    <div className='rounded-xl border border-vaded-brand/20 bg-vaded-bg-tertiary p-4 text-vaded-brand/70 shadow-glow-red-sm'>
                         {icon}
                     </div>
                 </div>
