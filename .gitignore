@@ -134,3 +134,7 @@ docs/specs/
 .stryker-tmp/
 packages/*/reports/mutation/
 packages/*/reports/stryker-incremental.json
+.env*
+
+# Self-downloaded yt-dlp binary (see packages/bot/scripts/ensureYtDlp.mjs)
+/.bin/
