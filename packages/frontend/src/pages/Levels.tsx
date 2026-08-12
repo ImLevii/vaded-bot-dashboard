@@ -15,6 +15,14 @@ import { TrashIcon } from 'lucide-react'
 import type { MemberXP, LevelReward } from '@/services/levelsApi'
 import type { GuildRoleOption } from '@/types'
 
+// Mirrors the PATCH /levels/config bounds (xpPerMessage >= 1,
+// xpCooldownMs >= 1000) and the LevelConfig model defaults, so the form can
+// neither start at nor submit a value the endpoint rejects.
+const MIN_XP_PER_MESSAGE = 1
+const MIN_XP_COOLDOWN_MS = 1000
+const DEFAULT_XP_PER_MESSAGE = 15
+const DEFAULT_XP_COOLDOWN_MS = 60_000
+
 function Levels() {
     const { t } = useTranslation()
     const { selectedGuild } = useGuildStore()
@@ -28,10 +36,13 @@ function Levels() {
     const [newLevel, setNewLevel] = useState('')
     const [newRoleId, setNewRoleId] = useState('')
 
-    // Form state
+    // Form state. Seeded with the same defaults the LevelConfig model uses,
+    // not 0: the PATCH schema requires xpPerMessage >= 1 and xpCooldownMs >=
+    // 1000, so starting at 0 made every save on a guild without an existing
+    // config fail with "Validation failed".
     const [enabled, setEnabled] = useState(false)
-    const [xpPerMessage, setXpPerMessage] = useState(0)
-    const [xpCooldownMs, setXpCooldownMs] = useState(0)
+    const [xpPerMessage, setXpPerMessage] = useState(DEFAULT_XP_PER_MESSAGE)
+    const [xpCooldownMs, setXpCooldownMs] = useState(DEFAULT_XP_COOLDOWN_MS)
     const [announceChannel, setAnnounceChannel] = useState('')
 
     useEffect(() => {
@@ -73,9 +84,11 @@ function Levels() {
                     setXpCooldownMs(configData.xpCooldownMs)
                     setAnnounceChannel(configData.announceChannel || '')
                 } else {
+                    // No config row yet — show the model defaults rather than
+                    // zeros, which the PATCH schema would reject on save.
                     setEnabled(false)
-                    setXpPerMessage(0)
-                    setXpCooldownMs(0)
+                    setXpPerMessage(DEFAULT_XP_PER_MESSAGE)
+                    setXpCooldownMs(DEFAULT_XP_COOLDOWN_MS)
                     setAnnounceChannel('')
                 }
             } catch (error) {
@@ -105,8 +118,10 @@ function Levels() {
         try {
             await api.levels.updateConfig(selectedGuild.id, {
                 enabled,
-                xpPerMessage,
-                xpCooldownMs,
+                // Clamp rather than submit-and-fail: the number inputs coerce
+                // a cleared field to 0, which is below both schema minimums.
+                xpPerMessage: Math.max(MIN_XP_PER_MESSAGE, xpPerMessage),
+                xpCooldownMs: Math.max(MIN_XP_COOLDOWN_MS, xpCooldownMs),
                 announceChannel: announceChannel || null,
             })
             toast.success(t('levels.levelSettingsSaved'))
