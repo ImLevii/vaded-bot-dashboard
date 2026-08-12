@@ -218,6 +218,47 @@ describe('streamViaYtDlp – cookies', () => {
         else process.env.YT_DLP_COOKIES_PATH = previous
     })
 
+    it('uses a cookie-capable player client when cookies are configured', async () => {
+        const previous = process.env.YT_DLP_COOKIES_PATH
+        process.env.YT_DLP_COOKIES_PATH = __filename
+
+        const proc = makeFakeProc()
+        mockSpawn.mockReturnValue(proc)
+        setImmediate(() => proc.stdout.emit('data', Buffer.from('bytes')))
+        await streamViaYtDlp(validUrl)
+
+        const args = mockSpawn.mock.calls[0][1] as string[]
+        // android/ios ignore the cookie jar entirely, which would leave the
+        // request anonymous and re-trigger the bot-check the cookies exist for.
+        expect(args).toEqual(
+            expect.arrayContaining(['youtube:player_client=web']),
+        )
+        expect(args).not.toEqual(
+            expect.arrayContaining(['youtube:player_client=android']),
+        )
+
+        if (previous === undefined) delete process.env.YT_DLP_COOKIES_PATH
+        else process.env.YT_DLP_COOKIES_PATH = previous
+    })
+
+    it('keeps the anonymous android client when no cookies are configured', async () => {
+        const previous = process.env.YT_DLP_COOKIES_PATH
+        delete process.env.YT_DLP_COOKIES_PATH
+
+        const proc = makeFakeProc()
+        mockSpawn.mockReturnValue(proc)
+        setImmediate(() => proc.stdout.emit('data', Buffer.from('bytes')))
+        await streamViaYtDlp(validUrl)
+
+        const args = mockSpawn.mock.calls[0][1] as string[]
+        expect(args).toEqual(
+            expect.arrayContaining(['youtube:player_client=android']),
+        )
+
+        if (previous === undefined) delete process.env.YT_DLP_COOKIES_PATH
+        else process.env.YT_DLP_COOKIES_PATH = previous
+    })
+
     it('omits --cookies when YT_DLP_COOKIES_PATH is unset', async () => {
         const previous = process.env.YT_DLP_COOKIES_PATH
         delete process.env.YT_DLP_COOKIES_PATH

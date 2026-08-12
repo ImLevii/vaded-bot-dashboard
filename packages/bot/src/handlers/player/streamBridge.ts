@@ -149,10 +149,31 @@ const LIVE_STREAM_ERROR_FRAGMENT = 'live stream recording is not available'
 // yt-dlp's message for this varies in punctuation ("you're"/"you’re"); match the stable prefix.
 const BOT_CHECK_ERROR_FRAGMENT = 'sign in to confirm'
 
-/** `playerClient` defaults to 'android' for VODs; pass 'web' for live streams. */
+/**
+ * YouTube's `android`/`ios` player clients do not accept cookie
+ * authentication — yt-dlp skips the cookie jar for them and the request goes
+ * out anonymous. Forcing `player_client=android` (the long-standing default)
+ * therefore made a configured YT_DLP_COOKIES_PATH silently useless: the very
+ * bot-check the cookies exist to defeat still fired. Use a cookie-capable
+ * client whenever cookies are available, and keep `android` otherwise since
+ * it needs no auth at all.
+ */
+const COOKIE_CAPABLE_CLIENT = 'web'
+const ANONYMOUS_CLIENT = 'android'
+
+function defaultPlayerClient(): string {
+    return resolveYtDlpCookiesPath() ? COOKIE_CAPABLE_CLIENT : ANONYMOUS_CLIENT
+}
+
+/** Retry clients for the bot-check path, filtered to ones cookies work with. */
+function botCheckRetryClients(hasCookies: boolean): readonly string[] {
+    return hasCookies ? (['tv', 'mweb'] as const) : (['tv', 'ios'] as const)
+}
+
+/** `playerClient` defaults per `defaultPlayerClient()`; pass 'web' for live streams. */
 export function streamViaYtDlp(
     url: string,
-    playerClient: string = 'android',
+    playerClient: string = defaultPlayerClient(),
 ): Promise<Readable> {
     try {
         validateYtDlpUrl(url)
@@ -350,7 +371,8 @@ export async function createResilientStream(
             // usually IP-based, but each client is validated differently from
             // android and sometimes still gets through without cookies.
             if (lowerErrMsg.includes(BOT_CHECK_ERROR_FRAGMENT)) {
-                for (const retryClient of ['tv', 'ios'] as const) {
+                const hasCookies = Boolean(resolveYtDlpCookiesPath())
+                for (const retryClient of botCheckRetryClients(hasCookies)) {
                     try {
                         const retryStream = await streamViaYtDlp(
                             track.url,
