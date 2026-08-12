@@ -59,6 +59,10 @@ export function setupMiddleware(app: Express): void {
                         'https://i.ytimg.com',
                         'https://*.sndcdn.com',
                         'https://i.scdn.co',
+                        // Spotify's newer per-region edge CDN (e.g.
+                        // image-cdn-ak.spotifycdn.com) -- a different
+                        // domain than the legacy i.scdn.co above.
+                        'https://*.spotifycdn.com',
                     ],
                     'connect-src': [
                         "'self'",
