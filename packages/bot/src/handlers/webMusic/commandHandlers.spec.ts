@@ -1,10 +1,18 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
-import { handlePause, handleStop, handleSkip, handlePrevious } from './commandHandlers'
+import {
+    handlePause,
+    handleStop,
+    handleSkip,
+    handlePrevious,
+    handlePlay,
+} from './commandHandlers'
 
 const publishStateMock = jest.fn()
 const buildQueueStateMock = jest.fn()
 const resolveGuildQueueMock = jest.fn()
 const setReplenishSuppressedMock = jest.fn()
+const resolveQueryWithFallbacksMock = jest.fn()
+const resolveWebPlayContextMock = jest.fn()
 
 jest.mock('@lucky/shared/services', () => ({
     musicControlService: {
@@ -24,6 +32,28 @@ jest.mock('../../utils/music/queueResolver', () => ({
 jest.mock('../../utils/music/replenishSuppressionStore', () => ({
     setReplenishSuppressed: (...args: unknown[]) =>
         setReplenishSuppressedMock(...args),
+}))
+
+// resolveProvider pulls the shared utils barrel (→ Prisma client, which is
+// ESM-only and unparseable under Jest's CJS runtime), so it is stubbed here
+// rather than loaded. These handler tests cover the existing-queue paths;
+// the cold-start path that uses it is exercised via handlePlay below.
+jest.mock('@lucky/shared/config', () => ({
+    ENVIRONMENT_CONFIG: { PLAYER: { CONNECTION_TIMEOUT: 15_000 } },
+}))
+
+jest.mock(
+    '../../functions/music/commands/play/handlers/resolveProvider',
+    () => ({
+        resolveQueryWithFallbacks: (...args: unknown[]) =>
+            resolveQueryWithFallbacksMock(...args),
+    }),
+)
+
+jest.mock('./playContext', () => ({
+    resolveWebPlayContext: (...args: unknown[]) =>
+        resolveWebPlayContextMock(...args),
+    buildWebNodeOptions: () => ({ metadata: {} }),
 }))
 
 describe('handleStop', () => {
@@ -64,7 +94,10 @@ describe('handleStop', () => {
             { id: 'cmd-1', guildId: 'guild-1', data: {} } as any,
         )
 
-        expect(setReplenishSuppressedMock).toHaveBeenCalledWith('guild-1', 30_000)
+        expect(setReplenishSuppressedMock).toHaveBeenCalledWith(
+            'guild-1',
+            30_000,
+        )
     })
 
     it('returns failure when no queue', async () => {
@@ -185,7 +218,10 @@ describe('handlePrevious', () => {
         resolveGuildQueueMock.mockReturnValue({
             queue: {
                 currentTrack: { title: 'Track' },
-                history: { isEmpty: jest.fn().mockReturnValue(false), previous: previousAsync },
+                history: {
+                    isEmpty: jest.fn().mockReturnValue(false),
+                    previous: previousAsync,
+                },
             },
         })
 
@@ -207,7 +243,10 @@ describe('handlePrevious', () => {
         resolveGuildQueueMock.mockReturnValue({
             queue: {
                 currentTrack: { title: 'Track' },
-                history: { isEmpty: jest.fn().mockReturnValue(true), previous: jest.fn() },
+                history: {
+                    isEmpty: jest.fn().mockReturnValue(true),
+                    previous: jest.fn(),
+                },
                 node: { seek: seekAsync },
             },
         })
@@ -230,7 +269,10 @@ describe('handlePrevious', () => {
         resolveGuildQueueMock.mockReturnValue({
             queue: {
                 currentTrack: null,
-                history: { isEmpty: jest.fn().mockReturnValue(true), previous: jest.fn() },
+                history: {
+                    isEmpty: jest.fn().mockReturnValue(true),
+                    previous: jest.fn(),
+                },
                 node: { seek: seekAsync },
             },
         })
@@ -258,5 +300,69 @@ describe('handlePrevious', () => {
 
         expect(result.success).toBe(false)
         expect(result.error).toBe('No active queue')
+    })
+})
+
+describe('handlePlay cold start (no existing queue)', () => {
+    const guild = { id: 'guild-1' }
+    const client = {
+        guilds: { cache: { get: () => guild } },
+        player: {},
+        users: { fetch: jest.fn() },
+    } as any
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        buildQueueStateMock.mockResolvedValue({ guildId: 'guild-1' })
+        // The bug this covers: with no live session the handler used to bail
+        // out with "start playing from Discord first" instead of joining.
+        resolveGuildQueueMock.mockReturnValue({ queue: null })
+    })
+
+    it('joins voice and starts playback instead of refusing', async () => {
+        resolveWebPlayContextMock.mockResolvedValue({
+            ok: true,
+            context: {
+                voiceChannel: { id: 'vc-1', members: new Map() },
+                textChannel: { id: 'text-1' },
+                requestedBy: undefined,
+            },
+        })
+        resolveQueryWithFallbacksMock.mockResolvedValue({
+            result: {
+                track: { title: 'Song' },
+                searchResult: { playlist: null, tracks: [{}] },
+            },
+        })
+
+        const result = await handlePlay(client, {
+            id: 'cmd-1',
+            guildId: 'guild-1',
+            userId: 'user-1',
+            data: { query: 'a song' },
+        } as any)
+
+        expect(resolveQueryWithFallbacksMock).toHaveBeenCalled()
+        expect(result.success).toBe(true)
+        expect(result.data?.title).toBe('Song')
+        expect(publishStateMock).toHaveBeenCalled()
+    })
+
+    it('surfaces the context error when the user is not in a voice channel', async () => {
+        resolveWebPlayContextMock.mockResolvedValue({
+            ok: false,
+            error: 'Join a voice channel in Discord first, then try again.',
+        })
+
+        const result = await handlePlay(client, {
+            id: 'cmd-2',
+            guildId: 'guild-1',
+            userId: 'user-1',
+            data: { query: 'a song' },
+        } as any)
+
+        expect(result.success).toBe(false)
+        expect(result.error).toContain('Join a voice channel')
+        expect(resolveQueryWithFallbacksMock).not.toHaveBeenCalled()
     })
 })
