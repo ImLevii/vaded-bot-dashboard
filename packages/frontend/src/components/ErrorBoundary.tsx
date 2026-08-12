@@ -1,4 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from 'react'
+import { AlertTriangle } from 'lucide-react'
 import Button from './ui/Button'
 import { captureFrontendException } from '@/lib/sentry'
 
@@ -54,20 +55,35 @@ class ErrorBoundary extends Component<Props, State> {
             }`
             return (
                 <div className='flex items-center justify-center min-h-screen bg-vaded-bg-primary'>
-                    <div className='text-center space-y-4 p-6'>
-                        <h1 className='text-2xl font-bold text-white'>
+                    <div
+                        className='surface-panel max-w-md space-y-4 border border-vaded-error/25 p-8 text-center'
+                        style={{
+                            backgroundImage:
+                                'radial-gradient(circle at 50% 0%, rgb(242 63 66 / 0.1), transparent 60%)',
+                        }}
+                    >
+                        <span className='mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-vaded-error/15 text-vaded-error shadow-[0_0_16px_rgba(242,63,66,0.35)]'>
+                            <AlertTriangle
+                                className='h-6 w-6'
+                                aria-hidden='true'
+                            />
+                        </span>
+                        <h1 className='type-h2 text-vaded-text-primary'>
                             Something went wrong
                         </h1>
-                        <p className='text-vaded-text-secondary'>
+                        <p className='type-body-sm text-vaded-text-secondary'>
                             {this.state.error?.message ||
                                 'An unexpected error occurred'}
                         </p>
                         {cid && (
                             <p className='text-sm text-vaded-text-tertiary'>
-                                Error ID: <code>{cid}</code>
+                                Error ID:{' '}
+                                <code className='font-mono text-vaded-text-secondary'>
+                                    {cid}
+                                </code>
                             </p>
                         )}
-                        <div className='flex items-center justify-center gap-3'>
+                        <div className='flex items-center justify-center gap-3 pt-2'>
                             <Button
                                 onClick={() => {
                                     this.setState({
@@ -77,13 +93,12 @@ class ErrorBoundary extends Component<Props, State> {
                                     })
                                     window.location.reload()
                                 }}
-                                className='bg-vaded-red hover:bg-vaded-red/90'
                             >
                                 Reload Page
                             </Button>
                             <a
                                 href={reportHref}
-                                className='inline-flex items-center justify-center rounded-lg border border-vaded-border px-4 py-2 text-sm text-vaded-text-secondary hover:text-vaded-text-primary hover:border-vaded-text-tertiary transition-colors'
+                                className='vaded-focus-visible inline-flex items-center justify-center rounded-lg border border-vaded-border px-4 py-2 text-sm text-vaded-text-secondary transition-colors hover:border-vaded-border-strong hover:text-vaded-text-primary'
                             >
                                 Report this problem
                             </a>

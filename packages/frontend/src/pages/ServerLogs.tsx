@@ -42,29 +42,44 @@ const LEVEL_CONFIG: Record<
         icon: React.ComponentType<{ className?: string }>
         color: string
         bg: string
+        glow: string
     }
 > = {
-    info: { icon: Info, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+    info: {
+        icon: Info,
+        color: 'text-blue-400',
+        bg: 'bg-blue-500/10',
+        glow: 'shadow-glow-info',
+    },
     warn: {
         icon: AlertTriangle,
         color: 'text-yellow-400',
         bg: 'bg-yellow-500/10',
+        glow: 'shadow-[0_0_8px_rgba(250,204,21,0.5)]',
     },
-    error: { icon: AlertOctagon, color: 'text-red-400', bg: 'bg-red-500/10' },
+    error: {
+        icon: AlertOctagon,
+        color: 'text-red-400',
+        bg: 'bg-red-500/10',
+        glow: 'shadow-glow-red-sm',
+    },
     moderation: {
         icon: Shield,
         color: 'text-orange-400',
         bg: 'bg-orange-500/10',
+        glow: 'shadow-[0_0_8px_rgba(251,146,60,0.5)]',
     },
     automod: {
         icon: ShieldAlert,
         color: 'text-purple-400',
         bg: 'bg-purple-500/10',
+        glow: 'shadow-[0_0_8px_rgba(192,132,252,0.5)]',
     },
     system: {
         icon: Settings,
         color: 'text-vaded-text-secondary',
         bg: 'bg-vaded-bg-tertiary',
+        glow: '',
     },
 }
 
@@ -93,8 +108,9 @@ function LogEntry({ log, index }: { log: ServerLog; index: number }) {
         >
             <div
                 className={cn(
-                    'p-2 rounded-md mt-0.5 shrink-0 flex-center',
+                    'p-2 rounded-md mt-0.5 shrink-0 flex-center transition-shadow',
                     config.bg,
+                    config.glow,
                 )}
             >
                 <Icon className={cn('w-3.5 h-3.5', config.color)} />
@@ -104,7 +120,7 @@ function LogEntry({ log, index }: { log: ServerLog; index: number }) {
                     <Badge
                         variant='outline'
                         className={cn(
-                            'text-[8px] uppercase font-bold border-0 px-1.5 py-0.5',
+                            'text-[8px] uppercase font-bold font-mono border-0 px-1.5 py-0.5',
                             config.bg,
                             config.color,
                         )}
@@ -336,7 +352,7 @@ export default function ServerLogsPage() {
                                 'flex flex-col items-start p-3.5 rounded-lg border transition-all text-left',
                                 isLead && 'lg:col-span-2',
                                 levelFilter === level
-                                    ? 'border-vaded-border/80 bg-vaded-bg-active'
+                                    ? 'border-vaded-brand/40 bg-vaded-bg-active shadow-glow-red-sm'
                                     : 'border-vaded-border/40 bg-vaded-bg-secondary/50 hover:border-vaded-border/60 hover:bg-vaded-bg-tertiary/50',
                             )}
                         >

@@ -2,6 +2,7 @@ import { type MouseEvent, type ReactNode, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Sidebar from './Sidebar'
+import ParticleBackground from '@/components/ui/ParticleBackground'
 import { useGuildSelection } from '@/hooks/useGuildSelection'
 import { useAuthStore } from '@/stores/authStore'
 import { useGuildStore } from '@/stores/guildStore'
@@ -157,6 +158,13 @@ function Layout({ children }: LayoutProps) {
 
     return (
         <div className='vaded-shell vaded-shell-authenticated flex min-h-screen'>
+            {/* Ambient particle layer — subtle, dashboard-wide, never competes with data */}
+            <div
+                className='fixed inset-0 z-0 overflow-hidden'
+                aria-hidden='true'
+            >
+                <ParticleBackground variant='dashboard' />
+            </div>
             <a
                 className='vaded-skip-link'
                 href='#vaded-main-content'
@@ -165,7 +173,7 @@ function Layout({ children }: LayoutProps) {
                 Skip to content
             </a>
             <Sidebar />
-            <div className='flex min-w-0 flex-1 flex-col'>
+            <div className='relative z-10 flex min-w-0 flex-1 flex-col'>
                 <header className='vaded-shell-header sticky top-0 z-30 border-b border-vaded-border bg-vaded-bg-primary relative'>
                     <div className='mx-auto flex w-full max-w-[1400px] items-center justify-between gap-4 px-4 py-3.5 md:px-6 md:py-4'>
                         <div className='min-w-0'>

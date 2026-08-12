@@ -17,6 +17,13 @@ vi.mock('framer-motion', async () => {
         motion: new Proxy({}, { get: (_t, prop: string) => passthrough(prop) }),
         AnimatePresence: ({ children }: any) => children,
         useReducedMotion: vi.fn(() => false),
+        useInView: vi.fn(() => true),
+        useMotionValue: vi.fn((initial: number) => ({
+            get: () => initial,
+            set: vi.fn(),
+            on: vi.fn(() => vi.fn()),
+        })),
+        useSpring: vi.fn((source: unknown) => source),
     }
 })
 
@@ -169,7 +176,9 @@ describe('Landing', () => {
 
     test('renders footer copyright', () => {
         render(<Landing />)
-        expect(screen.getByText(/© 2026 VADED GAMING\. ISC\./)).toBeInTheDocument()
+        expect(
+            screen.getByText(/© 2026 VADED GAMING\. ISC\./),
+        ).toBeInTheDocument()
     })
 
     test('renders footer with Terms, Privacy and Discord support links', () => {
@@ -197,4 +206,3 @@ describe('Landing', () => {
         ).toBeInTheDocument()
     })
 })
-

@@ -268,7 +268,7 @@ function NavSections({
                                                 className={cn(
                                                     'vaded-focus-visible group relative flex min-h-[38px] items-center gap-2.5 rounded-lg border px-2.5 py-2 transition-all duration-120',
                                                     active
-                                                        ? 'border-vaded-brand/40 bg-vaded-bg-active text-vaded-text-primary shadow-[0_8px_24px_rgb(0_0_0/0.18)]'
+                                                        ? 'border-vaded-brand/40 bg-vaded-bg-active text-vaded-text-primary shadow-[0_8px_24px_rgb(0_0_0/0.18),0_0_16px_rgb(220_38_38/0.25)]'
                                                         : 'border-transparent text-vaded-text-tertiary hover:border-vaded-border hover:bg-vaded-bg-tertiary hover:text-vaded-text-primary',
                                                 )}
                                             >
@@ -276,7 +276,7 @@ function NavSections({
                                                     className={cn(
                                                         'absolute left-0 top-1/2 h-4 w-[3px] -translate-y-1/2 rounded-r transition-all duration-120',
                                                         active
-                                                            ? 'bg-vaded-brand'
+                                                            ? 'bg-vaded-brand shadow-glow-red-sm'
                                                             : 'bg-transparent',
                                                     )}
                                                     aria-hidden='true'
@@ -285,7 +285,7 @@ function NavSections({
                                                     className={cn(
                                                         'h-4 w-4 shrink-0 transition-colors duration-120',
                                                         active
-                                                            ? 'text-vaded-brand'
+                                                            ? 'text-vaded-brand drop-shadow-[0_0_6px_rgba(220,38,38,0.7)]'
                                                             : 'text-vaded-text-subtle group-hover:text-vaded-text-tertiary',
                                                     )}
                                                     aria-hidden='true'
@@ -408,7 +408,7 @@ function Sidebar() {
                     alt='Vaded Gaming'
                     width='32'
                     height='32'
-                    className='h-8 w-8 rounded-lg object-cover object-center shrink-0'
+                    className='h-8 w-8 shrink-0 rounded-lg object-cover object-center shadow-[0_0_16px_rgba(220,38,38,0.35)]'
                 />
                 <span className='font-black text-lg tracking-tight leading-none'>
                     VADED<span className='text-vaded-brand'>GAMING</span>
@@ -478,7 +478,10 @@ function Sidebar() {
                                   }
                         }
                         className='fixed inset-y-0 left-0 z-50 w-64 border-r border-white/6 lg:hidden'
-                        style={{ background: 'rgba(15,17,23,0.85)', backdropFilter: 'blur(24px) saturate(1.6)' }}
+                        style={{
+                            background: 'rgba(15,17,23,0.85)',
+                            backdropFilter: 'blur(24px) saturate(1.6)',
+                        }}
                         aria-label='Navigation sidebar'
                     >
                         {sidebarContent}
@@ -487,7 +490,7 @@ function Sidebar() {
             </AnimatePresence>
 
             <aside
-                className='hidden h-screen w-64 shrink-0 border-r border-white/6 bg-vaded-bg-secondary/60 backdrop-blur-2xl lg:flex lg:sticky lg:top-0 lg:flex-col'
+                className='relative z-10 hidden h-screen w-64 shrink-0 border-r border-white/6 bg-vaded-bg-secondary/60 backdrop-blur-2xl lg:flex lg:sticky lg:top-0 lg:flex-col'
                 aria-label='Navigation sidebar'
             >
                 {sidebarContent}

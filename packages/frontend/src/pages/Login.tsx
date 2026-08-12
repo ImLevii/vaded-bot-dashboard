@@ -3,6 +3,7 @@ import { useReducedMotion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import Button from '@/components/ui/Button'
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher'
+import ParticleBackground from '@/components/ui/ParticleBackground'
 import { useAuthStore } from '@/stores/authStore'
 import { useAuthRedirect } from '@/hooks/useAuthRedirect'
 import { usePageMetadata } from '@/hooks/usePageMetadata'
@@ -38,19 +39,20 @@ export default function LoginPage() {
     ] as const
 
     return (
-        <div className='min-h-screen bg-vaded-bg-primary flex flex-col relative'>
+        <div className='min-h-screen bg-vaded-bg-primary flex flex-col relative overflow-hidden'>
+            <ParticleBackground variant='dashboard' />
             <div className='absolute top-6 right-6 z-20'>
                 <LanguageSwitcher />
             </div>
 
-            <div className='flex-1 flex items-center justify-center px-4 py-16'>
+            <div className='relative z-10 flex-1 flex items-center justify-center px-4 py-16'>
                 <div className='w-full max-w-md'>
                     <div className={sectionClass} style={sectionStyle}>
                         <div className='flex items-center gap-3 mb-8'>
                             <img
                                 src='/vaded-logo.png'
                                 alt='Vaded Gaming'
-                                className='h-12 w-12 rounded-lg object-cover border border-vaded-border'
+                                className='h-12 w-12 rounded-lg object-cover border border-vaded-brand/25 shadow-glow-red-sm'
                             />
                             <h1
                                 className='text-2xl font-bold text-vaded-text-primary'
@@ -82,7 +84,7 @@ export default function LoginPage() {
                             </h3>
                             <div className='grid grid-cols-3 gap-4'>
                                 <div className='text-center'>
-                                    <p className='text-2xl font-bold text-vaded-brand'>
+                                    <p className='font-[var(--font-vaded-hero)] text-2xl font-bold text-vaded-brand'>
                                         32+
                                     </p>
                                     <p className='text-xs text-vaded-text-tertiary mt-1'>
@@ -90,7 +92,7 @@ export default function LoginPage() {
                                     </p>
                                 </div>
                                 <div className='text-center'>
-                                    <p className='text-2xl font-bold text-vaded-brand'>
+                                    <p className='font-[var(--font-vaded-hero)] text-2xl font-bold text-vaded-brand'>
                                         100+
                                     </p>
                                     <p className='text-xs text-vaded-text-tertiary mt-1'>
@@ -98,7 +100,7 @@ export default function LoginPage() {
                                     </p>
                                 </div>
                                 <div className='text-center'>
-                                    <p className='text-2xl font-bold text-vaded-brand'>
+                                    <p className='font-[var(--font-vaded-hero)] text-2xl font-bold text-vaded-brand'>
                                         24/7
                                     </p>
                                     <p className='text-xs text-vaded-text-tertiary mt-1'>
@@ -124,6 +126,7 @@ export default function LoginPage() {
                             onClick={login}
                             disabled={isLoading}
                             variant='primary'
+                            glow
                             className='vaded-focus-visible h-12 w-full rounded-lg font-medium'
                         >
                             {isLoading ? (

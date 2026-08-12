@@ -5,6 +5,7 @@ import { usePageMetadata } from '@/hooks/usePageMetadata'
 import { motion, useReducedMotion } from 'framer-motion'
 import {
     ArrowUpRight,
+    ChevronDown,
     ChevronRight,
     Server,
     Database,
@@ -19,6 +20,9 @@ import {
     Users,
     Radio,
 } from 'lucide-react'
+import ParticleBackground from '@/components/ui/ParticleBackground'
+import AnimatedCounter from '@/components/ui/AnimatedCounter'
+import { fadeUp, staggerContainer } from '@/lib/animations'
 
 export default function Landing() {
     const login = useAuthStore((s) => s.login)
@@ -33,7 +37,10 @@ export default function Landing() {
     return (
         <div className='vaded-shell min-h-screen dark text-white bg-vaded-surface-canvas'>
             <TopNav onOpenDashboard={login} />
-            <Hero prefersReducedMotion={prefersReducedMotion ?? false} onOpenDashboard={login} />
+            <Hero
+                prefersReducedMotion={prefersReducedMotion ?? false}
+                onOpenDashboard={login}
+            />
             <StatsStrip />
             <FeatureGrid />
             <CommandList />
@@ -46,7 +53,10 @@ export default function Landing() {
 
 function TopNav({ onOpenDashboard }: { onOpenDashboard: () => void }) {
     return (
-        <header className='sticky top-0 z-30 border-b border-vaded-border-soft/60 bg-vaded-surface-canvas/80 backdrop-blur-xl supports-[backdrop-filter]:bg-vaded-surface-canvas/60' style={{ boxShadow: '0 1px 0 rgba(220,38,38,0.08)' }}>
+        <header
+            className='sticky top-0 z-30 border-b border-vaded-border-soft/60 bg-vaded-surface-canvas/80 backdrop-blur-xl supports-[backdrop-filter]:bg-vaded-surface-canvas/60'
+            style={{ boxShadow: '0 1px 0 rgba(220,38,38,0.08)' }}
+        >
             <div className='mx-auto flex h-16 max-w-6xl items-center justify-between px-4 md:px-8'>
                 <a
                     href='/'
@@ -64,9 +74,12 @@ function TopNav({ onOpenDashboard }: { onOpenDashboard: () => void }) {
                     </div>
                     <div className='flex flex-col leading-none'>
                         <span className='font-black text-xl tracking-tight leading-tight'>
-                            VADED<span className='text-vaded-brand'>GAMING</span>
+                            VADED
+                            <span className='text-vaded-brand'>GAMING</span>
                         </span>
-                        <span className='font-mono text-[9px] text-vaded-text-muted tracking-widest uppercase opacity-70'>Discord Bot</span>
+                        <span className='font-mono text-[9px] text-vaded-text-muted tracking-widest uppercase opacity-70'>
+                            Discord Bot
+                        </span>
                     </div>
                 </a>
                 <nav className='flex items-center gap-1 font-mono text-xs text-vaded-text-muted'>
@@ -120,7 +133,8 @@ function BlueprintGrid() {
                 aria-hidden
                 className='pointer-events-none absolute inset-0'
                 style={{
-                    backgroundImage: 'radial-gradient(circle, rgba(220,38,38,0.7) 1.2px, transparent 1.2px)',
+                    backgroundImage:
+                        'radial-gradient(circle, rgba(220,38,38,0.7) 1.2px, transparent 1.2px)',
                     backgroundSize: '28px 28px',
                     opacity: 0.16,
                 }}
@@ -139,7 +153,8 @@ function BlueprintGrid() {
                 aria-hidden
                 className='pointer-events-none absolute bottom-0 left-0 right-0 h-40'
                 style={{
-                    background: 'linear-gradient(to bottom, transparent, #0f1117)',
+                    background:
+                        'linear-gradient(to bottom, transparent, #0f1117)',
                 }}
             />
         </>
@@ -153,14 +168,28 @@ function Hero({ prefersReducedMotion, onOpenDashboard }: HeroProps) {
 
     const anim = prefersReducedMotion
         ? {}
-        : { initial: { opacity: 0, y: 24 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as const } }
+        : {
+              initial: { opacity: 0, y: 24 },
+              animate: { opacity: 1, y: 0 },
+              transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as const },
+          }
 
     const animDelayed = prefersReducedMotion
         ? {}
-        : { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] as const } }
+        : {
+              initial: { opacity: 0, y: 20 },
+              animate: { opacity: 1, y: 0 },
+              transition: {
+                  duration: 0.7,
+                  delay: 0.15,
+                  ease: [0.16, 1, 0.3, 1] as const,
+              },
+          }
 
     return (
         <section className='relative overflow-hidden px-4 py-24 md:py-40 md:px-8'>
+            {/* Drifting red-spark particle field — deepest layer, full intensity (hero only) */}
+            <ParticleBackground variant='landing' />
             {/* VG logo circuit board — deepest background layer */}
             <div
                 aria-hidden
@@ -174,8 +203,10 @@ function Hero({ prefersReducedMotion, onOpenDashboard }: HeroProps) {
                         opacity: 0.13,
                         mixBlendMode: 'luminosity',
                         filter: 'saturate(0.4) brightness(1.2)',
-                        maskImage: 'radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%)',
-                        WebkitMaskImage: 'radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%)',
+                        maskImage:
+                            'radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%)',
+                        WebkitMaskImage:
+                            'radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%)',
                     }}
                 />
             </div>
@@ -186,7 +217,8 @@ function Hero({ prefersReducedMotion, onOpenDashboard }: HeroProps) {
                 style={{
                     width: '900px',
                     height: '600px',
-                    background: 'radial-gradient(ellipse, rgba(220,38,38,0.22) 0%, rgba(220,38,38,0.06) 45%, transparent 70%)',
+                    background:
+                        'radial-gradient(ellipse, rgba(220,38,38,0.22) 0%, rgba(220,38,38,0.06) 45%, transparent 70%)',
                     filter: 'blur(2px)',
                 }}
             />
@@ -196,7 +228,8 @@ function Hero({ prefersReducedMotion, onOpenDashboard }: HeroProps) {
                 className='pointer-events-none absolute bottom-0 left-0 right-0'
                 style={{
                     height: '40%',
-                    background: 'radial-gradient(ellipse 100% 60% at 50% 100%, rgba(220,38,38,0.08) 0%, transparent 70%)',
+                    background:
+                        'radial-gradient(ellipse 100% 60% at 50% 100%, rgba(220,38,38,0.08) 0%, transparent 70%)',
                 }}
             />
             {/* Left accent glow */}
@@ -206,7 +239,8 @@ function Hero({ prefersReducedMotion, onOpenDashboard }: HeroProps) {
                 style={{
                     width: '320px',
                     height: '400px',
-                    background: 'radial-gradient(ellipse, rgba(220,38,38,0.07) 0%, transparent 70%)',
+                    background:
+                        'radial-gradient(ellipse, rgba(220,38,38,0.07) 0%, transparent 70%)',
                 }}
             />
             {/* Right accent glow */}
@@ -216,33 +250,45 @@ function Hero({ prefersReducedMotion, onOpenDashboard }: HeroProps) {
                 style={{
                     width: '320px',
                     height: '400px',
-                    background: 'radial-gradient(ellipse, rgba(220,38,38,0.07) 0%, transparent 70%)',
+                    background:
+                        'radial-gradient(ellipse, rgba(220,38,38,0.07) 0%, transparent 70%)',
                 }}
             />
 
             <BlueprintGrid />
 
-            <div className='relative mx-auto max-w-3xl text-center'>
+            <div className='relative z-10 mx-auto max-w-3xl text-center'>
                 {/* Eyebrow */}
                 <motion.div {...anim}>
                     <p className='mb-8 inline-flex items-center gap-2.5 rounded-full border border-vaded-brand/35 bg-vaded-brand/10 px-5 py-2 font-mono text-[11px] uppercase tracking-[0.22em] text-vaded-brand shadow-[0_0_24px_rgba(220,38,38,0.15)]'>
-                        <span className='h-1.5 w-1.5 rounded-full bg-vaded-brand shadow-[0_0_6px_rgba(220,38,38,0.8)]' aria-hidden />
+                        <span
+                            className='h-1.5 w-1.5 rounded-full bg-vaded-brand shadow-[0_0_6px_rgba(220,38,38,0.8)]'
+                            aria-hidden
+                        />
                         {t('landing.hero.eyebrow')}
                     </p>
 
                     {/* Headline */}
-                    <h1 className='mx-auto mb-7 font-black leading-[0.96] tracking-[-0.05em]'
-                        style={{ fontSize: 'clamp(3rem,11vw,6.5rem)', fontFamily: "'Orbitron', sans-serif" }}>
+                    <h1
+                        className='mx-auto mb-7 font-black leading-[0.96] tracking-[-0.05em]'
+                        style={{
+                            fontSize: 'clamp(3rem,11vw,6.5rem)',
+                            fontFamily: "'Orbitron', sans-serif",
+                        }}
+                    >
                         <span
                             className='block text-white'
-                            style={{ textShadow: '0 0 80px rgba(255,255,255,0.08)' }}
+                            style={{
+                                textShadow: '0 0 80px rgba(255,255,255,0.08)',
+                            }}
                         >
                             VADED
                         </span>
                         <span
                             className='block text-vaded-brand'
                             style={{
-                                textShadow: '0 0 60px rgba(220,38,38,0.5), 0 0 120px rgba(220,38,38,0.2)',
+                                textShadow:
+                                    '0 0 60px rgba(220,38,38,0.5), 0 0 120px rgba(220,38,38,0.2)',
                             }}
                         >
                             GAMING
@@ -266,10 +312,18 @@ function Hero({ prefersReducedMotion, onOpenDashboard }: HeroProps) {
                             </span>
                             <span className='flex items-center gap-3 px-5 py-3'>
                                 <span className='flex flex-col items-start'>
-                                    <span className='font-mono text-xs font-black tracking-widest uppercase text-vaded-brand leading-none'>Dashboard</span>
-                                    <span className='text-[11px] text-vaded-text-tertiary leading-none mt-1 font-medium'>Open the control panel</span>
+                                    <span className='font-mono text-xs font-black tracking-widest uppercase text-vaded-brand leading-none'>
+                                        Dashboard
+                                    </span>
+                                    <span className='text-[11px] text-vaded-text-tertiary leading-none mt-1 font-medium'>
+                                        Open the control panel
+                                    </span>
                                 </span>
-                                <ArrowUpRight size={14} className='text-vaded-text-tertiary group-hover:text-vaded-brand transition-colors shrink-0' aria-hidden />
+                                <ArrowUpRight
+                                    size={14}
+                                    className='text-vaded-text-tertiary group-hover:text-vaded-brand transition-colors shrink-0'
+                                    aria-hidden
+                                />
                             </span>
                         </button>
                         <a
@@ -292,41 +346,103 @@ function Hero({ prefersReducedMotion, onOpenDashboard }: HeroProps) {
                             </span>
                             <span className='flex items-center gap-3 px-5 py-3'>
                                 <span className='flex flex-col items-start'>
-                                    <span className='font-mono text-xs font-black tracking-widest uppercase text-[#7289da] leading-none'>Discord</span>
-                                    <span className='text-[11px] text-vaded-text-tertiary leading-none mt-1 font-medium'>Join the community</span>
+                                    <span className='font-mono text-xs font-black tracking-widest uppercase text-[#7289da] leading-none'>
+                                        Discord
+                                    </span>
+                                    <span className='text-[11px] text-vaded-text-tertiary leading-none mt-1 font-medium'>
+                                        Join the community
+                                    </span>
                                 </span>
-                                <ArrowUpRight size={14} className='text-vaded-text-tertiary group-hover:text-[#5865F2] transition-colors shrink-0' aria-hidden />
+                                <ArrowUpRight
+                                    size={14}
+                                    className='text-vaded-text-tertiary group-hover:text-[#5865F2] transition-colors shrink-0'
+                                    aria-hidden
+                                />
                             </span>
                         </a>
                     </div>
+                </motion.div>
+
+                {/* Scroll-down indicator */}
+                <motion.div
+                    className='mt-16 flex justify-center motion-safe:animate-bounce'
+                    initial={prefersReducedMotion ? {} : { opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.6, delay: 0.6 }}
+                    aria-hidden='true'
+                >
+                    <ChevronDown className='h-5 w-5 text-vaded-text-muted' />
                 </motion.div>
             </div>
         </section>
     )
 }
 
+interface StatEntry {
+    icon: typeof Music2
+    value: number | null
+    suffix: string
+    display: string
+    label: string
+}
+
 function StatsStrip() {
-    const stats = [
-        { icon: Music2, value: '10K+', label: 'Tracks played' },
-        { icon: Users, value: '1', label: 'Server strong' },
-        { icon: Zap, value: '100+', label: 'Commands' },
-        { icon: Radio, value: '24/7', label: 'Always on' },
+    const stats: StatEntry[] = [
+        {
+            icon: Music2,
+            value: 10,
+            suffix: 'K+',
+            display: '',
+            label: 'Tracks played',
+        },
+        {
+            icon: Users,
+            value: 1,
+            suffix: '',
+            display: '',
+            label: 'Server strong',
+        },
+        { icon: Zap, value: 100, suffix: '+', display: '', label: 'Commands' },
+        {
+            icon: Radio,
+            value: null,
+            suffix: '',
+            display: '24/7',
+            label: 'Always on',
+        },
     ]
     return (
         <div className='border-y border-vaded-border-soft bg-vaded-surface-sidebar'>
             <div className='mx-auto max-w-6xl'>
                 <ul className='grid grid-cols-2 divide-x divide-y divide-vaded-border-soft md:grid-cols-4 md:divide-y-0'>
-                    {stats.map(({ icon: Icon, value, label }) => (
-                        <li key={label} className='flex items-center gap-3 px-6 py-5 sm:px-8'>
-                            <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-vaded-brand/10 text-vaded-brand'>
-                                <Icon size={16} aria-hidden />
-                            </span>
-                            <div>
-                                <p className='font-black text-lg text-vaded-text-strong leading-none'>{value}</p>
-                                <p className='mt-0.5 text-xs text-vaded-text-muted'>{label}</p>
-                            </div>
-                        </li>
-                    ))}
+                    {stats.map(
+                        ({ icon: Icon, value, suffix, display, label }) => (
+                            <li
+                                key={label}
+                                className='flex items-center gap-3 px-6 py-5 sm:px-8'
+                            >
+                                <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-vaded-brand/10 text-vaded-brand'>
+                                    <Icon size={16} aria-hidden />
+                                </span>
+                                <div>
+                                    {value !== null ? (
+                                        <AnimatedCounter
+                                            value={value}
+                                            suffix={suffix}
+                                            className='font-[var(--font-vaded-hero)] text-lg font-bold text-vaded-text-strong leading-none tabular-nums'
+                                        />
+                                    ) : (
+                                        <p className='font-[var(--font-vaded-hero)] text-lg font-bold text-vaded-text-strong leading-none'>
+                                            {display}
+                                        </p>
+                                    )}
+                                    <p className='mt-0.5 text-xs text-vaded-text-muted'>
+                                        {label}
+                                    </p>
+                                </div>
+                            </li>
+                        ),
+                    )}
                 </ul>
             </div>
         </div>
@@ -338,7 +454,11 @@ function FeatureGrid() {
     const features = [
         { key: 'music', icon: Music2, span: 'md:col-span-2' },
         { key: 'moderation', icon: Shield, span: 'md:col-span-1' },
-        { key: 'customCommands', icon: SlidersHorizontal, span: 'md:col-span-1' },
+        {
+            key: 'customCommands',
+            icon: SlidersHorizontal,
+            span: 'md:col-span-1',
+        },
         { key: 'dashboard', icon: LayoutDashboard, span: 'md:col-span-2' },
         { key: 'embeds', icon: Sparkles, span: 'md:col-span-3' },
     ] as const
@@ -348,7 +468,9 @@ function FeatureGrid() {
             <div className='mx-auto max-w-6xl'>
                 <div className='mb-12 flex items-end justify-between gap-4 flex-wrap'>
                     <div>
-                        <p className='mb-2 font-mono text-[11px] uppercase tracking-[0.2em] text-vaded-brand'>// Features</p>
+                        <p className='mb-2 font-mono text-[11px] uppercase tracking-[0.2em] text-vaded-brand'>
+                            // Features
+                        </p>
                         <h2 className='text-3xl font-black tracking-tight text-vaded-text-strong md:text-4xl'>
                             {t('landing.features.heading')}
                         </h2>
@@ -357,30 +479,49 @@ function FeatureGrid() {
                         {t('landing.features.subheading')}
                     </p>
                 </div>
-                <ul className='grid gap-3 md:grid-cols-3'>
+                <motion.ul
+                    className='grid gap-3 md:grid-cols-3'
+                    initial='hidden'
+                    whileInView='visible'
+                    viewport={{ once: true, margin: '-80px' }}
+                    variants={staggerContainer(0.08)}
+                >
                     {features.map(({ key, icon: Icon, span }) => {
                         const isWide = span !== 'md:col-span-1'
                         return (
-                            <li key={key} className={span}>
-                                <article className='group relative surface-panel h-full flex flex-col gap-5 rounded-xl p-6 md:p-8 overflow-hidden border border-vaded-border-soft hover:border-vaded-brand/40 transition-colors'>
+                            <motion.li
+                                key={key}
+                                className={span}
+                                variants={fadeUp}
+                            >
+                                <article className='group relative surface-panel h-full flex flex-col gap-5 rounded-xl p-6 md:p-8 overflow-hidden border border-vaded-border-soft transition-all duration-200 hover:border-vaded-brand/40 motion-safe:hover:-translate-y-1 hover:shadow-card-hover'>
                                     {/* Subtle red corner glow on hover */}
-                                    <div className='pointer-events-none absolute -top-12 -left-12 h-32 w-32 rounded-full bg-vaded-brand/0 group-hover:bg-vaded-brand/6 transition-all duration-500 blur-2xl' aria-hidden />
-                                    <span className='inline-flex h-11 w-11 items-center justify-center rounded-xl bg-vaded-brand/10 text-vaded-brand border border-vaded-brand/20'>
+                                    <div
+                                        className='pointer-events-none absolute -top-12 -left-12 h-32 w-32 rounded-full bg-vaded-brand/0 group-hover:bg-vaded-brand/6 transition-all duration-500 blur-2xl'
+                                        aria-hidden
+                                    />
+                                    <span className='inline-flex h-11 w-11 items-center justify-center rounded-xl bg-vaded-brand/10 text-vaded-brand border border-vaded-brand/20 transition-shadow duration-200 group-hover:shadow-glow-red-sm'>
                                         <Icon size={20} aria-hidden />
                                     </span>
                                     <div>
-                                        <h3 className={`mb-2.5 font-bold text-vaded-text-strong tracking-tight ${isWide ? 'text-lg md:text-xl' : 'text-base'}`}>
-                                            {t(`landing.features.items.${key}.title`)}
+                                        <h3
+                                            className={`mb-2.5 font-bold text-vaded-text-strong tracking-tight ${isWide ? 'text-lg md:text-xl' : 'text-base'}`}
+                                        >
+                                            {t(
+                                                `landing.features.items.${key}.title`,
+                                            )}
                                         </h3>
                                         <p className='text-sm text-vaded-text-body leading-relaxed'>
-                                            {t(`landing.features.items.${key}.description`)}
+                                            {t(
+                                                `landing.features.items.${key}.description`,
+                                            )}
                                         </p>
                                     </div>
                                 </article>
-                            </li>
+                            </motion.li>
                         )
                     })}
-                </ul>
+                </motion.ul>
             </div>
         </section>
     )
@@ -401,7 +542,10 @@ function WhySelfHost() {
                 </h2>
                 <ul className='grid gap-px overflow-hidden rounded-xl border border-vaded-border-soft bg-vaded-border-soft md:grid-cols-3'>
                     {items.map((key, i) => (
-                        <li key={key} className='group relative bg-vaded-surface-sidebar p-6 sm:p-8 min-w-0 overflow-hidden'>
+                        <li
+                            key={key}
+                            className='group relative bg-vaded-surface-sidebar p-6 sm:p-8 min-w-0 overflow-hidden'
+                        >
                             <span className='mb-4 block font-mono text-2xl font-black text-vaded-brand/30 select-none'>
                                 0{i + 1}
                             </span>
@@ -409,7 +553,9 @@ function WhySelfHost() {
                                 {t(`landing.whySelfHost.items.${key}.title`)}
                             </h3>
                             <p className='text-sm text-vaded-text-body leading-relaxed break-words'>
-                                {t(`landing.whySelfHost.items.${key}.description`)}
+                                {t(
+                                    `landing.whySelfHost.items.${key}.description`,
+                                )}
                             </p>
                         </li>
                     ))}
@@ -421,11 +567,7 @@ function WhySelfHost() {
 
 function CommandList() {
     const { t } = useTranslation()
-    const rows = [
-        'play',
-        'autoplay',
-        'queue',
-    ] as const
+    const rows = ['play', 'autoplay', 'queue'] as const
 
     const kindColor: Record<string, string> = {
         music: 'text-vaded-brand bg-vaded-brand/10 border-vaded-brand/30',
@@ -546,14 +688,18 @@ function FooterSection() {
                 {/* CTA banner above footer links */}
                 <div className='mb-14 rounded-2xl border border-vaded-brand/20 bg-vaded-brand/5 px-6 py-8 md:px-10 flex flex-col md:flex-row items-center justify-between gap-6'>
                     <div>
-                        <h3 className='text-xl font-black text-vaded-text-strong mb-1'>Ready to run it in your server?</h3>
-                        <p className='text-sm text-vaded-text-muted'>Drop it in your Discord in under a minute.</p>
+                        <h3 className='text-xl font-black text-vaded-text-strong mb-1'>
+                            Ready to run it in your server?
+                        </h3>
+                        <p className='text-sm text-vaded-text-muted'>
+                            Drop it in your Discord in under a minute.
+                        </p>
                     </div>
                     <a
                         href='https://discord.gg/vadedgaming'
                         target='_blank'
                         rel='noreferrer'
-                            className='shrink-0 inline-flex h-11 items-center gap-2 rounded-xl btn-glass px-6 text-sm font-bold text-white'
+                        className='shrink-0 inline-flex h-11 items-center gap-2 rounded-xl btn-glass px-6 text-sm font-bold text-white'
                     >
                         {t('landing.footer.discord')}
                         <ArrowUpRight size={14} aria-hidden />
@@ -562,7 +708,7 @@ function FooterSection() {
 
                 <div className='grid grid-cols-1 gap-10 md:grid-cols-[1.5fr_1fr_1fr] md:gap-12'>
                     <div className='space-y-3'>
-                    <div className='flex items-center gap-2.5'>
+                        <div className='flex items-center gap-2.5'>
                             <img
                                 src='/vaded-logo.png'
                                 alt='Vaded Gaming'
@@ -571,7 +717,8 @@ function FooterSection() {
                                 className='h-10 w-10 rounded-xl'
                             />
                             <div className='inline-flex items-baseline gap-1 font-black text-xl text-vaded-text-strong'>
-                                VADED<span className='text-vaded-brand'>GAMING</span>
+                                VADED
+                                <span className='text-vaded-brand'>GAMING</span>
                             </div>
                         </div>
                         <p className='max-w-xs text-sm text-vaded-text-muted leading-relaxed'>
@@ -582,22 +729,39 @@ function FooterSection() {
                         heading={t('landing.footer.links')}
                         links={[
                             { href: '/docs', label: t('landing.footer.docs') },
-                            { href: '/changelog', label: t('landing.footer.changelog') },
+                            {
+                                href: '/changelog',
+                                label: t('landing.footer.changelog'),
+                            },
                         ]}
                     />
                     <FooterColumn
                         heading={t('landing.footer.support')}
                         links={[
-                            { href: 'https://discord.gg/vadedgaming', label: t('landing.footer.discord'), external: true },
-                            { href: '/terms', label: t('landing.footer.terms') },
-                            { href: '/privacy', label: t('landing.footer.privacy') },
+                            {
+                                href: 'https://discord.gg/vadedgaming',
+                                label: t('landing.footer.discord'),
+                                external: true,
+                            },
+                            {
+                                href: '/terms',
+                                label: t('landing.footer.terms'),
+                            },
+                            {
+                                href: '/privacy',
+                                label: t('landing.footer.privacy'),
+                            },
                         ]}
                     />
                 </div>
 
                 <div className='mt-10 flex flex-col items-start justify-between gap-3 border-t border-vaded-border-soft pt-6 md:flex-row md:items-center'>
-                    <p className='font-mono text-xs text-vaded-text-muted'>{t('landing.footer.copyright')}</p>
-                    <p className='text-xs text-vaded-text-muted'>{t('landing.footer.supportCopy')}</p>
+                    <p className='font-mono text-xs text-vaded-text-muted'>
+                        {t('landing.footer.copyright')}
+                    </p>
+                    <p className='text-xs text-vaded-text-muted'>
+                        {t('landing.footer.supportCopy')}
+                    </p>
                 </div>
             </div>
         </footer>

@@ -6,6 +6,8 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: 'primary' | 'secondary' | 'ghost' | 'destructive'
     size?: 'sm' | 'md' | 'lg'
     loading?: boolean
+    /** Idle pulsing neon glow — reserve for the single primary CTA on a screen (e.g. landing hero, a hero "Save"), not every button. */
+    glow?: boolean
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -15,6 +17,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             variant = 'primary',
             size = 'md',
             loading = false,
+            glow = false,
             disabled,
             children,
             ...props
@@ -29,9 +32,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                     'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
                     'disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed',
                     'active:scale-[0.98]',
+                    glow &&
+                        !disabled &&
+                        !loading &&
+                        'motion-safe:glow-pulse-red',
                     {
-                    'btn-glass text-white':
-                            variant === 'primary',
+                        'btn-glass text-white': variant === 'primary',
                         'bg-vaded-bg-tertiary border border-vaded-border text-vaded-text-primary hover:border-vaded-border-strong hover:bg-vaded-bg-active':
                             variant === 'secondary',
                         'bg-transparent hover:bg-vaded-bg-tertiary text-vaded-text-secondary hover:text-vaded-text-primary':
