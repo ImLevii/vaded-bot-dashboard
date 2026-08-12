@@ -21,9 +21,9 @@ const isProduction = process.env.NODE_ENV === 'production'
 export function createApp(routeOptions?: SetupRoutesOptions): Express {
     const app = express()
 
-    if (isProduction) {
-        app.set('trust proxy', 1)
-    }
+    // See musicRelayServer.ts's createMusicRelayApp() for why this isn't
+    // gated on NODE_ENV=production.
+    app.set('trust proxy', 1)
 
     setupMiddleware(app)
     setupRoutes(app, routeOptions)

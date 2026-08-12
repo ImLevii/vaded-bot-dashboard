@@ -25,9 +25,12 @@ const MUSIC_RELAY_HOST = process.env.MUSIC_RELAY_HOST ?? '0.0.0.0'
 export function createMusicRelayApp(): Express {
     const app = express()
 
-    if (process.env.NODE_ENV === 'production') {
-        app.set('trust proxy', 1)
-    }
+    // Always behind a reverse proxy in every real deployment path (Vercel,
+    // Cloudflare Tunnel, nginx) — gating this on NODE_ENV=production broke
+    // express-rate-limit's IP resolution on hosts intentionally run with
+    // NODE_ENV=development (e.g. for local-cookie behavior) while still
+    // sitting behind a real proxy.
+    app.set('trust proxy', 1)
 
     setupMiddleware(app)
     setupHealthRoutes(app)
