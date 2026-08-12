@@ -4,9 +4,14 @@ import {
     type MusicCommand,
     type MusicCommandResult,
 } from '@lucky/shared/services'
+import { ENVIRONMENT_CONFIG } from '@lucky/shared/config'
 import { buildQueueState } from './mappers'
 import { resolveGuildQueue } from '../../utils/music/queueResolver'
-import { normalizeSpotifyUrl, normalizeYoutubeUrl } from '../../functions/music/commands/play/urlNormalization'
+import {
+    normalizeSpotifyUrl,
+    normalizeYoutubeUrl,
+} from '../../functions/music/commands/play/urlNormalization'
+import { buildWebNodeOptions, resolveWebPlayContext } from './playContext'
 
 type Result = MusicCommandResult
 
@@ -97,7 +102,9 @@ export async function handleImportPlaylist(
     const guild = client.guilds.cache.get(cmd.guildId)
     if (!guild) return fail(cmd.id, cmd.guildId, 'Guild not found')
 
-    const requestedBy = await client.users.fetch(cmd.userId).catch(() => undefined)
+    const requestedBy = await client.users
+        .fetch(cmd.userId)
+        .catch(() => undefined)
     const result = await client.player.search(url, { requestedBy })
     if (!result?.tracks.length)
         return fail(cmd.id, cmd.guildId, 'No tracks found in playlist')
@@ -105,29 +112,34 @@ export async function handleImportPlaylist(
     let queue = resolveGuildQueue(client, cmd.guildId).queue
 
     if (!queue) {
-        // No active queue — try to create one by joining the provided voice channel
-        if (!voiceChannelId)
-            return fail(
-                cmd.id,
-                cmd.guildId,
-                'Bot is not in a voice channel. Join a voice channel and try again.',
-            )
+        // No active queue — join voice and create one. The voice channel comes
+        // from the requester's own voice state when the dashboard couldn't
+        // supply one (it only knows the *bot's* channel, which is null until
+        // the bot is already connected — a circular dependency that made
+        // web-initiated imports impossible).
+        const resolved = await resolveWebPlayContext(
+            client,
+            guild,
+            cmd.userId,
+            voiceChannelId,
+        )
+        if (!resolved.ok) return fail(cmd.id, cmd.guildId, resolved.error)
 
-        const channel = guild.channels.cache.get(voiceChannelId)
-        if (!channel?.isVoiceBased())
-            return fail(cmd.id, cmd.guildId, 'Voice channel not found')
-
-        // Play the first track to establish the queue and connection
-        await client.player.play(channel, result.tracks[0], {
-            requestedBy,
-            nodeOptions: {
-                metadata: { channel: null, requestedBy: null, vcMemberIds: [] },
-                leaveOnEmpty: true,
-                leaveOnEmptyCooldown: 30_000,
-                leaveOnEnd: true,
-                leaveOnEndCooldown: 300_000,
+        // Play the first track to establish the queue and connection.
+        // metadata.channel must be a real text channel: trackNowPlaying.ts
+        // returns early without one, which silently suppressed the Now
+        // Playing embed for every web-started session.
+        await client.player.play(
+            resolved.context.voiceChannel,
+            result.tracks[0],
+            {
+                requestedBy,
+                nodeOptions: buildWebNodeOptions(
+                    resolved.context,
+                    ENVIRONMENT_CONFIG.PLAYER.CONNECTION_TIMEOUT,
+                ),
             },
-        })
+        )
         // Add remaining tracks to the newly created queue
         queue = resolveGuildQueue(client, cmd.guildId).queue
         if (queue && result.tracks.length > 1) {

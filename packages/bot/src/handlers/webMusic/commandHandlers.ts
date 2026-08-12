@@ -1,13 +1,23 @@
+import type { Guild } from 'discord.js'
 import type { CustomClient } from '../../types'
 import {
     musicControlService,
     type MusicCommand,
     type MusicCommandResult,
 } from '@lucky/shared/services'
+import { ENVIRONMENT_CONFIG } from '@lucky/shared/config'
 import { buildQueueState, repeatModeToEnum } from './mappers'
 import { resolveGuildQueue } from '../../utils/music/queueResolver'
 import { setReplenishSuppressed } from '../../utils/music/replenishSuppressionStore'
-import { normalizeYoutubeUrl, normalizeSpotifyUrl, cleanQueryInput } from '../../functions/music/commands/play/urlNormalization'
+import { QueryType } from 'discord-player'
+import {
+    normalizeYoutubeUrl,
+    normalizeSpotifyUrl,
+    cleanQueryInput,
+    isUrl,
+} from '../../functions/music/commands/play/urlNormalization'
+import { resolveQueryWithFallbacks } from '../../functions/music/commands/play/handlers/resolveProvider'
+import { buildWebNodeOptions, resolveWebPlayContext } from './playContext'
 
 type Result = MusicCommandResult
 
@@ -45,6 +55,58 @@ export async function handleGetState(
     return ok(cmd.id, cmd.guildId)
 }
 
+/**
+ * Joins voice and creates the queue for a dashboard-initiated play when no
+ * session exists yet — the web equivalent of the Discord `/play` cold start.
+ */
+async function startWebSession(
+    client: CustomClient,
+    cmd: MusicCommand,
+    guild: Guild,
+    query: string,
+    voiceChannelId: string | undefined,
+): Promise<Result> {
+    const resolved = await resolveWebPlayContext(
+        client,
+        guild,
+        cmd.userId,
+        voiceChannelId,
+    )
+    if (!resolved.ok) return fail(cmd.id, cmd.guildId, resolved.error)
+
+    setReplenishSuppressed(cmd.guildId, 0)
+    const { result: playResult } = await resolveQueryWithFallbacks(
+        client.player,
+        resolved.context.voiceChannel,
+        query,
+        'default',
+        // Mirrors resolveSearchEngine(query, null) without importing
+        // queryUtils, which is documented as too heavy for this handler
+        // (it drags in the Discord/Prisma chain). URLs resolve as-is;
+        // bare text prefers Spotify for its better metadata, and
+        // resolveQueryWithFallbacks handles the YouTube/SoundCloud arms.
+        isUrl(query) ? QueryType.AUTO : QueryType.SPOTIFY_SEARCH,
+        {
+            requestedBy: resolved.context.requestedBy,
+            nodeOptions: buildWebNodeOptions(
+                resolved.context,
+                ENVIRONMENT_CONFIG.PLAYER.CONNECTION_TIMEOUT,
+            ),
+        },
+    )
+
+    const state = await buildQueueState(client, cmd.guildId)
+    await musicControlService.publishState(state)
+
+    const isPlaylist = !!playResult.searchResult.playlist
+    return ok(cmd.id, cmd.guildId, {
+        tracksAdded: isPlaylist ? playResult.searchResult.tracks.length : 1,
+        isPlaylist,
+        title:
+            playResult.searchResult.playlist?.title ?? playResult.track.title,
+    })
+}
+
 export async function handlePlay(
     client: CustomClient,
     cmd: MusicCommand,
@@ -57,22 +119,24 @@ export async function handlePlay(
     if (!guild) return fail(cmd.id, cmd.guildId, 'Guild not found')
 
     const voiceChannelId = cmd.data?.voiceChannelId as string | undefined
-    if (voiceChannelId && !guild.channels.cache.get(voiceChannelId)) {
-        return fail(cmd.id, cmd.guildId, 'Voice channel not found')
+    const existingQueue = getQueue(client, cmd.guildId)
+
+    // No live session yet — start one exactly as the Discord `/play` path
+    // does (join voice, create the queue with a text channel in metadata so
+    // the Now Playing embed fires, and use the same provider fallback chain)
+    // instead of refusing with "start playing from Discord first".
+    if (!existingQueue) {
+        return startWebSession(client, cmd, guild, query, voiceChannelId)
     }
 
-    const requestedBy = await client.users.fetch(cmd.userId).catch(() => undefined)
+    const requestedBy = await client.users
+        .fetch(cmd.userId)
+        .catch(() => undefined)
     const result = await client.player.search(query, { requestedBy })
     if (!result?.tracks.length)
         return fail(cmd.id, cmd.guildId, 'No results found')
 
-    const queue = getQueue(client, cmd.guildId)
-    if (!queue)
-        return fail(
-            cmd.id,
-            cmd.guildId,
-            'No active queue. Start playing from Discord first.',
-        )
+    const queue = existingQueue
 
     setReplenishSuppressed(cmd.guildId, 0)
     if (result.playlist) {
