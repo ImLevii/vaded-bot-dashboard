@@ -222,6 +222,42 @@ describe('AutoModPage', () => {
         expect(payload).not.toHaveProperty('updatedAt')
     })
 
+    test('omits DB columns the PATCH schema does not accept', async () => {
+        const user = userEvent.setup()
+        mockGuildStore(mockGuild)
+        // GET returns the raw automod_settings row, which carries columns the
+        // UI does not model. `linkExemptChannels` is real and unmodelled; when
+        // it survived into the payload the .strict() body schema rejected the
+        // whole request, so every save 400'd.
+        vi.mocked(api.automod.getSettings).mockResolvedValue({
+            data: {
+                settings: { ...mockSettings, linkExemptChannels: ['999'] },
+            },
+        } as any)
+        vi.mocked(api.automod.updateSettings).mockResolvedValue({} as any)
+
+        renderPage()
+
+        await waitFor(() => {
+            expect(screen.getByText('Auto-Moderation')).toBeInTheDocument()
+        })
+
+        await user.click(
+            screen.getAllByRole('button', { name: /Save Changes/ })[0],
+        )
+
+        await waitFor(() => {
+            expect(api.automod.updateSettings).toHaveBeenCalled()
+        })
+
+        const payload = vi.mocked(api.automod.updateSettings).mock
+            .calls[0][1] as Record<string, unknown>
+
+        expect(payload).not.toHaveProperty('linkExemptChannels')
+        // ...while the fields that ARE settable still round-trip.
+        expect(payload).toMatchObject({ spamEnabled: true, wordsEnabled: true })
+    })
+
     test('save success shows toast', async () => {
         const user = userEvent.setup()
         const { toast } = await import('sonner')
