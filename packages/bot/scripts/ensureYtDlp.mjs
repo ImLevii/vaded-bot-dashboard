@@ -8,7 +8,7 @@
  */
 import { spawnSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
-import { chmod, mkdir, rename } from 'node:fs/promises'
+import { chmod, mkdir, rename, unlink } from 'node:fs/promises'
 import { createWriteStream } from 'node:fs'
 import { pipeline } from 'node:stream/promises'
 import { Readable } from 'node:stream'
@@ -27,9 +27,21 @@ function releaseAssetName() {
     return null
 }
 
+/**
+ * A yt-dlp that spawns but exits non-zero is worse than a missing one: the
+ * standalone release is a PyInstaller one-file bundle, so a truncated
+ * download — or a host that can't unpack it (no space in TMPDIR) — still
+ * produces a runnable-looking file that fails every extraction with
+ * `PYI-*: Failed to extract ...`. Checking only `!result.error` (i.e. "did
+ * spawn work") treats those as healthy forever, so verify the exit status.
+ */
+function runsSuccessfully(command) {
+    const result = spawnSync(command, ['--version'], { stdio: 'ignore' })
+    return !result.error && result.status === 0
+}
+
 function isOnPath() {
-    const result = spawnSync('yt-dlp', ['--version'], { stdio: 'ignore' })
-    return !result.error
+    return runsSuccessfully('yt-dlp')
 }
 
 export async function ensureYtDlp() {
@@ -46,8 +58,20 @@ export async function ensureYtDlp() {
     )
 
     if (existsSync(targetPath)) {
-        process.env.YT_DLP_PATH = targetPath
-        return
+        if (runsSuccessfully(targetPath)) {
+            process.env.YT_DLP_PATH = targetPath
+            return
+        }
+        // Cached copy is corrupt/unusable — drop it and re-download below
+        // rather than pointing the bridge at a binary that fails every call.
+        console.warn(
+            `[ensureYtDlp] cached yt-dlp at ${targetPath} failed --version, re-downloading`,
+        )
+        try {
+            await unlink(targetPath)
+        } catch {
+            // fall through — the download below overwrites via rename anyway
+        }
     }
 
     try {
@@ -63,6 +87,18 @@ export async function ensureYtDlp() {
         await rename(tmpPath, targetPath)
         process.env.YT_DLP_PATH = targetPath
         console.log(`[ensureYtDlp] downloaded yt-dlp to ${targetPath}`)
+
+        // A freshly-downloaded binary that still can't run points at the
+        // host, not the download — most often no space left for the
+        // PyInstaller bundle to unpack into TMPDIR. Say so explicitly;
+        // otherwise this surfaces later as an opaque per-track failure.
+        if (!runsSuccessfully(targetPath)) {
+            console.error(
+                '[ensureYtDlp] freshly downloaded yt-dlp still fails --version. ' +
+                    'This usually means the host cannot unpack it (e.g. no free disk ' +
+                    `space for TMPDIR=${process.env.TMPDIR ?? '/tmp'}). YouTube playback will fail until resolved.`,
+            )
+        }
     } catch (error) {
         console.error(
             '[ensureYtDlp] failed to download yt-dlp, YouTube playback will fail until yt-dlp is on PATH or YT_DLP_PATH is set:',
