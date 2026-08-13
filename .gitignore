@@ -94,6 +94,9 @@ secrets.json
 config.json
 *.secret
 
+# yt-dlp cookies (live YouTube session auth — see YT_DLP_COOKIES_PATH in .env)
+cookies.txt
+
 # Cloudflare Tunnel (credentials; config.example.yml is committed)
 cloudflared/*.json
 cloudflared/config.yml
