@@ -104,154 +104,166 @@ export const clearConfigCache = (): void => {
 export const constants = {
     VOLUME: 50,
     MAX_AUTOPLAY_TRACKS: 50,
-    MUSIC_WATCHDOG_TIMEOUT_MS: parseIntEnv(
-        'MUSIC_WATCHDOG_TIMEOUT_MS',
-        25000,
-    ),
+    MUSIC_WATCHDOG_TIMEOUT_MS: parseIntEnv('MUSIC_WATCHDOG_TIMEOUT_MS', 25000),
     MUSIC_PROVIDER_COOLDOWN_MS: parseIntEnv(
         'MUSIC_PROVIDER_COOLDOWN_MS',
         120000,
     ),
     MUSIC_SESSION_RESTORE_ENABLED:
         process.env.MUSIC_SESSION_RESTORE_ENABLED !== 'false',
-    AUTOPLAY_DISLIKE_TTL_HOURS: parseIntEnv(
-        'AUTOPLAY_DISLIKE_TTL_HOURS',
-        24,
-    ),
+    AUTOPLAY_DISLIKE_TTL_HOURS: parseIntEnv('AUTOPLAY_DISLIKE_TTL_HOURS', 24),
 }
 
+// Each section is a getter, computed fresh on every access, rather than a
+// plain literal computed once at module-evaluation time. Importing
+// `ensureEnvironment` from this package's barrel (packages/shared/src/config/
+// index.ts) transitively evaluates this whole module, including whatever is
+// exported here — which happens before `ensureEnvironment()` has ever run.
+// A plain object literal would freeze every field (REDIS.HOST, DATABASE.URL,
+// SPOTIFY.CLIENT_ID, ...) at pre-.env-load values (usually `undefined`,
+// falling back to hardcoded defaults like 'localhost') for the rest of the
+// process's life, no matter how carefully callers order their own imports.
 export const ENVIRONMENT_CONFIG = {
-    DATABASE: {
-        URL: process.env.DATABASE_URL,
-        MAX_CONNECTIONS: parseIntEnv('DATABASE_MAX_CONNECTIONS', 10),
-        CONNECTION_TIMEOUT: parseIntEnv(
-            'DATABASE_CONNECTION_TIMEOUT',
-            30000,
-        ),
-        QUERY_TIMEOUT: parseIntEnv('DATABASE_QUERY_TIMEOUT', 10000),
+    get DATABASE() {
+        return {
+            URL: process.env.DATABASE_URL,
+            MAX_CONNECTIONS: parseIntEnv('DATABASE_MAX_CONNECTIONS', 10),
+            CONNECTION_TIMEOUT: parseIntEnv(
+                'DATABASE_CONNECTION_TIMEOUT',
+                30000,
+            ),
+            QUERY_TIMEOUT: parseIntEnv('DATABASE_QUERY_TIMEOUT', 10000),
+        }
     },
-    REDIS: {
-        HOST: process.env.REDIS_HOST ?? 'localhost',
-        PORT: parseIntEnv('REDIS_PORT', 6379),
-        PASSWORD: process.env.REDIS_PASSWORD,
-        DB: parseIntEnv('REDIS_DB', 0),
+    get REDIS() {
+        return {
+            HOST: process.env.REDIS_HOST ?? 'localhost',
+            PORT: parseIntEnv('REDIS_PORT', 6379),
+            PASSWORD: process.env.REDIS_PASSWORD,
+            DB: parseIntEnv('REDIS_DB', 0),
+        }
     },
-    TIKTOK: {
-        API_HOSTNAME:
-            process.env.TIKTOK_API_HOSTNAME ??
-            'api16-normal-c-useast1a.tiktokv.com',
-        REFERER_URL:
-            process.env.TIKTOK_REFERER_URL ?? 'https://www.tiktok.com/',
-        EXTRACTOR_RETRIES: parseIntEnv(
-            'TIKTOK_EXTRACTOR_RETRIES',
-            3,
-        ),
-        FRAGMENT_RETRIES: parseIntEnv('TIKTOK_FRAGMENT_RETRIES', 3),
-        SLEEP_INTERVAL: parseIntEnv('TIKTOK_SLEEP_INTERVAL', 1),
-        MAX_SLEEP_INTERVAL: parseIntEnv(
-            'TIKTOK_MAX_SLEEP_INTERVAL',
-            3,
-        ),
+    get TIKTOK() {
+        return {
+            API_HOSTNAME:
+                process.env.TIKTOK_API_HOSTNAME ??
+                'api16-normal-c-useast1a.tiktokv.com',
+            REFERER_URL:
+                process.env.TIKTOK_REFERER_URL ?? 'https://www.tiktok.com/',
+            EXTRACTOR_RETRIES: parseIntEnv('TIKTOK_EXTRACTOR_RETRIES', 3),
+            FRAGMENT_RETRIES: parseIntEnv('TIKTOK_FRAGMENT_RETRIES', 3),
+            SLEEP_INTERVAL: parseIntEnv('TIKTOK_SLEEP_INTERVAL', 1),
+            MAX_SLEEP_INTERVAL: parseIntEnv('TIKTOK_MAX_SLEEP_INTERVAL', 3),
+        }
     },
-    YOUTUBE: {
-        CONNECTION_TIMEOUT: parseIntEnv(
-            'YOUTUBE_CONNECTION_TIMEOUT',
-            120000,
-        ),
-        MAX_RETRIES: parseIntEnv('YOUTUBE_MAX_RETRIES', 3),
-        RETRY_DELAY: parseIntEnv('YOUTUBE_RETRY_DELAY', 1000),
-        MAX_EXTRACTORS: parseIntEnv('YOUTUBE_MAX_EXTRACTORS', 5),
-        USER_AGENT:
-            process.env.YOUTUBE_USER_AGENT ??
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    get YOUTUBE() {
+        return {
+            CONNECTION_TIMEOUT: parseIntEnv(
+                'YOUTUBE_CONNECTION_TIMEOUT',
+                120000,
+            ),
+            MAX_RETRIES: parseIntEnv('YOUTUBE_MAX_RETRIES', 3),
+            RETRY_DELAY: parseIntEnv('YOUTUBE_RETRY_DELAY', 1000),
+            MAX_EXTRACTORS: parseIntEnv('YOUTUBE_MAX_EXTRACTORS', 5),
+            USER_AGENT:
+                process.env.YOUTUBE_USER_AGENT ??
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        }
     },
-    DOWNLOAD: {
-        TIMEOUT: parseIntEnv('DOWNLOAD_TIMEOUT', 10000),
-        MAX_RETRIES: parseIntEnv('DOWNLOAD_MAX_RETRIES', 3),
-        RETRY_DELAY: parseIntEnv('DOWNLOAD_RETRY_DELAY', 1000),
+    get DOWNLOAD() {
+        return {
+            TIMEOUT: parseIntEnv('DOWNLOAD_TIMEOUT', 10000),
+            MAX_RETRIES: parseIntEnv('DOWNLOAD_MAX_RETRIES', 3),
+            RETRY_DELAY: parseIntEnv('DOWNLOAD_RETRY_DELAY', 1000),
+        }
     },
-    RATE_LIMITS: {
-        COMMAND_WINDOW_MS: parseIntEnv(
-            'RATE_LIMIT_COMMAND_WINDOW_MS',
-            60000,
-        ),
-        COMMAND_MAX_REQUESTS: parseIntEnv(
-            'RATE_LIMIT_COMMAND_MAX_REQUESTS',
-            5,
-        ),
-        MUSIC_COMMAND_WINDOW_MS: parseIntEnv(
-            'RATE_LIMIT_MUSIC_COMMAND_WINDOW_MS',
-            30000,
-        ),
-        MUSIC_COMMAND_MAX_REQUESTS: parseIntEnv(
-            'RATE_LIMIT_MUSIC_COMMAND_MAX_REQUESTS',
-            3,
-        ),
-        DOWNLOAD_WINDOW_MS: parseIntEnv(
-            'RATE_LIMIT_DOWNLOAD_WINDOW_MS',
-            300000,
-        ),
-        DOWNLOAD_MAX_REQUESTS: parseIntEnv(
-            'RATE_LIMIT_DOWNLOAD_MAX_REQUESTS',
-            2,
-        ),
+    get RATE_LIMITS() {
+        return {
+            COMMAND_WINDOW_MS: parseIntEnv(
+                'RATE_LIMIT_COMMAND_WINDOW_MS',
+                60000,
+            ),
+            COMMAND_MAX_REQUESTS: parseIntEnv(
+                'RATE_LIMIT_COMMAND_MAX_REQUESTS',
+                5,
+            ),
+            MUSIC_COMMAND_WINDOW_MS: parseIntEnv(
+                'RATE_LIMIT_MUSIC_COMMAND_WINDOW_MS',
+                30000,
+            ),
+            MUSIC_COMMAND_MAX_REQUESTS: parseIntEnv(
+                'RATE_LIMIT_MUSIC_COMMAND_MAX_REQUESTS',
+                3,
+            ),
+            DOWNLOAD_WINDOW_MS: parseIntEnv(
+                'RATE_LIMIT_DOWNLOAD_WINDOW_MS',
+                300000,
+            ),
+            DOWNLOAD_MAX_REQUESTS: parseIntEnv(
+                'RATE_LIMIT_DOWNLOAD_MAX_REQUESTS',
+                2,
+            ),
+        }
     },
-    SESSIONS: {
-        USER_SESSION_TTL: parseIntEnv('USER_SESSION_TTL', 86400),
-        QUEUE_SESSION_TTL: parseIntEnv('QUEUE_SESSION_TTL', 7200),
-        COMMAND_HISTORY_LIMIT: parseIntEnv(
-            'COMMAND_HISTORY_LIMIT',
-            10,
-        ),
+    get SESSIONS() {
+        return {
+            USER_SESSION_TTL: parseIntEnv('USER_SESSION_TTL', 86400),
+            QUEUE_SESSION_TTL: parseIntEnv('QUEUE_SESSION_TTL', 7200),
+            COMMAND_HISTORY_LIMIT: parseIntEnv('COMMAND_HISTORY_LIMIT', 10),
+        }
     },
-    CACHE: {
-        TRACK_INFO_SIZE: parseIntEnv('CACHE_TRACK_INFO_SIZE', 2000),
-        ARTIST_TITLE_SIZE: parseIntEnv(
-            'CACHE_ARTIST_TITLE_SIZE',
-            2000,
-        ),
-        MEMO_SIZE: parseIntEnv('CACHE_MEMO_SIZE', 5000),
-        TTL_HOURS: parseIntEnv('CACHE_TTL_HOURS', 1),
+    get CACHE() {
+        return {
+            TRACK_INFO_SIZE: parseIntEnv('CACHE_TRACK_INFO_SIZE', 2000),
+            ARTIST_TITLE_SIZE: parseIntEnv('CACHE_ARTIST_TITLE_SIZE', 2000),
+            MEMO_SIZE: parseIntEnv('CACHE_MEMO_SIZE', 5000),
+            TTL_HOURS: parseIntEnv('CACHE_TTL_HOURS', 1),
+        }
     },
-    PLAYER: {
-        LEAVE_ON_EMPTY_COOLDOWN: parseIntEnv(
-            'PLAYER_LEAVE_ON_EMPTY_COOLDOWN',
-            300000,
-        ),
-        LEAVE_ON_END_COOLDOWN: parseIntEnv(
-            'PLAYER_LEAVE_ON_END_COOLDOWN',
-            300000,
-        ),
-        CONNECTION_TIMEOUT: parseIntEnv(
-            'PLAYER_CONNECTION_TIMEOUT',
-            15000,
-        ),
+    get PLAYER() {
+        return {
+            LEAVE_ON_EMPTY_COOLDOWN: parseIntEnv(
+                'PLAYER_LEAVE_ON_EMPTY_COOLDOWN',
+                300000,
+            ),
+            LEAVE_ON_END_COOLDOWN: parseIntEnv(
+                'PLAYER_LEAVE_ON_END_COOLDOWN',
+                300000,
+            ),
+            CONNECTION_TIMEOUT: parseIntEnv('PLAYER_CONNECTION_TIMEOUT', 15000),
+        }
     },
-    SEARCH: {
-        TIMEOUT: parseIntEnv('SEARCH_TIMEOUT', 15000),
-        RETRY_DELAY: parseIntEnv('SEARCH_RETRY_DELAY', 5000),
+    get SEARCH() {
+        return {
+            TIMEOUT: parseIntEnv('SEARCH_TIMEOUT', 15000),
+            RETRY_DELAY: parseIntEnv('SEARCH_RETRY_DELAY', 5000),
+        }
     },
-    MUSIC: {
-        WATCHDOG_TIMEOUT_MS: parseIntEnv(
-            'MUSIC_WATCHDOG_TIMEOUT_MS',
-            25000,
-        ),
-        PROVIDER_COOLDOWN_MS: parseIntEnv(
-            'MUSIC_PROVIDER_COOLDOWN_MS',
-            120000,
-        ),
-        SESSION_RESTORE_ENABLED:
-            process.env.MUSIC_SESSION_RESTORE_ENABLED !== 'false',
-        AUTOPLAY_DISLIKE_TTL_HOURS: parseIntEnv(
-            'AUTOPLAY_DISLIKE_TTL_HOURS',
-            24,
-        ),
+    get MUSIC() {
+        return {
+            WATCHDOG_TIMEOUT_MS: parseIntEnv(
+                'MUSIC_WATCHDOG_TIMEOUT_MS',
+                25000,
+            ),
+            PROVIDER_COOLDOWN_MS: parseIntEnv(
+                'MUSIC_PROVIDER_COOLDOWN_MS',
+                120000,
+            ),
+            SESSION_RESTORE_ENABLED:
+                process.env.MUSIC_SESSION_RESTORE_ENABLED !== 'false',
+            AUTOPLAY_DISLIKE_TTL_HOURS: parseIntEnv(
+                'AUTOPLAY_DISLIKE_TTL_HOURS',
+                24,
+            ),
+        }
     },
-    SPOTIFY: {
-        CLIENT_ID: process.env.SPOTIFY_CLIENT_ID,
-        CLIENT_SECRET: process.env.SPOTIFY_CLIENT_SECRET,
+    get SPOTIFY() {
+        return {
+            CLIENT_ID: process.env.SPOTIFY_CLIENT_ID,
+            CLIENT_SECRET: process.env.SPOTIFY_CLIENT_SECRET,
+        }
     },
-} as const
+}
 
 export type EnvironmentConfig = typeof ENVIRONMENT_CONFIG
 

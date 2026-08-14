@@ -416,6 +416,22 @@ describe('setupErrorHandlers', () => {
         )
     })
 
+    it('recovers connection on voice-connection AbortError (timeout entering ready state)', () => {
+        const { queueHandlers } = createPlayerWithHandlers()
+        const queue = {
+            guild: { id: 'guild-abort', name: 'Guild Abort' },
+            connection: {
+                state: { status: 'disconnected' },
+                rejoin: jest.fn(),
+            },
+        }
+        const abortError = new Error('The operation was aborted')
+        abortError.name = 'AbortError'
+        ;(queueHandlers.error as QueueErrorHandler)(queue as any, abortError)
+
+        expect(queue.connection.rejoin).toHaveBeenCalled()
+    })
+
     it('wraps a non-Error top-level player payload before capturing it', () => {
         const { playerHandlers } = createPlayerWithHandlers()
 
