@@ -75,6 +75,10 @@ COPY packages/shared ./packages/shared
 COPY packages/bot ./packages/bot
 COPY packages/backend ./packages/backend
 COPY prisma ./prisma
+# packages/bot's `build` script chain (build -> preflight -> root db:generate)
+# shells out to scripts/db-generate.mjs, so it must exist in the image even
+# though nothing else in this stage needs the rest of scripts/.
+COPY scripts/db-generate.mjs ./scripts/db-generate.mjs
 
 RUN npx prisma generate
 
