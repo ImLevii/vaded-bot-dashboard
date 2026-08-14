@@ -140,6 +140,11 @@ function mapTechnicalErrors(sanitized: string): string | null {
             message: 'Request timed out. Please try again.',
         },
         {
+            keywords: ['operation was aborted'],
+            message:
+                "Couldn't establish a voice connection in time. This is usually a network/firewall issue blocking voice traffic (UDP) — check your firewall, router NAT settings, or VPN if you're running the bot locally.",
+        },
+        {
             keywords: ['permission'],
             message:
                 'Permission denied. Please check your settings and try again.',

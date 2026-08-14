@@ -148,6 +148,11 @@ function validateYtDlpUrl(url: string): void {
 const LIVE_STREAM_ERROR_FRAGMENT = 'live stream recording is not available'
 // yt-dlp's message for this varies in punctuation ("you're"/"you’re"); match the stable prefix.
 const BOT_CHECK_ERROR_FRAGMENT = 'sign in to confirm'
+// The default `android` client sometimes returns no usable formats for a
+// given video (long mixes, certain restrictions) even though other clients
+// can extract it fine — same underlying "wrong client" problem as the
+// bot-check case, so it gets the same client-retry treatment.
+const FORMAT_UNAVAILABLE_ERROR_FRAGMENT = 'requested format is not available'
 
 /**
  * YouTube's `android`/`ios` player clients do not accept cookie
@@ -367,10 +372,14 @@ export async function createResilientStream(
                     // fall through to SoundCloud stages below
                 }
             }
-            // YouTube's bot-check ("Sign in to confirm you're not a bot") is
-            // usually IP-based, but each client is validated differently from
-            // android and sometimes still gets through without cookies.
-            if (lowerErrMsg.includes(BOT_CHECK_ERROR_FRAGMENT)) {
+            // YouTube's bot-check ("Sign in to confirm you're not a bot") and
+            // "requested format is not available" are both, in practice, the
+            // android client failing this particular video where another
+            // client would succeed — retry the same alternates for either.
+            if (
+                lowerErrMsg.includes(BOT_CHECK_ERROR_FRAGMENT) ||
+                lowerErrMsg.includes(FORMAT_UNAVAILABLE_ERROR_FRAGMENT)
+            ) {
                 const hasCookies = Boolean(resolveYtDlpCookiesPath())
                 for (const retryClient of botCheckRetryClients(hasCookies)) {
                     try {
@@ -379,10 +388,15 @@ export async function createResilientStream(
                             retryClient,
                         )
                         infoLog({
-                            message: `Bridge: bot-check bypassed via ${retryClient} client`,
+                            message: `Bridge: retried via ${retryClient} client after android failure`,
                             data: {
                                 url: track.url,
                                 title: cleanedTitle || track.title,
+                                reason: lowerErrMsg.includes(
+                                    BOT_CHECK_ERROR_FRAGMENT,
+                                )
+                                    ? 'bot-check'
+                                    : 'format-unavailable',
                             },
                         })
                         return retryStream

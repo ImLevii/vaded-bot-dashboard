@@ -162,7 +162,8 @@ export const setupErrorHandlers = (player: PlayerEvents): void => {
                 details.errorMessage.includes('ECONNRESET') ||
                 details.errorMessage.includes('ECONNREFUSED') ||
                 details.errorMessage.includes('ETIMEDOUT') ||
-                details.errorMessage.includes('Connection reset by peer')
+                details.errorMessage.includes('Connection reset by peer') ||
+                details.errorName === 'AbortError'
 
             const connection = queue?.connection
             if (isConnectionError && connection) {

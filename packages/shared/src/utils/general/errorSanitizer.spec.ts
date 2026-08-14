@@ -323,6 +323,22 @@ describe('createUserFriendlyError', () => {
         expect(result).toBe('Request timed out. Please try again.')
     })
 
+    it('maps voice-connection AbortError to a firewall/network message', () => {
+        const error = new Error('The operation was aborted')
+        const result = createUserFriendlyError(error)
+        expect(result).toBe(
+            "Couldn't establish a voice connection in time. This is usually a network/firewall issue blocking voice traffic (UDP) — check your firewall, router NAT settings, or VPN if you're running the bot locally.",
+        )
+    })
+
+    it('maps AbortSignal.timeout()-style aborts to the generic timeout message, not the voice one', () => {
+        // AbortSignal.timeout() produces this exact message shape, which also
+        // contains "operation was aborted" — the 'timeout' entry must win.
+        const error = new Error('The operation was aborted due to timeout')
+        const result = createUserFriendlyError(error)
+        expect(result).toBe('Request timed out. Please try again.')
+    })
+
     it('maps permission errors to permission message', () => {
         const error = new Error('permission denied on file')
         const result = createUserFriendlyError(error)

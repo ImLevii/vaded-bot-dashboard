@@ -8,10 +8,16 @@ import {
     sanitizeErrorMessage,
     sanitizeStack,
 } from '@lucky/shared/utils'
-import { initializeBot, shutdown as shutdownBot } from './bot/start'
-import { dependencyCheckService } from './services/DependencyCheckService'
 
 let isShuttingDown = false
+
+// `./bot/start` transitively imports `@lucky/shared/services`, whose barrel
+// eagerly constructs a Prisma client at module-load time (AutoMessageService).
+// A static top-level import here would evaluate that before ensureEnvironment()
+// below ever runs, throwing "DATABASE_URL ... is required" on every standalone
+// bot start. Load it dynamically, after env is guaranteed to be loaded, the
+// same way packages/backend/src/index.ts defers its ./bootstrap import.
+let shutdownBot: () => Promise<void>
 
 async function gracefulShutdown(signal: string): Promise<void> {
     if (isShuttingDown) {
@@ -23,8 +29,10 @@ async function gracefulShutdown(signal: string): Promise<void> {
     debugLog({ message: `Received ${signal}, initiating graceful shutdown...` })
 
     try {
-        await shutdownBot()
-        debugLog({ message: 'Bot shutdown completed' })
+        if (shutdownBot) {
+            await shutdownBot()
+            debugLog({ message: 'Bot shutdown completed' })
+        }
     } catch (error) {
         errorLog({ message: `Error during ${signal} shutdown:`, error })
     }
@@ -56,6 +64,8 @@ async function main(): Promise<void> {
     })
 
     if (process.env.DEPENDENCY_CHECK_ENABLED === 'true') {
+        const { dependencyCheckService } =
+            await import('./services/DependencyCheckService')
         dependencyCheckService.start()
     }
 
@@ -65,6 +75,9 @@ async function main(): Promise<void> {
 
     process.on('SIGTERM', () => gracefulShutdown('SIGTERM'))
     process.on('SIGINT', () => gracefulShutdown('SIGINT'))
+
+    const { initializeBot, shutdown } = await import('./bot/start')
+    shutdownBot = shutdown
 
     const result = await initializeBot()
     if (!result.success) {
