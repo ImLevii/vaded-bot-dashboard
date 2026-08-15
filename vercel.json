@@ -37,6 +37,10 @@
     "redirects": [],
     "rewrites": [
         {
+            "source": "/api/guilds/:guildId/music/:path*",
+            "destination": "https://panel.vaded-hosting.com:25567/api/guilds/:guildId/music/:path*"
+        },
+        {
             "source": "/api/:match*",
             "destination": "/api"
         },
