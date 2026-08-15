@@ -5,7 +5,17 @@ import { writeLimiter } from '../middleware/rateLimit'
 import { asyncHandler } from '../middleware/asyncHandler'
 import { managementSchemas as s } from '../schemas/management'
 import { guildSettingsService } from '@lucky/shared/services'
+import { getPrismaClient } from '@lucky/shared/utils'
 import { z } from 'zod'
+
+const DEFAULT_DASHBOARD_SETTINGS = {
+    nickname: '',
+    commandPrefix: '!',
+    managerRoles: [] as string[],
+    updatesChannel: '',
+    timezone: 'UTC',
+    disableWarnings: false,
+}
 
 function p(val: string | string[]): string {
     return typeof val === 'string' ? val : val[0]
@@ -35,16 +45,36 @@ export function setupGuildSettingsRoutes(app: Express): void {
         validateParams(s.guildIdParam),
         asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
             const guildId = p(req.params.guildId)
-            const settings =
-                await guildSettingsService.getGuildSettings(guildId)
+            const prisma = getPrismaClient()
+            const row = await prisma.guildSettings.findUnique({
+                where: { guildId },
+                select: {
+                    nickname: true,
+                    commandPrefix: true,
+                    managerRoles: true,
+                    updatesChannel: true,
+                    timezone: true,
+                    disableWarnings: true,
+                },
+            })
             res.json({
-                settings: settings || {
-                    nickname: '',
-                    commandPrefix: '/',
-                    managerRoles: [],
-                    updatesChannel: '',
-                    timezone: 'UTC',
-                    disableWarnings: false,
+                settings: {
+                    nickname:
+                        row?.nickname ?? DEFAULT_DASHBOARD_SETTINGS.nickname,
+                    commandPrefix:
+                        row?.commandPrefix ??
+                        DEFAULT_DASHBOARD_SETTINGS.commandPrefix,
+                    managerRoles:
+                        row?.managerRoles ??
+                        DEFAULT_DASHBOARD_SETTINGS.managerRoles,
+                    updatesChannel:
+                        row?.updatesChannel ??
+                        DEFAULT_DASHBOARD_SETTINGS.updatesChannel,
+                    timezone:
+                        row?.timezone ?? DEFAULT_DASHBOARD_SETTINGS.timezone,
+                    disableWarnings:
+                        row?.disableWarnings ??
+                        DEFAULT_DASHBOARD_SETTINGS.disableWarnings,
                 },
             })
         }),
@@ -58,7 +88,13 @@ export function setupGuildSettingsRoutes(app: Express): void {
         validateBody(settingsBody),
         asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
             const guildId = p(req.params.guildId)
-            await guildSettingsService.setGuildSettings(guildId, req.body)
+            const data = req.body as z.infer<typeof settingsBody>
+            const prisma = getPrismaClient()
+            await prisma.guildSettings.upsert({
+                where: { guildId },
+                create: { guildId, ...data },
+                update: data,
+            })
             res.json({ success: true })
         }),
     )

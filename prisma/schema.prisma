@@ -246,6 +246,16 @@ model GuildSettings {
   supportCategoryId  String?
   supportAgentRoleId String?
 
+  // Dashboard general settings (packages/backend/src/routes/guildSettings.ts).
+  // Distinct from the "Bot settings" block above — display-only fields the web
+  // dashboard's Settings page reads/writes, not yet consumed by bot behavior.
+  nickname        String?
+  commandPrefix   String?  @default("!")
+  managerRoles    String[] @default([])
+  updatesChannel  String?
+  timezone        String?  @default("UTC")
+  disableWarnings Boolean  @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

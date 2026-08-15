@@ -23,6 +23,30 @@ jest.mock('@lucky/shared/services', () => ({
     },
 }))
 
+const mockFindUniqueGuildSettings = jest.fn<any>()
+const mockUpsertGuildSettings = jest.fn<any>()
+
+// tests/setup.ts globally mocks '@lucky/shared/utils' with a log-only stub
+// (no getPrismaClient), which this suite needs. Re-declaring it here with
+// jest.mock (rather than jest.requireActual + spread, which re-evaluates the
+// real log module and its chalk import in a way that breaks setupSessionMiddleware's
+// debugLog call) overrides that stub for this file only, keeping the same
+// no-op log functions plus a mocked getPrismaClient.
+jest.mock('@lucky/shared/utils', () => ({
+    errorLog: jest.fn(),
+    debugLog: jest.fn(),
+    infoLog: jest.fn(),
+    warnLog: jest.fn(),
+    captureException: jest.fn(),
+    getPrismaClient: jest.fn(() => ({
+        guildSettings: {
+            findUnique: (...args: any[]) =>
+                mockFindUniqueGuildSettings(...args),
+            upsert: (...args: any[]) => mockUpsertGuildSettings(...args),
+        },
+    })),
+}))
+
 describe('Guild Settings Routes', () => {
     let app: express.Express
 
@@ -52,7 +76,7 @@ describe('Guild Settings Routes', () => {
                 timezone: 'UTC',
                 disableWarnings: false,
             }
-            mockGetSettings.mockResolvedValue(settings)
+            mockFindUniqueGuildSettings.mockResolvedValue(settings)
 
             const res = await request(app)
                 .get(`/api/guilds/${GUILD_ID}/settings`)
@@ -60,21 +84,39 @@ describe('Guild Settings Routes', () => {
 
             expect(res.status).toBe(200)
             expect(res.body.settings).toEqual(settings)
+            expect(mockFindUniqueGuildSettings).toHaveBeenCalledWith({
+                where: { guildId: GUILD_ID },
+                select: {
+                    nickname: true,
+                    commandPrefix: true,
+                    managerRoles: true,
+                    updatesChannel: true,
+                    timezone: true,
+                    disableWarnings: true,
+                },
+            })
         })
 
-        test('should return defaults when no settings exist', async () => {
+        test('should return defaults when no settings row exists', async () => {
             const mockSession = sessionService as jest.Mocked<
                 typeof sessionService
             >
             mockSession.getSession.mockResolvedValue(MOCK_SESSION_DATA)
-            mockGetSettings.mockResolvedValue(null)
+            mockFindUniqueGuildSettings.mockResolvedValue(null)
 
             const res = await request(app)
                 .get(`/api/guilds/${GUILD_ID}/settings`)
                 .set('Cookie', ['sessionId=valid_session_id'])
 
             expect(res.status).toBe(200)
-            expect(res.body.settings.commandPrefix).toBe('/')
+            expect(res.body.settings).toEqual({
+                nickname: '',
+                commandPrefix: '!',
+                managerRoles: [],
+                updatesChannel: '',
+                timezone: 'UTC',
+                disableWarnings: false,
+            })
         })
 
         test('should return 401 when not authenticated', async () => {
@@ -97,7 +139,7 @@ describe('Guild Settings Routes', () => {
                 typeof sessionService
             >
             mockSession.getSession.mockResolvedValue(MOCK_SESSION_DATA)
-            mockSetSettings.mockResolvedValue(true)
+            mockUpsertGuildSettings.mockResolvedValue({})
 
             const res = await request(app)
                 .post(`/api/guilds/${GUILD_ID}/settings`)
@@ -106,10 +148,48 @@ describe('Guild Settings Routes', () => {
 
             expect(res.status).toBe(200)
             expect(res.body.success).toBe(true)
-            expect(mockSetSettings).toHaveBeenCalledWith(GUILD_ID, {
-                nickname: 'NewName',
-                commandPrefix: '!',
+            expect(mockUpsertGuildSettings).toHaveBeenCalledWith({
+                where: { guildId: GUILD_ID },
+                create: {
+                    guildId: GUILD_ID,
+                    nickname: 'NewName',
+                    commandPrefix: '!',
+                },
+                update: { nickname: 'NewName', commandPrefix: '!' },
             })
+        })
+
+        test('should persist settings so a later GET reflects the save (round-trip)', async () => {
+            const mockSession = sessionService as jest.Mocked<
+                typeof sessionService
+            >
+            mockSession.getSession.mockResolvedValue(MOCK_SESSION_DATA)
+            mockUpsertGuildSettings.mockResolvedValue({})
+
+            const payload = {
+                nickname: 'Round Trip Bot',
+                commandPrefix: '?',
+                managerRoles: ['role-1'],
+                updatesChannel: 'chan-1',
+                timezone: 'America/New_York',
+                disableWarnings: true,
+            }
+
+            const postRes = await request(app)
+                .post(`/api/guilds/${GUILD_ID}/settings`)
+                .set('Cookie', ['sessionId=valid_session_id'])
+                .send(payload)
+            expect(postRes.status).toBe(200)
+
+            // Simulate the row the upsert would have written, as the next GET would see it.
+            mockFindUniqueGuildSettings.mockResolvedValue(payload)
+
+            const getRes = await request(app)
+                .get(`/api/guilds/${GUILD_ID}/settings`)
+                .set('Cookie', ['sessionId=valid_session_id'])
+
+            expect(getRes.status).toBe(200)
+            expect(getRes.body.settings).toEqual(payload)
         })
 
         test('should reject invalid fields', async () => {
