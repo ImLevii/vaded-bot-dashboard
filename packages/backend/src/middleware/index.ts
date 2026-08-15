@@ -145,6 +145,17 @@ export function setupMiddleware(app: Express): void {
     setupSessionMiddleware(app)
 
     if (isProduction) {
+        // All-in-one Docker image copies the frontend build here (Dockerfile:
+        // `COPY --from=build-frontend .../frontend/dist ./packages/backend/dist/frontend/dist`).
+        // The other two are older/alternate layouts, kept as fallbacks.
+        const dockerAllInOnePath = path.join(
+            process.cwd(),
+            'packages',
+            'backend',
+            'dist',
+            'frontend',
+            'dist',
+        )
         const monorepoPublicPath = path.join(
             process.cwd(),
             'packages',
@@ -152,9 +163,11 @@ export function setupMiddleware(app: Express): void {
             'public',
         )
         const localPublicPath = path.join(process.cwd(), 'public')
-        const staticPath = existsSync(monorepoPublicPath)
-            ? monorepoPublicPath
-            : localPublicPath
+        const staticPath = existsSync(dockerAllInOnePath)
+            ? dockerAllInOnePath
+            : existsSync(monorepoPublicPath)
+              ? monorepoPublicPath
+              : localPublicPath
 
         app.use(express.static(staticPath))
     }
