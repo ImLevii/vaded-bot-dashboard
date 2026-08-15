@@ -101,7 +101,20 @@ if [ "${AUTO_UPDATE:-0}" = "1" ] || [ "${AUTO_UPDATE:-0}" = "true" ]; then
                 --workspace packages/backend
         ) || { echo "[entrypoint] FATAL: AUTO_UPDATE rebuild failed — fix the build or set AUTO_UPDATE=0 to boot the previous build." >&2; exit 1; }
     else
-        echo "[entrypoint] WARNING: git pull failed (dirty tree or no credentials); continuing with the existing build." >&2
+        # A failed pull is easy to miss: the stack still boots, just on stale
+        # code, so a fix you just pushed silently isn't running and every
+        # symptom looks like the bug was never fixed. Say so unmissably and
+        # name the actual causes (see the git error printed directly above).
+        echo "[entrypoint] ==================================================================" >&2
+        echo "[entrypoint] WARNING: git pull FAILED — see the git error immediately above." >&2
+        echo "[entrypoint] Booting the PREVIOUSLY BUILT code: anything you just pushed is NOT" >&2
+        echo "[entrypoint] running. Common causes:" >&2
+        echo "[entrypoint]   * 'untracked working tree files would be overwritten' — a file was" >&2
+        echo "[entrypoint]     copied in by hand (SFTP/file manager) at a path that is now" >&2
+        echo "[entrypoint]     tracked upstream. Move or delete that path, then restart." >&2
+        echo "[entrypoint]   * local edits to tracked files — 'git checkout -- <path>' to drop." >&2
+        echo "[entrypoint]   * private repo without GIT_USERNAME / GIT_TOKEN set." >&2
+        echo "[entrypoint] ==================================================================" >&2
     fi
 fi
 
