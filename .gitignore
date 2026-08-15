@@ -141,3 +141,8 @@ packages/*/reports/stryker-incremental.json
 
 # Self-downloaded yt-dlp binary (see packages/bot/scripts/ensureYtDlp.mjs)
 /.bin/
+
+# Personal Pterodactyl egg export with real secrets pre-filled as defaults
+# (generated from .env by deploy/pterodactyl/.generate-egg.mjs --local).
+# The tracked egg-vaded-gaming.json always ships with empty/placeholder defaults.
+deploy/pterodactyl/*.local.json

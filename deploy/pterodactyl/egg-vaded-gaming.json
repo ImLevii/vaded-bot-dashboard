@@ -1,0 +1,344 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2026-08-15T00:00:00+00:00",
+    "uuid": "7c1f65de-52a4-4f8a-9c07-b1e2a9d3f410",
+    "name": "Vaded Gaming — Bot + Backend API",
+    "author": "services.vadedhosting@gmail.com",
+    "description": "Runs the Vaded Gaming Discord bot and its Express backend API in a single server. The backend binds the primary allocation and serves the Vercel-hosted dashboard (packages/frontend is NOT built or served here). Requires an external PostgreSQL database (Pterodactyl’s built-in database hosts are MySQL and will not work) and, optionally, a Redis instance. See deploy/pterodactyl/README.md in the repository.",
+    "features": [],
+    "docker_images": {
+        "Node.js 24": "ghcr.io/ptero-eggs/yolks:nodejs_24",
+        "Node.js 22": "ghcr.io/ptero-eggs/yolks:nodejs_22"
+    },
+    "file_denylist": [],
+    "startup": "bash deploy/pterodactyl/entrypoint.sh",
+    "config": {
+        "files": "{}",
+        "startup": "{\r\n    \"done\": \"stack online: bot ready and API listening\"\r\n}",
+        "logs": "{}",
+        "stop": "^^C"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!/bin/bash\n# -----------------------------------------------------------------------------\n# Pterodactyl installation script for the Vaded Gaming bot + backend egg.\n#\n# Runs AS ROOT inside the egg's install container (node:24-bookworm-slim),\n# with the server volume mounted at /mnt/server. Native modules compiled here\n# (glibc 2.36) run fine on the nodejs_24 yolk runtime image (node:24-trixie-slim,\n# glibc 2.41).\n#\n# This file is the canonical source of the egg's scripts.installation.script.\n# If you edit it, re-embed it into deploy/pterodactyl/egg-vaded-gaming.json\n# (the egg carries a verbatim copy — Pterodactyl cannot reference files).\n#\n# Consumes (egg variables, injected as plain env vars):\n#   GIT_REPO      (required) https clone URL\n#   GIT_REF       branch or tag, default \"main\"\n#   GIT_USERNAME  optional, for private repos\n#   GIT_TOKEN     optional, for private repos (PAT)\n#\n# Deliberately NOT done here: anything involving packages/frontend. The\n# dashboard is deployed on Vercel; this server only ever runs bot + backend.\n# -----------------------------------------------------------------------------\nset -euo pipefail\n\nlog() { echo \"[install] $1\"; }\n\n# Wings allocates a pseudo-TTY for install containers but never feeds it\n# input. Without this, `git clone`/`git fetch` on a private repo with no\n# credentials set doesn't error — it silently blocks forever waiting for a\n# username on that TTY, which is the single most common cause of an install\n# that looks \"stuck\" with no further log output. Forcing this to 0 makes a\n# missing-credentials case fail fast with a clear message instead of hanging.\nexport GIT_TERMINAL_PROMPT=0\n\n# Pterodactyl injects EVERY declared egg variable into the install container's\n# environment too, not just the runtime one — including NODE_ENV, whose egg\n# default is \"production\" (correct for the running app: it gates secure\n# cross-origin cookies). `npm ci`/`npm run build` under NODE_ENV=production\n# silently skip devDependencies, so typescript/tsup/etc. never get installed\n# and the workspace builds fail or fall back to whatever stray typescript\n# happens to be hoisted at the repo root (reproduced: this is what caused\n# `tsc -b` in packages/shared to fail with \"TS5103: Invalid value for\n# '--ignoreDeprecations'\" — it ran against a wrong, non-workspace typescript).\n# Force development mode for the whole install regardless of the egg\n# variable; entrypoint.sh sets its own NODE_ENV independently at runtime, so\n# this has no effect on the running app.\nexport NODE_ENV=development\n\n: \"${GIT_REPO:?GIT_REPO is required (https URL of the repository to deploy)}\"\nGIT_REF=\"${GIT_REF:-main}\"\n\nexport DEBIAN_FRONTEND=noninteractive\nlog \"Installing build prerequisites (git, curl, C toolchain for native deps)...\"\napt-get update -qq\n# build-essential + python3: @discordjs/opus has no prebuilt for Node 24's ABI\n# and source-compiles; mediaplex/@snazzah/davey fetch napi prebuilds but keep\n# the toolchain available as their fallback path too.\napt-get install -y -qq --no-install-recommends \\\n    git ca-certificates curl build-essential python3 python3-dev\n\nNODE_MAJOR=\"$(node -p 'process.versions.node.split(\".\")[0]')\"\nlog \"Node.js $(node -v) / npm $(npm -v) in install container\"\nif [ \"$NODE_MAJOR\" -lt 22 ] || [ \"$NODE_MAJOR\" -ge 27 ]; then\n    echo \"[install] FATAL: this project requires Node >=22 <27 (package.json engines);\" \\\n         \"the install container has Node $NODE_MAJOR. Fix the egg's install container image.\" >&2\n    exit 1\nfi\n\n# --- Fetch the repository ----------------------------------------------------\ncd /mnt/server\n\nCLONE_URL=\"$GIT_REPO\"\nif [ -n \"${GIT_USERNAME:-}\" ] && [ -n \"${GIT_TOKEN:-}\" ]; then\n    # Inject credentials for private repos. NOTE: they persist in .git/config\n    # on the server volume; prefer a fine-grained, read-only deploy token.\n    CLONE_URL=\"$(echo \"$GIT_REPO\" | sed \"s#https://#https://${GIT_USERNAME}:${GIT_TOKEN}@#\")\"\nfi\n\nGIT_AUTH_HINT=\"If ${GIT_REPO} is a private repository, set the GIT_USERNAME and GIT_TOKEN egg variables (a read-only PAT) and reinstall.\"\n\nif [ -d .git ]; then\n    log \"Existing checkout found — updating to ${GIT_REF} (reinstall)\"\n    git remote set-url origin \"$CLONE_URL\"\n    git fetch --depth 1 origin \"$GIT_REF\" \\\n        || { echo \"[install] FATAL: git fetch failed (repo unreachable, ref '${GIT_REF}' not found, or auth rejected). ${GIT_AUTH_HINT}\" >&2; exit 1; }\n    git checkout -f FETCH_HEAD\nelse\n    log \"Cloning ${GIT_REPO} (${GIT_REF})...\"\n    git clone --depth 1 --branch \"$GIT_REF\" \"$CLONE_URL\" . \\\n        || { echo \"[install] FATAL: git clone failed (repo unreachable, ref '${GIT_REF}' not found, or auth rejected). ${GIT_AUTH_HINT}\" >&2; exit 1; }\nfi\ngit config --global --add safe.directory /mnt/server || true\n\n# --- Install workspace dependencies (shared + bot + backend ONLY) ------------\n# - No --ignore-scripts: @discordjs/opus (root allowScripts), prisma engines,\n#   mediaplex and @snazzah/davey all need their install scripts.\n# - YOUTUBE_DL_SKIP_DOWNLOAD: youtube-dl-exec's postinstall would download its\n#   own yt-dlp; we ship a pinned static binary below instead (same approach as\n#   the project Dockerfile).\n# - --legacy-peer-deps mirrors the project's own Dockerfile/npm usage.\nlog \"Installing npm dependencies for root + shared + bot + backend...\"\nexport YOUTUBE_DL_SKIP_DOWNLOAD=1\nnpm ci --legacy-peer-deps --no-audit --no-fund \\\n    --include-workspace-root \\\n    --workspace packages/shared \\\n    --workspace packages/bot \\\n    --workspace packages/backend\n\n# --- Prisma client + builds ---------------------------------------------------\n# prisma generate does not connect to a database; scripts/db-generate.mjs\n# supplies a placeholder DATABASE_URL when none is set.\nlog \"Generating Prisma client...\"\nnpm run db:generate\n\nlog \"Building packages: shared -> bot -> backend...\"\nnpm run build:shared\nnpm run build --workspace=packages/bot\nnpm run build --workspace=packages/backend\n\n# The prisma-client generator emits runtime assets (wasm/js) into\n# packages/shared/src/generated that tsc does not carry into dist. The\n# project's Docker images overlay src/generated onto dist/generated; mirror\n# that here so shared/dist imports resolve at runtime.\nlog \"Overlaying generated Prisma runtime assets into shared/dist...\"\nmkdir -p packages/shared/dist/generated\ncp -a packages/shared/src/generated/. packages/shared/dist/generated/\n\n# --- Prune dev dependencies ---------------------------------------------------\n# Safe because the runtime path is compiled dist + the prisma CLI, and prisma\n# is a *production* dependency at the repo root (needed for migrate deploy).\nlog \"Pruning dev dependencies...\"\nnpm prune --omit=dev --legacy-peer-deps\n\n# --- Static yt-dlp binary -----------------------------------------------------\n# The nodejs_24 yolk ships ffmpeg but not yt-dlp. streamBridge.ts resolves the\n# binary via YT_DLP_PATH (exported by deploy/pterodactyl/entrypoint.sh to this\n# location, matching the path bot/scripts/ensureYtDlp.mjs uses).\nARCH=\"$(uname -m)\"\ncase \"$ARCH\" in\n    aarch64|arm64) YTDLP_ASSET=\"yt-dlp_linux_aarch64\" ;;\n    *)             YTDLP_ASSET=\"yt-dlp_linux\" ;;\nesac\nlog \"Downloading static yt-dlp (${YTDLP_ASSET})...\"\nmkdir -p .bin\nif curl -fsSL --connect-timeout 10 --max-time 180 -o .bin/yt-dlp \\\n    \"https://github.com/yt-dlp/yt-dlp/releases/latest/download/${YTDLP_ASSET}\"; then\n    chmod 755 .bin/yt-dlp\nelse\n    # Non-fatal: only YouTube/SoundCloud playback via yt-dlp is affected, and\n    # the entrypoint prints a warning when the binary is missing.\n    echo \"[install] WARNING: yt-dlp download failed; YouTube playback will not work\" \\\n         \"until /home/container/.bin/yt-dlp exists.\" >&2\nfi\n\nmkdir -p downloads logs\n\n# --- Ownership ----------------------------------------------------------------\n# Wings re-chowns the volume to the runtime user after install, but do it here\n# too so a manual/failed-midway install never leaves root-owned files behind.\n# uid/gid 1000 matches the \"container\" user in ghcr.io/ptero-eggs/yolks images.\nlog \"Fixing ownership...\"\nchown -R 1000:1000 /mnt/server || true\n\nlog \"Install complete. Startup will run deploy/pterodactyl/entrypoint.sh.\"\nexit 0\n",
+            "container": "node:24-bookworm-slim",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Discord Bot Token",
+            "description": "Bot token from the Discord Developer Portal (Bot tab). Secret: hidden from the server owner; set by an administrator.",
+            "env_variable": "DISCORD_TOKEN",
+            "default_value": "",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Discord Client ID",
+            "description": "Application ID of the Discord application (OAuth2 tab).",
+            "env_variable": "CLIENT_ID",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:191",
+            "field_type": "text"
+        },
+        {
+            "name": "Discord Client Secret",
+            "description": "OAuth2 client secret of the Discord application. Required by the backend to exchange OAuth codes for dashboard logins.",
+            "env_variable": "CLIENT_SECRET",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Database URL (PostgreSQL)",
+            "description": "PostgreSQL connection string, e.g. postgresql://user:password@host:5432/dbname?sslmode=require. Must be PostgreSQL — Pterodactyl’s built-in database hosts are MySQL and will NOT work. Use Neon/Supabase or a Postgres you run on the node.",
+            "env_variable": "DATABASE_URL",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Direct Database URL",
+            "description": "Optional non-pooled PostgreSQL URL used only by prisma migrate deploy. Leave empty to reuse Database URL. Required for pooled providers (Neon/Supabase poolers).",
+            "env_variable": "DIRECT_URL",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Session Secret",
+            "description": "Random secret for dashboard session cookies (WEBAPP_SESSION_SECRET). Generate with: openssl rand -hex 32",
+            "env_variable": "WEBAPP_SESSION_SECRET",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|min:32",
+            "field_type": "text"
+        },
+        {
+            "name": "Spotify Client ID",
+            "description": "From https://developer.spotify.com/dashboard. The backend refuses to boot without it (validateBackendEnvironment).",
+            "env_variable": "SPOTIFY_CLIENT_ID",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Spotify Client Secret",
+            "description": "Spotify application client secret. Required by the backend at boot.",
+            "env_variable": "SPOTIFY_CLIENT_SECRET",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Redis Host",
+            "description": "Redis hostname. The backend requires this variable to be non-empty at boot; if you have no Redis, leave \"localhost\" and the stack starts in a documented degraded (in-memory fallback) mode.",
+            "env_variable": "REDIS_HOST",
+            "default_value": "localhost",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Redis Port",
+            "description": "Redis port (ignored when Redis URL is set).",
+            "env_variable": "REDIS_PORT",
+            "default_value": "6379",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|between:1,65535",
+            "field_type": "text"
+        },
+        {
+            "name": "Redis Password",
+            "description": "Redis password, if your Redis requires auth (ignored when Redis URL is set).",
+            "env_variable": "REDIS_PASSWORD",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Redis URL",
+            "description": "Optional single-URL Redis config, e.g. rediss://default:password@host:6380/0. Takes precedence over Redis Host/Port/Password. Redis Host must still be non-empty (leave it \"localhost\").",
+            "env_variable": "REDIS_URL",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Dashboard Origin(s)",
+            "description": "Comma-separated browser origin(s) of the Vercel dashboard, used for CORS and post-login redirects (WEBAPP_FRONTEND_URL). First entry is the primary.",
+            "env_variable": "WEBAPP_FRONTEND_URL",
+            "default_value": "https://vaded-bot-dashboard.vercel.app",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Backend Public URL",
+            "description": "Public https origin this backend is reachable at (WEBAPP_BACKEND_URL), e.g. https://panel.example.com:25567. Used as the default base for the Spotify callback.",
+            "env_variable": "WEBAPP_BACKEND_URL",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|url",
+            "field_type": "text"
+        },
+        {
+            "name": "OAuth Redirect URI",
+            "description": "Discord OAuth callback (WEBAPP_REDIRECT_URI), e.g. https://panel.example.com:25567/api/auth/callback. Leave empty when the dashboard proxies /api through Vercel rewrites (the forwarded host is used instead). Must exactly match a Redirect in the Discord Developer Portal.",
+            "env_variable": "WEBAPP_REDIRECT_URI",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|url",
+            "field_type": "text"
+        },
+        {
+            "name": "Developer User IDs",
+            "description": "Comma-separated Discord user IDs granted developer access in the dashboard.",
+            "env_variable": "DEVELOPER_USER_IDS",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Git Repository",
+            "description": "HTTPS clone URL the install script deploys from.",
+            "env_variable": "GIT_REPO",
+            "default_value": "https://github.com/ImLevii/vaded-bot-dashboard.git",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Git Branch / Ref",
+            "description": "Branch or tag to deploy.",
+            "env_variable": "GIT_REF",
+            "default_value": "main",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:191",
+            "field_type": "text"
+        },
+        {
+            "name": "Git Username",
+            "description": "Only for private repositories: username matching the access token.",
+            "env_variable": "GIT_USERNAME",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Git Access Token",
+            "description": "Only for private repositories: read-only PAT. Secret: hidden from the server owner. Note it persists in .git/config on the server volume.",
+            "env_variable": "GIT_TOKEN",
+            "default_value": "",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Run Migrations On Boot",
+            "description": "true: run \"prisma migrate deploy\" before starting (required on first boot; idempotent afterwards). false: skip — the backend refuses to start on an unmigrated schema.",
+            "env_variable": "RUN_MIGRATIONS",
+            "default_value": "true",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:true,false",
+            "field_type": "text"
+        },
+        {
+            "name": "Auto Update On Boot",
+            "description": "1: git pull + reinstall deps + rebuild on every start (slow, several minutes). 0: boot the installed build.",
+            "env_variable": "AUTO_UPDATE",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "Log Level",
+            "description": "2=info, 3=success, 4=debug. Minimum 2: the readiness detection (\"done\" line) keys on info-level log lines and never fires below it.",
+            "env_variable": "LOG_LEVEL",
+            "default_value": "2",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|between:2,4",
+            "field_type": "text"
+        },
+        {
+            "name": "Node Environment",
+            "description": "Keep \"production\" when the dashboard is on Vercel: cross-origin session cookies (Secure + SameSite=None) require it.",
+            "env_variable": "NODE_ENV",
+            "default_value": "production",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:production,development",
+            "field_type": "text"
+        },
+        {
+            "name": "Disable Metrics Listener",
+            "description": "true (default): the bot’s Prometheus endpoint (:9091) stays off so the backend on the primary allocation is the only listener. Set false only if you scrape metrics from inside the node.",
+            "env_variable": "METRICS_DISABLED",
+            "default_value": "true",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:true,false",
+            "field_type": "text"
+        },
+        {
+            "name": "Sentry DSN",
+            "description": "Optional Sentry error-tracking DSN.",
+            "env_variable": "SENTRY_DSN",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|url",
+            "field_type": "text"
+        },
+        {
+            "name": "Last.fm API Key",
+            "description": "Optional, for scrobbling / now-playing.",
+            "env_variable": "LASTFM_API_KEY",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Twitch Client ID",
+            "description": "Optional, for stream-online notifications.",
+            "env_variable": "TWITCH_CLIENT_ID",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Twitch Client Secret",
+            "description": "Optional, pairs with Twitch Client ID.",
+            "env_variable": "TWITCH_CLIENT_SECRET",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Node Options",
+            "description": "Optional NODE_OPTIONS for both children, e.g. --max-old-space-size=768.",
+            "env_variable": "NODE_OPTIONS",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "yt-dlp Cookies Path",
+            "description": "Optional path to a Netscape cookies.txt (e.g. /home/container/.bin/cookies.txt) for YouTube’s \"Sign in to confirm you’re not a bot\" checks, common on datacenter IPs like Pterodactyl nodes.",
+            "env_variable": "YT_DLP_COOKIES_PATH",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        }
+    ]
+}
