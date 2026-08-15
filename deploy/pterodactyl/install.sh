@@ -128,8 +128,19 @@ cp -a packages/shared/src/generated/. packages/shared/dist/generated/
 # --- Prune dev dependencies ---------------------------------------------------
 # Safe because the runtime path is compiled dist + the prisma CLI, and prisma
 # is a *production* dependency at the repo root (needed for migrate deploy).
+#
+# MUST repeat the same --workspace scoping as the npm ci above: an unscoped
+# `npm prune` reconciles against the FULL root package.json workspace list
+# (all of packages/*, including frontend), and since frontend was never
+# installed, prune doesn't just skip it — it INSTALLS frontend's entire
+# dependency tree (react, vite, tsparticles, ...) to "fix" the mismatch.
+# Reproduced and confirmed: unscoped prune here pulled in 875MB of frontend
+# deps, a direct violation of "never install the frontend" for this egg.
 log "Pruning dev dependencies..."
-npm prune --omit=dev --legacy-peer-deps
+npm prune --omit=dev --legacy-peer-deps \
+    --workspace packages/shared \
+    --workspace packages/bot \
+    --workspace packages/backend
 
 # --- Static yt-dlp binary -----------------------------------------------------
 # The nodejs_24 yolk ships ffmpeg but not yt-dlp. streamBridge.ts resolves the

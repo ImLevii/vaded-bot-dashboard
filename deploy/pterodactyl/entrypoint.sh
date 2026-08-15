@@ -77,18 +77,29 @@ fi
 if [ "${AUTO_UPDATE:-0}" = "1" ] || [ "${AUTO_UPDATE:-0}" = "true" ]; then
     echo "[entrypoint] AUTO_UPDATE enabled — pulling ${GIT_REF:-main} and rebuilding (this can take several minutes)..."
     if git pull --ff-only; then
-        export YOUTUBE_DL_SKIP_DOWNLOAD=1
-        npm ci --legacy-peer-deps --no-audit --no-fund \
-            --include-workspace-root \
-            --workspace packages/shared \
-            --workspace packages/bot \
-            --workspace packages/backend \
-        && npm run db:generate \
-        && npm run build:shared \
-        && npm run build --workspace=packages/bot \
-        && npm run build --workspace=packages/backend \
-        && cp -a packages/shared/src/generated/. packages/shared/dist/generated/ \
-        || { echo "[entrypoint] FATAL: AUTO_UPDATE rebuild failed — fix the build or set AUTO_UPDATE=0 to boot the previous build." >&2; exit 1; }
+        # Subshell so NODE_ENV=development (needed for the same reason as
+        # install.sh: `npm ci`/`npm run build` under NODE_ENV=production
+        # skip devDependencies, which breaks the typescript build — see
+        # install.sh's comment) doesn't leak out and override the
+        # NODE_ENV=production already exported above for the app launch below.
+        (
+            export NODE_ENV=development
+            export YOUTUBE_DL_SKIP_DOWNLOAD=1
+            npm ci --legacy-peer-deps --no-audit --no-fund \
+                --include-workspace-root \
+                --workspace packages/shared \
+                --workspace packages/bot \
+                --workspace packages/backend \
+            && npm run db:generate \
+            && npm run build:shared \
+            && npm run build --workspace=packages/bot \
+            && npm run build --workspace=packages/backend \
+            && cp -a packages/shared/src/generated/. packages/shared/dist/generated/ \
+            && npm prune --omit=dev --legacy-peer-deps \
+                --workspace packages/shared \
+                --workspace packages/bot \
+                --workspace packages/backend
+        ) || { echo "[entrypoint] FATAL: AUTO_UPDATE rebuild failed — fix the build or set AUTO_UPDATE=0 to boot the previous build." >&2; exit 1; }
     else
         echo "[entrypoint] WARNING: git pull failed (dirty tree or no credentials); continuing with the existing build." >&2
     fi
