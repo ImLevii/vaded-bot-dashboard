@@ -14,7 +14,7 @@
  * served-HTML shell. See ADR 2026-06-01-public-route-seo-rendering.
  */
 
-export const SITE_ORIGIN = 'https://vadedgaming.com'
+export const SITE_ORIGIN = 'https://vaded.gg'
 
 export interface RouteMeta {
     /** Path as routed. `'/'` is the root (and the SPA fallback for all other routes). */

@@ -1,4 +1,4 @@
-# Cloudflare Pages serves vadedgaming.com (project vaded-webapp), so
+# Cloudflare Pages serves vaded.gg (project vaded-webapp), so
 # this file — not vercel.json and not nginx/nginx.conf — is what governs the
 # public site. Rules are evaluated top to bottom, so /invite must come before
 # the SPA catch-all or the catch-all swallows it (#1888).
@@ -6,5 +6,5 @@
 # Proxied to the backend rather than sent straight to Discord: the backend
 # handler logs the utm_* parameters before redirecting, which is what
 # .agents/tracking-urls.md is built around (#1894).
-/invite  https://api.vadedgaming.com/invite  302
+/invite  https://api.vaded.gg/invite  302
 /*       /index.html                                 200

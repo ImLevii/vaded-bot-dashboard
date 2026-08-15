@@ -268,7 +268,7 @@ services:
                 max-file: "3"
                 tag: "{{.Name}}"
 
-    # Cloudflare Tunnel — exposes nginx to vadedgaming.com
+    # Cloudflare Tunnel — exposes nginx to vaded.gg
     cloudflared:
         <<: *small-svc
         image: cloudflare/cloudflared:2026.6.0

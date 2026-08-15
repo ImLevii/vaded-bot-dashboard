@@ -66,7 +66,7 @@ export function setupMiddleware(app: Express): void {
                     ],
                     'connect-src': [
                         "'self'",
-                        'https://api.vadedgaming.com',
+                        'https://api.vaded.gg',
                         'https://*.sentry.io',
                     ],
                     'worker-src': ["'self'", 'blob:'],
@@ -110,8 +110,8 @@ export function setupMiddleware(app: Express): void {
             // (replit.dev / repl.co / replit.app) are NOT trusted with
             // credentials — see ADR 2026-06-05-csrf-posture.
             return (
-                host === 'vadedgaming.com' ||
-                host.endsWith('.vadedgaming.com') ||
+                host === 'vaded.gg' ||
+                host.endsWith('.vaded.gg') ||
                 host === 'vaded-bot-dashboard.vercel.app' ||
                 host.endsWith('.vercel.app')
             )

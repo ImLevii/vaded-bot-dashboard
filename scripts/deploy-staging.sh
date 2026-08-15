@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Staging deploy — builds + runs the isolated `vaded-staging` stack from an
 # arbitrary branch/ref so a frontend/dashboard change can be visually verified
-# at https://staging.vadedgaming.com before it merges to main.
+# at https://staging.vaded.gg before it merges to main.
 #
 # Invoked by the homelab webhook (deploy/hooks.json → deploy-staging hook) with:
 #   $1 = X-Deploy-Ref        (branch name or commit SHA to deploy)
@@ -151,4 +151,4 @@ if ! wget -q -O /dev/null --timeout=4 "http://${HEALTH_HOST}:${HEALTH_PORT}/api/
     log "WARN: auth-config endpoint not ready (dashboard login may fail)"
 fi
 
-log "STAGING DEPLOY OK — ${DEPLOY_REF} (${RESOLVED_SHA:0:7}) live at https://staging.vadedgaming.com"
+log "STAGING DEPLOY OK — ${DEPLOY_REF} (${RESOLVED_SHA:0:7}) live at https://staging.vaded.gg"

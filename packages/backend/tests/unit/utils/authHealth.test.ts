@@ -9,11 +9,11 @@ describe('authHealth utils', () => {
         test('builds encoded Discord authorize URL', () => {
             const preview = buildAuthorizeUrlPreview(
                 'test-client-id',
-                'https://vadedgaming.com/api/auth/callback',
+                'https://vaded.gg/api/auth/callback',
             )
 
             expect(preview).toBe(
-                'https://discord.com/api/oauth2/authorize?client_id=test-client-id&redirect_uri=https%3A%2F%2Fvadedgaming.com%2Fapi%2Fauth%2Fcallback&response_type=code&scope=identify%20guilds',
+                'https://discord.com/api/oauth2/authorize?client_id=test-client-id&redirect_uri=https%3A%2F%2Fvaded.gg%2Fapi%2Fauth%2Fcallback&response_type=code&scope=identify%20guilds',
             )
         })
 
@@ -21,7 +21,7 @@ describe('authHealth utils', () => {
             expect(
                 buildAuthorizeUrlPreview(
                     '',
-                    'https://vadedgaming.com/api/auth/callback',
+                    'https://vaded.gg/api/auth/callback',
                 ),
             ).toBe('')
         })
@@ -34,9 +34,9 @@ describe('authHealth utils', () => {
             over: Partial<Parameters<typeof buildAuthConfigHealth>[0]> = {},
         ): Parameters<typeof buildAuthConfigHealth>[0] => ({
             clientId: 'test-client-id',
-            redirectUri: 'https://vadedgaming.com/api/auth/callback',
-            frontendOrigins: ['https://vadedgaming.com'],
-            backendOrigins: ['https://vaded-api.vadedgaming.com'],
+            redirectUri: 'https://vaded.gg/api/auth/callback',
+            frontendOrigins: ['https://vaded.gg'],
+            backendOrigins: ['https://vaded-api.vaded.gg'],
             sessionSecretConfigured: true,
             redisHealthy: true,
             ...over,
@@ -45,12 +45,12 @@ describe('authHealth utils', () => {
         test('returns ok when redirect contract matches frontend origins', () => {
             const response = buildAuthConfigHealth({
                 clientId: 'test-client-id',
-                redirectUri: 'https://vadedgaming.com/api/auth/callback',
+                redirectUri: 'https://vaded.gg/api/auth/callback',
                 frontendOrigins: [
-                    'https://vadedgaming.com',
+                    'https://vaded.gg',
                     'https://vaded-bot-dashboard.vercel.app',
                 ],
-                backendOrigins: ['https://vaded-api.vadedgaming.com'],
+                backendOrigins: ['https://vaded-api.vaded.gg'],
                 sessionSecretConfigured: true,
                 redisHealthy: true,
             })
@@ -70,8 +70,8 @@ describe('authHealth utils', () => {
             const response = buildAuthConfigHealth({
                 clientId: 'test-client-id',
                 redirectUri: 'https://app.otherdomain.com/api/auth/callback',
-                frontendOrigins: ['https://vadedgaming.com'],
-                backendOrigins: ['https://vaded-api.vadedgaming.com'],
+                frontendOrigins: ['https://vaded.gg'],
+                backendOrigins: ['https://vaded-api.vaded.gg'],
                 sessionSecretConfigured: true,
                 redisHealthy: true,
             })
@@ -85,10 +85,9 @@ describe('authHealth utils', () => {
         test('returns ok when redirect uri origin matches WEBAPP_BACKEND_URL', () => {
             const response = buildAuthConfigHealth({
                 clientId: 'test-client-id',
-                redirectUri:
-                    'https://vaded-api.vadedgaming.com/api/auth/callback',
-                frontendOrigins: ['https://vadedgaming.com'],
-                backendOrigins: ['https://vaded-api.vadedgaming.com'],
+                redirectUri: 'https://vaded-api.vaded.gg/api/auth/callback',
+                frontendOrigins: ['https://vaded.gg'],
+                backendOrigins: ['https://vaded-api.vaded.gg'],
                 sessionSecretConfigured: true,
                 redisHealthy: true,
             })
@@ -100,10 +99,10 @@ describe('authHealth utils', () => {
         test('returns ok when redirect uri origin matches request origin fallback', () => {
             const response = buildAuthConfigHealth({
                 clientId: 'test-client-id',
-                redirectUri: 'https://vaded-api.vadedgaming.com/api/auth/callback',
-                frontendOrigins: ['https://vadedgaming.com'],
+                redirectUri: 'https://vaded-api.vaded.gg/api/auth/callback',
+                frontendOrigins: ['https://vaded.gg'],
                 backendOrigins: [],
-                requestOrigin: 'https://vaded-api.vadedgaming.com',
+                requestOrigin: 'https://vaded-api.vaded.gg',
                 sessionSecretConfigured: true,
                 redisHealthy: true,
             })
@@ -115,8 +114,8 @@ describe('authHealth utils', () => {
         test('returns degraded when callback path is not the API callback path', () => {
             const response = buildAuthConfigHealth({
                 clientId: 'test-client-id',
-                redirectUri: 'https://vadedgaming.com/auth/callback',
-                frontendOrigins: ['https://vadedgaming.com'],
+                redirectUri: 'https://vaded.gg/auth/callback',
+                frontendOrigins: ['https://vaded.gg'],
                 sessionSecretConfigured: true,
                 redisHealthy: true,
             })
@@ -131,8 +130,8 @@ describe('authHealth utils', () => {
             const response = buildAuthConfigHealth({
                 clientId: 'test-client-id',
                 redirectUri: 'not-a-valid-uri',
-                frontendOrigins: ['https://vadedgaming.com'],
-                backendOrigins: ['https://vaded-api.vadedgaming.com'],
+                frontendOrigins: ['https://vaded.gg'],
+                backendOrigins: ['https://vaded-api.vaded.gg'],
                 sessionSecretConfigured: true,
                 redisHealthy: true,
             })
@@ -144,7 +143,7 @@ describe('authHealth utils', () => {
         test('returns degraded when no frontend, backend, or request origins are configured', () => {
             const response = buildAuthConfigHealth({
                 clientId: 'test-client-id',
-                redirectUri: 'https://vadedgaming.com/api/auth/callback',
+                redirectUri: 'https://vaded.gg/api/auth/callback',
                 frontendOrigins: [],
                 backendOrigins: [],
                 requestOrigin: undefined,
@@ -167,7 +166,7 @@ describe('authHealth utils', () => {
         test('ignores malformed configured origins and malformed request origin', () => {
             const response = buildAuthConfigHealth({
                 clientId: 'test-client-id',
-                redirectUri: 'https://vadedgaming.com/api/auth/callback',
+                redirectUri: 'https://vaded.gg/api/auth/callback',
                 frontendOrigins: ['not-an-origin'],
                 backendOrigins: ['still-not-an-origin'],
                 requestOrigin: 'bad-origin',
@@ -185,9 +184,9 @@ describe('authHealth utils', () => {
             const response = buildAuthConfigHealth({
                 clientId: '111111111111111111',
                 expectedClientId: 'test-client-id',
-                redirectUri: 'https://vadedgaming.com/api/auth/callback',
-                frontendOrigins: ['https://vadedgaming.com'],
-                backendOrigins: ['https://vaded-api.vadedgaming.com'],
+                redirectUri: 'https://vaded.gg/api/auth/callback',
+                frontendOrigins: ['https://vaded.gg'],
+                backendOrigins: ['https://vaded-api.vaded.gg'],
                 sessionSecretConfigured: true,
                 redisHealthy: true,
             })

@@ -167,8 +167,8 @@ You get a random `*.trycloudflare.com` URL. Limitations: no custom domain, reque
 
 For this project, use:
 
-- Hostname: `vadedgaming.com`
-- Webhook endpoint: `https://vadedgaming.com/webhook/deploy`
+- Hostname: `vaded.gg`
+- Webhook endpoint: `https://vaded.gg/webhook/deploy`
 
 Docker-based `cloudflared` (same compose network as nginx):
 
@@ -177,7 +177,7 @@ tunnel: <TUNNEL_ID>
 credentials-file: /etc/cloudflared/<TUNNEL_ID>.json
 
 ingress:
-    - hostname: vadedgaming.com
+    - hostname: vaded.gg
       service: http://nginx:80
     - service: http_status:404
 ```
@@ -189,7 +189,7 @@ tunnel: <TUNNEL_ID>
 credentials-file: /home/<user>/.cloudflared/<TUNNEL_ID>.json
 
 ingress:
-    - hostname: vadedgaming.com
+    - hostname: vaded.gg
       service: http://localhost:8090
     - service: http_status:404
 ```
@@ -198,17 +198,17 @@ Important: `localhost` in a container means the container itself. If `cloudflare
 
 ## 9. Zero-downtime migration checklist (`nexus` -> `vaded`)
 
-1. Add `vadedgaming.com` in Cloudflare DNS and map it to the existing tunnel.
-2. Keep `vadedgaming.com` active during migration (do not remove yet).
+1. Add `vaded.gg` in Cloudflare DNS and map it to the existing tunnel.
+2. Keep `vaded.gg` active during migration (do not remove yet).
 3. Add both hostnames to tunnel ingress (or publish both in dashboard).
 4. Verify Vaded Gaming endpoint:
-    - `curl -i -X POST https://vadedgaming.com/webhook/deploy`
+    - `curl -i -X POST https://vaded.gg/webhook/deploy`
 5. Update GitHub secret:
-    - `gh secret set DEPLOY_WEBHOOK_URL --body "https://vadedgaming.com/webhook/deploy"`
+    - `gh secret set DEPLOY_WEBHOOK_URL --body "https://vaded.gg/webhook/deploy"`
 6. Run deployment via workflow:
     - `npm run deploy:homelab`
 7. Monitor deploy and app health for at least one full release cycle.
-8. After stable operation, remove `vadedgaming.com` from tunnel and DNS.
+8. After stable operation, remove `vaded.gg` from tunnel and DNS.
 
 ## Troubleshooting
 

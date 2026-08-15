@@ -70,7 +70,7 @@ describe('routeMeta', () => {
     })
 
     it('exposes the production origin', () => {
-        expect(SITE_ORIGIN).toBe('https://vadedgaming.com')
+        expect(SITE_ORIGIN).toBe('https://vaded.gg')
     })
 
     it('rejects an empty title', () => {
