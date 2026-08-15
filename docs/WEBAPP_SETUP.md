@@ -68,6 +68,10 @@ WEBAPP_SESSION_SECRET=your_random_session_secret_here
 
 # Developer Access
 DEVELOPER_USER_IDS=user_id_1,user_id_2
+
+# Text channel for Now Playing embeds when playback starts from the web
+# dashboard (optional — falls back to the guild's system channel)
+WEBAPP_MUSIC_ANNOUNCE_CHANNEL_ID=channel_id
 ```
 
 For hosted frontend builds (Vercel/Netlify), set frontend env:
@@ -88,6 +92,7 @@ VITE_API_BASE_URL=/api
 - **WEBAPP_BACKEND_URL**: Public backend/API origin used for API links when backend is exposed on a dedicated host
 - **WEBAPP_SESSION_SECRET**: A random secret string for signing session cookies (use a strong random value)
 - **DEVELOPER_USER_IDS**: Comma-separated list of Discord user IDs with developer access
+- **WEBAPP_MUSIC_ANNOUNCE_CHANNEL_ID**: Text channel ID for Now Playing embeds sent by web-dashboard-started playback. Falls back to the guild's system channel, then its first postable text channel, if unset or the bot can't post there.
 
 ## Discord OAuth2 Setup
 

@@ -27,7 +27,12 @@ export type WebPlayContextResult =
     | { ok: true; context: WebPlayContext }
     | { ok: false; error: string }
 
-/** First text channel the bot may actually post in — system channel preferred. */
+/**
+ * Text channel for web-started Now Playing embeds, preferred in this order:
+ * 1. `WEBAPP_MUSIC_ANNOUNCE_CHANNEL_ID`, if set and the bot can post there.
+ * 2. The guild's system channel.
+ * 3. The first text channel the bot can post in.
+ */
 export function resolveAnnouncementChannel(guild: Guild): TextChannel | null {
     const me = guild.members.me
     if (!me) return null
@@ -39,6 +44,14 @@ export function resolveAnnouncementChannel(guild: Guild): TextChannel | null {
                 PermissionsBitField.Flags.ViewChannel,
                 PermissionsBitField.Flags.SendMessages,
             ]) ?? false
+
+    const configuredChannelId = process.env.WEBAPP_MUSIC_ANNOUNCE_CHANNEL_ID
+    if (configuredChannelId) {
+        const configured = guild.channels.cache.get(configuredChannelId)
+        if (configured?.type === ChannelType.GuildText && canPost(configured)) {
+            return configured
+        }
+    }
 
     const system = guild.systemChannel
     if (system && canPost(system)) return system
