@@ -130,6 +130,16 @@ Say the allocation is `panel.example.com:25567`.
   (the repo already does exactly this for the music routes). Then the backend sees
   `x-forwarded-host` and derives the OAuth callback automatically.
 
+> **Current state of this repo's music rewrite (`vercel.json`): it targets `http://`,
+> not `https://`.** Express on the allocation serves plain HTTP, so an `https://`
+> rewrite fails the TLS handshake and Vercel returns **502 Bad Gateway** on every
+> `/api/guilds/:id/music/*` call. Pointing the rewrite at `http://` is a deliberate
+> stopgap: the browser→Vercel leg is still HTTPS, but the Vercel-edge→panel leg
+> crosses the public internet unencrypted while carrying the `sessionId` cookie.
+> Replace it with real TLS in front of the allocation (Cloudflare Tunnel is the path
+> this repo already has tooling for — see `docs/CLOUDFLARE_TUNNEL_SETUP.md`) and
+> switch the rewrite back to `https://`.
+
 **Discord Developer Portal (OAuth2 → Redirects) — must match exactly:**
 
 - Direct wiring (`VITE_API_BASE_URL`): add
