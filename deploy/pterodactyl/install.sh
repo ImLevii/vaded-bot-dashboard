@@ -109,21 +109,34 @@ npm ci --legacy-peer-deps --no-audit --no-fund \
 # --- Prisma client + builds ---------------------------------------------------
 # prisma generate does not connect to a database; scripts/db-generate.mjs
 # supplies a placeholder DATABASE_URL when none is set.
+#
+# Wipe the previous generator output first: packages/shared/src/generated is
+# gitignored, so git never cleans it and anything an older prisma version (or
+# a half-finished run) left behind lingers forever and gets picked up by the
+# build. Prisma only rewrites the files it emits today.
 log "Generating Prisma client..."
+rm -rf packages/shared/src/generated
 npm run db:generate
+
+# Always build from an empty dist. tsc -b --force rewrites what it emits but
+# never removes what it no longer emits, so a dist left over from an earlier
+# or half-finished build survives indefinitely. That bit us in production: a
+# stale shared/dist/generated/prisma/client.js kept an extensionless
+# `./internal/class` import (never rewritten by add-js-extensions.js) and
+# crashed every boot with ERR_MODULE_NOT_FOUND.
+log "Clearing previous build output..."
+rm -rf packages/shared/dist packages/bot/dist packages/backend/dist
 
 log "Building packages: shared -> bot -> backend..."
 npm run build:shared
 npm run build --workspace=packages/bot
 npm run build --workspace=packages/backend
 
-# The prisma-client generator emits runtime assets (wasm/js) into
-# packages/shared/src/generated that tsc does not carry into dist. The
-# project's Docker images overlay src/generated onto dist/generated; mirror
-# that here so shared/dist imports resolve at runtime.
-log "Overlaying generated Prisma runtime assets into shared/dist..."
-mkdir -p packages/shared/dist/generated
-cp -a packages/shared/src/generated/. packages/shared/dist/generated/
+# No src/generated -> dist/generated overlay here, unlike the project's Docker
+# images: with prisma 7 + `engineType = "client"` the generator emits pure
+# TypeScript (75 .ts files, zero wasm/js assets), so tsc compiles all of it
+# into dist and add-js-extensions.js fixes the extensionless imports. Copying
+# src/generated on top only drops unused .ts files next to the compiled .js.
 
 # --- Prune dev dependencies ---------------------------------------------------
 # Safe because the runtime path is compiled dist + the prisma CLI, and prisma

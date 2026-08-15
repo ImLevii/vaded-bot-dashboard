@@ -90,11 +90,12 @@ if [ "${AUTO_UPDATE:-0}" = "1" ] || [ "${AUTO_UPDATE:-0}" = "true" ]; then
                 --workspace packages/shared \
                 --workspace packages/bot \
                 --workspace packages/backend \
+            && rm -rf packages/shared/src/generated \
             && npm run db:generate \
+            && rm -rf packages/shared/dist packages/bot/dist packages/backend/dist \
             && npm run build:shared \
             && npm run build --workspace=packages/bot \
             && npm run build --workspace=packages/backend \
-            && cp -a packages/shared/src/generated/. packages/shared/dist/generated/ \
             && npm prune --omit=dev --legacy-peer-deps \
                 --workspace packages/shared \
                 --workspace packages/bot \
