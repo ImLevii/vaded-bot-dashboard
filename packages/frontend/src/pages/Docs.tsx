@@ -15,7 +15,7 @@ type DocsPage = {
     content: () => ReactElement
 }
 
-const REPO = 'https://vadedgaming.com'
+const REPO = 'https://vaded.gg'
 const BOT_INVITE = getBotInviteUrl()
 
 const NAV: DocsNavGroup[] = [
@@ -86,18 +86,19 @@ const PAGES: DocsPage[] = [
         content: () => (
             <>
                 <p>
-                    vadedgaming is an open-source Discord bot. Music, moderation,
-                    custom commands, automation, and a web dashboard. Free
-                    forever, with no premium tier paywalling the good parts.
+                    vadedgaming is an open-source Discord bot. Music,
+                    moderation, custom commands, automation, and a web
+                    dashboard. Free forever, with no premium tier paywalling the
+                    good parts.
                 </p>
                 <h2 id='what-is-vaded'>What is vadedgaming</h2>
                 <p>
-                    vadedgaming started as a music bot for a friend's server. It now
-                    also handles moderation, custom commands, leveling, reaction
-                    roles, embed building, automation, and starboards. The web
-                    dashboard at the same domain lets you configure everything
-                    without leaving the browser — no <code>/config</code> chat
-                    commands to memorize.
+                    vadedgaming started as a music bot for a friend's server. It
+                    now also handles moderation, custom commands, leveling,
+                    reaction roles, embed building, automation, and starboards.
+                    The web dashboard at the same domain lets you configure
+                    everything without leaving the browser — no{' '}
+                    <code>/config</code> chat commands to memorize.
                 </p>
                 <p>
                     The whole project is a TypeScript monorepo published under
@@ -108,8 +109,8 @@ const PAGES: DocsPage[] = [
                 </p>
                 <h2 id='two-ways-to-run-it'>Two ways to run it</h2>
                 <p>
-                    You can use vadedgaming in either of two ways. Pick whichever fits
-                    your situation.
+                    You can use vadedgaming in either of two ways. Pick
+                    whichever fits your situation.
                 </p>
                 <ol>
                     <li>
@@ -182,8 +183,8 @@ const PAGES: DocsPage[] = [
                 </ul>
                 <h2 id='project-status'>Project status</h2>
                 <p>
-                    Vaded Gaming is under active development. The current line is the{' '}
-                    <code>2.x</code> release train. Releases follow{' '}
+                    Vaded Gaming is under active development. The current line
+                    is the <code>2.x</code> release train. Releases follow{' '}
                     <a
                         href='https://semver.org/spec/v2.0.0.html'
                         rel='noreferrer noopener'
@@ -203,8 +204,8 @@ const PAGES: DocsPage[] = [
                 </p>
                 <h2 id='how-this-is-built'>How this is built</h2>
                 <p>
-                    Vaded Gaming is six services: <code>bot</code> (discord.js v14),{' '}
-                    <code>backend</code> (Express + Prisma),{' '}
+                    Vaded Gaming is six services: <code>bot</code> (discord.js
+                    v14), <code>backend</code> (Express + Prisma),{' '}
                     <code>frontend</code> (React 19 + Vite + Tailwind v4),{' '}
                     <code>postgres</code>, <code>redis</code>, and{' '}
                     <code>nginx</code>. All six are orchestrated with a single
@@ -229,8 +230,8 @@ const PAGES: DocsPage[] = [
         content: () => (
             <>
                 <p>
-                    You'll be running Vaded Gaming in your server in under two minutes.
-                    No account creation, no payment, no email.
+                    You'll be running Vaded Gaming in your server in under two
+                    minutes. No account creation, no payment, no email.
                 </p>
                 <h2 id='add-the-bot'>Add the bot</h2>
                 <ol>
@@ -271,8 +272,8 @@ const PAGES: DocsPage[] = [
                 <p>
                     If you don't see your server, refresh the guild cache from{' '}
                     <strong>Profile menu / Refresh servers</strong>. Discord
-                    doesn't push membership changes — Vaded Gaming re-fetches on login
-                    and on demand.
+                    doesn't push membership changes — Vaded Gaming re-fetches on
+                    login and on demand.
                 </p>
                 <h2 id='first-commands'>First commands to try</h2>
                 <ul>
@@ -283,8 +284,8 @@ const PAGES: DocsPage[] = [
                     </li>
                     <li>
                         <code>/autoplay on</code> — keep music going when the
-                        queue ends. Vaded Gaming pulls recommendations from what you've
-                        been queuing.
+                        queue ends. Vaded Gaming pulls recommendations from what
+                        you've been queuing.
                     </li>
                     <li>
                         <code>/queue</code> — see what's coming up. Use{' '}
@@ -464,10 +465,10 @@ const PAGES: DocsPage[] = [
         content: () => (
             <>
                 <p>
-                    Self-hosting means you run Vaded Gaming on your own hardware. Your
-                    guild data, autoplay history, custom commands, and
-                    moderation log stay on your box. No third-party ToS over
-                    your community, no rate-limited tier.
+                    Self-hosting means you run Vaded Gaming on your own
+                    hardware. Your guild data, autoplay history, custom
+                    commands, and moderation log stay on your box. No
+                    third-party ToS over your community, no rate-limited tier.
                 </p>
                 <h2 id='requirements'>Requirements</h2>
                 <ul>
@@ -515,8 +516,8 @@ const PAGES: DocsPage[] = [
                     <li>
                         Under <strong>Bot / Privileged Gateway Intents</strong>,
                         enable <code>Server Members Intent</code> and{' '}
-                        <code>Message Content Intent</code>. Vaded Gaming needs both
-                        for moderation and custom-command triggers.
+                        <code>Message Content Intent</code>. Vaded Gaming needs
+                        both for moderation and custom-command triggers.
                     </li>
                     <li>
                         Under <strong>OAuth2 / Redirects</strong>, add{' '}
@@ -550,10 +551,9 @@ $EDITOR .env`}</code>
                     <code>POSTGRES_PASSWORD</code> with{' '}
                     <code>openssl rand -hex 24</code> before the first{' '}
                     <code>docker compose up</code>. An empty value fails the
-                    compose guard on purpose. Optional integrations like
-                    Spotify and Last.fm get their own keys. The full list with
-                    notes lives in{' '}
-                    <a href='/docs?page=env'>Environment variables</a>.
+                    compose guard on purpose. Optional integrations like Spotify
+                    and Last.fm get their own keys. The full list with notes
+                    lives in <a href='/docs?page=env'>Environment variables</a>.
                 </p>
                 <p>
                     <code>SESSION_SECRET</code> must be 32+ random bytes.
@@ -678,8 +678,8 @@ docker compose ps`}</code>
                 <p>
                     Settings inherit a sane default and are upserted on first
                     write. You don't have to seed defaults — the first time you
-                    save anything on a fresh guild, Vaded Gaming creates the row and
-                    merges your change in.
+                    save anything on a fresh guild, Vaded Gaming creates the row
+                    and merges your change in.
                 </p>
                 <h2 id='global-admin'>Global admin controls</h2>
                 <p>
@@ -718,8 +718,8 @@ docker compose up -d`}</code>
                 </p>
                 <h2 id='webhook'>Webhook deploy</h2>
                 <p>
-                    Vaded Gaming ships a webhook receiver that pulls and restarts on a
-                    GitHub Actions ping. The recipe lives in{' '}
+                    Vaded Gaming ships a webhook receiver that pulls and
+                    restarts on a GitHub Actions ping. The recipe lives in{' '}
                     <code>deploy/</code>. Wire it once, then every push to{' '}
                     <code>main</code> deploys automatically:
                 </p>
@@ -884,8 +884,9 @@ docker compose up -d <service>`}</code>
                         <code>
                             docker compose exec bot pip install -U yt-dlp
                         </code>
-                        . Vaded Gaming now retries failed extractions with exponential
-                        backoff, but a multi-month-old yt-dlp still hits walls.
+                        . Vaded Gaming now retries failed extractions with
+                        exponential backoff, but a multi-month-old yt-dlp still
+                        hits walls.
                     </li>
                     <li>
                         Check the bot's voice permissions in your channel (
@@ -965,17 +966,18 @@ docker compose up -d <service>`}</code>
         content: () => (
             <>
                 <p>
-                    Vaded Gaming plays from Spotify, YouTube, and SoundCloud. It uses{' '}
-                    <code>yt-dlp</code> for extraction and bundles its own Opus
-                    encoder, so no Lavalink server or external audio service is
-                    required.
+                    Vaded Gaming plays from Spotify, YouTube, and SoundCloud. It
+                    uses <code>yt-dlp</code> for extraction and bundles its own
+                    Opus encoder, so no Lavalink server or external audio
+                    service is required.
                 </p>
                 <h2 id='sources'>Sources</h2>
                 <ul>
                     <li>
                         <strong>Spotify.</strong> Paste a track, album, or
-                        playlist URL. Vaded Gaming resolves the metadata through the
-                        Spotify API, then streams audio from a matched source.
+                        playlist URL. Vaded Gaming resolves the metadata through
+                        the Spotify API, then streams audio from a matched
+                        source.
                     </li>
                     <li>
                         <strong>YouTube.</strong> Paste a video or playlist URL,
@@ -1067,16 +1069,16 @@ docker compose up -d <service>`}</code>
                 <h2 id='last-fm'>Last.fm scrobbling</h2>
                 <p>
                     Connect a Last.fm account from the dashboard under{' '}
-                    <strong>Integrations / Last.fm</strong>. Vaded Gaming scrobbles
-                    everything that plays, so your listening history follows you
-                    across servers and devices. Per-user, not per-server — each
-                    Discord user links their own Last.fm.
+                    <strong>Integrations / Last.fm</strong>. Vaded Gaming
+                    scrobbles everything that plays, so your listening history
+                    follows you across servers and devices. Per-user, not
+                    per-server — each Discord user links their own Last.fm.
                 </p>
                 <h2 id='spotify-link'>Linking Spotify</h2>
                 <p>
-                    Linking Spotify unlocks personalized autoplay: Vaded Gaming pulls
-                    your top tracks and recent saves as additional seeds. Auth
-                    is per-user via OAuth; the bot only requests{' '}
+                    Linking Spotify unlocks personalized autoplay: Vaded Gaming
+                    pulls your top tracks and recent saves as additional seeds.
+                    Auth is per-user via OAuth; the bot only requests{' '}
                     <code>user-top-read</code> and{' '}
                     <code>user-library-read</code>.
                 </p>
@@ -1175,10 +1177,10 @@ docker compose up -d <service>`}</code>
                 <h2 id='logging'>Logging channel</h2>
                 <p>
                     Set a logging channel under{' '}
-                    <strong>Server settings / Logging</strong> and Vaded Gaming mirrors
-                    every moderation action and auto-mod hit into it. Useful for
-                    transparency. Granular toggles let you log only deletions,
-                    only bans, or everything.
+                    <strong>Server settings / Logging</strong> and Vaded Gaming
+                    mirrors every moderation action and auto-mod hit into it.
+                    Useful for transparency. Granular toggles let you log only
+                    deletions, only bans, or everything.
                 </p>
             </>
         ),
@@ -1314,8 +1316,8 @@ docker compose up -d <service>`}</code>
                 <p>
                     Pin a message and let users self-assign roles by reacting.
                     Configure under <strong>Reaction roles / New</strong>. Each
-                    row maps an emoji to a role. Vaded Gaming watches the reaction
-                    add/remove events and updates membership.
+                    row maps an emoji to a role. Vaded Gaming watches the
+                    reaction add/remove events and updates membership.
                 </p>
                 <h2 id='self-roles'>Self-role panels</h2>
                 <p>
@@ -1371,8 +1373,8 @@ docker compose up -d <service>`}</code>
                 <p>
                     Sign in with Discord OAuth at <code>/login</code>. You see
                     every server where you have <code>Manage Server</code> and
-                    where Vaded Gaming is present. Sessions last 30 days, signed with
-                    the server's <code>SESSION_SECRET</code>.
+                    where Vaded Gaming is present. Sessions last 30 days, signed
+                    with the server's <code>SESSION_SECRET</code>.
                 </p>
                 <h2 id='modules'>Modules</h2>
                 <ul>
@@ -1756,14 +1758,19 @@ docker compose up -d <service>`}</code>
         title: 'Permissions',
         breadcrumb: 'Docs / Permissions',
         toc: [
-            { id: 'discord-perms', label: 'Discord permissions Vaded Gaming needs' },
+            {
+                id: 'discord-perms',
+                label: 'Discord permissions Vaded Gaming needs',
+            },
             { id: 'principle', label: 'Principle of least privilege' },
             { id: 'dashboard-rbac', label: 'Dashboard RBAC' },
             { id: 'admin-tier', label: 'Admin tier' },
         ],
         content: () => (
             <>
-                <h2 id='discord-perms'>Discord permissions Vaded Gaming needs</h2>
+                <h2 id='discord-perms'>
+                    Discord permissions Vaded Gaming needs
+                </h2>
                 <ul>
                     <li>
                         <strong>Read Messages / Send Messages.</strong> For
@@ -1794,8 +1801,8 @@ docker compose up -d <service>`}</code>
                     </li>
                     <li>
                         <strong>Manage Roles.</strong> For reaction roles and
-                        role-rewards on level-up. Vaded Gaming's role must be above any
-                        role it manages.
+                        role-rewards on level-up. Vaded Gaming's role must be
+                        above any role it manages.
                     </li>
                     <li>
                         <strong>Read Message History.</strong> For starboard and
@@ -1808,11 +1815,11 @@ docker compose up -d <service>`}</code>
                 </ul>
                 <h2 id='principle'>Principle of least privilege</h2>
                 <p>
-                    The OAuth invite asks for what Vaded Gaming <em>can</em> use, not
-                    what it <em>requires</em>. If you don't use moderation, deny{' '}
-                    <code>Kick / Ban</code>. If you don't use reaction roles,
-                    deny <code>Manage Roles</code>. Re-invite at any time to
-                    change the grant.
+                    The OAuth invite asks for what Vaded Gaming <em>can</em>{' '}
+                    use, not what it <em>requires</em>. If you don't use
+                    moderation, deny <code>Kick / Ban</code>. If you don't use
+                    reaction roles, deny <code>Manage Roles</code>. Re-invite at
+                    any time to change the grant.
                 </p>
                 <h2 id='dashboard-rbac'>Dashboard RBAC</h2>
                 <p>
@@ -1842,9 +1849,9 @@ docker compose up -d <service>`}</code>
                 <p>
                     Self-hosters can mark Discord user IDs as global admins via{' '}
                     <code>ADMIN_USER_IDS</code>. Admins bypass per-guild RBAC
-                    and see global feature toggles. The hosted Vaded Gaming has zero
-                    admin user IDs in production — there is no behind-the-scenes
-                    peek into your server.
+                    and see global feature toggles. The hosted Vaded Gaming has
+                    zero admin user IDs in production — there is no
+                    behind-the-scenes peek into your server.
                 </p>
             </>
         ),
@@ -2088,8 +2095,8 @@ docker compose up -d <service>`}</code>
                 </p>
                 <h2 id='lastfm'>Last.fm</h2>
                 <p>
-                    Last.fm scrobbles every track Vaded Gaming plays for users who've
-                    linked their account. Get an API key from{' '}
+                    Last.fm scrobbles every track Vaded Gaming plays for users
+                    who've linked their account. Get an API key from{' '}
                     <a
                         href='https://www.last.fm/api/account/create'
                         rel='noreferrer noopener'
@@ -2153,9 +2160,10 @@ docker compose up -d <service>`}</code>
                 </p>
                 <h2 id='limits'>Are there server-size limits?</h2>
                 <p>
-                    No hard limits. The hosted Vaded Gaming has been tested on servers
-                    up to ~50k members. Beyond that, you'll want to self-host
-                    with sharding (<code>BOT_SHARDS</code>) for headroom.
+                    No hard limits. The hosted Vaded Gaming has been tested on
+                    servers up to ~50k members. Beyond that, you'll want to
+                    self-host with sharding (<code>BOT_SHARDS</code>) for
+                    headroom.
                 </p>
                 <h2 id='data'>What data does Vaded Gaming collect?</h2>
                 <p>
@@ -2169,15 +2177,15 @@ docker compose up -d <service>`}</code>
                 <h2 id='voice-quality'>Why does my voice quality differ?</h2>
                 <p>
                     Voice quality follows Discord's per-channel bitrate setting.
-                    Vaded Gaming encodes at the channel bitrate up to 96 kbps. Boost
-                    the channel's bitrate (Channel settings / Bitrate) for
+                    Vaded Gaming encodes at the channel bitrate up to 96 kbps.
+                    Boost the channel's bitrate (Channel settings / Bitrate) for
                     higher fidelity.
                 </p>
                 <h2 id='lavalink'>Do I need Lavalink?</h2>
                 <p>
-                    No. Vaded Gaming ships its own Opus encoder via prebuilt binaries,
-                    so there's no Java sidecar to run. That means a smaller
-                    stack, less to monitor, and faster local dev.
+                    No. Vaded Gaming ships its own Opus encoder via prebuilt
+                    binaries, so there's no Java sidecar to run. That means a
+                    smaller stack, less to monitor, and faster local dev.
                 </p>
                 <h2 id='contribute'>Can I contribute?</h2>
                 <p>

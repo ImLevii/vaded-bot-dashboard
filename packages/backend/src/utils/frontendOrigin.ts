@@ -1,7 +1,7 @@
 const DEFAULT_FRONTEND_URL = 'http://localhost:5173'
 const DEFAULT_PRODUCTION_FRONTEND_URLS = [
     'https://vaded-bot-dashboard.vercel.app',
-    'https://vadedgaming.com',
+    'https://vaded.gg',
 ]
 
 export function getFrontendOrigins(): string[] {

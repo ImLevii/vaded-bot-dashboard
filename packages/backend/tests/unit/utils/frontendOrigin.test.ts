@@ -32,7 +32,7 @@ describe('frontendOrigin', () => {
 
         expect(getFrontendOrigins()).toEqual([
             'https://vaded-bot-dashboard.vercel.app',
-            'https://vadedgaming.com',
+            'https://vaded.gg',
         ])
         expect(getPrimaryFrontendUrl()).toBe(
             'https://vaded-bot-dashboard.vercel.app',

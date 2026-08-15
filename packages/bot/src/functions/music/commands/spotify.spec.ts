@@ -7,11 +7,13 @@ const createErrorEmbedMock = jest.fn((title: string, description: string) => ({
     title,
     description,
 }))
-const buildPlatformAttribEmbedMock = jest.fn((platform: string, body: unknown) => ({
-    type: 'platform',
-    platform,
-    ...body,
-}))
+const buildPlatformAttribEmbedMock = jest.fn(
+    (platform: string, body: unknown) => ({
+        type: 'platform',
+        platform,
+        ...body,
+    }),
+)
 const isSpotifyConfiguredMock = jest.fn()
 const getByDiscordIdMock = jest.fn()
 const unlinkMock = jest.fn()
@@ -25,11 +27,13 @@ jest.mock('../../../utils/general/embeds', () => ({
 }))
 
 jest.mock('../../../utils/general/responseEmbeds', () => ({
-    buildPlatformAttribEmbed: (...args: unknown[]) => buildPlatformAttribEmbedMock(...args),
+    buildPlatformAttribEmbed: (...args: unknown[]) =>
+        buildPlatformAttribEmbedMock(...args),
 }))
 
 jest.mock('../../../spotify', () => ({
-    isSpotifyConfigured: (...args: unknown[]) => isSpotifyConfiguredMock(...args),
+    isSpotifyConfigured: (...args: unknown[]) =>
+        isSpotifyConfiguredMock(...args),
 }))
 
 jest.mock('@lucky/shared/services', () => ({
@@ -57,7 +61,9 @@ function getConnectUrlFromEmbed(): string {
     const description = String((body as any)?.description ?? '')
     const match = description.match(/\[Click here to connect\]\(([^)]+)\)/)
     if (!match) {
-        throw new Error(`Expected connect link in embed description: ${description}`)
+        throw new Error(
+            `Expected connect link in embed description: ${description}`,
+        )
     }
     return match[1]
 }
@@ -74,14 +80,14 @@ describe('spotify command', () => {
 
     describe('link subcommand', () => {
         it('generates connect link with WEBAPP_BACKEND_URL', async () => {
-            process.env.WEBAPP_BACKEND_URL = 'https://api.vadedgaming.com/'
+            process.env.WEBAPP_BACKEND_URL = 'https://api.vaded.gg/'
 
             await spotifyCommand.execute({
                 interaction: createInteraction('link'),
             } as any)
 
             const url = getConnectUrlFromEmbed()
-            expect(url).toContain('https://api.vadedgaming.com/api/spotify/connect')
+            expect(url).toContain('https://api.vaded.gg/api/spotify/connect')
         })
 
         it('shows error when not configured', async () => {

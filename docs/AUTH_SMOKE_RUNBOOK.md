@@ -5,12 +5,12 @@ Use this runbook after deploy changes that touch webhook/auth/deploy flow.
 ## Preconditions
 
 - Production deploy already completed successfully.
-- `https://vadedgaming.com` is reachable.
+- `https://vaded.gg` is reachable.
 - Discord app credentials are configured and `/api/health/auth-config` returns `status=ok`.
 
 ## Manual steps (real browser)
 
-1. Open `https://vadedgaming.com/api/auth/discord`.
+1. Open `https://vaded.gg/api/auth/discord`.
 2. Complete Discord login + authorization.
 3. Confirm redirect callback lands in Vaded Gaming dashboard.
 4. Confirm dashboard bootstrap works:
@@ -44,10 +44,10 @@ Timestamp (UTC): `2026-03-14T23:52:15Z`
 Deployment and auth pre-check evidence captured:
 
 - Deploy workflow success: `23099053025` (`workflow_run`) and `23099053968` (`workflow_dispatch`)
-- `https://vadedgaming.com/api/health` -> `HTTP 200`, body includes `"status":"ok"`
-- `https://vadedgaming.com/api/health/auth-config` -> `HTTP 200`, body includes auth contract payload
-- `https://vadedgaming.com/api/auth/discord` -> `HTTP 302` to Discord authorize URL
-- `https://vadedgaming.com/api/auth/status` -> `{"authenticated":false}` before manual login
+- `https://vaded.gg/api/health` -> `HTTP 200`, body includes `"status":"ok"`
+- `https://vaded.gg/api/health/auth-config` -> `HTTP 200`, body includes auth contract payload
+- `https://vaded.gg/api/auth/discord` -> `HTTP 302` to Discord authorize URL
+- `https://vaded.gg/api/auth/status` -> `{"authenticated":false}` before manual login
 
 Manual browser-login evidence status:
 

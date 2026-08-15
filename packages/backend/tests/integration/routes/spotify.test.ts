@@ -37,12 +37,11 @@ jest.mock('../../../src/middleware/auth', () => ({
 }))
 
 jest.mock('../../../src/utils/frontendOrigin', () => ({
-    getPrimaryFrontendUrl: () => 'https://vadedgaming.com',
+    getPrimaryFrontendUrl: () => 'https://vaded.gg',
 }))
 
 jest.mock('../../../src/utils/oauthRedirectUri', () => ({
-    getOAuthRedirectUri: () =>
-        'https://api.vadedgaming.com/api/spotify/callback',
+    getOAuthRedirectUri: () => 'https://api.vaded.gg/api/spotify/callback',
 }))
 
 jest.mock('@lucky/shared/utils', () => ({
@@ -73,7 +72,7 @@ describe('Spotify Routes', () => {
         process.env.SPOTIFY_CLIENT_ID = 'test-client-id'
         process.env.SPOTIFY_CLIENT_SECRET = 'test-client-secret'
         process.env.SPOTIFY_REDIRECT_URI =
-            'https://api.vadedgaming.com/api/spotify/callback'
+            'https://api.vaded.gg/api/spotify/callback'
         process.env.WEBAPP_SESSION_SECRET = 'test-secret'
     })
 

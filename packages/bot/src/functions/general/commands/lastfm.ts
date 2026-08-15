@@ -21,9 +21,10 @@ function getAbsoluteOrigin(rawUrl?: string): string | null {
     if (!value) return null
     try {
         const parsed = new URL(value)
-        const isHttp = parsed.protocol === 'http:' || parsed.protocol === 'https:'
+        const isHttp =
+            parsed.protocol === 'http:' || parsed.protocol === 'https:'
         if (!isHttp) return null
-        if (parsed.hostname.toLowerCase() === 'nexus.vadedgaming.com') return null
+        if (parsed.hostname.toLowerCase() === 'nexus.vaded.gg') return null
         return parsed.origin
     } catch {
         return null

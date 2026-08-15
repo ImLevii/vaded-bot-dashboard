@@ -6,8 +6,8 @@ type ApiLocation = {
 function isManagedFrontendHost(hostname: string): boolean {
     return (
         hostname === 'vaded-bot-dashboard.vercel.app' ||
-        hostname === 'vadedgaming.com' ||
-        hostname.endsWith('.vadedgaming.com')
+        hostname === 'vaded.gg' ||
+        hostname.endsWith('.vaded.gg')
     )
 }
 

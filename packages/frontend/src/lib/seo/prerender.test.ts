@@ -14,13 +14,13 @@ const TEMPLATE = `<!doctype html>
     <meta name="description" content="default description" />
     <meta property="og:title" content="Default Title" />
     <meta property="og:description" content="default description" />
-    <meta property="og:url" content="https://vadedgaming.com" />
-    <meta property="og:image" content="https://vadedgaming.com/og-image.png" />
+    <meta property="og:url" content="https://vaded.gg" />
+    <meta property="og:image" content="https://vaded.gg/og-image.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Default Title" />
     <meta name="twitter:description" content="default description" />
-    <meta name="twitter:image" content="https://vadedgaming.com/og-image.png" />
-    <link rel="canonical" href="https://vadedgaming.com/" />
+    <meta name="twitter:image" content="https://vaded.gg/og-image.png" />
+    <link rel="canonical" href="https://vaded.gg/" />
   </head>
   <body>
     <div id="root"></div>
@@ -50,13 +50,13 @@ describe('renderRouteHtml', () => {
         expect(getMeta(html, 'name', 'description')).toBe(
             'Release notes and version history for Vaded Gaming.',
         )
-        expect(getMeta(html, 'property', 'og:title')).toBe('Changelog · Vaded Gaming')
+        expect(getMeta(html, 'property', 'og:title')).toBe(
+            'Changelog · Vaded Gaming',
+        )
         expect(getMeta(html, 'property', 'og:url')).toBe(
-            'https://vadedgaming.com/changelog',
+            'https://vaded.gg/changelog',
         )
-        expect(getCanonical(html)).toBe(
-            'https://vadedgaming.com/changelog',
-        )
+        expect(getCanonical(html)).toBe('https://vaded.gg/changelog')
         expect(getMeta(html, 'property', 'og:image')).toBe(OG_IMAGE_URL)
     })
 
@@ -71,11 +71,9 @@ describe('renderRouteHtml', () => {
     it('points an alias og:url at its own path but canonical at the primary', () => {
         const html = renderRouteHtml(TEMPLATE, ROUTE_META_BY_PATH['/terms']!)
         expect(getMeta(html, 'property', 'og:url')).toBe(
-            'https://vadedgaming.com/terms',
+            'https://vaded.gg/terms',
         )
-        expect(getCanonical(html)).toBe(
-            'https://vadedgaming.com/terms-of-service',
-        )
+        expect(getCanonical(html)).toBe('https://vaded.gg/terms-of-service')
     })
 
     it('leaves twitter:card (summary_large_image) untouched', () => {
@@ -119,16 +117,16 @@ describe('buildSitemap', () => {
         const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1])
         expect(locs.sort()).toEqual(
             [
-                'https://vadedgaming.com/',
-                'https://vadedgaming.com/docs',
-                'https://vadedgaming.com/changelog',
-                'https://vadedgaming.com/terms-of-service',
-                'https://vadedgaming.com/privacy-policy',
+                'https://vaded.gg/',
+                'https://vaded.gg/docs',
+                'https://vaded.gg/changelog',
+                'https://vaded.gg/terms-of-service',
+                'https://vaded.gg/privacy-policy',
             ].sort(),
         )
         // aliases excluded
-        expect(locs).not.toContain('https://vadedgaming.com/terms')
-        expect(locs).not.toContain('https://vadedgaming.com/privacy')
+        expect(locs).not.toContain('https://vaded.gg/terms')
+        expect(locs).not.toContain('https://vaded.gg/privacy')
     })
 })
 
@@ -139,8 +137,6 @@ describe('buildRobots', () => {
         expect(txt).toContain('Allow: /')
         expect(txt).toContain('Disallow: /api/')
         expect(txt).toContain('Disallow: /features')
-        expect(txt).toContain(
-            'Sitemap: https://vadedgaming.com/sitemap.xml',
-        )
+        expect(txt).toContain('Sitemap: https://vaded.gg/sitemap.xml')
     })
 })

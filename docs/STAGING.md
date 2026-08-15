@@ -5,8 +5,8 @@ dashboard/frontend changes on a real branch before they merge to `main`**. The
 dashboard is a live Discord OAuth client, so it can't be meaningfully reviewed
 without real auth + guild data — staging provides exactly that.
 
-- **Frontend:** https://staging.vadedgaming.com
-- **Backend:** https://staging-api.vadedgaming.com
+- **Frontend:** https://staging.vaded.gg
+- **Backend:** https://staging-api.vaded.gg
 - **Stack:** `docker-compose.staging.yml` (project `vaded-staging`) — postgres,
   redis, backend, frontend, nginx. **No bot** (the dashboard reads guild data via
   Discord REST; staging reuses the prod bot's presence in the test guild) and
@@ -30,16 +30,16 @@ Manual deploy of any ref: run the **Deploy Staging** workflow via
 
 ## Isolation (why it's safe next to prod)
 
-| Layer | Production | Staging |
-|---|---|---|
-| Compose project | `vaded` | `vaded-staging` |
-| Containers | `vaded-*` | `vaded-staging-*` |
-| Network | `vaded_vaded-network` | `vaded-staging-network` |
-| DB / Redis volumes | `postgres_data` / `redis_data` | `staging_postgres_data` / `staging_redis_data` |
-| nginx host port | 8090 | 8093 |
-| Tunnel routing | `nginx:80` (docker net) | `http://100.95.204.103:8093` (host port) |
-| Discord OAuth | prod redirect | shares `CLIENT_ID`, adds the staging redirect URI |
-| Bot | runs the gateway | none (REST-only data via the prod bot's token) |
+| Layer              | Production                     | Staging                                           |
+| ------------------ | ------------------------------ | ------------------------------------------------- |
+| Compose project    | `vaded`                        | `vaded-staging`                                   |
+| Containers         | `vaded-*`                      | `vaded-staging-*`                                 |
+| Network            | `vaded_vaded-network`          | `vaded-staging-network`                           |
+| DB / Redis volumes | `postgres_data` / `redis_data` | `staging_postgres_data` / `staging_redis_data`    |
+| nginx host port    | 8090                           | 8093                                              |
+| Tunnel routing     | `nginx:80` (docker net)        | `http://100.95.204.103:8093` (host port)          |
+| Discord OAuth      | prod redirect                  | shares `CLIENT_ID`, adds the staging redirect URI |
+| Bot                | runs the gateway               | none (REST-only data via the prod bot's token)    |
 
 ## Host-managed (not in the repo)
 

@@ -7,7 +7,7 @@
 # Run:           cloudflared tunnel run vaded-webapp
 #
 # Production example (Vaded Gaming):
-#   hostname: vadedgaming.com
+#   hostname: vaded.gg
 #   service: http://nginx:80   # when cloudflared runs as Docker service in same compose network
 #   service: http://localhost:8090  # when cloudflared runs natively on host
 
