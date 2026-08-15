@@ -47,23 +47,35 @@ export const xpHandler: MessageHandler = {
                 message.member?.displayName ?? message.author.username,
             )
 
-            if (result.leveledUp && config.announceChannel) {
-                const rawChannel = await message.client.channels
-                    .fetch(config.announceChannel)
-                    .catch(() => null)
-                if (rawChannel?.isTextBased()) {
-                    await (rawChannel as TextChannel).send(
-                        `🎉 ${message.author} reached level **${result.newLevel}**!`,
-                    )
-                }
+            if (result.leveledUp) {
+                // Grant every reward in the crossed range, not just the one
+                // matching newLevel: addXP walks multiple levels for a single
+                // message, so an exact match skipped rewards for the levels
+                // passed through on the way up.
                 const rewards = await levelService.getRewards(guildId)
-                const reward = rewards.find(
-                    (r: { level: number }) => r.level === result.newLevel,
+                const earned = rewards.filter(
+                    (r: { level: number }) =>
+                        r.level > result.previousLevel &&
+                        r.level <= result.newLevel,
                 )
-                if (reward) {
+                for (const reward of earned) {
                     await context.member.roles
                         .add(reward.roleId)
                         .catch(() => {})
+                }
+
+                // Announcing is independent of granting. Reward granting used
+                // to live inside this branch, so any guild that had not set an
+                // announce channel never handed out reward roles at all.
+                if (config.announceChannel) {
+                    const rawChannel = await message.client.channels
+                        .fetch(config.announceChannel)
+                        .catch(() => null)
+                    if (rawChannel?.isTextBased()) {
+                        await (rawChannel as TextChannel).send(
+                            `🎉 ${message.author} reached level **${result.newLevel}**!`,
+                        )
+                    }
                 }
             }
 

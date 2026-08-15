@@ -78,7 +78,18 @@ export class LevelService {
         userId: string,
         amount: number,
         displayName?: string | null,
-    ): Promise<{ member: MemberXP; leveledUp: boolean; newLevel: number }> {
+    ): Promise<{
+        member: MemberXP
+        leveledUp: boolean
+        newLevel: number
+        /**
+         * Level held before this award. Callers need it to act on every level
+         * crossed: a single message can carry a member up several levels (see
+         * the while loop below), so reacting to `newLevel` alone silently
+         * skips the ones in between.
+         */
+        previousLevel: number
+    }> {
         // Use a transaction to ensure read-modify-write is atomic for concurrent XP additions
         const result = await prisma.$transaction(async (tx) => {
             // Upsert with XP increment (returns the updated record with post-increment XP)
@@ -102,6 +113,7 @@ export class LevelService {
 
             // Calculate new level based on the post-increment XP
             let leveledUp = false
+            const previousLevel = current.level
             let newLevel = current.level
 
             while (current.xp >= xpNeededForLevel(newLevel + 1)) {
@@ -118,7 +130,7 @@ export class LevelService {
                 })
             }
 
-            return { member: finalMember, leveledUp, newLevel }
+            return { member: finalMember, leveledUp, newLevel, previousLevel }
         })
 
         return result

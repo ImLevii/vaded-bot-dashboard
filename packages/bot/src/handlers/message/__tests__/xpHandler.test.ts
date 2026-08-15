@@ -239,6 +239,7 @@ describe('xpHandler', () => {
             ;(levelService.addXP as jest.Mock).mockResolvedValue({
                 leveledUp: true,
                 newLevel: 5,
+                previousLevel: 4,
             })
             ;(levelService.getRewards as jest.Mock).mockResolvedValue([
                 { level: 5, roleId: 'role5' },
@@ -275,6 +276,107 @@ describe('xpHandler', () => {
             const result = await xpHandler.handle(message, context)
             expect(result.stop).toBe(false)
             expect(context.member.roles.add).toHaveBeenCalledWith('role5')
+        })
+
+        // Reward granting used to sit inside `if (leveledUp &&
+        // config.announceChannel)`, so guilds that never configured an
+        // announce channel silently received no reward roles at all. The test
+        // above misses it because it supplies announceChannel.
+        it('assigns role rewards even when no announce channel is configured', async () => {
+            const now = Date.now()
+            ;(levelService.getConfig as jest.Mock).mockResolvedValue({
+                enabled: true,
+                xpCooldownMs: 60000,
+                xpPerMessage: 10,
+                announceChannel: null,
+            })
+            ;(levelService.getMemberXP as jest.Mock).mockResolvedValue({
+                lastXpAt: new Date(now - 61000),
+            })
+            ;(levelService.addXP as jest.Mock).mockResolvedValue({
+                leveledUp: true,
+                newLevel: 5,
+                previousLevel: 4,
+            })
+            ;(levelService.getRewards as jest.Mock).mockResolvedValue([
+                { level: 5, roleId: 'role5' },
+            ])
+
+            const message = {
+                author: {
+                    id: 'user1',
+                    bot: false,
+                    toString: jest.fn(() => '<@user1>'),
+                },
+                channelId: 'channel1',
+                client: { channels: { fetch: jest.fn() } },
+            } as unknown as Message
+
+            const context: MessageContext = {
+                guild: { id: 'guild1' } as any,
+                member: {
+                    roles: { add: jest.fn().mockResolvedValue(undefined) },
+                } as any,
+                featureToggles: {},
+            }
+
+            await xpHandler.handle(message, context)
+
+            expect(context.member.roles.add).toHaveBeenCalledWith('role5')
+            expect(message.client.channels.fetch).not.toHaveBeenCalled()
+        })
+
+        // A single message can carry a member up several levels, so matching
+        // only `newLevel` skipped every reward passed through on the way.
+        it('assigns every reward crossed by a multi-level jump', async () => {
+            const now = Date.now()
+            ;(levelService.getConfig as jest.Mock).mockResolvedValue({
+                enabled: true,
+                xpCooldownMs: 60000,
+                xpPerMessage: 5000,
+                announceChannel: null,
+            })
+            ;(levelService.getMemberXP as jest.Mock).mockResolvedValue({
+                lastXpAt: new Date(now - 61000),
+            })
+            ;(levelService.addXP as jest.Mock).mockResolvedValue({
+                leveledUp: true,
+                newLevel: 7,
+                previousLevel: 4,
+            })
+            ;(levelService.getRewards as jest.Mock).mockResolvedValue([
+                { level: 4, roleId: 'role4' },
+                { level: 5, roleId: 'role5' },
+                { level: 6, roleId: 'role6' },
+                { level: 7, roleId: 'role7' },
+                { level: 9, roleId: 'role9' },
+            ])
+
+            const message = {
+                author: {
+                    id: 'user1',
+                    bot: false,
+                    toString: jest.fn(() => '<@user1>'),
+                },
+                channelId: 'channel1',
+                client: { channels: { fetch: jest.fn() } },
+            } as unknown as Message
+
+            const addRole = jest.fn().mockResolvedValue(undefined)
+            const context: MessageContext = {
+                guild: { id: 'guild1' } as any,
+                member: { roles: { add: addRole } } as any,
+                featureToggles: {},
+            }
+
+            await xpHandler.handle(message, context)
+
+            // 5, 6, 7 are crossed; 4 was already held and 9 is not reached.
+            expect(addRole).toHaveBeenCalledWith('role5')
+            expect(addRole).toHaveBeenCalledWith('role6')
+            expect(addRole).toHaveBeenCalledWith('role7')
+            expect(addRole).not.toHaveBeenCalledWith('role4')
+            expect(addRole).not.toHaveBeenCalledWith('role9')
         })
 
         it('should handle first-time XP addition with no prior record', async () => {

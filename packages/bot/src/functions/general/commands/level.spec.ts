@@ -70,10 +70,14 @@ function makeInteraction(
     subcommand: string,
     opts: Record<string, unknown> = {},
     withGuild = true,
+    hasManageGuild = true,
 ) {
     return {
         guild: withGuild ? { id: 'guild-1', name: 'TestGuild' } : null,
         user: { id: 'u1', tag: 'alice#0000' },
+        // `setup` and the `reward` group require Manage Server; `rank` and
+        // `leaderboard` are member-facing and must work without it.
+        memberPermissions: { has: () => hasManageGuild },
         options: {
             getSubcommandGroup: () => subcommandGroup,
             getSubcommand: () => subcommand,
@@ -98,6 +102,42 @@ beforeEach(() => {
 })
 
 describe('/level', () => {
+    describe('permission gating', () => {
+        test('rejects reward management without Manage Server', async () => {
+            const interaction = makeInteraction(
+                'reward',
+                'add',
+                { level: 10, role: { id: 'role-123' } },
+                true,
+                false,
+            ) as never
+
+            await levelCommand.execute({ interaction })
+
+            expect(levelServiceMock.addReward).not.toHaveBeenCalled()
+            const call = interactionReply.mock.calls[0][0] as {
+                content: { embeds: Array<{ title: string }> }
+            }
+            expect(call.content.embeds[0].title).toContain(
+                'Missing Permissions',
+            )
+        })
+
+        test('rejects setup without Manage Server', async () => {
+            const interaction = makeInteraction(
+                'null',
+                'setup',
+                { xp: 20 },
+                true,
+                false,
+            ) as never
+
+            await levelCommand.execute({ interaction })
+
+            expect(levelServiceMock.upsertConfig).not.toHaveBeenCalled()
+        })
+    })
+
     describe('reward add subcommand', () => {
         test('adds reward for level', async () => {
             const interaction = makeInteraction('reward', 'add', {
@@ -153,6 +193,29 @@ describe('/level', () => {
     })
 
     describe('rank subcommand', () => {
+        // The command used to carry a blanket
+        // setDefaultMemberPermissions(ManageGuild), which hid rank and
+        // leaderboard from every ordinary member.
+        test('works for a member without Manage Server', async () => {
+            levelServiceMock.getMemberXP.mockResolvedValueOnce({
+                xp: 500,
+                level: 5,
+            })
+            levelServiceMock.getRank.mockResolvedValueOnce(3)
+
+            const interaction = makeInteraction(
+                'null',
+                'rank',
+                {},
+                true,
+                false,
+            ) as never
+
+            await levelCommand.execute({ interaction })
+
+            expect(levelServiceMock.getMemberXP).toHaveBeenCalled()
+        })
+
         test('shows own rank when no user provided', async () => {
             levelServiceMock.getMemberXP.mockResolvedValueOnce({
                 xp: 500,

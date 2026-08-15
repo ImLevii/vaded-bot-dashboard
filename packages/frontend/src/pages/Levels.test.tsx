@@ -484,6 +484,25 @@ describe('Levels', () => {
         expect(toast.error).not.toHaveBeenCalled()
     })
 
+    // With no config row the page must seed `enabled` to the Prisma model
+    // default (true). It used to seed false, so an admin who saved any other
+    // field first silently switched the whole XP system off.
+    test('defaults enabled to true when no config row exists', async () => {
+        mockGuildStore()
+        vi.mocked(api.levels.getConfig).mockResolvedValue(null as never)
+        vi.mocked(api.levels.getLeaderboard).mockResolvedValue([])
+        vi.mocked(api.levels.getRewards).mockResolvedValue([])
+
+        render(<Levels />)
+
+        await waitFor(() => {
+            expect(api.levels.getConfig).toHaveBeenCalled()
+        })
+
+        const toggle = await screen.findByRole('switch')
+        expect(toggle).toBeChecked()
+    })
+
     test('displays no rewards message when list is empty', async () => {
         mockGuildStore()
         vi.mocked(api.levels.getRewards).mockResolvedValue([])

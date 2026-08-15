@@ -86,7 +86,10 @@ function Levels() {
                 } else {
                     // No config row yet — show the model defaults rather than
                     // zeros, which the PATCH schema would reject on save.
-                    setEnabled(false)
+                    // enabled mirrors the Prisma default (true): seeding false
+                    // here meant saving any unrelated field silently turned
+                    // the whole XP system off.
+                    setEnabled(true)
                     setXpPerMessage(DEFAULT_XP_PER_MESSAGE)
                     setXpCooldownMs(DEFAULT_XP_COOLDOWN_MS)
                     setAnnounceChannel('')

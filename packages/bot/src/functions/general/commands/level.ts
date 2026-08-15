@@ -3,8 +3,15 @@ import { PermissionFlagsBits, ChannelType } from 'discord.js'
 import Command from '../../../models/Command'
 import { interactionReply } from '../../../utils/general/interactionReply'
 import { requireGuild } from '../../../utils/command/commandValidations'
-import { createSuccessEmbed, createErrorEmbed, createInfoEmbed } from '../../../utils/general/embeds'
-import { buildUserProfileEmbed, buildListPageEmbed } from '../../../utils/general/responseEmbeds'
+import {
+    createSuccessEmbed,
+    createErrorEmbed,
+    createInfoEmbed,
+} from '../../../utils/general/embeds'
+import {
+    buildUserProfileEmbed,
+    buildListPageEmbed,
+} from '../../../utils/general/responseEmbeds'
 import { errorLog } from '@lucky/shared/utils'
 import { createUserFriendlyError } from '@lucky/shared/utils/general/errorSanitizer'
 import { levelService, xpNeededForLevel } from '@lucky/shared/services'
@@ -17,13 +24,18 @@ export default new Command({
         .addSubcommand((sub) =>
             sub
                 .setName('rank')
-                .setDescription('Show your rank or another user\'s rank')
+                .setDescription("Show your rank or another user's rank")
                 .addUserOption((o) =>
-                    o.setName('user').setDescription('User to check').setRequired(false),
+                    o
+                        .setName('user')
+                        .setDescription('User to check')
+                        .setRequired(false),
                 ),
         )
         .addSubcommand((sub) =>
-            sub.setName('leaderboard').setDescription('Show the XP leaderboard'),
+            sub
+                .setName('leaderboard')
+                .setDescription('Show the XP leaderboard'),
         )
         .addSubcommand((sub) =>
             sub
@@ -39,7 +51,9 @@ export default new Command({
                 .addIntegerOption((o) =>
                     o
                         .setName('cooldown-seconds')
-                        .setDescription('Cooldown between XP awards in seconds (default: 60)')
+                        .setDescription(
+                            'Cooldown between XP awards in seconds (default: 60)',
+                        )
                         .setMinValue(1)
                         .setRequired(true),
                 )
@@ -58,12 +72,21 @@ export default new Command({
                 .addSubcommand((sub) =>
                     sub
                         .setName('add')
-                        .setDescription('Add a role reward for reaching a level')
+                        .setDescription(
+                            'Add a role reward for reaching a level',
+                        )
                         .addIntegerOption((o) =>
-                            o.setName('level').setDescription('Level required').setMinValue(1).setRequired(true),
+                            o
+                                .setName('level')
+                                .setDescription('Level required')
+                                .setMinValue(1)
+                                .setRequired(true),
                         )
                         .addRoleOption((o) =>
-                            o.setName('role').setDescription('Role to grant').setRequired(true),
+                            o
+                                .setName('role')
+                                .setDescription('Role to grant')
+                                .setRequired(true),
                         ),
                 )
                 .addSubcommand((sub) =>
@@ -71,11 +94,14 @@ export default new Command({
                         .setName('remove')
                         .setDescription('Remove a role reward for a level')
                         .addIntegerOption((o) =>
-                            o.setName('level').setDescription('Level to remove reward from').setMinValue(1).setRequired(true),
+                            o
+                                .setName('level')
+                                .setDescription('Level to remove reward from')
+                                .setMinValue(1)
+                                .setRequired(true),
                         ),
                 ),
-        )
-        .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
+        ),
     category: 'general',
     execute: async ({ interaction }) => {
         if (!(await requireGuild(interaction))) return
@@ -84,12 +110,41 @@ export default new Command({
         const subcommandGroup = interaction.options.getSubcommandGroup(false)
         const subcommand = interaction.options.getSubcommand()
 
+        // `rank` and `leaderboard` are member-facing. This used to carry a
+        // command-wide setDefaultMemberPermissions(ManageGuild), which also
+        // hid those two from every member without Manage Server — nobody
+        // could check their own rank. Gate only the admin subcommands.
+        const isAdminAction =
+            subcommandGroup === 'reward' || subcommand === 'setup'
+        if (
+            isAdminAction &&
+            !interaction.memberPermissions?.has(PermissionFlagsBits.ManageGuild)
+        ) {
+            await interactionReply({
+                interaction,
+                content: {
+                    embeds: [
+                        createErrorEmbed(
+                            'Missing Permissions',
+                            'You need the **Manage Server** permission to change level settings or rewards.',
+                        ),
+                    ],
+                    ephemeral: true,
+                },
+            })
+            return
+        }
+
         try {
             if (subcommandGroup === 'reward') {
                 if (subcommand === 'add') {
                     const level = interaction.options.getInteger('level', true)
                     const role = interaction.options.getRole('role', true)
-                    await levelService.addReward(interaction.guild.id, level, role.id)
+                    await levelService.addReward(
+                        interaction.guild.id,
+                        level,
+                        role.id,
+                    )
                     await interactionReply({
                         interaction,
                         content: {
@@ -107,7 +162,12 @@ export default new Command({
                     await interactionReply({
                         interaction,
                         content: {
-                            embeds: [createSuccessEmbed('Reward Removed', `Reward for level **${level}** removed.`)],
+                            embeds: [
+                                createSuccessEmbed(
+                                    'Reward Removed',
+                                    `Reward for level **${level}** removed.`,
+                                ),
+                            ],
                         },
                     })
                 }
@@ -115,9 +175,13 @@ export default new Command({
             }
 
             if (subcommand === 'rank') {
-                const targetUser = interaction.options.getUser('user') ?? interaction.user
+                const targetUser =
+                    interaction.options.getUser('user') ?? interaction.user
                 const guildId = interaction.guild.id
-                const xpData = await levelService.getMemberXP(guildId, targetUser.id)
+                const xpData = await levelService.getMemberXP(
+                    guildId,
+                    targetUser.id,
+                )
                 const rank = await levelService.getRank(guildId, targetUser.id)
 
                 const xp = xpData?.xp ?? 0
@@ -138,20 +202,31 @@ export default new Command({
                     },
                 })
             } else if (subcommand === 'leaderboard') {
-                const entries = await levelService.getLeaderboard(interaction.guild.id, 50)
+                const entries = await levelService.getLeaderboard(
+                    interaction.guild.id,
+                    50,
+                )
 
                 if (entries.length === 0) {
                     await interactionReply({
                         interaction,
                         content: {
-                            embeds: [createInfoEmbed('Leaderboard', 'No XP recorded yet.')],
+                            embeds: [
+                                createInfoEmbed(
+                                    'Leaderboard',
+                                    'No XP recorded yet.',
+                                ),
+                            ],
                         },
                     })
                     return
                 }
 
                 const listItems = entries.map(
-                    (e: { userId: string; level: number; xp: number }, i: number) => ({
+                    (
+                        e: { userId: string; level: number; xp: number },
+                        i: number,
+                    ) => ({
                         name: `#${i + 1}`,
                         value: `<@${e.userId}> — Level ${e.level} (${e.xp} XP)`,
                     }),
@@ -167,7 +242,10 @@ export default new Command({
                 })
 
                 const components = []
-                const paginationRow = createLeaderboardPaginationButtons(currentPage, totalPages)
+                const paginationRow = createLeaderboardPaginationButtons(
+                    currentPage,
+                    totalPages,
+                )
                 if (paginationRow) {
                     components.push(paginationRow)
                 }
@@ -180,9 +258,16 @@ export default new Command({
                     },
                 })
             } else if (subcommand === 'setup') {
-                const xpPerMessage = interaction.options.getInteger('xp-per-message', true)
-                const cooldownSeconds = interaction.options.getInteger('cooldown-seconds', true)
-                const announceChannel = interaction.options.getChannel('announce-channel')
+                const xpPerMessage = interaction.options.getInteger(
+                    'xp-per-message',
+                    true,
+                )
+                const cooldownSeconds = interaction.options.getInteger(
+                    'cooldown-seconds',
+                    true,
+                )
+                const announceChannel =
+                    interaction.options.getChannel('announce-channel')
 
                 await levelService.upsertConfig(interaction.guild.id, {
                     xpPerMessage,
@@ -193,13 +278,20 @@ export default new Command({
                 const lines = [
                     `**XP per message:** ${xpPerMessage}`,
                     `**Cooldown:** ${cooldownSeconds}s`,
-                    announceChannel ? `**Announce channel:** ${announceChannel}` : '**Announce channel:** None',
+                    announceChannel
+                        ? `**Announce channel:** ${announceChannel}`
+                        : '**Announce channel:** None',
                 ]
 
                 await interactionReply({
                     interaction,
                     content: {
-                        embeds: [createSuccessEmbed('Level System Configured', lines.join('\n'))],
+                        embeds: [
+                            createSuccessEmbed(
+                                'Level System Configured',
+                                lines.join('\n'),
+                            ),
+                        ],
                     },
                 })
             }
