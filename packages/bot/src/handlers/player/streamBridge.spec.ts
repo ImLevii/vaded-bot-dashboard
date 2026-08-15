@@ -691,6 +691,36 @@ describe('fallback stage stamping', () => {
             [STREAM_BRIDGE_FALLBACK_METADATA_KEY]: 'soundcloud-full',
         })
     })
+
+    // discord-player's real Track exposes `metadata` as a getter with NO
+    // setter plus a setMetadata() method, so the previous plain assignment
+    // threw "Cannot set property metadata ... which has only a getter" and
+    // killed the very tracks a fallback had just rescued (observed in
+    // production 2026-08-15). The mocks above are plain objects, which is
+    // why they never caught it.
+    it('stamps via setMetadata when metadata is a getter-only accessor', async () => {
+        const proc = makeFakeProc()
+        mockSpawn.mockReturnValue(proc)
+        mockStreamViaSoundCloud.mockResolvedValue(fakeStream)
+        setImmediate(() => proc.emit('close', 1))
+
+        let stored: unknown = { isAutoplay: true }
+        const track = {
+            ...makeTrack(),
+            get metadata() {
+                return stored
+            },
+            setMetadata(value: unknown) {
+                stored = value
+            },
+        }
+
+        await expect(createResilientStream(track)).resolves.toBeDefined()
+        expect(stored).toEqual({
+            isAutoplay: true,
+            [STREAM_BRIDGE_FALLBACK_METADATA_KEY]: 'soundcloud-full',
+        })
+    })
 })
 
 describe('getStreamBridgeFallbackLabel', () => {

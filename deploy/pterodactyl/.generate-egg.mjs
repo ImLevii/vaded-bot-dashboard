@@ -329,6 +329,10 @@ if (process.argv.includes('--local')) {
         'WEBAPP_REDIRECT_URI',
         'NODE_ENV',
         'LOG_LEVEL',
+        // Host-local filesystem path: .env holds a Windows dev path
+        // (D:\...\cookies.txt) that means nothing inside the Linux container.
+        // On the server this wants /home/container/.bin/cookies.txt.
+        'YT_DLP_COOKIES_PATH',
     ])
 
     const localEgg = JSON.parse(JSON.stringify(egg))

@@ -307,15 +307,33 @@ function stampFallbackStage(
     track: Pick<Track, 'title' | 'author' | 'duration' | 'url'>,
     stage: StreamBridgeFallbackStage,
 ): void {
-    const mutable = track as { metadata?: unknown }
+    // discord-player's Track declares `metadata` as a getter with no setter
+    // (plus a separate setMetadata()), so a plain assignment throws
+    // "Cannot set property metadata ... which has only a getter" under ESM
+    // strict mode. That aborted every *successful* fallback stream — the
+    // stamp runs only after a fallback resolves, so the throw killed exactly
+    // the tracks the bridge had just rescued. Prefer setMetadata(), matching
+    // namedSessions.ts / sessionSnapshots.ts; keep the direct assignment for
+    // plain-object tracks that have no such method.
+    const holder = track as {
+        metadata?: unknown
+        setMetadata?: (value: unknown) => void
+    }
     const existing =
-        typeof mutable.metadata === 'object' && mutable.metadata !== null
-            ? (mutable.metadata as Record<string, unknown>)
+        typeof holder.metadata === 'object' && holder.metadata !== null
+            ? (holder.metadata as Record<string, unknown>)
             : {}
-    mutable.metadata = {
+    const next = {
         ...existing,
         [STREAM_BRIDGE_FALLBACK_METADATA_KEY]: stage,
     }
+
+    if (typeof holder.setMetadata === 'function') {
+        holder.setMetadata(next)
+        return
+    }
+
+    holder.metadata = next
 }
 
 export async function createResilientStream(
