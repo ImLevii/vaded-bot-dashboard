@@ -9,6 +9,9 @@ import { ENVIRONMENT_CONFIG } from '@lucky/shared/config'
 import { buildQueueState, repeatModeToEnum } from './mappers'
 import { resolveGuildQueue } from '../../utils/music/queueResolver'
 import { setReplenishSuppressed } from '../../utils/music/replenishSuppressionStore'
+import { musicWatchdogService } from '../../utils/music/watchdog'
+import { musicSessionSnapshotService } from '../../utils/music/sessionSnapshots'
+import { clearSessionMoodCache } from '../../utils/music/autoplay/replenisher'
 import { QueryType } from 'discord-player'
 import {
     normalizeYoutubeUrl,
@@ -194,6 +197,17 @@ export async function handleStop(
 ): Promise<Result> {
     const queue = getQueue(client, cmd.guildId)
     if (!queue) return fail(cmd.id, cmd.guildId, 'No active queue')
+
+    // Tear down exactly like the /stop slash command (functions/music/
+    // commands/stop.ts). Without markIntentionalStop() the watchdog reads the
+    // deliberate stop as an orphaned session and rejoins the channel, and
+    // without deleteSnapshot() the surviving snapshot restores the queue that
+    // was just cleared — so a dashboard stop reported "queue cleared" while
+    // dozens of tracks came back moments later.
+    musicWatchdogService.markIntentionalStop(cmd.guildId)
+    await musicSessionSnapshotService.deleteSnapshot(cmd.guildId)
+    clearSessionMoodCache(cmd.guildId)
+
     queue.node.stop()
     queue.clear()
     queue.delete()

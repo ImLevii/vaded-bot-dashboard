@@ -13,6 +13,9 @@ const resolveGuildQueueMock = jest.fn()
 const setReplenishSuppressedMock = jest.fn()
 const resolveQueryWithFallbacksMock = jest.fn()
 const resolveWebPlayContextMock = jest.fn()
+const markIntentionalStopMock = jest.fn()
+const deleteSnapshotMock = jest.fn<() => Promise<void>>()
+const clearSessionMoodCacheMock = jest.fn()
 
 jest.mock('@lucky/shared/services', () => ({
     musicControlService: {
@@ -32,6 +35,24 @@ jest.mock('../../utils/music/queueResolver', () => ({
 jest.mock('../../utils/music/replenishSuppressionStore', () => ({
     setReplenishSuppressed: (...args: unknown[]) =>
         setReplenishSuppressedMock(...args),
+}))
+
+jest.mock('../../utils/music/watchdog', () => ({
+    musicWatchdogService: {
+        markIntentionalStop: (...args: unknown[]) =>
+            markIntentionalStopMock(...args),
+    },
+}))
+
+jest.mock('../../utils/music/sessionSnapshots', () => ({
+    musicSessionSnapshotService: {
+        deleteSnapshot: (...args: unknown[]) => deleteSnapshotMock(...args),
+    },
+}))
+
+jest.mock('../../utils/music/autoplay/replenisher', () => ({
+    clearSessionMoodCache: (...args: unknown[]) =>
+        clearSessionMoodCacheMock(...args),
 }))
 
 // resolveProvider pulls the shared utils barrel (→ Prisma client, which is
@@ -60,6 +81,29 @@ describe('handleStop', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         buildQueueStateMock.mockResolvedValue({ guildId: 'guild-1' })
+        deleteSnapshotMock.mockResolvedValue(undefined)
+    })
+
+    // A dashboard stop used to skip the teardown that /stop performs, so the
+    // watchdog saw an "orphan session" and rejoined, and the surviving
+    // snapshot restored the queue that had just been cleared — the user saw
+    // "queue cleared" and then 48 tracks still queued a minute later.
+    it('marks the stop intentional and drops the session snapshot', async () => {
+        const stop = jest.fn()
+        const clear = jest.fn()
+        const del = jest.fn()
+        resolveGuildQueueMock.mockReturnValue({
+            queue: { node: { stop }, clear, delete: del },
+        })
+
+        await handleStop(
+            {} as any,
+            { id: 'cmd-1', guildId: 'guild-1', data: {} } as any,
+        )
+
+        expect(markIntentionalStopMock).toHaveBeenCalledWith('guild-1')
+        expect(deleteSnapshotMock).toHaveBeenCalledWith('guild-1')
+        expect(clearSessionMoodCacheMock).toHaveBeenCalledWith('guild-1')
     })
 
     it('stops node, clears, and deletes the queue', async () => {
