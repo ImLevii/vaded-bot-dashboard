@@ -29,7 +29,7 @@
                 },
                 {
                     "key": "Content-Security-Policy",
-                    "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://cdn.discordapp.com https://cdn.discord.com https://i.ytimg.com https://*.sndcdn.com https://i.scdn.co https://*.spotifycdn.com; connect-src 'self' https://panel.vaded-hosting.com:25567 https://*.sentry.io; worker-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; report-uri /api/security/csp-report"
+                    "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://cdn.discordapp.com https://cdn.discord.com https://i.ytimg.com https://*.sndcdn.com https://i.scdn.co https://*.spotifycdn.com; connect-src 'self' https://api.vaded.gg https://*.sentry.io; worker-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; report-uri /api/security/csp-report"
                 }
             ]
         }

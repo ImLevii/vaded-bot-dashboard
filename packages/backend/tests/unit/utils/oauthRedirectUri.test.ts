@@ -1,6 +1,9 @@
 import type { Request } from 'express'
 import { beforeEach, afterEach, describe, expect, test } from '@jest/globals'
-import { getOAuthRedirectUri } from '../../../src/utils/oauthRedirectUri'
+import {
+    getOAuthRedirectUri,
+    getFrontendRedirectOrigin,
+} from '../../../src/utils/oauthRedirectUri'
 
 function createRequest(
     headers: Record<string, string> = {},
@@ -327,5 +330,71 @@ describe('getOAuthRedirectUri', () => {
         expect(getOAuthRedirectUri(req)).toBe(
             'http://app.local/api/auth/callback',
         )
+    })
+})
+
+describe('getFrontendRedirectOrigin', () => {
+    const originalNodeEnv = process.env.NODE_ENV
+    const originalFrontendUrl = process.env.WEBAPP_FRONTEND_URL
+
+    afterEach(() => {
+        if (originalNodeEnv) {
+            process.env.NODE_ENV = originalNodeEnv
+        } else {
+            delete process.env.NODE_ENV
+        }
+
+        if (originalFrontendUrl) {
+            process.env.WEBAPP_FRONTEND_URL = originalFrontendUrl
+        } else {
+            delete process.env.WEBAPP_FRONTEND_URL
+        }
+    })
+
+    test('derives origin from forwarded host, ignoring a stale configured frontend url', () => {
+        process.env.NODE_ENV = 'production'
+        process.env.WEBAPP_FRONTEND_URL =
+            'https://vaded-bot-dashboard.vercel.app'
+
+        const req = createRequest({
+            'x-forwarded-proto': 'https',
+            'x-forwarded-host': 'vaded.gg',
+        })
+
+        expect(getFrontendRedirectOrigin(req)).toBe('https://vaded.gg')
+    })
+
+    test('follows the forwarded host even when it is the legacy vercel domain', () => {
+        process.env.NODE_ENV = 'production'
+        process.env.WEBAPP_FRONTEND_URL = 'https://vaded.gg'
+
+        const req = createRequest({
+            'x-forwarded-proto': 'https',
+            'x-forwarded-host': 'vaded-bot-dashboard.vercel.app',
+        })
+
+        expect(getFrontendRedirectOrigin(req)).toBe(
+            'https://vaded-bot-dashboard.vercel.app',
+        )
+    })
+
+    test('falls back to the configured primary frontend url when no host is forwarded', () => {
+        process.env.NODE_ENV = 'production'
+        process.env.WEBAPP_FRONTEND_URL = 'https://vaded.gg'
+
+        const req = createRequest()
+
+        expect(getFrontendRedirectOrigin(req)).toBe('https://vaded.gg')
+    })
+
+    test('forces https in production regardless of forwarded proto', () => {
+        process.env.NODE_ENV = 'production'
+
+        const req = createRequest({
+            'x-forwarded-proto': 'http',
+            'x-forwarded-host': 'vaded.gg',
+        })
+
+        expect(getFrontendRedirectOrigin(req)).toBe('https://vaded.gg')
     })
 })

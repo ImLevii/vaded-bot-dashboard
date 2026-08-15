@@ -7,13 +7,11 @@ import { asyncHandler } from '../middleware/asyncHandler'
 import { AppError } from '../errors/AppError'
 import { authLimiter } from '../middleware/rateLimit'
 import { handleOAuthCallback } from './authCallback'
-import { getPrimaryFrontendUrl } from '../utils/frontendOrigin'
-import { getOAuthRedirectUri } from '../utils/oauthRedirectUri'
+import {
+    getFrontendRedirectOrigin,
+    getOAuthRedirectUri,
+} from '../utils/oauthRedirectUri'
 import { isDeveloperUser } from '../middleware/requireAdmin'
-
-const getFrontendUrl = (): string => {
-    return getPrimaryFrontendUrl()
-}
 
 async function handleDiscordLogin(req: Request, res: Response): Promise<void> {
     try {
@@ -45,7 +43,7 @@ async function handleDiscordLogin(req: Request, res: Response): Promise<void> {
         const state = req.session.oauthState
 
         if (!clientId) {
-            const frontendUrl = getFrontendUrl()
+            const frontendUrl = getFrontendRedirectOrigin(req)
             res.redirect(
                 `${frontendUrl}/?error=auth_failed&message=client_id_not_configured`,
             )
@@ -60,7 +58,7 @@ async function handleDiscordLogin(req: Request, res: Response): Promise<void> {
             message: 'Error in Discord OAuth redirect:',
             error,
         })
-        const frontendUrl = getFrontendUrl()
+        const frontendUrl = getFrontendRedirectOrigin(req)
         res.redirect(`${frontendUrl}/?error=auth_failed&message=redirect_error`)
     }
 }

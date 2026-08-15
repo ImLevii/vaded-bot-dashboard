@@ -1,4 +1,5 @@
 import type { Request } from 'express'
+import { getPrimaryFrontendUrl } from './frontendOrigin'
 
 const getForwardedHeader = (
     req: Request,
@@ -52,6 +53,26 @@ const resolveEnvRedirectUri = (): string | undefined => {
 
 const shouldForceEnvRedirectUri = (): boolean => {
     return process.env.WEBAPP_REDIRECT_URI_FORCE === 'true'
+}
+
+// Post-OAuth (and OAuth-error) browser redirects must land back on whatever
+// origin the user actually started from. Trusting the forwarded host here
+// mirrors getOAuthRedirectUri() below, so a dashboard opened from
+// vaded-bot-dashboard.vercel.app returns there instead of always bouncing to
+// the statically configured primary frontend URL (e.g. vaded.gg).
+export function getFrontendRedirectOrigin(req: Request): string {
+    if (!hasForwardedHost(req)) {
+        return getPrimaryFrontendUrl()
+    }
+
+    const forwardedProto = getForwardedHeader(req, 'x-forwarded-proto')
+    const forwardedHost = getForwardedHeader(req, 'x-forwarded-host')
+    const protocol =
+        process.env.NODE_ENV === 'production'
+            ? 'https'
+            : (forwardedProto ?? req.protocol ?? 'http')
+
+    return `${protocol}://${forwardedHost}`
 }
 
 export function getOAuthRedirectUri(

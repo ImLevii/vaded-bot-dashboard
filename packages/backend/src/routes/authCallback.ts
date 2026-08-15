@@ -3,8 +3,10 @@ import { timingSafeEqual } from 'node:crypto'
 import { debugLog, errorLog } from '@lucky/shared/utils'
 import { discordOAuthService } from '../services/DiscordOAuthService'
 import { sessionService } from '../services/SessionService'
-import { getPrimaryFrontendUrl } from '../utils/frontendOrigin'
-import { getOAuthRedirectUri } from '../utils/oauthRedirectUri'
+import {
+    getFrontendRedirectOrigin,
+    getOAuthRedirectUri,
+} from '../utils/oauthRedirectUri'
 
 export async function handleOAuthCallback(
     req: Request,
@@ -12,7 +14,7 @@ export async function handleOAuthCallback(
 ): Promise<void> {
     try {
         const { code, error, state } = req.query
-        const frontendUrl = getPrimaryFrontendUrl()
+        const frontendUrl = getFrontendRedirectOrigin(req)
 
         if (error) {
             errorLog({
@@ -154,7 +156,7 @@ export async function handleOAuthCallback(
         res.redirect(`${frontendUrl}/music?authenticated=true`)
     } catch (error) {
         errorLog({ message: 'Error in Discord OAuth callback:', error })
-        const frontendUrl = getPrimaryFrontendUrl()
+        const frontendUrl = getFrontendRedirectOrigin(req)
         res.redirect(
             `${frontendUrl}/?error=auth_failed&message=authentication_error`,
         )

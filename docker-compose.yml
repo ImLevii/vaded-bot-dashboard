@@ -19,7 +19,12 @@ x-large-svc: &large-svc
 # (last.fm + spotify). Service-specific vars stay inline in each
 # service's `environment:` block.
 x-common-app-env: &common-app-env
-    NODE_ENV: production
+    # Defaults to production (matches the real deploy, TLS-terminated at the
+    # Cloudflare Tunnel), but a local `npm start` sets NODE_ENV=development in
+    # .env to keep session cookies non-Secure — nginx here serves plain http
+    # on :8080, and a Secure/SameSite=None cookie set over http is silently
+    # dropped by the browser, breaking auth on every request after login.
+    NODE_ENV: ${NODE_ENV:-production}
     DISCORD_TOKEN: ${DISCORD_TOKEN}
     CLIENT_ID: ${CLIENT_ID}
     SENTRY_DSN: ${SENTRY_DSN:-}
