@@ -110,15 +110,21 @@ describe('normalizeSoundCloudUrl', () => {
             'https://soundcloud.com/artist/track-no-protocol',
         )
     })
+
+    it('preserves other SoundCloud query params while stripping ?in=', () => {
+        const url =
+            'https://soundcloud.com/artist/track?in=playlist&secret_token=abc'
+        const result = normalizeSoundCloudUrl(url)
+        expect(result).not.toContain('in=')
+        expect(result).toContain('secret_token=abc')
+    })
 })
 
 describe('normalizeYoutubeUrl', () => {
-    it('strips list=RD.../start_radio from a "Start Radio" mix URL', () => {
+    it('leaves list=RD.../start_radio on a "Start Radio" mix URL intact so it resolves as a playlist', () => {
         const url =
             'https://www.youtube.com/watch?v=6_oRaS6jD5E&list=RD6_oRaS6jD5E&start_radio=1'
-        expect(normalizeYoutubeUrl(url)).toBe(
-            'https://www.youtube.com/watch?v=6_oRaS6jD5E',
-        )
+        expect(normalizeYoutubeUrl(url)).toBe(url)
     })
 
     it('leaves real (non-mix) playlist URLs unchanged', () => {
@@ -148,21 +154,12 @@ describe('normalizeYoutubeUrl', () => {
         )
     })
 
-    it('strips list=RD.../start_radio from a protocol-less mix URL', () => {
+    it('adds a scheme to a protocol-less mix URL without stripping list/start_radio', () => {
         const bare =
             'youtube.com/watch?v=6_oRaS6jD5E&list=RD6_oRaS6jD5E&start_radio=1'
         expect(normalizeYoutubeUrl(bare)).toBe(
-            'https://youtube.com/watch?v=6_oRaS6jD5E',
+            'https://youtube.com/watch?v=6_oRaS6jD5E&list=RD6_oRaS6jD5E&start_radio=1',
         )
-    })
-})
-
-    it('preserves other SoundCloud query params while stripping ?in=', () => {
-        const url =
-            'https://soundcloud.com/artist/track?in=playlist&secret_token=abc'
-        const result = normalizeSoundCloudUrl(url)
-        expect(result).not.toContain('in=')
-        expect(result).toContain('secret_token=abc')
     })
 })
 
@@ -191,7 +188,9 @@ describe('isUrl', () => {
 describe('cleanQueryInput', () => {
     it('strips search:query: prefix pasted from a discord-player error message', () => {
         expect(
-            cleanQueryInput('search:query:https://www.youtube.com/watch?v=6_oRaS6jD5E'),
+            cleanQueryInput(
+                'search:query:https://www.youtube.com/watch?v=6_oRaS6jD5E',
+            ),
         ).toBe('https://www.youtube.com/watch?v=6_oRaS6jD5E')
     })
 

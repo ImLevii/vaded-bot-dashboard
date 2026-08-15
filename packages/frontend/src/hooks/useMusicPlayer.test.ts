@@ -62,6 +62,7 @@ function makeState(guildId: string, volume = 50): QueueState {
         position: 0,
         voiceChannelId: null,
         voiceChannelName: null,
+        listeners: [],
         timestamp: 0,
     }
 }
@@ -179,7 +180,20 @@ describe('useMusicPlayer', () => {
     test('sets lastStateUpdate from initial REST state', async () => {
         const { sse } = makeMockSSE()
         mockCreateSSEConnection.mockReturnValue(sse)
-        const restState = { guildId: 'guild-1', isPlaying: true, tracks: [], currentTrack: null, isPaused: false, volume: 60, repeatMode: 'off', shuffled: false, position: 0, voiceChannelId: null, voiceChannelName: null, timestamp: 0 }
+        const restState = {
+            guildId: 'guild-1',
+            isPlaying: true,
+            tracks: [],
+            currentTrack: null,
+            isPaused: false,
+            volume: 60,
+            repeatMode: 'off',
+            shuffled: false,
+            position: 0,
+            voiceChannelId: null,
+            voiceChannelName: null,
+            timestamp: 0,
+        }
         mockGetState.mockResolvedValue({ data: restState })
 
         const { result } = renderHook(() => useMusicPlayer('guild-1'))
@@ -220,7 +234,9 @@ describe('useMusicPlayer', () => {
         expect(result.current.state.volume).toBe(volumeBefore)
         expect(result.current.lastStateUpdate).toEqual(expect.any(Number))
         if (before !== null) {
-            expect(result.current.lastStateUpdate).toBeGreaterThanOrEqual(before)
+            expect(result.current.lastStateUpdate).toBeGreaterThanOrEqual(
+                before,
+            )
         }
     })
 

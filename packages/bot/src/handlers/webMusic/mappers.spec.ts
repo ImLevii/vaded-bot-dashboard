@@ -85,7 +85,10 @@ describe('mapTrack', () => {
     it('forwards recommendationReason from track metadata', () => {
         const track = mapTrack(
             makeRawTrack({
-                metadata: { isAutoplay: true, recommendationReason: 'similar vibes' },
+                metadata: {
+                    isAutoplay: true,
+                    recommendationReason: 'similar vibes',
+                },
             }),
         )
         expect(track.recommendationReason).toBe('similar vibes')
@@ -157,6 +160,7 @@ describe('buildQueueState', () => {
             position: 0,
             voiceChannelId: null,
             voiceChannelName: null,
+            listeners: [],
             timestamp: expect.any(Number),
         })
     })
@@ -176,7 +180,24 @@ describe('buildQueueState', () => {
                 streamTime: 12000,
             },
             repeatMode: QueueRepeatMode.QUEUE,
-            channel: { id: 'vc-1', name: 'Music' },
+            channel: {
+                id: 'vc-1',
+                name: 'Music',
+                members: new Map([
+                    [
+                        'user-1',
+                        {
+                            user: {
+                                id: 'user-1',
+                                bot: false,
+                                displayAvatarURL: () =>
+                                    'https://cdn.example.com/avatar.png',
+                            },
+                            displayName: 'Listener One',
+                        },
+                    ],
+                ]),
+            },
         }
         resolveGuildQueueMock.mockReturnValue({ queue: mockQueue } as never)
         const state = await buildQueueState({} as never, 'guild-1')
@@ -188,6 +209,14 @@ describe('buildQueueState', () => {
         expect(state.repeatMode).toBe('queue')
         expect(state.position).toBe(12000)
         expect(state.voiceChannelId).toBe('vc-1')
+        expect(state.listeners).toEqual([
+            {
+                id: 'user-1',
+                displayName: 'Listener One',
+                avatarUrl: 'https://cdn.example.com/avatar.png',
+                isBot: false,
+            },
+        ])
     })
 
     it('handles queue with null currentTrack', async () => {

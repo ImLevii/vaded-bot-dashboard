@@ -461,6 +461,30 @@
   }
 }
 
+/* Diagonal light-catch reflection for glass surfaces — a soft streak across
+   the top-left corner, like light glancing off a physical glass panel. */
+@utility surface-sheen {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+      118deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.02) 16%,
+      transparent 32%,
+      transparent 78%,
+      rgba(220, 38, 38, 0.08) 100%
+    );
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+}
+
 @utility surface-card {
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: var(--radius-lg);

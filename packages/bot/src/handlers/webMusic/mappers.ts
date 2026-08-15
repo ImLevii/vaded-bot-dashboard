@@ -1,7 +1,9 @@
 import { QueueRepeatMode } from 'discord-player'
+import type { GuildMember, VoiceBasedChannel } from 'discord.js'
 import type {
     MusicTrackInfo as TrackInfo,
     QueueState,
+    VoiceListener,
 } from '@lucky/shared/services'
 import type { CustomClient } from '../../types'
 import { resolveGuildQueue } from '../../utils/music/queueResolver'
@@ -26,8 +28,7 @@ const KNOWN_SOURCES = ['youtube', 'spotify', 'soundcloud']
 
 export function mapTrack(track: RawTrack): TrackInfo {
     const rawReason = track.metadata?.recommendationReason
-    const reason =
-        typeof rawReason === 'string' ? rawReason : undefined
+    const reason = typeof rawReason === 'string' ? rawReason : undefined
     return {
         id: track.id,
         title: track.title,
@@ -42,6 +43,18 @@ export function mapTrack(track: RawTrack): TrackInfo {
             : 'unknown') as TrackInfo['source'],
         ...(reason ? { recommendationReason: reason } : {}),
     }
+}
+
+function mapListeners(
+    channel: VoiceBasedChannel | null | undefined,
+): VoiceListener[] {
+    if (!channel) return []
+    return [...channel.members.values()].map((m: GuildMember) => ({
+        id: m.user.id,
+        displayName: m.displayName,
+        avatarUrl: m.user.displayAvatarURL({ size: 64 }) ?? null,
+        isBot: m.user.bot,
+    }))
 }
 
 export function repeatModeToString(
@@ -98,6 +111,7 @@ export async function buildQueueState(
         position: queue.node.streamTime ?? 0,
         voiceChannelId: queue.channel?.id ?? null,
         voiceChannelName: queue.channel?.name ?? null,
+        listeners: mapListeners(queue.channel),
         timestamp: Date.now(),
     }
 }
@@ -115,6 +129,7 @@ function emptyQueueState(guildId: string): QueueState {
         position: 0,
         voiceChannelId: null,
         voiceChannelName: null,
+        listeners: [],
         timestamp: Date.now(),
     }
 }

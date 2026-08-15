@@ -74,25 +74,17 @@ export function normalizeSoundCloudUrl(url: string): string {
 }
 
 /**
- * Strips YouTube "Start Radio" mix params (`list=RD...`, `start_radio=1`).
- * These auto-generated mixes are session-bound and the YouTube extractor's
- * validate() reclassifies any `list=` URL as a playlist query, then fails
- * with "No results found" because the mix has no resolvable content. Real
- * playlists (`list=PL...`/`OLAK5uy...`) are left untouched since those
- * resolve fine; the bare video URL always resolves correctly.
+ * Ensures a YouTube URL has a scheme before it reaches discord-player-youtubei's
+ * validate()/handle(). "Start Radio" mix URLs (`list=RD...`) are intentionally
+ * left intact: the installed extractor's getMixedPlaylist() resolves them into
+ * their full track list (it needs both `list` and `v`), the same way a regular
+ * `list=PL...` playlist expands.
  */
 export function normalizeYoutubeUrl(url: string): string {
     if (!url.includes('youtube.com') && !url.includes('youtu.be')) return url
     try {
-        const parsed = new URL(withScheme(url))
-        const listId = parsed.searchParams.get('list')
-        if (listId?.startsWith('RD')) {
-            parsed.searchParams.delete('list')
-            parsed.searchParams.delete('start_radio')
-        }
-        return parsed.toString()
+        return new URL(withScheme(url)).toString()
     } catch {
         return url
     }
 }
-

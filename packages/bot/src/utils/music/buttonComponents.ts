@@ -60,12 +60,9 @@ export function createMusicActionButtons(
 ): ActionRowBuilder<ButtonBuilder> {
     const isAutoplay = queue.repeatMode === QueueRepeatMode.AUTOPLAY
 
-    const stopButton = new ButtonBuilder()
-        .setCustomId(MUSIC_BUTTON_IDS.STOP)
-        .setEmoji('⏹️')
-        .setLabel('Stop')
-        .setStyle(ButtonStyle.Danger)
-
+    // Stop lives in createMusicControlButtons's row already — repeating its
+    // custom_id here makes Discord reject the whole message with
+    // COMPONENT_CUSTOM_ID_DUPLICATED once both rows are sent together.
     const clearQueueButton = new ButtonBuilder()
         .setCustomId(MUSIC_BUTTON_IDS.CLEAR_QUEUE)
         .setEmoji('🗑️')
@@ -80,7 +77,6 @@ export function createMusicActionButtons(
         .setDisabled(!isAutoplay)
 
     return new ActionRowBuilder<ButtonBuilder>().addComponents(
-        stopButton,
         clearQueueButton,
         clearAutoplayButton,
     )

@@ -53,6 +53,14 @@ export interface ProviderHealthState {
     cooldownUntil: number | null
 }
 
+/** A member currently connected to the bot's voice channel. */
+export interface VoiceListener {
+    id: string
+    displayName: string
+    avatarUrl: string | null
+    isBot: boolean
+}
+
 /** Current state of the music queue. */
 export interface QueueState {
     guildId: string
@@ -66,6 +74,8 @@ export interface QueueState {
     position: number
     voiceChannelId: string | null
     voiceChannelName: string | null
+    /** Non-bot members currently connected to the voice channel. */
+    listeners: VoiceListener[]
     providerHealth?: ProviderHealthState[]
     lastRecoveryAction?: string
     sessionSnapshotId?: string

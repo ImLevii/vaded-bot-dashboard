@@ -102,6 +102,7 @@ function emptyState(guildId: string): QueueState {
         position: 0,
         voiceChannelId: null,
         voiceChannelName: null,
+        listeners: [],
         timestamp: Date.now(),
     }
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
     Music2,
@@ -20,6 +20,8 @@ import SearchBar from '@/components/Music/SearchBar'
 import ImportPlaylist from '@/components/Music/ImportPlaylist'
 import QueueList from '@/components/Music/QueueList'
 // import AutoplayGenres from '@/components/Music/AutoplayGenres'
+import ListenersWidget from '@/components/Music/ListenersWidget'
+import TrackSourceIcon from '@/components/Music/TrackSourceIcon'
 import EmptyState from '@/components/ui/EmptyState'
 import type { QueueState } from '@/types'
 import type { MusicActionKey } from '@/hooks/useMusicPlayer'
@@ -73,7 +75,7 @@ export default function MusicPage() {
 
     return (
         <div className='space-y-8 px-1 sm:px-0 pb-8'>
-            <header className='flex items-center justify-between gap-3'>
+            <header className='flex items-center justify-between gap-3 flex-wrap'>
                 <div className='flex items-center gap-3 min-w-0'>
                     <Music2
                         className='h-6 w-6 sm:h-7 sm:w-7 text-vaded-brand shrink-0'
@@ -92,7 +94,13 @@ export default function MusicPage() {
                         </p>
                     </div>
                 </div>
-                <ConnectionBadge connected={player.isConnected} />
+                <div className='flex items-center gap-2 flex-wrap justify-end'>
+                    <ListenersWidget
+                        listeners={player.state.listeners}
+                        voiceChannelName={player.state.voiceChannelName}
+                    />
+                    <ConnectionBadge connected={player.isConnected} />
+                </div>
             </header>
 
             <NowPlayingHero
@@ -132,7 +140,10 @@ export default function MusicPage() {
                         if (!controlsEnabled) {
                             throw new Error(t('music.playerNotConnected'))
                         }
-                        await player.importPlaylist(url, player.state.voiceChannelId ?? undefined)
+                        await player.importPlaylist(
+                            url,
+                            player.state.voiceChannelId ?? undefined,
+                        )
                     }}
                 />
             </div>
@@ -140,21 +151,21 @@ export default function MusicPage() {
             {/* <AutoplayGenres guildId={guildId} /> */}
 
             <QueueList
-                    tracks={player.state.tracks}
-                    disabled={!controlsEnabled}
-                    onRemove={(i) => {
-                        if (!controlsEnabled) return
-                        player.removeTrack(i)
-                    }}
-                    onMove={(from, to) => {
-                        if (!controlsEnabled) return
-                        player.moveTrack(from, to)
-                    }}
-                    onClear={() => {
-                        if (!controlsEnabled) return
-                        player.clearQueue()
-                    }}
-                />
+                tracks={player.state.tracks}
+                disabled={!controlsEnabled}
+                onRemove={(i) => {
+                    if (!controlsEnabled) return
+                    player.removeTrack(i)
+                }}
+                onMove={(from, to) => {
+                    if (!controlsEnabled) return
+                    player.moveTrack(from, to)
+                }}
+                onClear={() => {
+                    if (!controlsEnabled) return
+                    player.clearQueue()
+                }}
+            />
 
             {player.error && (
                 <div
@@ -238,7 +249,10 @@ function NowPlayingHero({
                 <div className='flex items-center justify-center min-h-[300px] sm:min-h-[340px]'>
                     <div className='text-center'>
                         <div className='w-20 h-20 rounded-full bg-vaded-bg-active border border-vaded-border flex items-center justify-center mx-auto mb-4'>
-                            <Music2 className='h-9 w-9 text-vaded-text-tertiary' aria-hidden='true' />
+                            <Music2
+                                className='h-9 w-9 text-vaded-text-tertiary'
+                                aria-hidden='true'
+                            />
                         </div>
                         <p className='type-body font-semibold text-vaded-text-secondary'>
                             {t('music.nothingPlaying')}
@@ -258,7 +272,7 @@ function NowPlayingHero({
     const progress = durationMs > 0 ? (positionMs / durationMs) * 100 : 0
 
     return (
-        <div className='relative rounded-2xl border border-vaded-border overflow-hidden'>
+        <div className='relative surface-sheen rounded-2xl border border-vaded-border overflow-hidden'>
             {/* Blurred album art backdrop */}
             {currentTrack.thumbnail && (
                 <div
@@ -270,20 +284,23 @@ function NowPlayingHero({
                     aria-hidden='true'
                 />
             )}
-            <div className='absolute inset-0 bg-vaded-bg-primary/80' aria-hidden='true' />
+            <div
+                className='absolute inset-0 bg-vaded-bg-primary/80'
+                aria-hidden='true'
+            />
 
             <div className='relative z-10 p-5 sm:p-8'>
                 {/* Main layout: art left, info right */}
                 <div className='flex flex-col sm:flex-row gap-6 sm:gap-8 items-center sm:items-start'>
-
                     {/* Album art — spins when playing */}
                     <div className='shrink-0 relative'>
                         <div
                             className='w-36 h-36 sm:w-44 sm:h-44 rounded-full overflow-hidden border-4 border-vaded-border shadow-[0_0_40px_rgb(220_38_38_/_0.25)]'
                             style={{
-                                animation: state.isPlaying && !isStale
-                                    ? 'vinyl-spin 8s linear infinite'
-                                    : 'none',
+                                animation:
+                                    state.isPlaying && !isStale
+                                        ? 'vinyl-spin 8s linear infinite'
+                                        : 'none',
                             }}
                         >
                             {currentTrack.thumbnail ? (
@@ -307,13 +324,15 @@ function NowPlayingHero({
 
                     {/* Track info + controls */}
                     <div className='flex-1 min-w-0 w-full text-center sm:text-left'>
-
                         {/* NOW PLAYING label with live dot */}
                         <div className='flex items-center gap-2 justify-center sm:justify-start mb-2'>
                             {state.isPlaying && !isStale && (
                                 <span
                                     className='w-2 h-2 rounded-full bg-vaded-brand block shrink-0'
-                                    style={{ animation: 'live-pulse 1.4s ease-in-out infinite' }}
+                                    style={{
+                                        animation:
+                                            'live-pulse 1.4s ease-in-out infinite',
+                                    }}
                                     aria-hidden='true'
                                 />
                             )}
@@ -329,14 +348,21 @@ function NowPlayingHero({
                                 title={currentTrack.title}
                                 style={
                                     (currentTrack.title?.length ?? 0) > 36
-                                        ? { animation: 'marquee 10s linear infinite' }
+                                        ? {
+                                              animation:
+                                                  'marquee 10s linear infinite',
+                                          }
                                         : undefined
                                 }
                             >
                                 {currentTrack.title || t('music.unknown')}
                             </h2>
                         </div>
-                        <p className='type-body text-vaded-text-secondary mb-5'>
+                        <p className='flex items-center justify-center gap-1.5 sm:justify-start type-body text-vaded-text-secondary mb-5'>
+                            <TrackSourceIcon
+                                source={currentTrack.source}
+                                className='h-3.5 w-3.5 shrink-0'
+                            />
                             {currentTrack.author || t('music.unknown')}
                         </p>
 
@@ -351,7 +377,9 @@ function NowPlayingHero({
                                     className={`relative h-full rounded-full transition-[width] duration-1000 overflow-hidden ${isStale ? 'bg-vaded-warning' : 'bg-vaded-brand'}`}
                                     style={{
                                         width: `${progress}%`,
-                                        boxShadow: isStale ? undefined : '0 0 12px rgba(220,38,38,0.6)',
+                                        boxShadow: isStale
+                                            ? undefined
+                                            : '0 0 12px rgba(220,38,38,0.6)',
                                     }}
                                 >
                                     {/* Animated shimmer sweep */}
@@ -360,8 +388,10 @@ function NowPlayingHero({
                                             aria-hidden='true'
                                             className='absolute inset-0 -skew-x-12'
                                             style={{
-                                                background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%)',
-                                                animation: 'shimmer 2.4s ease-in-out infinite',
+                                                background:
+                                                    'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%)',
+                                                animation:
+                                                    'shimmer 2.4s ease-in-out infinite',
                                                 backgroundSize: '60% 100%',
                                                 backgroundRepeat: 'no-repeat',
                                             }}
@@ -378,9 +408,14 @@ function NowPlayingHero({
                                 )}
                             </div>
                             <div className='flex justify-between type-meta text-vaded-text-tertiary mt-2 tabular-nums font-medium tracking-wide'>
-                                <span className='text-vaded-text-secondary'>{formatSeconds(positionMs / 1000)}</span>
+                                <span className='text-vaded-text-secondary'>
+                                    {formatSeconds(positionMs / 1000)}
+                                </span>
                                 {isStale && (
-                                    <span role='status' className='text-vaded-warning text-center'>
+                                    <span
+                                        role='status'
+                                        className='text-vaded-warning text-center'
+                                    >
                                         {t('music.progressMayBeOutdated')}
                                     </span>
                                 )}
@@ -395,18 +430,26 @@ function NowPlayingHero({
                             aria-label={t('music.musicPlayer')}
                         >
                             <ControlButton
-                                icon={busy && pendingAction === 'shuffle'
-                                    ? <Loader2 className='h-4 w-4 animate-spin' />
-                                    : <Shuffle className='h-4 w-4' />}
+                                icon={
+                                    busy && pendingAction === 'shuffle' ? (
+                                        <Loader2 className='h-4 w-4 animate-spin' />
+                                    ) : (
+                                        <Shuffle className='h-4 w-4' />
+                                    )
+                                }
                                 onClick={onShuffle}
                                 active={state.shuffled}
                                 disabled={!controlsEnabled}
                                 aria-label={t('music.shuffle')}
                             />
                             <ControlButton
-                                icon={busy && pendingAction === 'previous'
-                                    ? <Loader2 className='h-5 w-5 animate-spin' />
-                                    : <SkipBack className='h-5 w-5' />}
+                                icon={
+                                    busy && pendingAction === 'previous' ? (
+                                        <Loader2 className='h-5 w-5 animate-spin' />
+                                    ) : (
+                                        <SkipBack className='h-5 w-5' />
+                                    )
+                                }
                                 onClick={onPrevious}
                                 disabled={!controlsEnabled}
                                 aria-label={t('music.previousTrack')}
@@ -416,46 +459,77 @@ function NowPlayingHero({
                                 onClick={onPlayPause}
                                 disabled={!controlsEnabled}
                                 className='group relative h-14 w-14 rounded-xl btn-glass text-white flex items-center justify-center active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vaded-brand focus-visible:ring-offset-2 focus-visible:ring-offset-transparent overflow-hidden'
-                                style={{ boxShadow: '0 4px 24px rgba(220,38,38,0.3), 0 0 0 1px rgba(220,38,38,0.35)' }}
-                                aria-label={state.isPlaying ? t('music.pause') : t('music.play')}
-                                aria-busy={pendingAction === 'pause' || pendingAction === 'resume'}
+                                style={{
+                                    boxShadow:
+                                        '0 4px 24px rgba(220,38,38,0.3), 0 0 0 1px rgba(220,38,38,0.35)',
+                                }}
+                                aria-label={
+                                    state.isPlaying
+                                        ? t('music.pause')
+                                        : t('music.play')
+                                }
+                                aria-busy={
+                                    pendingAction === 'pause' ||
+                                    pendingAction === 'resume'
+                                }
                             >
                                 {/* Hover shimmer */}
-                                <span aria-hidden='true' className='pointer-events-none absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-full' />
-                                {pendingAction === 'pause' || pendingAction === 'resume'
-                                    ? <Loader2 className='h-6 w-6 animate-spin' />
-                                    : state.isPlaying
-                                        ? <Pause className='h-6 w-6' />
-                                        : <Play className='h-6 w-6 ml-0.5' />}
+                                <span
+                                    aria-hidden='true'
+                                    className='pointer-events-none absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-full'
+                                />
+                                {pendingAction === 'pause' ||
+                                pendingAction === 'resume' ? (
+                                    <Loader2 className='h-6 w-6 animate-spin' />
+                                ) : state.isPlaying ? (
+                                    <Pause className='h-6 w-6' />
+                                ) : (
+                                    <Play className='h-6 w-6 ml-0.5' />
+                                )}
                             </button>
                             <ControlButton
-                                icon={busy && pendingAction === 'skip'
-                                    ? <Loader2 className='h-5 w-5 animate-spin' />
-                                    : <SkipForward className='h-5 w-5' />}
+                                icon={
+                                    busy && pendingAction === 'skip' ? (
+                                        <Loader2 className='h-5 w-5 animate-spin' />
+                                    ) : (
+                                        <SkipForward className='h-5 w-5' />
+                                    )
+                                }
                                 onClick={onSkip}
                                 disabled={!controlsEnabled}
                                 aria-label={t('music.nextTrack')}
                             />
                             <ControlButton
-                                icon={busy && pendingAction === 'repeat'
-                                    ? <Loader2 className='h-4 w-4 animate-spin' />
-                                    : getRepeatIcon(state.repeatMode)}
+                                icon={
+                                    busy && pendingAction === 'repeat' ? (
+                                        <Loader2 className='h-4 w-4 animate-spin' />
+                                    ) : (
+                                        getRepeatIcon(state.repeatMode)
+                                    )
+                                }
                                 onClick={onRepeatCycle}
                                 active={state.repeatMode !== 'off'}
                                 disabled={!controlsEnabled}
-                                aria-label={t('music.repeatMode', { mode: state.repeatMode })}
+                                aria-label={t('music.repeatMode', {
+                                    mode: state.repeatMode,
+                                })}
                             />
                         </div>
 
                         {/* Volume */}
                         <div className='flex items-center gap-3 max-w-xs mx-auto sm:mx-0'>
-                            <Volume2 className='h-4 w-4 text-vaded-text-tertiary shrink-0' aria-hidden='true' />
+                            <Volume2
+                                className='h-4 w-4 text-vaded-text-tertiary shrink-0'
+                                aria-hidden='true'
+                            />
                             <input
                                 type='range'
                                 min='0'
                                 max='100'
                                 value={state.volume ?? 50}
-                                onChange={(e) => onVolumeChange(parseInt(e.target.value, 10))}
+                                onChange={(e) =>
+                                    onVolumeChange(parseInt(e.target.value, 10))
+                                }
                                 disabled={!controlsEnabled}
                                 className='flex-1 h-1.5 bg-vaded-bg-active rounded-full appearance-none cursor-pointer accent-vaded-brand disabled:opacity-40 disabled:cursor-not-allowed'
                                 aria-label={t('music.volume')}
@@ -467,7 +541,9 @@ function NowPlayingHero({
 
                         {!controlsEnabled && (
                             <p className='type-meta text-center sm:text-left text-vaded-text-tertiary mt-3'>
-                                {busy ? t('music.commandInProgress') : t('music.notConnectedToVoiceChannel')}
+                                {busy
+                                    ? t('music.commandInProgress')
+                                    : t('music.notConnectedToVoiceChannel')}
                             </p>
                         )}
                     </div>
@@ -503,12 +579,17 @@ function ControlButton({
                     ? 'rgba(220,38,38,0.12)'
                     : 'rgba(255,255,255,0.05)',
                 backdropFilter: 'blur(8px)',
-                boxShadow: active ? '0 0 12px rgba(220,38,38,0.2), inset 0 1px 0 rgba(255,255,255,0.08)' : 'inset 0 1px 0 rgba(255,255,255,0.06)',
+                boxShadow: active
+                    ? '0 0 12px rgba(220,38,38,0.2), inset 0 1px 0 rgba(255,255,255,0.08)'
+                    : 'inset 0 1px 0 rgba(255,255,255,0.06)',
             }}
             {...props}
         >
             {/* Hover glass sheen */}
-            <span aria-hidden='true' className='pointer-events-none absolute inset-0 bg-gradient-to-b from-white/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity' />
+            <span
+                aria-hidden='true'
+                className='pointer-events-none absolute inset-0 bg-gradient-to-b from-white/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity'
+            />
             {icon}
         </button>
     )
@@ -533,29 +614,62 @@ function formatSeconds(seconds: number): string {
     return `${mins}:${secs.toString().padStart(2, '0')}`
 }
 
+// SSE drops that self-heal within this window never reach the UI — most
+// disconnects are momentary (network blip, tab throttling) and the retry
+// loop in useMusicPlayer already reconnects within ~1s, so flashing
+// "Reconnecting" for every one of them is just noise. A connection that's
+// never been established yet (fresh page load) still shows immediately.
+const DISCONNECTED_DISPLAY_GRACE_MS = 2000
+
 function ConnectionBadge({ connected }: { connected: boolean }) {
     const { t } = useTranslation()
+    const [showDisconnected, setShowDisconnected] = useState(!connected)
+    const everConnectedRef = useRef(connected)
+
+    useEffect(() => {
+        if (connected) {
+            everConnectedRef.current = true
+            setShowDisconnected(false)
+            return
+        }
+
+        if (!everConnectedRef.current) {
+            setShowDisconnected(true)
+            return
+        }
+
+        const timer = setTimeout(
+            () => setShowDisconnected(true),
+            DISCONNECTED_DISPLAY_GRACE_MS,
+        )
+        return () => clearTimeout(timer)
+    }, [connected])
+
+    const displayConnected = !showDisconnected
+
     return (
         <div
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full type-meta shrink-0 border transition-colors ${
-                connected
+                displayConnected
                     ? 'bg-vaded-success/10 text-vaded-success border-vaded-success/20'
                     : 'bg-vaded-warning/10 text-vaded-warning border-vaded-warning/20'
             }`}
             role='status'
             aria-label={
-                connected
+                displayConnected
                     ? t('music.connectedToLiveUpdates')
                     : t('music.reconnectingToLiveUpdates')
             }
         >
-            {connected ? (
+            {displayConnected ? (
                 <Wifi className='h-3 w-3' aria-hidden='true' />
             ) : (
                 <WifiOff className='h-3 w-3' aria-hidden='true' />
             )}
             <span className='hidden sm:inline'>
-                {connected ? t('music.connected') : t('music.reconnecting')}
+                {displayConnected
+                    ? t('music.connected')
+                    : t('music.reconnecting')}
             </span>
         </div>
     )

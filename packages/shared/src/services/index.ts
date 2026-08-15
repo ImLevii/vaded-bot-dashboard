@@ -11,6 +11,7 @@ export {
     type RepeatMode,
     type QueueState,
     type TrackInfo as MusicTrackInfo,
+    type VoiceListener,
 } from './music/index.js'
 export * from './LyricsService.js'
 export * from './ModerationService.js'

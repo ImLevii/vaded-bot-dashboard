@@ -12,6 +12,13 @@ export interface TrackInfo {
     recommendationReason?: string
 }
 
+export interface VoiceListener {
+    id: string
+    displayName: string
+    avatarUrl: string | null
+    isBot: boolean
+}
+
 export interface QueueState {
     guildId: string
     currentTrack: TrackInfo | null
@@ -24,6 +31,7 @@ export interface QueueState {
     position: number
     voiceChannelId: string | null
     voiceChannelName: string | null
+    listeners: VoiceListener[]
     timestamp: number
 }
 

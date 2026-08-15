@@ -93,12 +93,12 @@ describe('createMusicControlButtons', () => {
 })
 
 describe('createMusicActionButtons', () => {
-    it('calls addComponents with 3 buttons', () => {
+    it('calls addComponents with 2 buttons', () => {
         const queue = createMockQueue(false, 0, 0)
         createMusicActionButtons(queue as never)
         const row = getRow()
         const [call] = row.addComponents.mock.calls
-        expect((call as unknown[]).length).toBe(3)
+        expect((call as unknown[]).length).toBe(2)
     })
 
     it('does not throw when autoplay is active', () => {

@@ -1,5 +1,5 @@
-import { describe, test, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import MusicPage from './Music'
 import { useGuildSelection } from '@/hooks/useGuildSelection'
@@ -47,6 +47,7 @@ const mockPlayer = {
         guildId: '123',
         currentTrack: null,
         voiceChannelId: null,
+        listeners: [],
         timestamp: Date.now(),
     },
     isConnected: true,
@@ -74,6 +75,10 @@ describe('MusicPage', () => {
     beforeEach(() => {
         vi.clearAllMocks()
         vi.mocked(useMusicPlayer).mockReturnValue(mockPlayer as any)
+    })
+
+    afterEach(() => {
+        vi.useRealTimers()
     })
 
     test('shows no server message when no guild', () => {
@@ -171,6 +176,54 @@ describe('MusicPage', () => {
         )
         expect(
             screen.getByRole('status', { name: /Connected/ }),
+        ).toBeInTheDocument()
+    })
+
+    test('does not flash reconnecting badge on a brief SSE drop', () => {
+        vi.useFakeTimers()
+        vi.mocked(useGuildSelection).mockReturnValue({
+            selectedGuild: mockGuild,
+        } as any)
+        vi.mocked(useMusicPlayer).mockReturnValue({
+            ...mockPlayer,
+            isConnected: true,
+        } as any)
+        const { rerender } = render(
+            <MemoryRouter>
+                <MusicPage />
+            </MemoryRouter>,
+        )
+        expect(
+            screen.getByRole('status', { name: /Connected/ }),
+        ).toBeInTheDocument()
+
+        vi.mocked(useMusicPlayer).mockReturnValue({
+            ...mockPlayer,
+            isConnected: false,
+        } as any)
+        rerender(
+            <MemoryRouter>
+                <MusicPage />
+            </MemoryRouter>,
+        )
+
+        // Still "Connected" immediately after the drop — inside the grace window.
+        expect(
+            screen.getByRole('status', { name: /Connected/ }),
+        ).toBeInTheDocument()
+
+        act(() => {
+            vi.advanceTimersByTime(1000)
+        })
+        expect(
+            screen.getByRole('status', { name: /Connected/ }),
+        ).toBeInTheDocument()
+
+        act(() => {
+            vi.advanceTimersByTime(1500)
+        })
+        expect(
+            screen.getByRole('status', { name: /Reconnecting/ }),
         ).toBeInTheDocument()
     })
 

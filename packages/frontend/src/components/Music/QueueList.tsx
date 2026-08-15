@@ -10,6 +10,7 @@ import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Skeleton from '@/components/ui/Skeleton'
 import EmptyState from '@/components/ui/EmptyState'
+import TrackSourceIcon from '@/components/Music/TrackSourceIcon'
 import { toast } from 'sonner'
 import type { TrackInfo } from '@/types'
 
@@ -101,6 +102,11 @@ export default memo(function QueueList({
                             {tracks.length}
                         </span>
                     )}
+                    {tracks.length > 0 && (
+                        <span className='type-meta text-vaded-text-tertiary'>
+                            {formatTotalDuration(tracks)}
+                        </span>
+                    )}
                 </div>
                 {tracks.length > 0 && (
                     <Button
@@ -116,14 +122,18 @@ export default memo(function QueueList({
                         aria-label='Clear queue'
                     >
                         <Trash2 className='h-3.5 w-3.5' aria-hidden='true' />
-                        <span className='hidden sm:inline font-medium'>Clear all</span>
+                        <span className='hidden sm:inline font-medium'>
+                            Clear all
+                        </span>
                     </Button>
                 )}
             </div>
 
             {tracks.length === 0 ? (
                 <EmptyState
-                    icon={<ListMusic className='h-10 w-10' aria-hidden='true' />}
+                    icon={
+                        <ListMusic className='h-10 w-10' aria-hidden='true' />
+                    }
                     title='Queue is empty'
                     description='Search for a song or import a playlist to get started'
                     className='min-h-[180px]'
@@ -139,6 +149,7 @@ export default memo(function QueueList({
                                 key={`${track.id}-${index}`}
                                 track={track}
                                 index={index}
+                                isNext={index === 0}
                                 disabled={disabled}
                                 isDropTarget={dropTarget === index}
                                 onRemove={onRemove}
@@ -169,6 +180,15 @@ export default memo(function QueueList({
     )
 })
 
+function formatTotalDuration(tracks: TrackInfo[]): string {
+    const totalMs = tracks.reduce((sum, t) => sum + (t.duration || 0), 0)
+    const totalMinutes = Math.round(totalMs / 60000)
+    if (totalMinutes < 60) return `${totalMinutes} min`
+    const hours = Math.floor(totalMinutes / 60)
+    const minutes = totalMinutes % 60
+    return `${hours}h ${minutes}m`
+}
+
 function QueueSkeleton() {
     return (
         <Card className='p-4 sm:p-6'>
@@ -193,10 +213,10 @@ function QueueSkeleton() {
     )
 }
 
-
 const QueueItem = memo(function QueueItem({
     track,
     index,
+    isNext = false,
     disabled = false,
     isDropTarget,
     onRemove,
@@ -207,6 +227,7 @@ const QueueItem = memo(function QueueItem({
 }: {
     track: TrackInfo
     index: number
+    isNext?: boolean
     disabled?: boolean
     isDropTarget: boolean
     onRemove: (i: number) => void
@@ -217,7 +238,11 @@ const QueueItem = memo(function QueueItem({
 }) {
     return (
         <div
-            className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg hover:bg-vaded-bg-tertiary active:bg-vaded-bg-tertiary group transition-colors ${
+            className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border-l-2 hover:bg-vaded-bg-tertiary active:bg-vaded-bg-tertiary group transition-colors ${
+                isNext
+                    ? 'border-l-vaded-brand bg-vaded-brand/5'
+                    : 'border-l-transparent'
+            } ${
                 isDropTarget
                     ? 'ring-1 ring-vaded-red/50 bg-vaded-bg-tertiary'
                     : ''
@@ -244,8 +269,19 @@ const QueueItem = memo(function QueueItem({
             <TrackThumbnail thumbnail={track.thumbnail} />
 
             <div className='flex-1 min-w-0'>
-                <p className='type-body text-vaded-text-primary truncate'>{track.title}</p>
+                {isNext && (
+                    <p className='type-meta text-vaded-brand font-bold tracking-wide mb-0.5'>
+                        Up next
+                    </p>
+                )}
+                <p className='type-body text-vaded-text-primary truncate'>
+                    {track.title}
+                </p>
                 <div className='flex items-center gap-2 mt-0.5 flex-wrap'>
+                    <TrackSourceIcon
+                        source={track.source}
+                        className='h-3 w-3 shrink-0'
+                    />
                     <p className='type-meta text-vaded-text-secondary truncate'>
                         {track.author}
                     </p>

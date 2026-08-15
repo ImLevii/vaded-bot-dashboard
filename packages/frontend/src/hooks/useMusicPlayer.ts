@@ -23,6 +23,7 @@ const EMPTY_STATE: QueueState = {
     position: 0,
     voiceChannelId: null,
     voiceChannelName: null,
+    listeners: [],
     timestamp: Date.now(),
 }
 

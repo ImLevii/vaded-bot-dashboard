@@ -77,6 +77,7 @@ describe('web music repeat mode mappers', () => {
             channel: {
                 id: 'vc-1',
                 name: 'Voice',
+                members: new Map(),
             },
         }
         resolveGuildQueueMock.mockReturnValue({
