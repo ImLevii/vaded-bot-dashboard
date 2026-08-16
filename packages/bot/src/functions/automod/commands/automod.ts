@@ -108,16 +108,29 @@ export default new Command({
         .addSubcommand((subcommand) =>
             subcommand
                 .setName('preset')
-                .setDescription('Apply a preset configuration pack to auto-moderation')
+                .setDescription(
+                    'Apply a preset configuration pack to auto-moderation',
+                )
                 .addStringOption((option) =>
                     option
                         .setName('name')
-                        .setDescription('Preset to apply — omit to list available presets')
+                        .setDescription(
+                            'Preset to apply — omit to list available presets',
+                        )
                         .setRequired(false)
                         .addChoices(
-                            { name: 'Balanced — baseline for mixed communities', value: 'balanced' },
-                            { name: 'Strict Shield — aggressive anti-spam for public servers', value: 'strict' },
-                            { name: 'Light — basic spam and link protection only', value: 'light' },
+                            {
+                                name: 'Balanced — baseline for mixed communities',
+                                value: 'balanced',
+                            },
+                            {
+                                name: 'Strict Shield — aggressive anti-spam for public servers',
+                                value: 'strict',
+                            },
+                            {
+                                name: 'Light — basic spam and link protection only',
+                                value: 'light',
+                            },
                         ),
                 ),
         )
@@ -180,7 +193,9 @@ export default new Command({
                         },
                         {
                             name: 'Invite Filtering',
-                            value: settings.invitesEnabled ? 'Enabled' : 'Disabled',
+                            value: settings.invitesEnabled
+                                ? 'Enabled'
+                                : 'Disabled',
                         },
                         {
                             name: 'Bad Words Filter',
@@ -242,10 +257,11 @@ export default new Command({
                     return
                 }
 
-                const { settings, template } = await autoModService.applyTemplate(
-                    interaction.guild.id,
-                    presetName,
-                )
+                const { settings, template } =
+                    await autoModService.applyTemplate(
+                        interaction.guild.id,
+                        presetName,
+                    )
 
                 const embed = new EmbedBuilder()
                     .setColor(COLOR.ENABLED_GREEN)
@@ -275,7 +291,9 @@ export default new Command({
                         },
                         {
                             name: 'Invite Filtering',
-                            value: settings.invitesEnabled ? 'Enabled' : 'Disabled',
+                            value: settings.invitesEnabled
+                                ? 'Enabled'
+                                : 'Disabled',
                             inline: true,
                         },
                         {
@@ -329,6 +347,14 @@ export default new Command({
                 updateData.wordsEnabled = enabled
             }
 
+            // Turning any filter on implies AutoMod itself is on. The master
+            // `enabled` column defaults to false and this command never set
+            // it, so a guild configured purely through slash commands sat at
+            // enabled=false — which the handlers now honour as a kill switch.
+            if (enabled) {
+                updateData.enabled = true
+            }
+
             await autoModService.updateSettings(
                 interaction.guild.id,
                 updateData,
@@ -336,9 +362,7 @@ export default new Command({
 
             const embed = new EmbedBuilder()
                 .setColor(enabled ? COLOR.ENABLED_GREEN : COLOR.DISABLED_RED)
-                .setTitle(
-                    `Auto-Moderation ${enabled ? 'Enabled' : 'Disabled'}`,
-                )
+                .setTitle(`Auto-Moderation ${enabled ? 'Enabled' : 'Disabled'}`)
                 .addFields({
                     name: 'Module',
                     value: subcommand.toUpperCase(),

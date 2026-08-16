@@ -32,41 +32,9 @@ export function createAutoModApi(apiClient: AutoModApiClient) {
             }>(
                 `/guilds/${encodeGuildSegment(guildId)}/automod/templates/${encodeURIComponent(templateId)}/apply`,
             ),
-        addExemptChannel: (guildId: string, channelId: string) =>
-            apiClient.post<{ success: boolean }>(
-                `/guilds/${guildId}/automod/exempt/channels`,
-                { channelId },
-            ),
-        removeExemptChannel: (guildId: string, channelId: string) =>
-            apiClient.delete<{ success: boolean }>(
-                `/guilds/${guildId}/automod/exempt/channels/${channelId}`,
-            ),
-        addExemptRole: (guildId: string, roleId: string) =>
-            apiClient.post<{ success: boolean }>(
-                `/guilds/${guildId}/automod/exempt/roles`,
-                { roleId },
-            ),
-        removeExemptRole: (guildId: string, roleId: string) =>
-            apiClient.delete<{ success: boolean }>(
-                `/guilds/${guildId}/automod/exempt/roles/${roleId}`,
-            ),
-        addWord: (guildId: string, word: string) =>
-            apiClient.post<{ success: boolean }>(
-                `/guilds/${guildId}/automod/words`,
-                { word },
-            ),
-        removeWord: (guildId: string, word: string) =>
-            apiClient.delete<{ success: boolean }>(
-                `/guilds/${guildId}/automod/words/${encodeURIComponent(word)}`,
-            ),
-        addWhitelistedLink: (guildId: string, domain: string) =>
-            apiClient.post<{ success: boolean }>(
-                `/guilds/${guildId}/automod/links/whitelist`,
-                { domain },
-            ),
-        removeWhitelistedLink: (guildId: string, domain: string) =>
-            apiClient.delete<{ success: boolean }>(
-                `/guilds/${guildId}/automod/links/whitelist/${encodeURIComponent(domain)}`,
-            ),
+        // NOTE: granular exempt-channel / exempt-role / word / link-whitelist
+        // endpoints used to be declared here. No backend route ever
+        // implemented them, so every one returned 404. Exemptions and lists
+        // are edited in place and persisted through updateSettings above.
     }
 }

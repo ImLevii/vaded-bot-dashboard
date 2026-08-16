@@ -19,7 +19,10 @@ export const spamHandler: MessageHandler = {
         }
 
         const settings = await autoModService.getSettings(context.guild.id)
-        return settings?.spamEnabled === true
+        // `enabled` is the per-guild AutoMod master switch set from the
+        // dashboard; it was previously written but never read, so switching
+        // AutoMod off left spam filtering running.
+        return settings?.enabled === true && settings.spamEnabled === true
     },
 
     async handle(

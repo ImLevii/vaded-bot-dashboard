@@ -244,6 +244,20 @@ export class AutoModService {
         settingsCache.delete(guildId)
     }
 
+    /**
+     * Drop this process's cached settings for a guild.
+     *
+     * The cache above is a module-level Map, so it is per-process: the backend
+     * invalidating on write does nothing for the bot, which kept enforcing
+     * stale rules for up to CACHE_TTL after a dashboard save. The bot calls
+     * this when a `guildconfig:refresh` signal arrives (see
+     * GuildConfigControlService), which is what makes dashboard edits take
+     * effect immediately rather than up to five minutes later.
+     */
+    invalidateSettingsCache(guildId: string): void {
+        this.invalidateCache(guildId)
+    }
+
     /** Creates default auto-mod settings for a guild. */
     async createSettings(guildId: string): Promise<AutoModSettings> {
         const result = await prisma.autoModSettings.create({

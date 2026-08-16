@@ -33,6 +33,10 @@ jest.mock('@lucky/shared/services', () => ({
             this.name = 'AutoModTemplateNotFoundError'
         }
     },
+    guildConfigControlService: {
+        connect: jest.fn().mockResolvedValue(undefined),
+        publishRefresh: jest.fn().mockResolvedValue(undefined),
+    },
     autoModService: {
         getSettings: jest.fn(),
         updateSettings: jest.fn(),
@@ -71,6 +75,7 @@ import {
     AutoModTemplateNotFoundError,
     autoModService,
     customCommandService,
+    guildConfigControlService,
     serverLogService,
 } from '@lucky/shared/services'
 import { guildAccessService } from '../../../src/services/GuildAccessService'
@@ -235,6 +240,32 @@ describe('Management Routes Integration', () => {
                 },
                 MOCK_SESSION_DATA.userId,
             )
+        })
+
+        // The bot caches automod settings per-process for 5 minutes, so a save
+        // that does not publish this signal does not reach it — the "changes
+        // don't apply" symptom.
+        test('publishes an automod refresh so the bot drops its cache', async () => {
+            const mockSessionService = sessionService as jest.Mocked<
+                typeof sessionService
+            >
+            mockSessionService.getSession.mockResolvedValue(MOCK_SESSION_DATA)
+            ;(
+                autoModService as jest.Mocked<typeof autoModService>
+            ).updateSettings.mockResolvedValue({ enabled: true })
+            ;(
+                serverLogService as jest.Mocked<typeof serverLogService>
+            ).logAutoModSettingsChange.mockResolvedValue()
+
+            await request(app)
+                .patch('/api/guilds/111111111111111111/automod/settings')
+                .set('Cookie', ['sessionId=valid_session_id'])
+                .send({ spamEnabled: true })
+                .expect(200)
+
+            expect(
+                guildConfigControlService.publishRefresh,
+            ).toHaveBeenCalledWith('automod', '111111111111111111')
         })
 
         test('should return 401 when not authenticated', async () => {

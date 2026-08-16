@@ -175,6 +175,9 @@ describe('automod command', () => {
                     spamEnabled: true,
                     spamThreshold: 4,
                     spamTimeWindow: 5,
+                    // Enabling any filter also flips the guild master switch
+                    // on, which the handlers now honour.
+                    enabled: true,
                 },
             )
             const reply = interactionReplyMock.mock.calls[0][0] as any
@@ -206,7 +209,7 @@ describe('automod command', () => {
 
             expect(updateSettingsMock).toHaveBeenCalledWith(
                 '123456789012345678',
-                { linksEnabled: true },
+                { linksEnabled: true, enabled: true },
             )
             const reply = interactionReplyMock.mock.calls[0][0] as any
             expect(reply.content.embeds).toHaveLength(1)
@@ -224,7 +227,7 @@ describe('automod command', () => {
 
             expect(updateSettingsMock).toHaveBeenCalledWith(
                 '123456789012345678',
-                { invitesEnabled: true },
+                { invitesEnabled: true, enabled: true },
             )
             const reply = interactionReplyMock.mock.calls[0][0] as any
             expect(reply.content.embeds).toHaveLength(1)
@@ -245,7 +248,7 @@ describe('automod command', () => {
 
             expect(updateSettingsMock).toHaveBeenCalledWith(
                 '123456789012345678',
-                { wordsEnabled: true },
+                { wordsEnabled: true, enabled: true },
             )
             const reply = interactionReplyMock.mock.calls[0][0] as any
             expect(reply.content.embeds).toHaveLength(1)

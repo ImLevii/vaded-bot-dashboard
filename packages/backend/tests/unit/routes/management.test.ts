@@ -1,10 +1,4 @@
-import {
-    describe,
-    test,
-    expect,
-    jest,
-    beforeEach,
-} from '@jest/globals'
+import { describe, test, expect, jest, beforeEach } from '@jest/globals'
 import type { Request, Response, NextFunction } from 'express'
 
 const requireGuildModuleAccess = jest.fn()
@@ -22,6 +16,10 @@ jest.mock('../../../src/middleware/auth', () => ({
 }))
 
 jest.mock('@lucky/shared/services', () => ({
+    guildConfigControlService: {
+        connect: jest.fn().mockResolvedValue(undefined),
+        publishRefresh: jest.fn().mockResolvedValue(undefined),
+    },
     autoModService: {
         getSettings: jest.fn().mockResolvedValue({ enabled: true }),
         updateSettings: jest.fn().mockResolvedValue({ enabled: true }),
@@ -49,8 +47,12 @@ jest.mock('@lucky/shared/services', () => ({
         getWelcomeMessage: jest.fn().mockResolvedValue(null),
         getLeaveMessage: jest.fn().mockResolvedValue(null),
         createMessage: jest.fn().mockResolvedValue({ id: 'msg-1' }),
-        updateMessage: jest.fn().mockResolvedValue({ id: 'msg-1', type: 'welcome' }),
-        toggleMessage: jest.fn().mockResolvedValue({ id: 'msg-1', type: 'welcome' }),
+        updateMessage: jest
+            .fn()
+            .mockResolvedValue({ id: 'msg-1', type: 'welcome' }),
+        toggleMessage: jest
+            .fn()
+            .mockResolvedValue({ id: 'msg-1', type: 'welcome' }),
         deleteMessage: jest.fn().mockResolvedValue({}),
     },
     serverLogService: {
@@ -76,16 +78,9 @@ function createApp() {
     const app = express()
     app.use(express.json())
     setupManagementRoutes(app)
-    app.use(
-        (
-            err: any,
-            _req: Request,
-            res: Response,
-            _next: NextFunction,
-        ) => {
-            res.status(err.statusCode ?? 500).json({ error: err.message })
-        },
-    )
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+        res.status(err.statusCode ?? 500).json({ error: err.message })
+    })
     return app
 }
 
@@ -98,7 +93,11 @@ describe('Management Routes RBAC', () => {
         beforeEach(() => {
             requireGuildModuleAccess.mockImplementation(
                 (_module: string, _mode?: string) => {
-                    return (_req: Request, _res: Response, next: NextFunction) => {
+                    return (
+                        _req: Request,
+                        _res: Response,
+                        next: NextFunction,
+                    ) => {
                         const res = _res as any
                         res.status(403).json({ error: 'Forbidden' })
                         res.statusCode = 403
@@ -147,6 +146,10 @@ describe('Management Routes RBAC', () => {
             )
         })
 
+        // AutoMod guards on `moderation`, matching the /automod subtree guard
+        // in routes/index.ts and the dashboard's page gate. It previously
+        // demanded `settings` here as well, so a delegated moderator holding
+        // moderation:manage but no settings grant got a silent 403 on save.
         test('requireGuildModuleAccess is called for automod state-changing routes', async () => {
             const app = createApp()
             await request(app)
@@ -154,6 +157,10 @@ describe('Management Routes RBAC', () => {
                 .send({ enabled: false })
 
             expect(requireGuildModuleAccess).toHaveBeenCalledWith(
+                'moderation',
+                'manage',
+            )
+            expect(requireGuildModuleAccess).not.toHaveBeenCalledWith(
                 'settings',
                 'manage',
             )

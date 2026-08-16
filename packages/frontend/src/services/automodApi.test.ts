@@ -52,59 +52,7 @@ describe('createAutoModApi', () => {
         )
     })
 
-    test('maps exempt channels and roles endpoints', () => {
-        const api = createAutoModApi(apiClient)
-
-        api.addExemptChannel('guild-1', 'channel-1')
-        api.removeExemptChannel('guild-1', 'channel-1')
-        api.addExemptRole('guild-1', 'role-1')
-        api.removeExemptRole('guild-1', 'role-1')
-
-        expect(apiClient.post).toHaveBeenNthCalledWith(
-            1,
-            '/guilds/guild-1/automod/exempt/channels',
-            { channelId: 'channel-1' },
-        )
-        expect(apiClient.delete).toHaveBeenNthCalledWith(
-            1,
-            '/guilds/guild-1/automod/exempt/channels/channel-1',
-        )
-        expect(apiClient.post).toHaveBeenNthCalledWith(
-            2,
-            '/guilds/guild-1/automod/exempt/roles',
-            { roleId: 'role-1' },
-        )
-        expect(apiClient.delete).toHaveBeenNthCalledWith(
-            2,
-            '/guilds/guild-1/automod/exempt/roles/role-1',
-        )
-    })
-
-    test('maps words and whitelist endpoints with URI encoding', () => {
-        const api = createAutoModApi(apiClient)
-
-        api.addWord('guild-1', 'bad word')
-        api.removeWord('guild-1', 'bad word/1')
-        api.addWhitelistedLink('guild-1', 'example.com')
-        api.removeWhitelistedLink('guild-1', 'sub.domain/path')
-
-        expect(apiClient.post).toHaveBeenNthCalledWith(
-            1,
-            '/guilds/guild-1/automod/words',
-            { word: 'bad word' },
-        )
-        expect(apiClient.delete).toHaveBeenNthCalledWith(
-            1,
-            '/guilds/guild-1/automod/words/bad%20word%2F1',
-        )
-        expect(apiClient.post).toHaveBeenNthCalledWith(
-            2,
-            '/guilds/guild-1/automod/links/whitelist',
-            { domain: 'example.com' },
-        )
-        expect(apiClient.delete).toHaveBeenNthCalledWith(
-            2,
-            '/guilds/guild-1/automod/links/whitelist/sub.domain%2Fpath',
-        )
-    })
+    // Tests for granular exempt/word/whitelist endpoints were removed with the
+    // client methods they covered: no backend route ever implemented them, so
+    // these only ever asserted the shape of URLs that returned 404.
 })

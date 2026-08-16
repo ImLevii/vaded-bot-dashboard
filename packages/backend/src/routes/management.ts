@@ -14,6 +14,7 @@ import {
     AutoModTemplateNotFoundError,
     autoModService,
     customCommandService,
+    guildConfigControlService,
     serverLogService,
     serializeServerLog,
     type LogType,
@@ -35,10 +36,20 @@ function requireUserId(req: AuthenticatedRequest): string {
 }
 
 export function setupManagementRoutes(app: Express): void {
+    // Publisher for "this guild's config changed" signals. Best-effort: if
+    // Redis is unavailable the routes below still work, publishRefresh()
+    // no-ops, and the bot falls back to its cache TTL / next restart.
+    void guildConfigControlService.connect()
+
     app.get(
         '/api/guilds/:guildId/automod/settings',
         requireAuth,
-        requireGuildModuleAccess('settings', 'view'),
+        // AutoMod is a moderation feature: the /automod subtree guard in
+        // routes/index.ts already requires the `moderation` module, and the
+        // dashboard page is gated on it too. Requiring `settings` here as
+        // well meant a delegated moderator with moderation:manage but no
+        // settings grant got a silent 403 on every save.
+        requireGuildModuleAccess('moderation', 'view'),
         validateParams(s.guildIdParam),
         asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
             const settings = await autoModService.getSettings(
@@ -51,7 +62,7 @@ export function setupManagementRoutes(app: Express): void {
     app.patch(
         '/api/guilds/:guildId/automod/settings',
         requireAuth,
-        requireGuildModuleAccess('settings', 'manage'),
+        requireGuildModuleAccess('moderation', 'manage'),
         writeLimiter,
         validateParams(s.guildIdParam),
         validateBody(s.autoModSettingsBody),
@@ -60,6 +71,11 @@ export function setupManagementRoutes(app: Express): void {
             const userId = requireUserId(req)
             const body = s.autoModSettingsBody.parse(req.body)
             const settings = await autoModService.updateSettings(guildId, body)
+
+            // The bot caches automod settings per-process for CACHE_TTL, so
+            // without this the change does not reach it for up to 5 minutes.
+            // Fire-and-forget: never fail the save because Redis is down.
+            await guildConfigControlService.publishRefresh('automod', guildId)
 
             await serverLogService.logAutoModSettingsChange(
                 guildId,
@@ -77,7 +93,7 @@ export function setupManagementRoutes(app: Express): void {
     app.get(
         '/api/guilds/:guildId/automod/templates',
         requireAuth,
-        requireGuildModuleAccess('settings', 'view'),
+        requireGuildModuleAccess('moderation', 'view'),
         validateParams(s.guildIdParam),
         asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
             const templates = await autoModService.listTemplates()
@@ -88,7 +104,7 @@ export function setupManagementRoutes(app: Express): void {
     app.post(
         '/api/guilds/:guildId/automod/templates/:templateId/apply',
         requireAuth,
-        requireGuildModuleAccess('settings', 'manage'),
+        requireGuildModuleAccess('moderation', 'manage'),
         writeLimiter,
         validateParams(s.autoModTemplateParam),
         asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -100,6 +116,10 @@ export function setupManagementRoutes(app: Express): void {
                 const result = await autoModService.applyTemplate(
                     guildId,
                     templateId,
+                )
+                await guildConfigControlService.publishRefresh(
+                    'automod',
+                    guildId,
                 )
                 await serverLogService.logAutoModSettingsChange(
                     guildId,

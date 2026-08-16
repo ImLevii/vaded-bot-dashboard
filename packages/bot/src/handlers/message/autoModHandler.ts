@@ -56,6 +56,12 @@ export const autoModHandler: MessageHandler = {
             const settings = await autoModService.getSettings(guildId)
             if (!settings) return { stop: false }
 
+            // The dashboard's AutoMod master switch writes `enabled`, but
+            // nothing read it — turning AutoMod off changed nothing. The
+            // global AUTOMOD feature toggle checked in canHandle is
+            // deployment-wide; this is the per-guild switch.
+            if (!settings.enabled) return { stop: false }
+
             const ignoredChannels = settings.exemptChannels ?? []
             const ignoredRoles = settings.exemptRoles ?? []
             const hasIgnoredRole = memberRoles.some((role) =>

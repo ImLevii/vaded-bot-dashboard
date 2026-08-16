@@ -134,13 +134,28 @@ function NumberInput({
     min?: number
     max?: number
 }) {
+    // While the user is mid-edit the field may legitimately be empty or a
+    // partial number. `Number('')` is 0, and every one of these fields is
+    // `.min(1)` server-side, so pushing that upstream rejected the *entire*
+    // save with a generic error. Hold the in-progress text locally and only
+    // publish real numbers; blur discards a leftover empty draft.
+    const [draft, setDraft] = useState<string | null>(null)
+
     return (
         <div className='space-y-1.5'>
             <Label className='text-xs text-vaded-text-secondary'>{label}</Label>
             <Input
                 type='number'
-                value={value}
-                onChange={(e) => onChange(Number(e.target.value))}
+                value={draft ?? String(value)}
+                onChange={(e) => {
+                    const raw = e.target.value
+                    setDraft(raw)
+                    if (raw === '') return
+                    const parsed = Number(raw)
+                    if (Number.isNaN(parsed)) return
+                    onChange(parsed)
+                }}
+                onBlur={() => setDraft(null)}
                 min={min}
                 max={max}
                 className='h-9 bg-vaded-bg-tertiary border-vaded-border text-white text-sm'
@@ -581,10 +596,31 @@ export default function AutoModPage() {
                     Object.assign(payload, { [key]: settings[key] })
                 }
             }
-            await api.automod.updateSettings(selectedGuild.id, payload)
+            const response = await api.automod.updateSettings(
+                selectedGuild.id,
+                payload,
+            )
+            // Adopt the server's copy rather than trusting local state, so a
+            // partially-rejected or normalized save can't leave the form
+            // showing values the backend never stored.
+            if (response.data?.settings) {
+                setSettings(
+                    normalizeAutoModSettings(
+                        response.data.settings,
+                        selectedGuild.id,
+                    ),
+                )
+            }
             toast.success('Auto-moderation settings saved!')
-        } catch {
-            toast.error('Failed to save settings')
+        } catch (error) {
+            // Surfacing the real reason matters here: a 400 from a cleared
+            // number field and a 403 from a missing permission both used to
+            // show the same opaque "Failed to save settings".
+            if (error instanceof ApiError) {
+                toast.error(error.message)
+            } else {
+                toast.error('Failed to save settings')
+            }
         } finally {
             setSaving(false)
         }
@@ -732,6 +768,28 @@ export default function AutoModPage() {
             </div>
 
             <div className='space-y-6'>
+                {/* Master switch. The `enabled` column was always sent by this
+                    page but had no control and was ignored by the bot; it is
+                    now a real per-guild kill switch. */}
+                <Card className='p-5 border border-vaded-border'>
+                    <div className='flex items-center justify-between gap-4'>
+                        <div>
+                            <h2 className='text-base font-semibold text-white uppercase tracking-wide'>
+                                Master Switch
+                            </h2>
+                            <p className='text-xs text-vaded-text-tertiary mt-1'>
+                                When off, no filter below runs, whatever it is
+                                set to.
+                            </p>
+                        </div>
+                        <Switch
+                            checked={settings.enabled}
+                            onCheckedChange={(v) => update('enabled', v)}
+                            aria-label='Enable auto-moderation'
+                        />
+                    </div>
+                </Card>
+
                 {/* Templates Section */}
                 <motion.div
                     initial={{ opacity: 0, y: 8 }}

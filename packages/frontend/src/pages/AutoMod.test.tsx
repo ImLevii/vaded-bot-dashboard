@@ -64,6 +64,19 @@ const renderPage = () => {
     )
 }
 
+// The page renders an AutoMod master switch above the per-filter rows. These
+// assertions index filter switches positionally, so exclude the master one
+// rather than shifting every index by one.
+const MASTER_SWITCH_LABEL = 'Enable auto-moderation'
+
+const getFilterSwitches = () =>
+    screen
+        .getAllByRole('switch')
+        .filter((el) => el.getAttribute('aria-label') !== MASTER_SWITCH_LABEL)
+
+const getMasterSwitch = () =>
+    screen.getByRole('switch', { name: MASTER_SWITCH_LABEL })
+
 describe('AutoModPage', () => {
     beforeEach(() => {
         vi.clearAllMocks()
@@ -147,7 +160,7 @@ describe('AutoModPage', () => {
             expect(screen.getByText('Spam Detection')).toBeInTheDocument()
         })
 
-        const switches = screen.getAllByRole('switch')
+        const switches = getFilterSwitches()
         const spamSwitch = switches[0]
 
         expect(spamSwitch).toBeChecked()
@@ -155,6 +168,48 @@ describe('AutoModPage', () => {
         await user.click(spamSwitch)
 
         expect(spamSwitch).not.toBeChecked()
+    })
+
+    // `enabled` was always included in the save payload but had no control on
+    // the page and was ignored by the bot, so the AutoMod master switch did
+    // nothing. It is now a real per-guild kill switch.
+    test('sends the master switch state when saving', async () => {
+        const user = userEvent.setup()
+        mockGuildStore(mockGuild)
+        vi.mocked(api.automod.getSettings).mockResolvedValue({
+            data: { settings: { ...mockSettings, enabled: true } },
+        } as any)
+        vi.mocked(api.automod.updateSettings).mockResolvedValue({
+            data: { settings: { ...mockSettings, enabled: false } },
+        } as any)
+
+        renderPage()
+
+        await waitFor(() => {
+            expect(screen.getByText('Master Switch')).toBeInTheDocument()
+        })
+
+        const master = getMasterSwitch()
+        expect(master).toBeChecked()
+
+        await user.click(master)
+        // Desktop header and mobile sticky bar both render a save button.
+        await user.click(
+            screen.getAllByRole('button', { name: /save changes/i })[0],
+        )
+
+        await waitFor(() => {
+            expect(api.automod.updateSettings).toHaveBeenCalledWith(
+                mockGuild.id,
+                expect.objectContaining({ enabled: false }),
+            )
+        })
+
+        // The page adopts the server's returned settings rather than trusting
+        // local state, so the switch must reflect the saved response.
+        await waitFor(() => {
+            expect(getMasterSwitch()).not.toBeChecked()
+        })
     })
 
     test('toggles caps filter and hides children', async () => {
@@ -170,7 +225,7 @@ describe('AutoModPage', () => {
             expect(screen.getByText('Caps Lock Detection')).toBeInTheDocument()
         })
 
-        const capsSwitch = screen.getAllByRole('switch')[1]
+        const capsSwitch = getFilterSwitches()[1]
 
         expect(capsSwitch).not.toBeChecked()
 
@@ -496,7 +551,7 @@ describe('AutoModPage', () => {
             expect(screen.getByText('Auto-Moderation')).toBeInTheDocument()
         })
 
-        const switches = screen.getAllByRole('switch')
+        const switches = getFilterSwitches()
         switches.forEach((switchElement) => {
             expect(switchElement).not.toBeChecked()
         })
@@ -515,7 +570,7 @@ describe('AutoModPage', () => {
         })
 
         expect(screen.getByText('Spam Detection')).toBeInTheDocument()
-        const switches = screen.getAllByRole('switch')
+        const switches = getFilterSwitches()
         switches.forEach((switchElement) => {
             expect(switchElement).not.toBeChecked()
         })
@@ -551,7 +606,7 @@ describe('AutoModPage', () => {
             expect(screen.getByText('Auto-Moderation')).toBeInTheDocument()
         })
 
-        const switches = screen.getAllByRole('switch')
+        const switches = getFilterSwitches()
         expect(switches[0]).toBeChecked()
         expect(switches[1]).not.toBeChecked()
         expect(switches[2]).toBeChecked()

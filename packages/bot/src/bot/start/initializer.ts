@@ -16,6 +16,10 @@ import {
     setupWebMusicHandler,
     stopWebMusicHandler,
 } from '../../handlers/webMusic'
+import {
+    setupGuildConfigRefresh,
+    teardownGuildConfigRefresh,
+} from '../../handlers/guildConfig'
 import type { CustomClient } from '../../types'
 import { ConfigurationError } from '@lucky/shared/types'
 import { redisClient } from '@lucky/shared/services'
@@ -145,6 +149,7 @@ export class BotInitializer {
                 await startClient({ client: this.client })
                 startMetricsServer(this.client)
                 await setupWebMusicHandler(this.client)
+                await setupGuildConfigRefresh(this.client)
                 weeklyDigestService.start(this.client)
                 heartbeatService.start(this.client)
             }
@@ -312,6 +317,15 @@ export class BotInitializer {
             stopTwitchService()
         } catch (error) {
             errorLog({ message: 'Error stopping Twitch service:', error })
+        }
+
+        try {
+            await teardownGuildConfigRefresh()
+        } catch (error) {
+            errorLog({
+                message: 'Error stopping guild config refresh listener:',
+                error,
+            })
         }
 
         try {

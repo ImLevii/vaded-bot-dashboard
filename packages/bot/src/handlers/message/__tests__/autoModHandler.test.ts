@@ -74,6 +74,39 @@ describe('autoModHandler', () => {
     })
 
     describe('handle', () => {
+        // The dashboard's AutoMod master switch writes `enabled`, but nothing
+        // ever read it, so turning AutoMod off left every filter running.
+        it('runs no filters when the guild master switch is off', async () => {
+            ;(autoModService.getSettings as jest.Mock).mockResolvedValue({
+                enabled: false,
+                exemptChannels: [],
+                exemptRoles: [],
+                capsEnabled: true,
+                wordsEnabled: true,
+            })
+
+            const message = {
+                author: { id: 'user1', bot: false },
+                channelId: 'channel1',
+                content: 'SHOUTING BADWORD',
+                delete: jest.fn(),
+            } as unknown as Message
+
+            const context: MessageContext = {
+                guild: { id: 'guild1' } as any,
+                member: {
+                    roles: { cache: { map: jest.fn().mockReturnValue([]) } },
+                } as any,
+                featureToggles: { AUTOMOD: true },
+            }
+
+            const result = await autoModHandler.handle(message, context)
+
+            expect(result.stop).toBe(false)
+            expect(autoModService.checkCaps).not.toHaveBeenCalled()
+            expect(message.delete).not.toHaveBeenCalled()
+        })
+
         it('should return stop: false when settings are null', async () => {
             ;(autoModService.getSettings as jest.Mock).mockResolvedValue(null)
 
@@ -124,6 +157,7 @@ describe('autoModHandler', () => {
 
         it('should return stop: false when role is exempt', async () => {
             ;(autoModService.getSettings as jest.Mock).mockResolvedValue({
+                enabled: true,
                 exemptChannels: [],
                 exemptRoles: ['role1'],
                 capsEnabled: true,
@@ -154,6 +188,7 @@ describe('autoModHandler', () => {
 
         it('should detect caps violations', async () => {
             ;(autoModService.getSettings as jest.Mock).mockResolvedValue({
+                enabled: true,
                 exemptChannels: [],
                 exemptRoles: [],
                 capsEnabled: true,
@@ -188,6 +223,7 @@ describe('autoModHandler', () => {
 
         it('should detect links violations', async () => {
             ;(autoModService.getSettings as jest.Mock).mockResolvedValue({
+                enabled: true,
                 exemptChannels: [],
                 exemptRoles: [],
                 capsEnabled: false,
@@ -223,6 +259,7 @@ describe('autoModHandler', () => {
 
         it('should detect invites violations', async () => {
             ;(autoModService.getSettings as jest.Mock).mockResolvedValue({
+                enabled: true,
                 exemptChannels: [],
                 exemptRoles: [],
                 capsEnabled: false,
@@ -257,6 +294,7 @@ describe('autoModHandler', () => {
 
         it('should detect bad words violations', async () => {
             ;(autoModService.getSettings as jest.Mock).mockResolvedValue({
+                enabled: true,
                 exemptChannels: [],
                 exemptRoles: [],
                 capsEnabled: false,
@@ -291,6 +329,7 @@ describe('autoModHandler', () => {
 
         it('should return stop: false when no violations', async () => {
             ;(autoModService.getSettings as jest.Mock).mockResolvedValue({
+                enabled: true,
                 exemptChannels: [],
                 exemptRoles: [],
                 capsEnabled: true,
@@ -324,6 +363,7 @@ describe('autoModHandler', () => {
 
     describe('bot permission gating (event-driven)', () => {
         const baseSettings = {
+            enabled: true,
             exemptChannels: [],
             exemptRoles: [],
             capsEnabled: true,

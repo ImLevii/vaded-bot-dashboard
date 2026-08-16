@@ -39,6 +39,7 @@ describe('spamHandler', () => {
 
         it('should return false when message is from a bot', async () => {
             ;(autoModService.getSettings as jest.Mock).mockResolvedValue({
+                enabled: true,
                 spamEnabled: true,
             })
 
@@ -56,8 +57,31 @@ describe('spamHandler', () => {
             expect(result).toBe(false)
         })
 
+        // `enabled` is the per-guild master switch; it was written by the
+        // dashboard but never read, so spam filtering ran even with AutoMod
+        // switched off.
+        it('should return false when the guild master switch is off', async () => {
+            ;(autoModService.getSettings as jest.Mock).mockResolvedValue({
+                enabled: false,
+                spamEnabled: true,
+            })
+
+            const message = {
+                author: { bot: false },
+            } as unknown as Message
+
+            const context: MessageContext = {
+                guild: { id: 'guild1' } as any,
+                member: {} as any,
+                featureToggles: { AUTOMOD: true },
+            }
+
+            expect(await spamHandler.canHandle(message, context)).toBe(false)
+        })
+
         it('should return true for valid non-bot message with AUTOMOD enabled and spamEnabled true', async () => {
             ;(autoModService.getSettings as jest.Mock).mockResolvedValue({
+                enabled: true,
                 spamEnabled: true,
             })
 

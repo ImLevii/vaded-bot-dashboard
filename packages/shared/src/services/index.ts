@@ -33,6 +33,15 @@ export {
 } from './embedValidation.js'
 export { twitchNotificationService } from './TwitchNotificationService'
 export { TwitchControlService, twitchControlService } from './twitch/index.js'
+export {
+    GuildConfigControlService,
+    guildConfigControlService,
+    CHANNEL_GUILD_CONFIG_REFRESH,
+} from './guildConfig/index.js'
+export type {
+    GuildConfigScope,
+    GuildConfigRefresh,
+} from './guildConfig/index.js'
 export { twitchFollowerRoleService } from './TwitchFollowerRoleService'
 export { twitchSubscriberRoleService } from './TwitchSubscriberRoleService'
 export { lastFmLinkService, type LastFmLinkRow } from './LastFmLinkService'
