@@ -12,6 +12,7 @@ import type { CustomClient } from '../types'
 import type Command from '../models/Command'
 import type ContextMenuCommand from '../models/ContextMenuCommand'
 import type { CommandCategory } from '../config/constants'
+import { executeCustomCommand } from './customCommands/execute'
 import { interactionReply } from '../utils/general/interactionReply'
 import { monitorCommandExecution } from '../utils/monitoring'
 import { createUserFriendlyError } from '@lucky/shared/utils/general/errorSanitizer'
@@ -186,6 +187,11 @@ export const executeCommand = async ({
     try {
         const command = client.commands.get(interaction.commandName)
         if (!command) {
+            // Dashboard-authored commands are registered with Discord at
+            // runtime, so they never appear in the static collection above.
+            if (await executeCustomCommand(interaction)) {
+                return
+            }
             debugLog({
                 message: `Command not found: ${interaction.commandName}`,
             })

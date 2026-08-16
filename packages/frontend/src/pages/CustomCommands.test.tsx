@@ -5,7 +5,7 @@ import { MemoryRouter } from 'react-router-dom'
 import CustomCommandsPage from './CustomCommands'
 import { api } from '@/services/api'
 import { useGuildStore } from '@/stores/guildStore'
-import type { Command } from '@/types'
+import type { CustomCommand } from '@/types'
 
 vi.mock('@/services/api')
 vi.mock('@/stores/guildStore')
@@ -24,34 +24,39 @@ const mockGuild = {
     approximate_presence_count: 50,
 }
 
-const mockCommands: Command[] = [
-    {
+// Shaped like an actual `custom_commands` row. The previous fixtures were
+// built-in commands (category/hasHelp), a shape the API never returns — which
+// is why a toggle pointing at a non-existent endpoint shipped green.
+function makeCommand(overrides: Partial<CustomCommand> = {}): CustomCommand {
+    return {
         id: 'cmd1',
-        name: 'play',
-        description: 'Play a song',
-        category: 'Misc',
+        guildId: '123',
+        name: 'gg',
+        description: 'Say good game',
+        response: 'gg {user}',
+        embedData: null,
         enabled: true,
-        hasSettings: false,
-        hasHelp: true,
-    },
-    {
-        id: 'cmd2',
-        name: 'ban',
-        description: 'Ban a user',
-        category: 'Moderator',
-        enabled: true,
-        hasSettings: false,
-        hasHelp: true,
-    },
-    {
+        useCount: 3,
+        lastUsed: null,
+        allowedRoles: [],
+        allowedChannels: [],
+        commandKind: 'basic',
+        createdBy: 'user-1',
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-01T00:00:00.000Z',
+        ...overrides,
+    }
+}
+
+const mockCommands: CustomCommand[] = [
+    makeCommand(),
+    makeCommand({ id: 'cmd2', name: 'rules', description: 'Server rules' }),
+    makeCommand({
         id: 'cmd3',
-        name: 'coinflip',
-        description: 'Flip a coin',
-        category: 'Fun',
+        name: 'clip',
+        description: null,
         enabled: false,
-        hasSettings: false,
-        hasHelp: true,
-    },
+    }),
 ]
 
 function mockGuildStore(guild: typeof mockGuild | null) {
@@ -65,447 +70,176 @@ function mockGuildStore(guild: typeof mockGuild | null) {
     } as any)
 }
 
-const renderPage = () => {
-    return render(
+const renderPage = () =>
+    render(
         <MemoryRouter>
             <CustomCommandsPage />
         </MemoryRouter>,
     )
-}
 
 describe('CustomCommandsPage', () => {
     beforeEach(() => {
         vi.clearAllMocks()
+        vi.mocked(api.commands.list).mockResolvedValue({
+            data: { commands: mockCommands },
+        } as any)
     })
 
     test('shows no server selected when no guild', () => {
         mockGuildStore(null)
         renderPage()
         expect(screen.getByText('No Server Selected')).toBeInTheDocument()
-        expect(
-            screen.getByText('Select a server to manage commands'),
-        ).toBeInTheDocument()
     })
 
-    test('shows loading skeletons while fetching', () => {
+    test('lists the guild custom commands', async () => {
         mockGuildStore(mockGuild)
-        vi.mocked(api.commands.list).mockImplementation(
-            () => new Promise(() => {}),
+        renderPage()
+
+        expect(await screen.findByText('/gg')).toBeInTheDocument()
+        expect(screen.getByText('/rules')).toBeInTheDocument()
+        expect(screen.getByText('/clip')).toBeInTheDocument()
+    })
+
+    // description is nullable on custom_commands; the old page called
+    // .toLowerCase() on it and threw for any command created without one.
+    test('renders and searches commands with a null description', async () => {
+        const user = userEvent.setup()
+        mockGuildStore(mockGuild)
+        renderPage()
+
+        await screen.findByText('/clip')
+        await user.type(screen.getByPlaceholderText(/search/i), 'clip')
+
+        expect(await screen.findByText('/clip')).toBeInTheDocument()
+        expect(screen.queryByText('/gg')).not.toBeInTheDocument()
+    })
+
+    // Toggling used to POST /commands/:id/toggle, a route that does not exist.
+    // It must PATCH /commands/:name instead.
+    test('toggles a command by name, not id', async () => {
+        const user = userEvent.setup()
+        mockGuildStore(mockGuild)
+        vi.mocked(api.commands.toggle).mockResolvedValue({ data: {} } as any)
+        renderPage()
+
+        await screen.findByText('/gg')
+        await user.click(screen.getByRole('switch', { name: 'Toggle gg' }))
+
+        await waitFor(() => {
+            expect(api.commands.toggle).toHaveBeenCalledWith('123', 'gg', false)
+        })
+    })
+
+    test('reverts the toggle when the request fails', async () => {
+        const user = userEvent.setup()
+        mockGuildStore(mockGuild)
+        vi.mocked(api.commands.toggle).mockRejectedValue(new Error('nope'))
+        renderPage()
+
+        await screen.findByText('/gg')
+        const toggle = screen.getByRole('switch', { name: 'Toggle gg' })
+        expect(toggle).toBeChecked()
+
+        await user.click(toggle)
+
+        await waitFor(() => {
+            expect(
+                screen.getByRole('switch', { name: 'Toggle gg' }),
+            ).toBeChecked()
+        })
+    })
+
+    test('creates a command and reloads the list', async () => {
+        const user = userEvent.setup()
+        mockGuildStore(mockGuild)
+        vi.mocked(api.commands.create).mockResolvedValue({ data: {} } as any)
+        renderPage()
+
+        await screen.findByText('/gg')
+        await user.click(screen.getByRole('button', { name: /new command/i }))
+
+        await user.type(screen.getByLabelText(/command name/i), 'welcome')
+        // `{{` is userEvent's escape for a literal `{` — unescaped, it parses
+        // `{user}` as a key descriptor and types nothing.
+        await user.type(
+            screen.getByLabelText(/^response$/i),
+            'Welcome {{user}!',
         )
-        renderPage()
-        const skeletons = document.querySelectorAll('.animate-pulse')
-        expect(skeletons.length).toBeGreaterThan(0)
-    })
-
-    test('renders command cards on success', async () => {
-        mockGuildStore(mockGuild)
-        vi.mocked(api.commands.list).mockResolvedValue({
-            data: { commands: mockCommands },
-        } as any)
-
-        renderPage()
+        await user.click(screen.getByRole('button', { name: /^create$/i }))
 
         await waitFor(() => {
-            expect(screen.getByText('/play')).toBeInTheDocument()
-            expect(screen.getByText('/ban')).toBeInTheDocument()
-            expect(screen.getByText('/coinflip')).toBeInTheDocument()
+            expect(api.commands.create).toHaveBeenCalledWith('123', {
+                name: 'welcome',
+                response: 'Welcome {user}!',
+                description: undefined,
+            })
         })
     })
 
-    test('renders command descriptions', async () => {
+    // Discord rejects uppercase and spaces in slash command names, so catch it
+    // before the round-trip rather than surfacing an opaque 400.
+    test('rejects an invalid command name without calling the API', async () => {
+        const user = userEvent.setup()
         mockGuildStore(mockGuild)
-        vi.mocked(api.commands.list).mockResolvedValue({
-            data: { commands: mockCommands },
-        } as any)
-
         renderPage()
 
+        await screen.findByText('/gg')
+        await user.click(screen.getByRole('button', { name: /new command/i }))
+
+        await user.type(screen.getByLabelText(/command name/i), 'Bad Name')
+        await user.type(screen.getByLabelText(/^response$/i), 'hi')
+        await user.click(screen.getByRole('button', { name: /^create$/i }))
+
+        expect(await screen.findByText(/1-32 lowercase/i)).toBeInTheDocument()
+        expect(api.commands.create).not.toHaveBeenCalled()
+    })
+
+    test('deletes a command', async () => {
+        const user = userEvent.setup()
+        mockGuildStore(mockGuild)
+        vi.mocked(api.commands.remove).mockResolvedValue({ data: {} } as any)
+        renderPage()
+
+        await screen.findByText('/gg')
+        await user.click(screen.getByRole('button', { name: 'Delete gg' }))
+
         await waitFor(() => {
-            expect(screen.getByText('Play a song')).toBeInTheDocument()
-            expect(screen.getByText('Ban a user')).toBeInTheDocument()
-            expect(screen.getByText('Flip a coin')).toBeInTheDocument()
+            expect(api.commands.remove).toHaveBeenCalledWith('123', 'gg')
+        })
+        await waitFor(() => {
+            expect(screen.queryByText('/gg')).not.toBeInTheDocument()
         })
     })
 
-    test('renders category badges', async () => {
+    test('edits an existing command by name', async () => {
+        const user = userEvent.setup()
         mockGuildStore(mockGuild)
-        vi.mocked(api.commands.list).mockResolvedValue({
-            data: { commands: mockCommands },
-        } as any)
-
+        vi.mocked(api.commands.update).mockResolvedValue({ data: {} } as any)
         renderPage()
 
+        await screen.findByText('/gg')
+        await user.click(screen.getByRole('button', { name: 'Edit gg' }))
+
+        const responseField = screen.getByLabelText(/^response$/i)
+        await user.clear(responseField)
+        await user.type(responseField, 'updated')
+        await user.click(screen.getByRole('button', { name: /^save$/i }))
+
         await waitFor(() => {
-            expect(screen.getByText('Misc')).toBeInTheDocument()
-            expect(screen.getByText('Moderator')).toBeInTheDocument()
-            expect(screen.getByText('Fun')).toBeInTheDocument()
+            expect(api.commands.update).toHaveBeenCalledWith('123', 'gg', {
+                response: 'updated',
+                description: 'Say good game',
+            })
         })
     })
 
-    test('renders toggle switches', async () => {
-        mockGuildStore(mockGuild)
-        vi.mocked(api.commands.list).mockResolvedValue({
-            data: { commands: mockCommands },
-        } as any)
-
-        renderPage()
-
-        await waitFor(() => {
-            const switches = screen.getAllByRole('switch')
-            expect(switches.length).toBe(3)
-            expect(switches[0]).toBeChecked()
-            expect(switches[1]).toBeChecked()
-            expect(switches[2]).not.toBeChecked()
-        })
-    })
-
-    test('shows empty state when no commands', async () => {
+    test('shows the empty state when the guild has no commands', async () => {
         mockGuildStore(mockGuild)
         vi.mocked(api.commands.list).mockResolvedValue({
             data: { commands: [] },
         } as any)
-
         renderPage()
 
-        await waitFor(() => {
-            expect(screen.getByText('No commands found')).toBeInTheDocument()
-            expect(
-                screen.getByText('Commands will appear here'),
-            ).toBeInTheDocument()
-        })
-    })
-
-    test('search filters commands by name', async () => {
-        const user = userEvent.setup()
-        mockGuildStore(mockGuild)
-        vi.mocked(api.commands.list).mockResolvedValue({
-            data: { commands: mockCommands },
-        } as any)
-
-        renderPage()
-
-        await waitFor(() => {
-            expect(screen.getByText('/play')).toBeInTheDocument()
-        })
-
-        const searchInput = screen.getByPlaceholderText('Search commands...')
-        await user.type(searchInput, 'play')
-
-        await waitFor(() => {
-            expect(screen.getByText('/play')).toBeInTheDocument()
-            expect(screen.queryByText('/ban')).not.toBeInTheDocument()
-            expect(screen.queryByText('/coinflip')).not.toBeInTheDocument()
-        })
-    })
-
-    test('search filters commands by description', async () => {
-        const user = userEvent.setup()
-        mockGuildStore(mockGuild)
-        vi.mocked(api.commands.list).mockResolvedValue({
-            data: { commands: mockCommands },
-        } as any)
-
-        renderPage()
-
-        await waitFor(() => {
-            expect(screen.getByText('/play')).toBeInTheDocument()
-        })
-
-        const searchInput = screen.getByPlaceholderText('Search commands...')
-        await user.type(searchInput, 'coin')
-
-        await waitFor(() => {
-            expect(screen.getByText('/coinflip')).toBeInTheDocument()
-            expect(screen.queryByText('/play')).not.toBeInTheDocument()
-            expect(screen.queryByText('/ban')).not.toBeInTheDocument()
-        })
-    })
-
-    test('clears search on X button click', async () => {
-        const user = userEvent.setup()
-        mockGuildStore(mockGuild)
-        vi.mocked(api.commands.list).mockResolvedValue({
-            data: { commands: mockCommands },
-        } as any)
-
-        renderPage()
-
-        await waitFor(() => {
-            expect(screen.getByText('/play')).toBeInTheDocument()
-        })
-
-        const searchInput = screen.getByPlaceholderText('Search commands...')
-        await user.type(searchInput, 'play')
-
-        await waitFor(() => {
-            expect(screen.queryByText('/ban')).not.toBeInTheDocument()
-        })
-
-        const clearButton = screen.getByRole('button', { name: '' })
-        await user.click(clearButton)
-
-        await waitFor(() => {
-            expect(screen.getByText('/play')).toBeInTheDocument()
-            expect(screen.getByText('/ban')).toBeInTheDocument()
-            expect(screen.getByText('/coinflip')).toBeInTheDocument()
-        })
-    })
-
-    test('category filter chips work', async () => {
-        const user = userEvent.setup()
-        mockGuildStore(mockGuild)
-        vi.mocked(api.commands.list).mockResolvedValue({
-            data: { commands: mockCommands },
-        } as any)
-
-        renderPage()
-
-        await waitFor(() => {
-            expect(screen.getByText(/All \(3\)/)).toBeInTheDocument()
-        })
-
-        const musicChip = screen.getByRole('button', { name: /Misc \(1\)/ })
-        await user.click(musicChip)
-
-        await waitFor(() => {
-            expect(screen.getByText('/play')).toBeInTheDocument()
-            expect(screen.queryByText('/ban')).not.toBeInTheDocument()
-            expect(screen.queryByText('/coinflip')).not.toBeInTheDocument()
-        })
-    })
-
-    test('clicking category twice resets filter', async () => {
-        const user = userEvent.setup()
-        mockGuildStore(mockGuild)
-        vi.mocked(api.commands.list).mockResolvedValue({
-            data: { commands: mockCommands },
-        } as any)
-
-        renderPage()
-
-        await waitFor(() => {
-            expect(screen.getByText(/All \(3\)/)).toBeInTheDocument()
-        })
-
-        const funChip = screen.getByRole('button', { name: /Fun \(1\)/ })
-        await user.click(funChip)
-
-        await waitFor(() => {
-            expect(screen.queryByText('/play')).not.toBeInTheDocument()
-        })
-
-        await user.click(funChip)
-
-        await waitFor(() => {
-            expect(screen.getByText('/play')).toBeInTheDocument()
-            expect(screen.getByText('/ban')).toBeInTheDocument()
-        })
-    })
-
-    test('all chip resets category filter', async () => {
-        const user = userEvent.setup()
-        mockGuildStore(mockGuild)
-        vi.mocked(api.commands.list).mockResolvedValue({
-            data: { commands: mockCommands },
-        } as any)
-
-        renderPage()
-
-        await waitFor(() => {
-            expect(screen.getByText(/All \(3\)/)).toBeInTheDocument()
-        })
-
-        const moderatorChip = screen.getByRole('button', {
-            name: /Moderator \(1\)/,
-        })
-        await user.click(moderatorChip)
-
-        await waitFor(() => {
-            expect(screen.queryByText('/play')).not.toBeInTheDocument()
-        })
-
-        const allChip = screen.getByRole('button', { name: /All \(3\)/ })
-        await user.click(allChip)
-
-        await waitFor(() => {
-            expect(screen.getByText('/play')).toBeInTheDocument()
-            expect(screen.getByText('/ban')).toBeInTheDocument()
-            expect(screen.getByText('/coinflip')).toBeInTheDocument()
-        })
-    })
-
-    test('toggle command calls api.commands.toggle', async () => {
-        const user = userEvent.setup()
-        mockGuildStore(mockGuild)
-        vi.mocked(api.commands.list).mockResolvedValue({
-            data: { commands: mockCommands },
-        } as any)
-        vi.mocked(api.commands.toggle).mockResolvedValue({} as any)
-
-        renderPage()
-
-        await waitFor(() => {
-            expect(screen.getByText('/coinflip')).toBeInTheDocument()
-        })
-
-        const switches = screen.getAllByRole('switch')
-        const coinflipSwitch = switches[2]
-
-        await user.click(coinflipSwitch)
-
-        await waitFor(() => {
-            expect(api.commands.toggle).toHaveBeenCalledWith(
-                '123',
-                'cmd3',
-                true,
-            )
-        })
-    })
-
-    test('toggle success shows toast', async () => {
-        const user = userEvent.setup()
-        const { toast } = await import('sonner')
-        mockGuildStore(mockGuild)
-        vi.mocked(api.commands.list).mockResolvedValue({
-            data: { commands: mockCommands },
-        } as any)
-        vi.mocked(api.commands.toggle).mockResolvedValue({} as any)
-
-        renderPage()
-
-        await waitFor(() => {
-            expect(screen.getByText('/coinflip')).toBeInTheDocument()
-        })
-
-        const switches = screen.getAllByRole('switch')
-        await user.click(switches[2])
-
-        await waitFor(() => {
-            expect(toast.success).toHaveBeenCalledWith('coinflip enabled')
-        })
-    })
-
-    test('toggle failure shows error toast', async () => {
-        const user = userEvent.setup()
-        const { toast } = await import('sonner')
-        mockGuildStore(mockGuild)
-        vi.mocked(api.commands.list).mockResolvedValue({
-            data: { commands: mockCommands },
-        } as any)
-        vi.mocked(api.commands.toggle).mockRejectedValue(
-            new Error('Network error'),
-        )
-
-        renderPage()
-
-        await waitFor(() => {
-            expect(screen.getByText('/play')).toBeInTheDocument()
-        })
-
-        const switches = screen.getAllByRole('switch')
-        await user.click(switches[0])
-
-        await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith('Failed to toggle command')
-        })
-    })
-
-    test('toggle updates local state on success', async () => {
-        const user = userEvent.setup()
-        mockGuildStore(mockGuild)
-        vi.mocked(api.commands.list).mockResolvedValue({
-            data: { commands: mockCommands },
-        } as any)
-        vi.mocked(api.commands.toggle).mockResolvedValue({} as any)
-
-        renderPage()
-
-        await waitFor(() => {
-            expect(screen.getByText('/coinflip')).toBeInTheDocument()
-        })
-
-        const switches = screen.getAllByRole('switch')
-        const coinflipSwitch = switches[2]
-
-        expect(coinflipSwitch).not.toBeChecked()
-
-        await user.click(coinflipSwitch)
-
-        await waitFor(() => {
-            expect(coinflipSwitch).toBeChecked()
-        })
-    })
-
-    test('disabled command has opacity styling', async () => {
-        mockGuildStore(mockGuild)
-        vi.mocked(api.commands.list).mockResolvedValue({
-            data: { commands: mockCommands },
-        } as any)
-
-        renderPage()
-
-        await waitFor(() => {
-            expect(screen.getByText('/coinflip')).toBeInTheDocument()
-        })
-
-        const coinflipCard = screen
-            .getByText('/coinflip')
-            .closest('[class*="surface-panel"]')
-        expect(coinflipCard).toHaveClass('opacity-60')
-    })
-
-    test('shows empty state with filters applied', async () => {
-        const user = userEvent.setup()
-        mockGuildStore(mockGuild)
-        vi.mocked(api.commands.list).mockResolvedValue({
-            data: { commands: mockCommands },
-        } as any)
-
-        renderPage()
-
-        await waitFor(() => {
-            expect(screen.getByText('/play')).toBeInTheDocument()
-        })
-
-        const searchInput = screen.getByPlaceholderText('Search commands...')
-        await user.type(searchInput, 'nonexistent')
-
-        await waitFor(() => {
-            expect(screen.getByText('No commands found')).toBeInTheDocument()
-            expect(
-                screen.getByText('Try adjusting your filters'),
-            ).toBeInTheDocument()
-        })
-    })
-
-    test('handles API error gracefully', async () => {
-        mockGuildStore(mockGuild)
-        vi.mocked(api.commands.list).mockRejectedValue(
-            new Error('Network error'),
-        )
-
-        renderPage()
-
-        await waitFor(() => {
-            expect(screen.getByText('No commands found')).toBeInTheDocument()
-        })
-    })
-
-    test('renders header with guild name', async () => {
-        mockGuildStore(mockGuild)
-        vi.mocked(api.commands.list).mockResolvedValue({
-            data: { commands: mockCommands },
-        } as any)
-
-        renderPage()
-
-        await waitFor(() => {
-            expect(screen.getByText('Custom Commands')).toBeInTheDocument()
-            expect(
-                screen.getByText(
-                    /Manage and configure commands for Test Guild/,
-                ),
-            ).toBeInTheDocument()
-        })
+        expect(await screen.findByText('No commands found')).toBeInTheDocument()
     })
 })

@@ -201,6 +201,12 @@ export function setupManagementRoutes(app: Express): void {
                 res.json(existing)
                 return
             }
+            // Tells the bot to re-register this guild's slash commands so a
+            // command created here shows up in Discord without a restart.
+            await guildConfigControlService.publishRefresh(
+                'customCommands',
+                guildId,
+            )
             await serverLogService.logCustomCommandChange(
                 guildId,
                 'created',
@@ -228,6 +234,10 @@ export function setupManagementRoutes(app: Express): void {
                 name,
                 body,
             )
+            await guildConfigControlService.publishRefresh(
+                'customCommands',
+                guildId,
+            )
             await serverLogService.logCustomCommandChange(
                 guildId,
                 'updated',
@@ -249,6 +259,10 @@ export function setupManagementRoutes(app: Express): void {
             const userId = requireUserId(req)
             const name = p(req.params.name)
             await customCommandService.deleteCommand(guildId, name)
+            await guildConfigControlService.publishRefresh(
+                'customCommands',
+                guildId,
+            )
             await serverLogService.logCustomCommandChange(
                 guildId,
                 'deleted',

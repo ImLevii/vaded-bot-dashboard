@@ -28,6 +28,51 @@ export interface Command {
     hasHelp: boolean
 }
 
+/**
+ * A dashboard-authored command, matching the `custom_commands` row.
+ *
+ * Distinct from {@link Command}, which describes a built-in. The commands page
+ * used to render `Command` for this data, so it read a `category` column that
+ * does not exist and assumed a non-null `description`.
+ */
+export interface CustomCommand {
+    id: string
+    guildId: string
+    name: string
+    description: string | null
+    response: string | null
+    embedData: CustomCommandEmbed | null
+    enabled: boolean
+    useCount: number
+    lastUsed: string | null
+    allowedRoles: string[]
+    allowedChannels: string[]
+    commandKind: 'basic' | 'job_post'
+    createdBy: string
+    createdAt: string
+    updatedAt: string
+}
+
+export interface CustomCommandEmbed {
+    title?: string
+    description?: string
+    color?: number
+    imageUrl?: string
+    footer?: string
+}
+
+export interface CreateCustomCommandInput {
+    name: string
+    response: string
+    description?: string
+}
+
+export interface UpdateCustomCommandInput {
+    response?: string
+    description?: string
+    enabled?: boolean
+}
+
 export type CommandCategory =
     | 'Manager'
     | 'Misc'

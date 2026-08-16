@@ -1,15 +1,14 @@
 import { reportError } from '@/lib/sentry'
 import { useState, useEffect, useMemo } from 'react'
-import { Terminal, Search, Filter } from 'lucide-react'
+import { Terminal, Search } from 'lucide-react'
 import Card from '@/components/ui/Card'
-import Button from '@/components/ui/Button'
 import { Switch } from '@/components/ui/switch'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { toast } from 'sonner'
 import { api } from '@/services/api'
-import type { Command } from '@/types'
+import type { CustomCommand } from '@/types'
 import { cn } from '@/lib/utils'
 
 interface CommandsConfigProps {
@@ -17,11 +16,8 @@ interface CommandsConfigProps {
 }
 
 export default function CommandsConfig({ guildId }: CommandsConfigProps) {
-    const [commands, setCommands] = useState<Command[]>([])
+    const [commands, setCommands] = useState<CustomCommand[]>([])
     const [searchQuery, setSearchQuery] = useState('')
-    const [selectedCategory, setSelectedCategory] = useState<string | null>(
-        null,
-    )
 
     useEffect(() => {
         if (guildId) {
@@ -42,30 +38,26 @@ export default function CommandsConfig({ guildId }: CommandsConfigProps) {
         }
     }
 
-    const categories = useMemo(() => {
-        return Array.from(new Set(commands.map((cmd) => cmd.category)))
-    }, [commands])
-
     const filteredCommands = useMemo(() => {
-        return commands.filter((cmd) => {
-            const matchesSearch =
-                searchQuery === '' ||
-                cmd.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                cmd.description
-                    .toLowerCase()
-                    .includes(searchQuery.toLowerCase())
-            const matchesCategory =
-                selectedCategory === null || cmd.category === selectedCategory
-            return matchesSearch && matchesCategory
-        })
-    }, [commands, searchQuery, selectedCategory])
+        const query = searchQuery.trim().toLowerCase()
+        if (!query) return commands
+        return commands.filter(
+            (cmd) =>
+                cmd.name.toLowerCase().includes(query) ||
+                // description is nullable on custom_commands; this used to be
+                // called unguarded and threw on any command without one.
+                (cmd.description ?? '').toLowerCase().includes(query),
+        )
+    }, [commands, searchQuery])
 
-    const toggleCommand = async (commandId: string, enabled: boolean) => {
+    // Keyed by name: that is the natural key the backend routes use, and the
+    // previous /commands/:id/toggle endpoint never existed.
+    const toggleCommand = async (name: string, enabled: boolean) => {
         try {
-            await api.commands.toggle(guildId, commandId, enabled)
+            await api.commands.toggle(guildId, name, enabled)
             setCommands((prev) =>
                 prev.map((cmd) =>
-                    cmd.id === commandId ? { ...cmd, enabled } : cmd,
+                    cmd.name === name ? { ...cmd, enabled } : cmd,
                 ),
             )
             toast.success(`Command ${enabled ? 'enabled' : 'disabled'}`)
@@ -106,43 +98,9 @@ export default function CommandsConfig({ guildId }: CommandsConfigProps) {
                     />
                 </div>
 
-                <div
-                    className='flex flex-wrap gap-2'
-                    role='group'
-                    aria-label='Filter by category'
-                >
-                    <Button
-                        type='button'
-                        variant={
-                            selectedCategory === null ? 'primary' : 'ghost'
-                        }
-                        size='sm'
-                        onClick={() => setSelectedCategory(null)}
-                        className='h-8'
-                    >
-                        All
-                    </Button>
-                    {categories.map((category) => (
-                        <Button
-                            key={category}
-                            type='button'
-                            variant={
-                                selectedCategory === category
-                                    ? 'primary'
-                                    : 'ghost'
-                            }
-                            size='sm'
-                            onClick={() => setSelectedCategory(category)}
-                            className='h-8'
-                        >
-                            <Filter
-                                className='mr-1 h-3 w-3'
-                                aria-hidden='true'
-                            />
-                            {category}
-                        </Button>
-                    ))}
-                </div>
+                {/* Category filter removed: custom_commands has no category
+                    column, so the chips were built from `undefined` and never
+                    rendered anything selectable. */}
 
                 <ScrollArea className='h-[400px] rounded-lg border border-vaded-border bg-vaded-bg-tertiary'>
                     <div className='space-y-1 p-4'>
@@ -167,17 +125,19 @@ export default function CommandsConfig({ guildId }: CommandsConfigProps) {
                                                 variant='secondary'
                                                 className='text-xs'
                                             >
-                                                {command.category}
+                                                {command.useCount} uses
                                             </Badge>
                                         </div>
                                         <p className='text-sm text-vaded-text-secondary'>
-                                            {command.description}
+                                            {command.description ??
+                                                command.response ??
+                                                ''}
                                         </p>
                                     </div>
                                     <Switch
                                         checked={command.enabled}
                                         onCheckedChange={(checked: boolean) =>
-                                            toggleCommand(command.id, checked)
+                                            toggleCommand(command.name, checked)
                                         }
                                         aria-label={`Toggle ${command.name} command`}
                                     />

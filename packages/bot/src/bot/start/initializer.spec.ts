@@ -22,6 +22,8 @@ const musicWatchdogStopPeriodicScanMock = jest.fn()
 const startMetricsServerMock = jest.fn()
 const stopMetricsServerMock = jest.fn().mockResolvedValue(undefined)
 const setupWebMusicHandlerMock = jest.fn().mockResolvedValue(undefined)
+const setupGuildConfigRefreshMock = jest.fn().mockResolvedValue(undefined)
+const teardownGuildConfigRefreshMock = jest.fn().mockResolvedValue(undefined)
 const stopWebMusicHandlerMock = jest.fn()
 const birthdaySchedulerStopMock = jest.fn()
 const modDigestSchedulerStopMock = jest.fn()
@@ -95,6 +97,13 @@ jest.mock('../../handlers/webMusic', () => ({
         setupWebMusicHandlerMock(...args),
     stopWebMusicHandler: (...args: unknown[]) =>
         stopWebMusicHandlerMock(...args),
+}))
+
+jest.mock('../../handlers/guildConfig', () => ({
+    setupGuildConfigRefresh: (...args: unknown[]) =>
+        setupGuildConfigRefreshMock(...args),
+    teardownGuildConfigRefresh: (...args: unknown[]) =>
+        teardownGuildConfigRefreshMock(...args),
 }))
 
 jest.mock('../../utils/general/birthdayScheduler', () => ({

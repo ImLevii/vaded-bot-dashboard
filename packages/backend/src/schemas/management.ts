@@ -57,11 +57,18 @@ const smartTagFields = {
 }
 
 const createCommandBody = z.object({
+    // Custom commands are registered with Discord as guild slash commands, so
+    // the name has to satisfy Discord's rule: 1-32 chars and lowercase where a
+    // lowercase variant exists. The previous /^[\w-]+$/ accepted uppercase,
+    // which Discord rejects outright.
     name: z
         .string()
         .min(1, 'Name is required')
         .max(32)
-        .regex(/^[\w-]+$/, 'Name must be alphanumeric with dashes/underscores'),
+        .regex(
+            /^[a-z0-9_-]+$/,
+            'Name must be lowercase letters, numbers, dashes or underscores',
+        ),
     response: z.string().min(1, 'Response is required').max(2000),
     description: z.string().max(100).optional(),
     ...smartTagFields,

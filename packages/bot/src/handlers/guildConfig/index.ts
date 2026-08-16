@@ -6,6 +6,7 @@ import {
 } from '@lucky/shared/services'
 import { debugLog, errorLog, infoLog } from '@lucky/shared/utils'
 import type { CustomClient } from '../../types'
+import { syncGuildCustomCommands } from '../customCommands/registration'
 
 /**
  * Reacts to "this guild's config changed" signals published by the backend
@@ -32,10 +33,12 @@ const handlers: Record<GuildConfigScope, RefreshHandler> = {
         })
     },
 
-    // Custom commands are read from the DB per message and are not cached, so
-    // nothing to invalidate today. Phase 2 will re-register the guild's slash
-    // commands with Discord here.
-    customCommands: () => {},
+    // Re-register the guild's slash commands so a command created in the
+    // dashboard is usable in Discord immediately. Guild-scoped registrations
+    // propagate instantly, unlike global ones.
+    customCommands: async (client, guildId) => {
+        await syncGuildCustomCommands(client, guildId)
+    },
 
     // LevelService performs no caching — config is read live on every message.
     levels: () => {},

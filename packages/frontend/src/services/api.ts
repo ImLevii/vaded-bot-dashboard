@@ -4,7 +4,6 @@ import type {
     User,
     Guild,
     Module,
-    Command,
     ServerSettings,
     ServerListing,
     Feature,
@@ -22,6 +21,7 @@ import { createModerationApi } from './moderationApi'
 import { createAutoModApi } from './automodApi'
 import { createLogsApi } from './logsApi'
 import { createAutoMessagesApi } from './autoMessagesApi'
+import { createCommandsApi } from './commandsApi'
 import { createEmbedsApi } from './embedsApi'
 import { createReactionRolesApi } from './reactionRolesApi'
 import { createAutomationApi } from './automationApi'
@@ -225,9 +225,15 @@ export const api = {
             guildId: string,
             userId: string,
             grants: Array<{ module: string; mode: string }>,
-        ) => apiClient.put<{ ok: boolean }>(`/guilds/${guildId}/members/${userId}/grants`, { grants }),
+        ) =>
+            apiClient.put<{ ok: boolean }>(
+                `/guilds/${guildId}/members/${userId}/grants`,
+                { grants },
+            ),
         clearMemberGrants: (guildId: string, userId: string) =>
-            apiClient.delete<{ ok: boolean }>(`/guilds/${guildId}/members/${userId}/grants`),
+            apiClient.delete<{ ok: boolean }>(
+                `/guilds/${guildId}/members/${userId}/grants`,
+            ),
         getSettings: (id: string) =>
             apiClient.get<{ settings: ServerSettings }>(
                 `/guilds/${id}/settings`,
@@ -273,30 +279,10 @@ export const api = {
             ),
     },
 
-    commands: {
-        list: (guildId: string) =>
-            apiClient.get<{ commands: Command[] }>(
-                `/guilds/${guildId}/commands`,
-            ),
-        toggle: (guildId: string, commandId: string, enabled: boolean) =>
-            apiClient.post<{ success: boolean }>(
-                `/guilds/${guildId}/commands/${commandId}/toggle`,
-                { enabled },
-            ),
-        getSettings: (guildId: string, commandId: string) =>
-            apiClient.get<{ settings: Record<string, unknown> }>(
-                `/guilds/${guildId}/commands/${commandId}/settings`,
-            ),
-        updateSettings: (
-            guildId: string,
-            commandId: string,
-            settings: Record<string, unknown>,
-        ) =>
-            apiClient.post<{ success: boolean }>(
-                `/guilds/${guildId}/commands/${commandId}/settings`,
-                settings,
-            ),
-    },
+    // Custom commands live in createCommandsApi (registered below). The
+    // previous inline block keyed mutations by row id and pointed at
+    // /commands/:id/toggle and /commands/:id/settings, none of which exist on
+    // the backend — every call 404'd.
 
     features: {
         list: async () => {
@@ -463,6 +449,7 @@ export const api = {
     },
 
     autoMessages: createAutoMessagesApi(apiClient),
+    commands: createCommandsApi(apiClient),
     embeds: createEmbedsApi(apiClient),
     reactionRoles: createReactionRolesApi(apiClient),
     roleGroups: createRoleGroupsApi(apiClient),

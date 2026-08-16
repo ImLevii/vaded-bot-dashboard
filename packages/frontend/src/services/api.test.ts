@@ -59,6 +59,7 @@ const loadApiModule = async (inferredBase = '/api') => {
         get: vi.fn(),
         post: vi.fn(),
         put: vi.fn(),
+        patch: vi.fn(),
         delete: vi.fn(),
         interceptors: {
             response: {
@@ -275,6 +276,7 @@ describe('api service bootstrap', () => {
 
         apiClient.get.mockResolvedValue({ data: {} })
         apiClient.post.mockResolvedValue({ data: {} })
+        apiClient.patch.mockResolvedValue({ data: {} })
         apiClient.delete.mockResolvedValue({ data: {} })
 
         await module.api.auth.checkStatus()
@@ -297,12 +299,17 @@ describe('api service bootstrap', () => {
         await module.api.modules.updateSettings('guild-1', 'music', {
             volume: 80,
         })
+        // Custom commands are keyed by name. getSettings/updateSettings were
+        // dropped along with the /commands/:id/settings routes, which the
+        // backend never implemented.
         await module.api.commands.list('guild-1')
         await module.api.commands.toggle('guild-1', 'play', false)
-        await module.api.commands.getSettings('guild-1', 'play')
-        await module.api.commands.updateSettings('guild-1', 'play', {
-            cooldown: 10,
+        await module.api.commands.create('guild-1', {
+            name: 'gg',
+            response: 'gg',
         })
+        await module.api.commands.update('guild-1', 'gg', { response: 'gg!' })
+        await module.api.commands.remove('guild-1', 'gg')
         await module.api.features.getGlobalToggles()
         await module.api.features.updateGlobalToggle('music', true)
         await module.api.trackHistory.getHistory('guild-1')
@@ -355,16 +362,21 @@ describe('api service bootstrap', () => {
             { volume: 80 },
         )
         expect(apiClient.get).toHaveBeenCalledWith('/guilds/guild-1/commands')
-        expect(apiClient.post).toHaveBeenCalledWith(
-            '/guilds/guild-1/commands/play/toggle',
+        // Custom commands are keyed by name and toggled with a PATCH; the old
+        // POST /commands/:id/toggle route never existed on the backend.
+        expect(apiClient.patch).toHaveBeenCalledWith(
+            '/guilds/guild-1/commands/play',
             { enabled: false },
         )
-        expect(apiClient.get).toHaveBeenCalledWith(
-            '/guilds/guild-1/commands/play/settings',
-        )
         expect(apiClient.post).toHaveBeenCalledWith(
-            '/guilds/guild-1/commands/play/settings',
-            { cooldown: 10 },
+            '/guilds/guild-1/commands',
+            {
+                name: 'gg',
+                response: 'gg',
+            },
+        )
+        expect(apiClient.delete).toHaveBeenCalledWith(
+            '/guilds/guild-1/commands/gg',
         )
         expect(apiClient.get).toHaveBeenCalledWith('/toggles/global')
         expect(apiClient.post).toHaveBeenCalledWith('/toggles/global/music', {
