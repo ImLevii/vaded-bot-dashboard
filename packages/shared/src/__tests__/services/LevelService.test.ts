@@ -240,5 +240,75 @@ describe('LevelService', () => {
             const upsertCall = mockTx.memberXP.upsert.mock.calls[0][0]
             expect(upsertCall.update.xp).toEqual({ increment: 100 })
         })
+
+        // addXP walks multiple levels for one award, so callers need the
+        // starting level to act on every level crossed.
+        test('reports the level held before the award', async () => {
+            mockTx.memberXP.upsert.mockResolvedValue({
+                id: 'xp1',
+                guildId: 'guild1',
+                userId: 'user1',
+                xp: xpNeededForLevel(3),
+                level: 0,
+                lastXpAt: new Date(),
+            })
+            mockTx.memberXP.update.mockResolvedValue({ level: 3 })
+
+            const result = await service.addXP('guild1', 'user1', 900)
+
+            expect(result.previousLevel).toBe(0)
+            expect(result.newLevel).toBe(3)
+            expect(result.leveledUp).toBe(true)
+        })
+    })
+
+    describe('adjustXP', () => {
+        beforeEach(() => {
+            mockTx.memberXP.findUnique = jest.fn<any>()
+            mockTx.memberXP.upsert = jest.fn<any>((args: any) =>
+                Promise.resolve(args.create ?? args.update),
+            )
+        })
+
+        test('adds a delta to the existing total', async () => {
+            mockTx.memberXP.findUnique.mockResolvedValue({ xp: 100, level: 1 })
+
+            await service.adjustXP('guild1', 'user1', 50, 'add')
+
+            expect(mockTx.memberXP.upsert.mock.calls[0][0].update.xp).toBe(150)
+        })
+
+        test('sets an absolute value', async () => {
+            mockTx.memberXP.findUnique.mockResolvedValue({ xp: 100, level: 1 })
+
+            await service.adjustXP('guild1', 'user1', 25, 'set')
+
+            expect(mockTx.memberXP.upsert.mock.calls[0][0].update.xp).toBe(25)
+        })
+
+        // XP and level are stored separately, so an adjustment that does not
+        // recompute the level would leave the two contradicting each other.
+        test('recomputes the level from the curve', async () => {
+            mockTx.memberXP.findUnique.mockResolvedValue({ xp: 0, level: 0 })
+
+            await service.adjustXP(
+                'guild1',
+                'user1',
+                xpNeededForLevel(4),
+                'set',
+            )
+
+            expect(mockTx.memberXP.upsert.mock.calls[0][0].update.level).toBe(4)
+        })
+
+        test('never drops below zero', async () => {
+            mockTx.memberXP.findUnique.mockResolvedValue({ xp: 10, level: 0 })
+
+            await service.adjustXP('guild1', 'user1', -500, 'add')
+
+            const call = mockTx.memberXP.upsert.mock.calls[0][0]
+            expect(call.update.xp).toBe(0)
+            expect(call.update.level).toBe(0)
+        })
     })
 })

@@ -1,6 +1,7 @@
 import type { Message, TextChannel } from 'discord.js'
 import { levelService } from '@lucky/shared/services'
 import { errorLog } from '@lucky/shared/utils'
+import { renderLevelUpMessage } from './levelUpMessage'
 import type {
     MessageContext,
     MessageHandler,
@@ -27,6 +28,22 @@ export const xpHandler: MessageHandler = {
 
             const config = await levelService.getConfig(guildId)
             if (!config || !config.enabled) {
+                return { stop: false }
+            }
+
+            // Defaulted rather than read directly: XP is awarded on every
+            // message, so a config row missing these (older row, partial
+            // migration) must degrade to "nothing ignored" instead of
+            // throwing and silently stopping XP for the whole guild.
+            const ignoredChannels = config.ignoredChannels ?? []
+            const ignoredRoles = config.ignoredRoles ?? []
+            const memberRoles =
+                context.member.roles?.cache?.map((r) => r.id) ?? []
+
+            if (
+                ignoredChannels.includes(message.channelId) ||
+                memberRoles.some((role) => ignoredRoles.includes(role))
+            ) {
                 return { stop: false }
             }
 
@@ -58,25 +75,38 @@ export const xpHandler: MessageHandler = {
                         r.level > result.previousLevel &&
                         r.level <= result.newLevel,
                 )
+
                 for (const reward of earned) {
                     await context.member.roles
                         .add(reward.roleId)
                         .catch(() => {})
                 }
 
+                // With stacking off, a new reward replaces the older ones so a
+                // member wears only their current tier.
+                if (!config.stackRewards && earned.length > 0) {
+                    const superseded = rewards.filter(
+                        (r: { level: number; roleId: string }) =>
+                            r.level <= result.previousLevel &&
+                            memberRoles.includes(r.roleId),
+                    )
+                    for (const stale of superseded) {
+                        await context.member.roles
+                            .remove(stale.roleId)
+                            .catch(() => {})
+                    }
+                }
+
                 // Announcing is independent of granting. Reward granting used
                 // to live inside this branch, so any guild that had not set an
                 // announce channel never handed out reward roles at all.
-                if (config.announceChannel) {
-                    const rawChannel = await message.client.channels
-                        .fetch(config.announceChannel)
-                        .catch(() => null)
-                    if (rawChannel?.isTextBased()) {
-                        await (rawChannel as TextChannel).send(
-                            `🎉 ${message.author} reached level **${result.newLevel}**!`,
-                        )
-                    }
-                }
+                await announceLevelUp(message, context, {
+                    config,
+                    level: result.newLevel,
+                    rewardMentions: earned.map(
+                        (r: { roleId: string }) => `<@&${r.roleId}>`,
+                    ),
+                })
             }
 
             return { stop: false }
@@ -88,4 +118,55 @@ export const xpHandler: MessageHandler = {
             return { stop: false }
         }
     },
+}
+
+type AnnounceArgs = {
+    config: {
+        announceMode?: string | null
+        announceChannel: string | null
+        levelUpMessage?: string | null
+    }
+    level: number
+    rewardMentions: string[]
+}
+
+async function announceLevelUp(
+    message: Message,
+    _context: MessageContext,
+    { config, level, rewardMentions }: AnnounceArgs,
+): Promise<void> {
+    // 'channel' is the historical behaviour and the column default.
+    const mode = config.announceMode ?? 'channel'
+    if (mode === 'off') return
+
+    const content = renderLevelUpMessage(config.levelUpMessage, {
+        userMention: `<@${message.author.id}>`,
+        level,
+        rewardMentions,
+    })
+
+    try {
+        if (mode === 'dm') {
+            await message.author.send(content).catch(() => {})
+            return
+        }
+
+        if (mode === 'current') {
+            if (message.channel.isTextBased() && 'send' in message.channel) {
+                await (message.channel as TextChannel).send(content)
+            }
+            return
+        }
+
+        // Default 'channel' mode: only announce when a target is configured.
+        if (!config.announceChannel) return
+        const rawChannel = await message.client.channels
+            .fetch(config.announceChannel)
+            .catch(() => null)
+        if (rawChannel?.isTextBased()) {
+            await (rawChannel as TextChannel).send(content)
+        }
+    } catch (error) {
+        errorLog({ message: 'Failed to announce level up:', error })
+    }
 }

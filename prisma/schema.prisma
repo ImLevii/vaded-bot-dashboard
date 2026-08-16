@@ -1017,6 +1017,17 @@ model LevelConfig {
   xpPerMessage    Int      @default(15)
   xpCooldownMs    Int      @default(60000)
   announceChannel String?
+  // Channels/roles that earn no XP — bot-spam channels, muted members, etc.
+  ignoredChannels String[] @default([])
+  ignoredRoles    String[] @default([])
+  // Level-up announcement. announceMode: channel | current | dm | off.
+  // "channel" keeps the historical behaviour and needs announceChannel set.
+  announceMode    String   @default("channel")
+  // Template with {user} {level} {rewards} tokens; null uses the default copy.
+  levelUpMessage  String?
+  // When false, a reward role replaces the previously granted reward roles
+  // instead of accumulating them.
+  stackRewards    Boolean  @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 

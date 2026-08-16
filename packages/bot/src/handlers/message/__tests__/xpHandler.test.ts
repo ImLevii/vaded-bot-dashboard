@@ -326,6 +326,64 @@ describe('xpHandler', () => {
             expect(message.client.channels.fetch).not.toHaveBeenCalled()
         })
 
+        it('awards no XP in an ignored channel', async () => {
+            ;(levelService.getConfig as jest.Mock).mockResolvedValue({
+                enabled: true,
+                xpCooldownMs: 60000,
+                xpPerMessage: 10,
+                ignoredChannels: ['channel1'],
+                ignoredRoles: [],
+            })
+
+            const message = {
+                author: { id: 'user1', bot: false },
+                channelId: 'channel1',
+            } as unknown as Message
+
+            const context: MessageContext = {
+                guild: { id: 'guild1' } as any,
+                member: {
+                    roles: { cache: { map: () => [] } },
+                } as any,
+                featureToggles: {},
+            }
+
+            await xpHandler.handle(message, context)
+
+            expect(levelService.addXP).not.toHaveBeenCalled()
+        })
+
+        it('awards no XP to a member holding an ignored role', async () => {
+            ;(levelService.getConfig as jest.Mock).mockResolvedValue({
+                enabled: true,
+                xpCooldownMs: 60000,
+                xpPerMessage: 10,
+                ignoredChannels: [],
+                ignoredRoles: ['muted-role'],
+            })
+
+            const message = {
+                author: { id: 'user1', bot: false },
+                channelId: 'channel1',
+            } as unknown as Message
+
+            const context: MessageContext = {
+                guild: { id: 'guild1' } as any,
+                member: {
+                    roles: {
+                        cache: {
+                            map: () => ['muted-role'],
+                        },
+                    },
+                } as any,
+                featureToggles: {},
+            }
+
+            await xpHandler.handle(message, context)
+
+            expect(levelService.addXP).not.toHaveBeenCalled()
+        })
+
         // A single message can carry a member up several levels, so matching
         // only `newLevel` skipped every reward passed through on the way.
         it('assigns every reward crossed by a multi-level jump', async () => {

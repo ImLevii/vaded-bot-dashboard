@@ -10,6 +10,11 @@ export type LevelConfig = {
     xpPerMessage: number
     xpCooldownMs: number
     announceChannel: string | null
+    ignoredChannels: string[]
+    ignoredRoles: string[]
+    announceMode: string
+    levelUpMessage: string | null
+    stackRewards: boolean
     createdAt: Date
     updatedAt: Date
 }
@@ -35,11 +40,19 @@ export type LevelReward = {
     roleId: string
 }
 
+/** How a level-up is announced. */
+export type LevelAnnounceMode = 'channel' | 'current' | 'dm' | 'off'
+
 type UpsertConfigData = {
     enabled?: boolean
     xpPerMessage?: number
     xpCooldownMs?: number
     announceChannel?: string | null
+    ignoredChannels?: string[]
+    ignoredRoles?: string[]
+    announceMode?: LevelAnnounceMode
+    levelUpMessage?: string | null
+    stackRewards?: boolean
 }
 
 /** Calculates XP required to reach a specific level. */
@@ -136,12 +149,67 @@ export class LevelService {
         return result
     }
 
-    async getLeaderboard(guildId: string, limit = 10): Promise<MemberXP[]> {
+    async getLeaderboard(
+        guildId: string,
+        limit = 10,
+        offset = 0,
+    ): Promise<MemberXP[]> {
         return await prisma.memberXP.findMany({
             where: { guildId },
             orderBy: { xp: 'desc' },
             take: limit,
+            skip: offset,
         })
+    }
+
+    /** Total ranked members, so a paginated leaderboard can show page counts. */
+    async countMembers(guildId: string): Promise<number> {
+        return await prisma.memberXP.count({ where: { guildId } })
+    }
+
+    /**
+     * Admin XP adjustment. `mode: 'set'` writes an absolute value, `'add'`
+     * applies a delta (negative to remove). The resulting level is always
+     * recomputed from the curve so XP and level cannot drift apart.
+     */
+    async adjustXP(
+        guildId: string,
+        userId: string,
+        amount: number,
+        mode: 'set' | 'add' = 'add',
+    ): Promise<MemberXP> {
+        return await prisma.$transaction(async (tx) => {
+            const existing = await tx.memberXP.findUnique({
+                where: { guildId_userId: { guildId, userId } },
+            })
+            const nextXp = Math.max(
+                0,
+                mode === 'set' ? amount : (existing?.xp ?? 0) + amount,
+            )
+
+            let level = 0
+            while (nextXp >= xpNeededForLevel(level + 1)) level++
+
+            return await tx.memberXP.upsert({
+                where: { guildId_userId: { guildId, userId } },
+                create: {
+                    guildId,
+                    userId,
+                    xp: nextXp,
+                    level,
+                    lastXpAt: new Date(),
+                },
+                update: { xp: nextXp, level },
+            })
+        })
+    }
+
+    /** Wipes every member's XP for a guild. Returns the number of rows removed. */
+    async resetGuildXP(guildId: string): Promise<number> {
+        const { count } = await prisma.memberXP.deleteMany({
+            where: { guildId },
+        })
+        return count
     }
 
     async getRank(guildId: string, userId: string): Promise<number> {
