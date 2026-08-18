@@ -1,9 +1,25 @@
 import { describe, it, expect } from '@jest/globals'
-import { buildPlayResponseEmbed, detectSource } from './nowPlayingEmbed'
+import {
+    buildPlayResponseEmbed,
+    buildVinylAttachment,
+    detectSource,
+} from './nowPlayingEmbed'
 
 const fakeUser = {
     tag: 'Admin#0001',
     displayAvatarURL: () => 'https://cdn.discordapp.com/avatars/1/abc.png',
+}
+
+/**
+ * Field names carry an emoji prefix ("📡 Source"), so match on the trailing
+ * label — asserting the bare name silently matches nothing and makes
+ * "field is absent" checks pass for the wrong reason.
+ */
+function findField(
+    fields: { name: string; value: string }[] | undefined,
+    label: string,
+) {
+    return (fields ?? []).find((f) => f.name.endsWith(label))
 }
 
 describe('detectSource', () => {
@@ -63,15 +79,15 @@ describe('buildPlayResponseEmbed', () => {
         expect(data.title).toBe('Bohemian Rhapsody')
         expect(data.description).toContain('Queen')
         expect(data.url).toBe(baseTrack.url)
-        expect(data.thumbnail?.url).toBe(baseTrack.thumbnail)
+        // The nowPlaying layout reserves the thumbnail slot for the spinning
+        // vinyl and promotes the track art to the large image.
+        expect(data.thumbnail?.url).toBe('attachment://vinyl.gif')
+        expect(data.image?.url).toBe(baseTrack.thumbnail)
         expect(data.author?.name).toContain('Now Playing')
         expect(data.footer?.text).toContain('Admin#0001')
 
-        const fields = data.fields ?? []
-        const durationField = fields.find((f) => f.name === 'Duration')
-        const sourceField = fields.find((f) => f.name === 'Source')
-        expect(durationField?.value).toBe('5:55')
-        expect(sourceField?.value).toBe('YouTube')
+        expect(findField(data.fields, 'Duration')?.value).toBe('`5:55`')
+        expect(findField(data.fields, 'Source')?.value).toBe('`YouTube`')
     })
 
     it('omits the Duration field when duration is 0:00 (unknown)', () => {
@@ -80,8 +96,18 @@ describe('buildPlayResponseEmbed', () => {
             track: { ...baseTrack, duration: '0:00' },
             requestedBy: fakeUser,
         })
-        const fields = embed.data.fields ?? []
-        expect(fields.find((f) => f.name === 'Duration')).toBeUndefined()
+        expect(findField(embed.data.fields, 'Duration')).toBeUndefined()
+    })
+
+    it('uses the track art as the thumbnail for non-nowPlaying kinds', () => {
+        const embed = buildPlayResponseEmbed({
+            kind: 'addedToQueue',
+            track: baseTrack,
+            requestedBy: fakeUser,
+            queuePosition: 3,
+        })
+        expect(embed.data.thumbnail?.url).toBe(baseTrack.thumbnail)
+        expect(embed.data.image).toBeUndefined()
     })
 
     it('uses "Added to Queue" header + shows queue position when addedToQueue', () => {
@@ -92,10 +118,17 @@ describe('buildPlayResponseEmbed', () => {
             queuePosition: 3,
         })
         expect(embed.data.author?.name).toContain('Added to Queue')
-        const posField = embed.data.fields?.find(
-            (f) => f.name === 'Queue Position',
-        )
-        expect(posField?.value).toBe('#3')
+        expect(findField(embed.data.fields, 'Position')?.value).toBe('`#3`')
+    })
+
+    it('renders position 0 as "Now" rather than a queue slot', () => {
+        const embed = buildPlayResponseEmbed({
+            kind: 'addedToQueue',
+            track: baseTrack,
+            requestedBy: fakeUser,
+            queuePosition: 0,
+        })
+        expect(findField(embed.data.fields, 'Position')?.value).toBe('`Now`')
     })
 
     it('renders playlistQueued with title + track count instead of single track fields', () => {
@@ -110,8 +143,7 @@ describe('buildPlayResponseEmbed', () => {
         expect(embed.data.description).toContain('42')
         // Playlist responses don't carry per-track fields — those belong to
         // individual track notifications, not the playlist summary.
-        const fields = embed.data.fields ?? []
-        expect(fields.find((f) => f.name === 'Duration')).toBeUndefined()
+        expect(findField(embed.data.fields, 'Duration')).toBeUndefined()
     })
 
     it('falls back to "Unknown Track" when title is empty', () => {
@@ -133,8 +165,15 @@ describe('buildPlayResponseEmbed', () => {
             },
             requestedBy: fakeUser,
         })
-        const sourceField = embed.data.fields?.find((f) => f.name === 'Source')
-        expect(sourceField?.value).toBe('Spotify')
+        expect(findField(embed.data.fields, 'Source')?.value).toBe('`Spotify`')
         expect(embed.data.color).toBe(0x1db954)
+    })
+})
+
+describe('buildVinylAttachment', () => {
+    it('returns null when the gif is not on disk instead of throwing', () => {
+        // jest maps vinylAsset to a path that does not exist, so this exercises
+        // the existsSync guard that keeps a missing asset from breaking replies.
+        expect(buildVinylAttachment()).toBeNull()
     })
 })

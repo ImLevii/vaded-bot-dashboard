@@ -21,9 +21,6 @@ import {
     scrobble as lastFmScrobble,
 } from '../../lastfm'
 import { getStreamBridgeFallbackLabel } from './streamBridge'
-import { buildVinylAttachment as _unused } from '../../utils/music/nowPlayingEmbed'
-
-const prefillFailureLoggedGuilds = new Set<string>()
 
 /**
  * Manages per-guild now-playing state with automatic TTL + explicit cleanup
@@ -87,39 +84,6 @@ class TrackNowPlayingState {
 const trackNowPlayingState = new TrackNowPlayingState()
 
 /**
- * Log a skip-reason emoji prefill failure for a guild (once per session).
- * Prevents per-emoji spam by tracking which guilds have already logged.
- */
-function logEmojiPrefillFailure(guildId: string, error: unknown): void {
-    if (prefillFailureLoggedGuilds.has(guildId)) {
-        return
-    }
-    prefillFailureLoggedGuilds.add(guildId)
-    const errorCode = extractErrorCode(error)
-    warnLog({
-        message: 'Failed to prefill skip-reason emojis on now-playing message',
-        error,
-        data: { guildId, errorCode },
-    })
-}
-
-/**
- * Extract Discord API error code from an error object if present.
- * Used for diagnosing prefill failures (e.g., 50013 = Missing Permissions).
- */
-function extractErrorCode(error: unknown): number | string | undefined {
-    if (error instanceof Error) {
-        // discord.js errors have a code property
-        const discordError = error as unknown as { code?: number | string }
-        if (discordError.code) return discordError.code
-        // Try to extract from error message (e.g., "50013")
-        const match = error.message.match(/\b(\d{5})\b/)
-        if (match) return match[1]
-    }
-    return undefined
-}
-
-/**
  * Register an existing message as the "now playing" display for a guild.
  * Used by the /play command to pre-register its interaction reply so that
  * the playerStart handler edits it (with buttons) instead of sending a
@@ -167,19 +131,6 @@ function getLastFmRequesterId(
     return track.requestedBy?.id ?? fallbackRequester ?? queueRequester
 }
 
-function formatDuration(duration: string) {
-    if (!duration || duration === '0:00') return 'Unknown duration'
-    return duration
-}
-
-function getSource(url: string) {
-    if (url.includes('youtube.com') || url.includes('youtu.be'))
-        return 'YouTube'
-    if (url.includes('spotify.com')) return 'Spotify'
-    if (url.includes('soundcloud.com')) return 'SoundCloud'
-    return 'Unknown'
-}
-
 /**
  * Append the per-source acceptance rate to the recommendation reason.
  * Returns the original reason if the rate is unavailable or if reading fails.
@@ -225,10 +176,14 @@ function msToTimestamp(ms: number): string {
 
 function repeatModeLabel(mode: QueueRepeatMode): string {
     switch (mode) {
-        case QueueRepeatMode.TRACK: return 'Track'
-        case QueueRepeatMode.QUEUE: return 'Queue'
-        case QueueRepeatMode.AUTOPLAY: return 'Autoplay'
-        default: return 'Off'
+        case QueueRepeatMode.TRACK:
+            return 'Track'
+        case QueueRepeatMode.QUEUE:
+            return 'Queue'
+        case QueueRepeatMode.AUTOPLAY:
+            return 'Autoplay'
+        default:
+            return 'Off'
     }
 }
 
@@ -244,7 +199,9 @@ export async function sendNowPlayingEmbed(
     const requesterInfo = requester
         ? `Added by ${requester.username}`
         : 'Added automatically'
-    const requestedByDisplay = requester ? `**${requester.username}**` : '🤖 Autoplay'
+    const requestedByDisplay = requester
+        ? `**${requester.username}**`
+        : '🤖 Autoplay'
     const trackMetadata = (track.metadata ?? {}) as {
         recommendationReason?: string
         recommendationSource?: string

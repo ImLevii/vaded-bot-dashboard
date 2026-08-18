@@ -1,15 +1,9 @@
 ﻿import { EmbedBuilder, AttachmentBuilder } from 'discord.js'
 import type { Track } from 'discord-player'
 import type { User } from 'discord.js'
-import { join, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { existsSync } from 'node:fs'
 import { COLOR } from '@lucky/shared/constants'
-
-const VINYL_GIF_PATH = join(
-    dirname(fileURLToPath(import.meta.url)),
-    '../../../../../assets/vinyl.gif',
-)
+import { VINYL_GIF_PATH } from './vinylAsset'
 
 export function buildVinylAttachment(): AttachmentBuilder | null {
     if (!existsSync(VINYL_GIF_PATH)) return null
@@ -158,13 +152,22 @@ export function buildPlayResponseEmbed(
 
     const fields: { name: string; value: string; inline: boolean }[] = []
     // Streams accumulate duration as HH:MM:SS:ff — 4 segments signals a live stream
-    const isLive = !track.duration ||
+    const isLive =
+        !track.duration ||
         track.duration === '0:00' ||
         track.duration.split(':').length > 3
     if (!isLive) {
-        fields.push({ name: '⏱ Duration', value: `\`${track.duration}\``, inline: true })
+        fields.push({
+            name: '⏱ Duration',
+            value: `\`${track.duration}\``,
+            inline: true,
+        })
     }
-    fields.push({ name: '📡 Source', value: `\`${badge.label}\``, inline: true })
+    fields.push({
+        name: '📡 Source',
+        value: `\`${badge.label}\``,
+        inline: true,
+    })
     if (kind === 'addedToQueue' && typeof queuePosition === 'number') {
         fields.push({
             name: '📋 Position',

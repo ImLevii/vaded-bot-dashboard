@@ -29,6 +29,10 @@ module.exports = {
     moduleNameMapper: {
         '^(\\.{1,2}/.*)\\.js$': '$1',
         '^chalk$': '<rootDir>/tests/__mocks__/chalk.ts',
+        // vinylAsset.ts resolves the gif path from import.meta.url, which this
+        // CommonJS transform cannot parse — swap it so nowPlayingEmbed and its
+        // importers stay loadable under test.
+        '^\\./vinylAsset$': '<rootDir>/tests/__mocks__/vinylAsset.ts',
         '^@lucky/shared/utils/database/prismaClient$':
             '<rootDir>/tests/__mocks__/prismaClient.ts',
         '^@lucky/shared/services/guildAutomation/service$':
