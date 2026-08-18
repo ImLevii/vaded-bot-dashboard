@@ -9,12 +9,19 @@ import { replenishQueue } from '../../utils/music/queueOperations'
 import type { QueueMetadata } from '../../types/QueueMetadata'
 
 export const setupVoiceKickDetection = (client: Client): void => {
-    client.on('voiceStateUpdate', (oldState, newState) => {
+    client.on('voiceStateUpdate', async (oldState, newState) => {
         if (newState.member?.id !== client.user?.id) return
         const wasInChannel = Boolean(oldState.channelId)
         const nowDisconnected = !newState.channelId
         if (wasInChannel && nowDisconnected && oldState.guild) {
-            musicWatchdogService.markIntentionalStop(oldState.guild.id)
+            const guildId = oldState.guild.id
+            musicWatchdogService.markIntentionalStop(guildId)
+            // The connectionDestroyed/disconnect handlers below fire *before*
+            // this event when the disconnect came from Discord's side, so they
+            // save a snapshot while the stop is not yet flagged. Dropping it
+            // here closes that race: without it the orphan scan found a fresh
+            // snapshot moments later and rejoined the channel.
+            await musicSessionSnapshotService.deleteSnapshot(guildId)
             infoLog({
                 message: `Bot was disconnected from voice in ${oldState.guild.name} — marked intentional`,
             })
@@ -97,8 +104,13 @@ export const setupLifecycleHandlers = (player: {
         })
 
         await voiceStatus.clearStatus(queue)
-        await musicSessionSnapshotService.saveSnapshot(queue)
-        // Queue was explicitly deleted — never attempt recovery here.
+        // Queue was explicitly deleted — never attempt recovery here. That
+        // includes not writing the snapshot that recovery reads: on a /stop or
+        // a dashboard stop this saved the queue being torn down, and the orphan
+        // scan restored it a minute later.
+        if (!musicWatchdogService.isIntentionalStop(queue.guild.id)) {
+            await musicSessionSnapshotService.saveSnapshot(queue)
+        }
     })
 
     player.events.on('emptyChannel', async (queue: GuildQueue) => {
@@ -123,8 +135,8 @@ export const setupLifecycleHandlers = (player: {
         })
 
         await voiceStatus.clearStatus(queue)
-        await musicSessionSnapshotService.saveSnapshot(queue)
         if (!musicWatchdogService.isIntentionalStop(queue.guild.id)) {
+            await musicSessionSnapshotService.saveSnapshot(queue)
             await musicWatchdogService.checkAndRecover(queue)
         }
     })

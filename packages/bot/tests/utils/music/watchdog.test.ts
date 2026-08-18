@@ -27,6 +27,7 @@ function makeQueue(
     overrides: Partial<{
         guildId: string
         isPlaying: boolean
+        isPaused: boolean
         connectionStatus: string
         currentTrack: unknown
         tracksSize: number
@@ -35,6 +36,8 @@ function makeQueue(
     const opts = {
         guildId: 'guild-1',
         isPlaying: false,
+        // A paused queue is not a stalled one — the watchdog leaves it alone.
+        isPaused: false,
         connectionStatus: 'ready',
         currentTrack: null,
         tracksSize: 0,
@@ -44,6 +47,7 @@ function makeQueue(
         guild: { id: opts.guildId, name: 'Test Guild' },
         node: {
             isPlaying: jest.fn().mockReturnValue(opts.isPlaying),
+            isPaused: jest.fn().mockReturnValue(opts.isPaused),
             play: jest.fn().mockResolvedValue(undefined),
         },
         connection: {
@@ -118,10 +122,25 @@ describe('MusicWatchdogService', () => {
         })
 
         it('requeues current track when connection is ready and track exists', async () => {
-            const queue = makeQueue({ currentTrack: { title: 'Song' } })
+            const currentTrack = { title: 'Song' }
+            const queue = makeQueue({ currentTrack })
             const result = await service.checkAndRecover(queue)
             expect(result).toBe('requeue_current')
-            expect(queue.node.play).toHaveBeenCalled()
+            // Explicit track: a bare play() dispatches from the (empty) track
+            // list and answers with NoResultError instead of resuming.
+            expect(queue.node.play).toHaveBeenCalledWith(currentTrack, {
+                queue: false,
+            })
+        })
+
+        it('leaves a paused queue alone', async () => {
+            const queue = makeQueue({
+                isPaused: true,
+                currentTrack: { title: 'Song' },
+            })
+            const result = await service.checkAndRecover(queue)
+            expect(result).toBe('none')
+            expect(queue.node.play).not.toHaveBeenCalled()
         })
     })
 

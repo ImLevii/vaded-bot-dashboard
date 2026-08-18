@@ -5,6 +5,7 @@ const debugLogMock = jest.fn()
 const infoLogMock = jest.fn()
 const restoreSnapshotMock = jest.fn()
 const saveSnapshotMock = jest.fn()
+const deleteSnapshotMock = jest.fn()
 const watchdogArmMock = jest.fn()
 const watchdogCheckRecoverMock = jest.fn()
 const watchdogClearMock = jest.fn()
@@ -21,6 +22,7 @@ jest.mock('../../utils/music/sessionSnapshots', () => ({
     musicSessionSnapshotService: {
         restoreSnapshot: (...args: unknown[]) => restoreSnapshotMock(...args),
         saveSnapshot: (...args: unknown[]) => saveSnapshotMock(...args),
+        deleteSnapshot: (...args: unknown[]) => deleteSnapshotMock(...args),
     },
 }))
 
@@ -51,6 +53,7 @@ describe('setupLifecycleHandlers', () => {
         jest.clearAllMocks()
         restoreSnapshotMock.mockResolvedValue({ restoredCount: 0 })
         saveSnapshotMock.mockResolvedValue(null)
+        deleteSnapshotMock.mockResolvedValue(undefined)
         watchdogCheckRecoverMock.mockResolvedValue('none')
         watchdogIsIntentionalStopMock.mockReturnValue(false)
     })
@@ -173,7 +176,10 @@ describe('setupLifecycleHandlers', () => {
         expect(watchdogCheckRecoverMock).not.toHaveBeenCalled()
     })
 
-    it('does NOT call checkAndRecover when disconnect is intentional stop', async () => {
+    // Saving here was the other half of the reconnect bug: skipping recovery
+    // is pointless if the teardown still writes the snapshot that the orphan
+    // scan reads a minute later to rebuild the session the user just ended.
+    it('does NOT save a snapshot or recover when disconnect is intentional', async () => {
         watchdogIsIntentionalStopMock.mockReturnValue(true)
 
         const handlers: Record<string, PlayerEventHandler> = {}
@@ -193,8 +199,31 @@ describe('setupLifecycleHandlers', () => {
 
         await handlers.disconnect(queue)
 
-        expect(saveSnapshotMock).toHaveBeenCalledWith(queue)
+        expect(saveSnapshotMock).not.toHaveBeenCalled()
         expect(watchdogCheckRecoverMock).not.toHaveBeenCalled()
+    })
+
+    it('does NOT save a snapshot when connectionDestroyed is intentional', async () => {
+        watchdogIsIntentionalStopMock.mockReturnValue(true)
+
+        const handlers: Record<string, PlayerEventHandler> = {}
+        const player = {
+            events: {
+                on: jest.fn((event: string, handler: PlayerEventHandler) => {
+                    handlers[event] = handler
+                }),
+            },
+        }
+
+        setupLifecycleHandlers(player)
+
+        const queue = {
+            guild: { id: 'guild-5', name: 'Guild 5' },
+        } as unknown as GuildQueue
+
+        await handlers.connectionDestroyed(queue)
+
+        expect(saveSnapshotMock).not.toHaveBeenCalled()
     })
 
     it('replenishes queue on emptyQueue when autoplay is enabled', async () => {
@@ -252,7 +281,7 @@ describe('setupVoiceKickDetection', () => {
         jest.clearAllMocks()
     })
 
-    it('marks intentional stop when bot is kicked from voice channel', () => {
+    it('marks intentional stop when bot is kicked from voice channel', async () => {
         const voiceStateUpdateListeners: Array<
             (oldState: any, newState: any) => void
         > = []
@@ -284,9 +313,14 @@ describe('setupVoiceKickDetection', () => {
             channelId: null,
         }
 
-        voiceStateUpdateListeners[0](oldState, newState)
+        await voiceStateUpdateListeners[0](oldState, newState)
 
         expect(watchdogMarkIntentionalStopMock).toHaveBeenCalledWith('guild-1')
+        // connectionDestroyed fires before this event when Discord initiated
+        // the disconnect, so it has already written a snapshot while the stop
+        // was not yet flagged. Dropping it here is what stops the orphan scan
+        // rejoining the channel the bot was just removed from.
+        expect(deleteSnapshotMock).toHaveBeenCalledWith('guild-1')
         expect(infoLogMock).toHaveBeenCalledWith(
             expect.objectContaining({
                 message: expect.stringMatching(/disconnected from voice/i),
@@ -294,7 +328,7 @@ describe('setupVoiceKickDetection', () => {
         )
     })
 
-    it('ignores voiceStateUpdate for non-bot members', () => {
+    it('ignores voiceStateUpdate for non-bot members', async () => {
         const voiceStateUpdateListeners: Array<
             (oldState: any, newState: any) => void
         > = []
@@ -324,12 +358,12 @@ describe('setupVoiceKickDetection', () => {
             channelId: null,
         }
 
-        voiceStateUpdateListeners[0](oldState, newState)
+        await voiceStateUpdateListeners[0](oldState, newState)
 
         expect(watchdogMarkIntentionalStopMock).not.toHaveBeenCalled()
     })
 
-    it('ignores bot moving between channels (not a disconnect)', () => {
+    it('ignores bot moving between channels (not a disconnect)', async () => {
         const voiceStateUpdateListeners: Array<
             (oldState: any, newState: any) => void
         > = []
@@ -359,7 +393,7 @@ describe('setupVoiceKickDetection', () => {
             channelId: 'voice-channel-2',
         }
 
-        voiceStateUpdateListeners[0](oldState, newState)
+        await voiceStateUpdateListeners[0](oldState, newState)
 
         expect(watchdogMarkIntentionalStopMock).not.toHaveBeenCalled()
     })

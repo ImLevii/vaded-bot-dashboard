@@ -13,6 +13,7 @@ const createErrorEmbedMock = jest.fn((title: string, desc?: string) => ({
     description: desc,
 }))
 const resolveGuildQueueMock = jest.fn()
+const deleteSnapshotMock = jest.fn()
 const debugLogMock = jest.fn()
 const errorLogMock = jest.fn()
 
@@ -32,6 +33,12 @@ jest.mock('../../../utils/general/embeds', () => ({
 
 jest.mock('../../../utils/music/queueResolver', () => ({
     resolveGuildQueue: (...args: unknown[]) => resolveGuildQueueMock(...args),
+}))
+
+jest.mock('../../../utils/music/sessionSnapshots', () => ({
+    musicSessionSnapshotService: {
+        deleteSnapshot: (...args: unknown[]) => deleteSnapshotMock(...args),
+    },
 }))
 
 jest.mock('@lucky/shared/utils', () => ({
@@ -57,6 +64,7 @@ function makeInteraction() {
 describe('clear command', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        deleteSnapshotMock.mockResolvedValue(undefined)
         requireGuildMock.mockResolvedValue(true)
         requireQueueMock.mockResolvedValue(true)
     })
@@ -115,6 +123,21 @@ describe('clear command', () => {
         } as any)
 
         expect(queue.clear).toHaveBeenCalled()
+        // The snapshot still holds the cleared tracks and is only rewritten on
+        // the next trackStart, so a reconnect in between brought them back.
+        expect(deleteSnapshotMock).toHaveBeenCalledWith('guild-1')
+    })
+
+    it('leaves the snapshot alone when the queue was already empty', async () => {
+        const queue = createQueue(0)
+        resolveGuildQueueMock.mockReturnValue({ queue })
+
+        await clearCommand.execute({
+            client: {} as any,
+            interaction: makeInteraction(),
+        } as any)
+
+        expect(deleteSnapshotMock).not.toHaveBeenCalled()
     })
 
     it('responds with success message and count', async () => {

@@ -1,5 +1,8 @@
 import { SlashCommandBuilder } from '@discordjs/builders'
-import { createErrorEmbed, createSuccessEmbed } from '../../../utils/general/embeds'
+import {
+    createErrorEmbed,
+    createSuccessEmbed,
+} from '../../../utils/general/embeds'
 import { interactionReply } from '../../../utils/general/interactionReply'
 import { debugLog, errorLog } from '@lucky/shared/utils'
 import Command from '../../../models/Command'
@@ -11,6 +14,7 @@ import type { CommandExecuteParams } from '../../../types/CommandData'
 import type { ChatInputCommandInteraction } from 'discord.js'
 import type { GuildQueue } from 'discord-player'
 import { resolveGuildQueue } from '../../../utils/music/queueResolver'
+import { musicSessionSnapshotService } from '../../../utils/music/sessionSnapshots'
 
 async function handleEmptyQueue(
     interaction: ChatInputCommandInteraction,
@@ -19,7 +23,10 @@ async function handleEmptyQueue(
         interaction,
         content: {
             embeds: [
-                createErrorEmbed('Empty queue', '🗑️ The queue is already empty!'),
+                createErrorEmbed(
+                    'Empty queue',
+                    '🗑️ The queue is already empty!',
+                ),
             ],
             ephemeral: true,
         },
@@ -33,6 +40,9 @@ async function clearQueueAndRespond(
     guildId: string,
 ): Promise<void> {
     queue.clear()
+    // Same reason as the dashboard's queue_clear: the snapshot outlives the
+    // clear and would restore the tracks on the next reconnect or orphan sweep.
+    await musicSessionSnapshotService.deleteSnapshot(guildId)
 
     debugLog({
         message: `Cleared ${trackCount} tracks from queue in guild ${guildId}`,

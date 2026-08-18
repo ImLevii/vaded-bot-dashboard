@@ -13,6 +13,7 @@ import {
 import type { CommandExecuteParams } from '../../../types/CommandData'
 import { resolveGuildQueue } from '../../../utils/music/queueResolver'
 import { musicWatchdogService } from '../../../utils/music/watchdog'
+import { musicSessionSnapshotService } from '../../../utils/music/sessionSnapshots'
 import { collaborativePlaylistService } from '../../../utils/music/collaborativePlaylist'
 
 export default new Command({
@@ -39,6 +40,10 @@ export default new Command({
             })
             if (queue) {
                 musicWatchdogService.markIntentionalStop(queue.guild.id)
+                // The reply promises the queue is cleared; without this the
+                // snapshot outlives the intentional-stop window and a later
+                // orphan sweep rejoins and restores it. /stop already does this.
+                await musicSessionSnapshotService.deleteSnapshot(queue.guild.id)
                 collaborativePlaylistService.clearGuildState(queue.guild.id)
             }
             queue?.delete()

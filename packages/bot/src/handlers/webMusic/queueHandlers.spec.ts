@@ -9,6 +9,7 @@ import {
 const publishStateMock = jest.fn()
 const buildQueueStateMock = jest.fn()
 const resolveGuildQueueMock = jest.fn()
+const deleteSnapshotMock = jest.fn()
 type QueueHandlerClient = Parameters<typeof handleQueueMove>[0]
 type QueueHandlerCommand = Parameters<typeof handleQueueMove>[1]
 
@@ -24,6 +25,15 @@ jest.mock('./mappers', () => ({
 
 jest.mock('../../utils/music/queueResolver', () => ({
     resolveGuildQueue: (...args: unknown[]) => resolveGuildQueueMock(...args),
+}))
+
+// Stubbed rather than exercised: the real module reaches the Prisma client,
+// whose generated entrypoint uses import.meta and cannot load under jest's
+// CommonJS transform (same treatment as prismaClient elsewhere).
+jest.mock('../../utils/music/sessionSnapshots', () => ({
+    musicSessionSnapshotService: {
+        deleteSnapshot: (...args: unknown[]) => deleteSnapshotMock(...args),
+    },
 }))
 
 type QueueHandlerCase = {
@@ -103,9 +113,15 @@ describe('web music queueHandlers queue resolution', () => {
     for (const testCase of missCases) {
         it(`returns queue miss error in ${testCase.name}`, async () => {
             const client = createClient()
-            const result = await testCase.run(client, createCommand(testCase.data))
+            const result = await testCase.run(
+                client,
+                createCommand(testCase.data),
+            )
 
-            expect(resolveGuildQueueMock).toHaveBeenCalledWith(client, 'guild-1')
+            expect(resolveGuildQueueMock).toHaveBeenCalledWith(
+                client,
+                'guild-1',
+            )
             expect(result.success).toBe(false)
             expect(result.error).toBe(testCase.expectedError)
             expect(publishStateMock).not.toHaveBeenCalled()
@@ -129,12 +145,13 @@ describe('web music queueHandlers queue resolution', () => {
             },
         })
 
-        const result = await handleQueueClear(
-            createClient(),
-            createCommand({}),
-        )
+        const result = await handleQueueClear(createClient(), createCommand({}))
 
         expect(clear).toHaveBeenCalled()
+        // The snapshot still holds the tracks that were just cleared, and it
+        // is only rewritten on the next trackStart — so a reconnect or orphan
+        // sweep in between restored the queue the user had emptied.
+        expect(deleteSnapshotMock).toHaveBeenCalledWith('guild-1')
         expect(buildQueueStateMock).toHaveBeenCalled()
         expect(publishStateMock).toHaveBeenCalledWith({ guildId: 'guild-1' })
         expect(result.success).toBe(true)

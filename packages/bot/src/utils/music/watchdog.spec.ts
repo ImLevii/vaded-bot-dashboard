@@ -46,6 +46,7 @@ describe('MusicWatchdogService', () => {
             connection,
             node: {
                 isPlaying: () => false,
+                isPaused: () => false,
                 play,
             },
             tracks: { size: 0 },
@@ -73,6 +74,7 @@ describe('MusicWatchdogService', () => {
             connection: { state: { status: 'ready' }, rejoin },
             node: {
                 isPlaying: () => true,
+                isPaused: () => false,
                 play,
             },
             tracks: { size: 3 },
@@ -154,7 +156,9 @@ describe('MusicWatchdogService — orphan session monitor', () => {
             tracks: [{ title: 'Song', url: 'https://example.com/song' }],
         })
 
-        const existingQueue = { node: { isPlaying: () => true } }
+        const existingQueue = {
+            node: { isPlaying: () => true, isPaused: () => false },
+        }
         const nodes = { get: jest.fn().mockReturnValue(existingQueue) }
         const player = { nodes } as unknown as Player
 
@@ -235,9 +239,58 @@ describe('MusicWatchdogService — orphan session monitor', () => {
         expect(restoreSnapshotMock).toHaveBeenCalledWith(queue, undefined, {
             skipCurrentTrack: true,
         })
+        // Recovery restores what was there; it must not switch autoplay on.
+        // Forcing repeat mode 3 here made an empty restore fall through to
+        // autoplay, which replayed the last track out of history.
+        expect(queue.setRepeatMode).not.toHaveBeenCalled()
         expect(service.getGuildState('guild-recover')).toEqual(
             expect.objectContaining({ lastRecoveryAction: 'rejoin' }),
         )
+    })
+
+    it('scanOrphanSessions skips a guild whose stop was intentional', async () => {
+        listGuildIdsMock.mockResolvedValue(['guild-stopped'])
+        getSnapshotMock.mockResolvedValue({
+            savedAt: Date.now() - 60_000,
+            voiceChannelId: 'vc-active',
+            tracks: [{ title: 'Song', url: 'https://example.com/song' }],
+        })
+
+        const nodes = {
+            get: jest.fn().mockReturnValue(null),
+            create: jest.fn(),
+        }
+        const client = { guilds: { cache: { get: jest.fn() } } }
+        const player = { nodes, client } as unknown as Player
+
+        const service = new MusicWatchdogService()
+        service.markIntentionalStop('guild-stopped')
+        await service.scanOrphanSessions(player)
+
+        // A deliberate stop must not be undone by the next sweep.
+        expect(getSnapshotMock).not.toHaveBeenCalled()
+        expect(nodes.create).not.toHaveBeenCalled()
+        expect(restoreSnapshotMock).not.toHaveBeenCalled()
+    })
+
+    it('scanOrphanSessions skips a guild whose queue is paused', async () => {
+        listGuildIdsMock.mockResolvedValue(['guild-paused'])
+        getSnapshotMock.mockResolvedValue({
+            savedAt: Date.now() - 60_000,
+            voiceChannelId: 'vc-active',
+            tracks: [{ title: 'Song', url: 'https://example.com/song' }],
+        })
+
+        const existingQueue = {
+            node: { isPlaying: () => false, isPaused: () => true },
+        }
+        const nodes = { get: jest.fn().mockReturnValue(existingQueue) }
+        const player = { nodes } as unknown as Player
+
+        const service = new MusicWatchdogService()
+        await service.scanOrphanSessions(player)
+
+        expect(restoreSnapshotMock).not.toHaveBeenCalled()
     })
 
     it('reuses existing queue during orphan recovery and avoids creating a new queue', async () => {
@@ -257,7 +310,7 @@ describe('MusicWatchdogService — orphan session monitor', () => {
             members: { filter: jest.fn().mockReturnValue({ size: 2 }) },
         }
         const existingQueue = {
-            node: { isPlaying: () => false },
+            node: { isPlaying: () => false, isPaused: () => false },
         }
         const guild = {
             channels: {
@@ -303,6 +356,7 @@ describe('MusicWatchdogService — orphan session monitor', () => {
         const queue = {
             setRepeatMode: jest.fn(),
             connect: jest.fn().mockResolvedValue(undefined),
+            delete: jest.fn(),
         }
         const guild = {
             channels: {
@@ -322,12 +376,56 @@ describe('MusicWatchdogService — orphan session monitor', () => {
         await service.scanOrphanSessions(player)
 
         expect(deleteSnapshotMock).toHaveBeenCalledWith('guild-empty-restore')
+        // Nothing to play, so the connection opened for the attempt is closed
+        // again rather than left sitting in the channel with autoplay running.
+        expect(queue.delete).toHaveBeenCalledTimes(1)
         expect(service.getGuildState('guild-empty-restore')).toEqual(
             expect.objectContaining({
                 lastRecoveryAction: 'failed',
                 lastRecoveryDetail: 'snapshot_restore_empty',
             }),
         )
+    })
+
+    it('leaves a pre-existing queue alone when the restore yields no tracks', async () => {
+        listGuildIdsMock.mockResolvedValue(['guild-existing-empty'])
+        getSnapshotMock.mockResolvedValue({
+            savedAt: Date.now() - 60_000,
+            voiceChannelId: 'vc-active',
+            tracks: [{ title: 'Song', url: 'https://example.com/song' }],
+        })
+        restoreSnapshotMock.mockResolvedValue({
+            restoredCount: 0,
+            sessionSnapshotId: null,
+        })
+
+        const voiceChannel = {
+            type: ChannelType.GuildVoice,
+            members: { filter: jest.fn().mockReturnValue({ size: 2 }) },
+        }
+        const existingQueue = {
+            node: { isPlaying: () => false, isPaused: () => false },
+            delete: jest.fn(),
+        }
+        const guild = {
+            channels: {
+                cache: { get: jest.fn().mockReturnValue(voiceChannel) },
+            },
+        }
+        const nodes = {
+            get: jest.fn().mockReturnValue(existingQueue),
+            create: jest.fn(),
+        }
+        const client = {
+            guilds: { cache: { get: jest.fn().mockReturnValue(guild) } },
+        }
+        const player = { nodes, client } as unknown as Player
+
+        const service = new MusicWatchdogService()
+        await service.scanOrphanSessions(player)
+
+        // Only a queue the watchdog itself opened gets torn down.
+        expect(existingQueue.delete).not.toHaveBeenCalled()
     })
 
     it('scanOrphanSessions isolates errors per guild', async () => {
@@ -435,7 +533,7 @@ describe('MusicWatchdogService — checkAndRecover edge cases', () => {
             guild: { id: 'guild-fail-rejoin' },
             currentTrack: { title: 'Song', url: 'https://example.com/song' },
             connection,
-            node: { isPlaying: () => false, play },
+            node: { isPlaying: () => false, isPaused: () => false, play },
             tracks: { size: 0 },
         } as unknown as GuildQueue
 
@@ -460,6 +558,7 @@ describe('MusicWatchdogService — checkAndRecover edge cases', () => {
             connection: { state: { status: 'ready' } },
             node: {
                 isPlaying: () => false,
+                isPaused: () => false,
                 play: jest.fn().mockRejectedValue(new Error('player dead')),
             },
             tracks: { size: 0 },
@@ -474,6 +573,52 @@ describe('MusicWatchdogService — checkAndRecover edge cases', () => {
         })
     })
 
+    // isPlaying() is false while paused, so a paused queue looked identical to
+    // a stalled one and the watchdog resumed playback the user had just paused.
+    it('returns none without playing when the queue is paused', async () => {
+        const play = jest.fn().mockResolvedValue(undefined)
+        const rejoin = jest.fn()
+        const service = new MusicWatchdogService({ timeoutMs: 100 })
+        const queue = {
+            guild: { id: 'guild-paused-recover' },
+            currentTrack: { title: 'Song', url: 'https://example.com/song' },
+            connection: { state: { status: 'ready' }, rejoin },
+            node: { isPlaying: () => false, isPaused: () => true, play },
+            tracks: { size: 0 },
+        } as unknown as GuildQueue
+
+        const action = await service.checkAndRecover(queue)
+
+        expect(action).toBe('none')
+        expect(play).not.toHaveBeenCalled()
+        expect(rejoin).not.toHaveBeenCalled()
+        expect(service.getGuildState('guild-paused-recover')).toMatchObject({
+            lastRecoveryDetail: 'queue_paused',
+        })
+    })
+
+    // A bare play() dispatches from `tracks`; on the last song of a queue that
+    // is empty, and discord-player answered with NoResultError instead of
+    // resuming. The track has to be passed explicitly, with queue: false so it
+    // plays rather than being appended.
+    it('replays the current track explicitly when the queue has run out', async () => {
+        const play = jest.fn().mockResolvedValue(undefined)
+        const currentTrack = { title: 'Song', url: 'https://example.com/song' }
+        const service = new MusicWatchdogService({ timeoutMs: 100 })
+        const queue = {
+            guild: { id: 'guild-last-track' },
+            currentTrack,
+            connection: { state: { status: 'ready' } },
+            node: { isPlaying: () => false, isPaused: () => false, play },
+            tracks: { size: 0 },
+        } as unknown as GuildQueue
+
+        const action = await service.checkAndRecover(queue)
+
+        expect(action).toBe('requeue_current')
+        expect(play).toHaveBeenCalledWith(currentTrack, { queue: false })
+    })
+
     it('returns none without playing when intentional stop is set', async () => {
         const play = jest.fn().mockResolvedValue(undefined)
         const service = new MusicWatchdogService({ timeoutMs: 100 })
@@ -481,7 +626,7 @@ describe('MusicWatchdogService — checkAndRecover edge cases', () => {
             guild: { id: 'guild-intentional' },
             currentTrack: { title: 'Song', url: 'https://example.com/song' },
             connection: { state: { status: 'ready' } },
-            node: { isPlaying: () => false, play },
+            node: { isPlaying: () => false, isPaused: () => false, play },
             tracks: { size: 3 },
         } as unknown as GuildQueue
 
@@ -508,6 +653,7 @@ describe('MusicWatchdogService — startPeriodicScan', () => {
             connection: { state: { status: 'ready' } },
             node: {
                 isPlaying: () => false,
+                isPaused: () => false,
                 play: jest.fn().mockResolvedValue(undefined),
             },
             tracks: { size: 1 },

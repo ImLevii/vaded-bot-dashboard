@@ -8,6 +8,7 @@ const createSuccessEmbedMock = jest.fn()
 const createErrorEmbedMock = jest.fn()
 const resolveGuildQueueMock = jest.fn()
 const markIntentionalStopMock = jest.fn()
+const deleteSnapshotMock = jest.fn()
 const infoLogMock = jest.fn()
 const debugLogMock = jest.fn()
 const errorLogMock = jest.fn()
@@ -37,6 +38,12 @@ jest.mock('../../../utils/music/watchdog', () => ({
     },
 }))
 
+jest.mock('../../../utils/music/sessionSnapshots', () => ({
+    musicSessionSnapshotService: {
+        deleteSnapshot: (...args: unknown[]) => deleteSnapshotMock(...args),
+    },
+}))
+
 jest.mock('@lucky/shared/utils', () => ({
     infoLog: (...args: unknown[]) => infoLogMock(...args),
     debugLog: (...args: unknown[]) => debugLogMock(...args),
@@ -57,6 +64,7 @@ function createQueue(guildId = 'guild-1') {
 describe('leave command', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        deleteSnapshotMock.mockResolvedValue(undefined)
         requireGuildMock.mockResolvedValue(true)
         interactionReplyMock.mockResolvedValue(undefined)
         createSuccessEmbedMock.mockReturnValue({ title: 'Goodbye!' })
@@ -73,6 +81,9 @@ describe('leave command', () => {
         })
 
         expect(markIntentionalStopMock).toHaveBeenCalledWith('guild-1')
+        // The reply claims the queue is cleared; a surviving snapshot outlives
+        // the intentional-stop window and a later orphan sweep restores it.
+        expect(deleteSnapshotMock).toHaveBeenCalledWith('guild-1')
         expect(queue.delete).toHaveBeenCalled()
     })
 

@@ -12,6 +12,7 @@ import {
     normalizeYoutubeUrl,
 } from '../../functions/music/commands/play/urlNormalization'
 import { buildWebNodeOptions, resolveWebPlayContext } from './playContext'
+import { musicSessionSnapshotService } from '../../utils/music/sessionSnapshots'
 
 type Result = MusicCommandResult
 
@@ -83,6 +84,12 @@ export async function handleQueueClear(
     if (!queue) return fail(cmd.id, cmd.guildId, 'No active queue')
 
     queue.tracks.clear()
+    // The snapshot still holds the tracks that were just cleared, and it
+    // outlives the clear — it is only rewritten on the next trackStart. Any
+    // reconnect or orphan sweep before then restored the whole queue the user
+    // had deliberately emptied. The next trackStart re-saves the live state.
+    await musicSessionSnapshotService.deleteSnapshot(cmd.guildId)
+
     const state = await buildQueueState(client, cmd.guildId)
     await musicControlService.publishState(state)
     return ok(cmd.id, cmd.guildId)
