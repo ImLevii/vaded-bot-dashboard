@@ -292,6 +292,95 @@ describe('createLevelsApi', () => {
             expect(result).toBeUndefined()
         })
     })
+
+    describe('getLeaderboardPage', () => {
+        test('sends the offset and returns the total', async () => {
+            get.mockResolvedValue({
+                data: { leaderboard: [MEMBER_XP], total: 37 },
+            })
+            const api = createLevelsApi(apiClient as any)
+            const result = await api.getLeaderboardPage('g1', 10, 20)
+            expect(get).toHaveBeenCalledWith('/guilds/g1/levels/leaderboard', {
+                params: { limit: 10, offset: 20 },
+            })
+            expect(result).toEqual({ leaderboard: [MEMBER_XP], total: 37 })
+        })
+
+        test('defaults to the first page', async () => {
+            get.mockResolvedValue({ data: { leaderboard: [], total: 0 } })
+            const api = createLevelsApi(apiClient as any)
+            await api.getLeaderboardPage('g1')
+            expect(get).toHaveBeenCalledWith('/guilds/g1/levels/leaderboard', {
+                params: { limit: 10, offset: 0 },
+            })
+        })
+
+        // The query schema rejects limit > 50 outright, so an over-large
+        // request would 400 rather than come back truncated.
+        test('clamps the limit to what the endpoint accepts', async () => {
+            get.mockResolvedValue({ data: { leaderboard: [], total: 0 } })
+            const api = createLevelsApi(apiClient as any)
+            await api.getLeaderboardPage('g1', 500, 0)
+            expect(get).toHaveBeenCalledWith('/guilds/g1/levels/leaderboard', {
+                params: { limit: 50, offset: 0 },
+            })
+        })
+
+        test('clamps a negative offset to the first page', async () => {
+            get.mockResolvedValue({ data: { leaderboard: [], total: 0 } })
+            const api = createLevelsApi(apiClient as any)
+            await api.getLeaderboardPage('g1', 10, -30)
+            expect(get).toHaveBeenCalledWith('/guilds/g1/levels/leaderboard', {
+                params: { limit: 10, offset: 0 },
+            })
+        })
+
+        // A missing total would otherwise render as "0 of 0" and hide the rows.
+        test('falls back to the page length when total is absent', async () => {
+            get.mockResolvedValue({ data: { leaderboard: [MEMBER_XP] } })
+            const api = createLevelsApi(apiClient as any)
+            const result = await api.getLeaderboardPage('g1')
+            expect(result.total).toBe(1)
+        })
+    })
+
+    describe('adjustXp', () => {
+        test('posts the adjustment and returns the updated member', async () => {
+            post.mockResolvedValue({ data: { member: MEMBER_XP } })
+            const api = createLevelsApi(apiClient as any)
+            const result = await api.adjustXp('g1', {
+                userId: 'u1',
+                amount: 250,
+                mode: 'add',
+            })
+            expect(post).toHaveBeenCalledWith('/guilds/g1/levels/xp', {
+                userId: 'u1',
+                amount: 250,
+                mode: 'add',
+            })
+            expect(result).toEqual(MEMBER_XP)
+        })
+
+        test('passes a negative amount through unchanged', async () => {
+            post.mockResolvedValue({ data: { member: MEMBER_XP } })
+            const api = createLevelsApi(apiClient as any)
+            await api.adjustXp('g1', { userId: 'u1', amount: -100 })
+            expect(post).toHaveBeenCalledWith('/guilds/g1/levels/xp', {
+                userId: 'u1',
+                amount: -100,
+            })
+        })
+    })
+
+    describe('resetGuildXp', () => {
+        test('deletes guild XP and returns the removed count', async () => {
+            del.mockResolvedValue({ data: { success: true, removed: 12 } })
+            const api = createLevelsApi(apiClient as any)
+            const result = await api.resetGuildXp('g1')
+            expect(del).toHaveBeenCalledWith('/guilds/g1/levels/xp')
+            expect(result).toBe(12)
+        })
+    })
 })
 
 describe('xpNeededForLevel', () => {

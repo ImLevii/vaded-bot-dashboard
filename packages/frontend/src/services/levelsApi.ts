@@ -56,6 +56,12 @@ export interface AdjustXpInput {
     mode?: 'add' | 'set'
 }
 
+export interface LeaderboardPage {
+    leaderboard: MemberXP[]
+    /** Members with XP in the guild, not just on this page. */
+    total: number
+}
+
 export interface AddRewardInput {
     level: number
     roleId: string
@@ -65,7 +71,31 @@ export function xpNeededForLevel(level: number): number {
     return level * level * 100
 }
 
+/**
+ * The leaderboard query schema rejects limit > 50 outright, so a caller
+ * asking for more gets a 400 rather than a truncated page. Clamp instead.
+ */
+const MAX_LEADERBOARD_LIMIT = 50
+
 export function createLevelsApi(client: AxiosInstance) {
+    // Both leaderboard reads hit the same endpoint and differ only in what
+    // they ask for and hand back, so the URL and response shape live here once.
+    async function requestLeaderboard(
+        guildId: string,
+        params: { limit: number; offset?: number },
+    ): Promise<{ leaderboard: MemberXP[]; total?: number }> {
+        const res = await client.get<{
+            leaderboard: MemberXP[]
+            total?: number
+        }>(`/guilds/${guildId}/levels/leaderboard`, {
+            params: {
+                ...params,
+                limit: Math.min(params.limit, MAX_LEADERBOARD_LIMIT),
+            },
+        })
+        return res.data
+    }
+
     return {
         async getConfig(guildId: string): Promise<LevelConfig | null> {
             const res = await client.get<{ config: LevelConfig | null }>(
@@ -85,29 +115,29 @@ export function createLevelsApi(client: AxiosInstance) {
             return res.data.config
         },
 
+        /** Top N only — for widgets that never page past the first screen. */
         async getLeaderboard(guildId: string, limit = 10): Promise<MemberXP[]> {
-            const res = await client.get<{ leaderboard: MemberXP[] }>(
-                `/guilds/${guildId}/levels/leaderboard`,
-                { params: { limit } },
-            )
-            return res.data.leaderboard
+            const { leaderboard } = await requestLeaderboard(guildId, { limit })
+            return leaderboard
         },
 
-        /** Paginated variant; `total` drives the page controls. */
+        /**
+         * Paginated variant; `total` drives the page controls. Falls back to
+         * the page length so a backend that omits `total` renders a single
+         * page rather than an empty one.
+         */
         async getLeaderboardPage(
             guildId: string,
             limit = 10,
             offset = 0,
-        ): Promise<{ leaderboard: MemberXP[]; total: number }> {
-            const res = await client.get<{
-                leaderboard: MemberXP[]
-                total: number
-            }>(`/guilds/${guildId}/levels/leaderboard`, {
-                params: { limit, offset },
+        ): Promise<LeaderboardPage> {
+            const data = await requestLeaderboard(guildId, {
+                limit,
+                offset: Math.max(offset, 0),
             })
             return {
-                leaderboard: res.data.leaderboard,
-                total: res.data.total ?? res.data.leaderboard.length,
+                leaderboard: data.leaderboard,
+                total: data.total ?? data.leaderboard.length,
             }
         },
 

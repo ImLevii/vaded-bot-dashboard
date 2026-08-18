@@ -83,11 +83,27 @@ function mockGuildStore(selectedGuild: typeof mockGuild | null = mockGuild) {
     } as ReturnType<typeof useGuildStore>)
 }
 
+/** Enough ranked members that the pager has a second page to reach. */
+function membersPage(startRank: number, count: number): MemberXP[] {
+    return Array.from({ length: count }, (_, i) => ({
+        ...mockLeaderboard[0],
+        id: `m-${startRank + i}`,
+        userId: `user-${startRank + i}`,
+        xp: 10_000 - (startRank + i) * 100,
+        level: 20 - startRank - i,
+    }))
+}
+
 describe('Levels', () => {
     beforeEach(() => {
         vi.clearAllMocks()
         vi.mocked(api.levels.getConfig).mockResolvedValue(mockConfig)
-        vi.mocked(api.levels.getLeaderboard).mockResolvedValue(mockLeaderboard)
+        // The leaderboard is paged now; `total` is what makes the pager
+        // appear, so it must reflect the whole guild, not the page.
+        vi.mocked(api.levels.getLeaderboardPage).mockResolvedValue({
+            leaderboard: mockLeaderboard,
+            total: mockLeaderboard.length,
+        })
         vi.mocked(api.levels.getRewards).mockResolvedValue(mockRewards)
         vi.mocked(api.guilds.getRbac).mockResolvedValue({
             data: { roles: mockRoles },
@@ -120,7 +136,11 @@ describe('Levels', () => {
         render(<Levels />)
 
         await waitFor(() => {
-            expect(api.levels.getLeaderboard).toHaveBeenCalledWith('123456', 20)
+            expect(api.levels.getLeaderboardPage).toHaveBeenCalledWith(
+                '123456',
+                10,
+                0,
+            )
         })
 
         expect(await screen.findByText('111')).toBeInTheDocument()
@@ -131,7 +151,10 @@ describe('Levels', () => {
 
     test('displays empty state when leaderboard is empty', async () => {
         mockGuildStore()
-        vi.mocked(api.levels.getLeaderboard).mockResolvedValue([])
+        vi.mocked(api.levels.getLeaderboardPage).mockResolvedValue({
+            leaderboard: [],
+            total: 0,
+        })
         render(<Levels />)
 
         expect(await screen.findByText('No data yet')).toBeInTheDocument()
@@ -490,7 +513,10 @@ describe('Levels', () => {
     test('ignores 404 errors when loading config', async () => {
         mockGuildStore()
         vi.mocked(api.levels.getConfig).mockResolvedValue(null as never)
-        vi.mocked(api.levels.getLeaderboard).mockResolvedValue([])
+        vi.mocked(api.levels.getLeaderboardPage).mockResolvedValue({
+            leaderboard: [],
+            total: 0,
+        })
         vi.mocked(api.levels.getRewards).mockResolvedValue([])
         const { toast } = await import('sonner')
 
@@ -509,7 +535,10 @@ describe('Levels', () => {
     test('defaults enabled to true when no config row exists', async () => {
         mockGuildStore()
         vi.mocked(api.levels.getConfig).mockResolvedValue(null as never)
-        vi.mocked(api.levels.getLeaderboard).mockResolvedValue([])
+        vi.mocked(api.levels.getLeaderboardPage).mockResolvedValue({
+            leaderboard: [],
+            total: 0,
+        })
         vi.mocked(api.levels.getRewards).mockResolvedValue([])
 
         render(<Levels />)
@@ -610,6 +639,290 @@ describe('Levels', () => {
 
         await waitFor(() => {
             expect(addButton).toBeDisabled()
+        })
+    })
+
+    describe('leaderboard pagination', () => {
+        test('hides the pager when everyone fits on one page', async () => {
+            mockGuildStore()
+            render(<Levels />)
+
+            expect(await screen.findByText('111')).toBeInTheDocument()
+            expect(
+                screen.queryByRole('button', { name: /next/i }),
+            ).not.toBeInTheDocument()
+        })
+
+        test('pages forward and keeps ranks absolute', async () => {
+            mockGuildStore()
+            vi.mocked(api.levels.getLeaderboardPage)
+                .mockResolvedValueOnce({
+                    leaderboard: membersPage(0, 10),
+                    total: 14,
+                })
+                .mockResolvedValueOnce({
+                    leaderboard: membersPage(10, 4),
+                    total: 14,
+                })
+
+            render(<Levels />)
+
+            expect(await screen.findByText('user-0')).toBeInTheDocument()
+            expect(screen.getByText('#1')).toBeInTheDocument()
+            expect(screen.getByText('1–10 of 14')).toBeInTheDocument()
+
+            fireEvent.click(screen.getByRole('button', { name: /next/i }))
+
+            await waitFor(() => {
+                expect(api.levels.getLeaderboardPage).toHaveBeenLastCalledWith(
+                    '123456',
+                    10,
+                    10,
+                )
+            })
+
+            // Row 1 of page 2 is rank #11, not #1.
+            expect(await screen.findByText('#11')).toBeInTheDocument()
+            expect(screen.queryByText('#1')).not.toBeInTheDocument()
+            expect(screen.getByText('11–14 of 14')).toBeInTheDocument()
+        })
+
+        test('disables previous on the first page and next on the last', async () => {
+            mockGuildStore()
+            vi.mocked(api.levels.getLeaderboardPage)
+                .mockResolvedValueOnce({
+                    leaderboard: membersPage(0, 10),
+                    total: 14,
+                })
+                .mockResolvedValueOnce({
+                    leaderboard: membersPage(10, 4),
+                    total: 14,
+                })
+
+            render(<Levels />)
+
+            await screen.findByText('user-0')
+            expect(
+                screen.getByRole('button', { name: /previous/i }),
+            ).toBeDisabled()
+
+            fireEvent.click(screen.getByRole('button', { name: /next/i }))
+
+            await screen.findByText('user-10')
+            expect(screen.getByRole('button', { name: /next/i })).toBeDisabled()
+            expect(
+                screen.getByRole('button', { name: /previous/i }),
+            ).toBeEnabled()
+        })
+
+        test('surfaces a page load failure without blanking the table', async () => {
+            mockGuildStore()
+            vi.mocked(api.levels.getLeaderboardPage)
+                .mockResolvedValueOnce({
+                    leaderboard: membersPage(0, 10),
+                    total: 14,
+                })
+                .mockRejectedValueOnce(new Error('page fetch failed'))
+            const { toast } = await import('sonner')
+
+            render(<Levels />)
+
+            await screen.findByText('user-0')
+            fireEvent.click(screen.getByRole('button', { name: /next/i }))
+
+            await waitFor(() => {
+                expect(toast.error).toHaveBeenCalledWith(
+                    'Failed to load the leaderboard',
+                )
+            })
+            expect(screen.getByText('user-0')).toBeInTheDocument()
+        })
+    })
+
+    describe('xp admin', () => {
+        const adjusted: MemberXP = {
+            ...mockLeaderboard[0],
+            userId: '180892352150241280',
+            displayName: 'Levii',
+            xp: 2500,
+            level: 7,
+        }
+
+        async function renderWithXpAdmin() {
+            mockGuildStore()
+            render(<Levels />)
+            return {
+                userInput: await screen.findByLabelText(/user id/i),
+                amountInput: screen.getByLabelText(/amount/i),
+                applyButton: screen.getByRole('button', { name: /apply/i }),
+            }
+        }
+
+        test('adds XP and refreshes the page being viewed', async () => {
+            vi.mocked(api.levels.adjustXp).mockResolvedValue(adjusted)
+            const { toast } = await import('sonner')
+
+            const { userInput, amountInput, applyButton } =
+                await renderWithXpAdmin()
+
+            fireEvent.change(userInput, {
+                target: { value: '180892352150241280' },
+            })
+            fireEvent.change(amountInput, { target: { value: '250' } })
+            fireEvent.click(applyButton)
+
+            await waitFor(() => {
+                expect(api.levels.adjustXp).toHaveBeenCalledWith('123456', {
+                    userId: '180892352150241280',
+                    amount: 250,
+                    mode: 'add',
+                })
+            })
+
+            expect(toast.success).toHaveBeenCalledWith(
+                'Levii is now level 7 (2,500 XP)',
+            )
+            // Ranks around the edited member shift, so the page is re-read.
+            expect(api.levels.getLeaderboardPage).toHaveBeenCalledTimes(2)
+        })
+
+        test('rejects a malformed user ID before calling the API', async () => {
+            const { toast } = await import('sonner')
+            const { userInput, amountInput, applyButton } =
+                await renderWithXpAdmin()
+
+            fireEvent.change(userInput, {
+                target: { value: 'not-a-snowflake' },
+            })
+            fireEvent.change(amountInput, { target: { value: '10' } })
+            fireEvent.click(applyButton)
+
+            await waitFor(() => {
+                expect(toast.error).toHaveBeenCalledWith(
+                    'Enter a valid Discord user ID',
+                )
+            })
+            expect(api.levels.adjustXp).not.toHaveBeenCalled()
+        })
+
+        test('rejects an amount beyond the endpoint bounds', async () => {
+            const { toast } = await import('sonner')
+            const { userInput, amountInput, applyButton } =
+                await renderWithXpAdmin()
+
+            fireEvent.change(userInput, {
+                target: { value: '180892352150241280' },
+            })
+            fireEvent.change(amountInput, { target: { value: '2000000' } })
+            fireEvent.click(applyButton)
+
+            await waitFor(() => {
+                expect(toast.error).toHaveBeenCalledWith(
+                    'Enter a whole number between -1,000,000 and 1,000,000',
+                )
+            })
+            expect(api.levels.adjustXp).not.toHaveBeenCalled()
+        })
+
+        test('rejects setting a member to negative XP', async () => {
+            const { toast } = await import('sonner')
+            const { userInput, amountInput, applyButton } =
+                await renderWithXpAdmin()
+
+            fireEvent.change(screen.getByLabelText(/action/i), {
+                target: { value: 'set' },
+            })
+            fireEvent.change(userInput, {
+                target: { value: '180892352150241280' },
+            })
+            fireEvent.change(amountInput, { target: { value: '-5' } })
+            fireEvent.click(applyButton)
+
+            await waitFor(() => {
+                expect(toast.error).toHaveBeenCalledWith(
+                    'A member cannot be set to negative XP',
+                )
+            })
+            expect(api.levels.adjustXp).not.toHaveBeenCalled()
+        })
+
+        test('surfaces an adjust failure', async () => {
+            vi.mocked(api.levels.adjustXp).mockRejectedValue(
+                new Error('API error'),
+            )
+            const { toast } = await import('sonner')
+            const { userInput, amountInput, applyButton } =
+                await renderWithXpAdmin()
+
+            fireEvent.change(userInput, {
+                target: { value: '180892352150241280' },
+            })
+            fireEvent.change(amountInput, { target: { value: '250' } })
+            fireEvent.click(applyButton)
+
+            await waitFor(() => {
+                expect(toast.error).toHaveBeenCalledWith('Failed to adjust XP')
+            })
+        })
+
+        // The wipe is irreversible, so it must never fire straight off the
+        // button that opens the dialog.
+        test('requires confirmation before wiping guild XP', async () => {
+            mockGuildStore()
+            render(<Levels />)
+
+            const resetButton = await screen.findByRole('button', {
+                name: /^reset$/i,
+            })
+            fireEvent.click(resetButton)
+
+            expect(await screen.findByText('Reset all XP?')).toBeInTheDocument()
+            expect(api.levels.resetGuildXp).not.toHaveBeenCalled()
+
+            fireEvent.click(screen.getByRole('button', { name: /cancel/i }))
+
+            await waitFor(() => {
+                expect(
+                    screen.queryByText('Reset all XP?'),
+                ).not.toBeInTheDocument()
+            })
+            expect(api.levels.resetGuildXp).not.toHaveBeenCalled()
+        })
+
+        test('wipes guild XP once confirmed', async () => {
+            mockGuildStore()
+            vi.mocked(api.levels.resetGuildXp).mockResolvedValue(42)
+            const { toast } = await import('sonner')
+
+            render(<Levels />)
+
+            fireEvent.click(
+                await screen.findByRole('button', { name: /^reset$/i }),
+            )
+            fireEvent.click(
+                await screen.findByRole('button', { name: /reset all xp/i }),
+            )
+
+            await waitFor(() => {
+                expect(api.levels.resetGuildXp).toHaveBeenCalledWith('123456')
+            })
+            expect(toast.success).toHaveBeenCalledWith(
+                'Cleared XP for 42 members',
+            )
+        })
+
+        test('offers no reset when the guild has no XP to wipe', async () => {
+            mockGuildStore()
+            vi.mocked(api.levels.getLeaderboardPage).mockResolvedValue({
+                leaderboard: [],
+                total: 0,
+            })
+
+            render(<Levels />)
+
+            expect(
+                await screen.findByRole('button', { name: /^reset$/i }),
+            ).toBeDisabled()
         })
     })
 })

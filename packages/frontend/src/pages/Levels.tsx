@@ -7,6 +7,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import Skeleton from '@/components/ui/Skeleton'
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+} from '@/components/ui/dialog'
 import { toast } from 'sonner'
 import { api } from '@/services/api'
 import { ApiError } from '@/services/ApiError'
@@ -27,11 +35,24 @@ const MIN_XP_COOLDOWN_MS = 1000
 const DEFAULT_XP_PER_MESSAGE = 15
 const DEFAULT_XP_COOLDOWN_MS = 60_000
 
+// The leaderboard is paged rather than a fixed top-20: a busy guild has far
+// more ranked members than one screen, and only the endpoint's `total` makes
+// the rest reachable.
+const LEADERBOARD_PAGE_SIZE = 10
+
+// Both mirror the POST /levels/xp schema, so a bad entry is rejected here with
+// a readable message instead of coming back as a generic "Validation failed".
+const SNOWFLAKE = /^\d{17,20}$/
+const MAX_XP_ADJUSTMENT = 1_000_000
+
 function Levels() {
     const { t } = useTranslation()
     const { selectedGuild } = useGuildStore()
     const [loading, setLoading] = useState(true)
     const [leaderboard, setLeaderboard] = useState<MemberXP[]>([])
+    const [leaderboardTotal, setLeaderboardTotal] = useState(0)
+    const [page, setPage] = useState(0)
+    const [pageLoading, setPageLoading] = useState(false)
     const [rewards, setRewards] = useState<LevelReward[]>([])
     const [roles, setRoles] = useState<GuildRoleOption[]>([])
     const [rolesError, setRolesError] = useState(false)
@@ -39,6 +60,14 @@ function Levels() {
     const [adding, setAdding] = useState(false)
     const [newLevel, setNewLevel] = useState('')
     const [newRoleId, setNewRoleId] = useState('')
+
+    // Manual XP correction. Kept next to the leaderboard it edits.
+    const [xpUserId, setXpUserId] = useState('')
+    const [xpAmount, setXpAmount] = useState('')
+    const [xpMode, setXpMode] = useState<'add' | 'set'>('add')
+    const [adjustingXp, setAdjustingXp] = useState(false)
+    const [confirmingReset, setConfirmingReset] = useState(false)
+    const [resetting, setResetting] = useState(false)
 
     // Form state. Seeded with the same defaults the LevelConfig model uses,
     // not 0: the PATCH schema requires xpPerMessage >= 1 and xpCooldownMs >=
@@ -76,7 +105,11 @@ function Levels() {
                     channelsData,
                 ] = await Promise.all([
                     api.levels.getConfig(selectedGuild.id),
-                    api.levels.getLeaderboard(selectedGuild.id, 20),
+                    api.levels.getLeaderboardPage(
+                        selectedGuild.id,
+                        LEADERBOARD_PAGE_SIZE,
+                        0,
+                    ),
                     api.levels.getRewards(selectedGuild.id),
                     // RBAC failure is isolated so it can't blank the whole
                     // page, but it must be surfaced (not silently swallowed):
@@ -96,7 +129,9 @@ function Levels() {
 
                 if (!mounted) return
 
-                setLeaderboard(leaderboardData)
+                setLeaderboard(leaderboardData.leaderboard)
+                setLeaderboardTotal(leaderboardData.total)
+                setPage(0)
                 setRewards(rewardsData)
                 setRoles(rbacData.data.roles)
                 setChannels(channelsData.data.channels ?? [])
@@ -141,6 +176,103 @@ function Levels() {
             mounted = false
         }
     }, [selectedGuild?.id])
+
+    // Used by the pager and by anything that changes XP, so a correction is
+    // visible in the rankings without a full page reload.
+    const loadLeaderboardPage = async (nextPage: number) => {
+        if (!selectedGuild) return
+
+        setPageLoading(true)
+        try {
+            const { leaderboard: members, total } =
+                await api.levels.getLeaderboardPage(
+                    selectedGuild.id,
+                    LEADERBOARD_PAGE_SIZE,
+                    nextPage * LEADERBOARD_PAGE_SIZE,
+                )
+            setLeaderboard(members)
+            setLeaderboardTotal(total)
+            setPage(nextPage)
+        } catch (error) {
+            reportError('Failed to load leaderboard page:', error, {
+                component: 'Levels',
+                action: 'loadLeaderboardPage',
+            })
+            toast.error('Failed to load the leaderboard')
+        } finally {
+            setPageLoading(false)
+        }
+    }
+
+    const handleAdjustXp = async () => {
+        if (!selectedGuild) return
+
+        if (!SNOWFLAKE.test(xpUserId.trim())) {
+            toast.error('Enter a valid Discord user ID')
+            return
+        }
+
+        const amount = Number(xpAmount)
+        if (!Number.isInteger(amount) || Math.abs(amount) > MAX_XP_ADJUSTMENT) {
+            toast.error(
+                `Enter a whole number between -${MAX_XP_ADJUSTMENT.toLocaleString()} and ${MAX_XP_ADJUSTMENT.toLocaleString()}`,
+            )
+            return
+        }
+        // 'set' writes an absolute total, which cannot be negative.
+        if (xpMode === 'set' && amount < 0) {
+            toast.error('A member cannot be set to negative XP')
+            return
+        }
+
+        setAdjustingXp(true)
+        try {
+            const member = await api.levels.adjustXp(selectedGuild.id, {
+                userId: xpUserId.trim(),
+                amount,
+                mode: xpMode,
+            })
+            toast.success(
+                `${member.displayName ?? member.userId} is now level ${member.level} (${member.xp.toLocaleString()} XP)`,
+            )
+            setXpAmount('')
+            // Their new position may not be on the page being viewed, but the
+            // ranks around it shift regardless.
+            await loadLeaderboardPage(page)
+        } catch (error) {
+            reportError('Failed to adjust member XP:', error, {
+                component: 'Levels',
+                action: 'adjustXp',
+            })
+            toast.error('Failed to adjust XP')
+        } finally {
+            setAdjustingXp(false)
+        }
+    }
+
+    const handleResetXp = async () => {
+        if (!selectedGuild) return
+
+        setResetting(true)
+        try {
+            const removed = await api.levels.resetGuildXp(selectedGuild.id)
+            toast.success(
+                `Cleared XP for ${removed.toLocaleString()} ${
+                    removed === 1 ? 'member' : 'members'
+                }`,
+            )
+            setConfirmingReset(false)
+            await loadLeaderboardPage(0)
+        } catch (error) {
+            reportError('Failed to reset guild XP:', error, {
+                component: 'Levels',
+                action: 'resetGuildXp',
+            })
+            toast.error('Failed to reset XP')
+        } finally {
+            setResetting(false)
+        }
+    }
 
     const handleSaveSettings = async () => {
         if (!selectedGuild) return
@@ -264,11 +396,20 @@ function Levels() {
                 ) : (
                     <Card className='overflow-hidden border border-vaded-border'>
                         <div className='divide-y divide-vaded-border'>
-                            {leaderboard.map((member) => (
+                            {leaderboard.map((member, index) => (
                                 <div
                                     key={member.userId}
                                     className='flex items-center justify-between p-4 transition-colors hover:bg-vaded-bg-active/25'
                                 >
+                                    {/* Absolute rank, not the row index: on
+                                        page 2 every entry would otherwise
+                                        restart at 1. */}
+                                    <span className='w-10 shrink-0 type-body-sm font-semibold text-vaded-text-tertiary'>
+                                        #
+                                        {page * LEADERBOARD_PAGE_SIZE +
+                                            index +
+                                            1}
+                                    </span>
                                     <div className='flex-1'>
                                         <p className='type-body-sm font-medium text-vaded-text-primary'>
                                             {member.displayName ??
@@ -287,6 +428,43 @@ function Levels() {
                                 </div>
                             ))}
                         </div>
+
+                        {leaderboardTotal > LEADERBOARD_PAGE_SIZE && (
+                            <div className='flex items-center justify-between gap-4 border-t border-vaded-border p-3'>
+                                <p className='type-body-sm text-vaded-text-secondary'>
+                                    {page * LEADERBOARD_PAGE_SIZE + 1}–
+                                    {page * LEADERBOARD_PAGE_SIZE +
+                                        leaderboard.length}{' '}
+                                    of {leaderboardTotal.toLocaleString()}
+                                </p>
+                                <div className='flex gap-2'>
+                                    <Button
+                                        variant='secondary'
+                                        size='sm'
+                                        onClick={() =>
+                                            loadLeaderboardPage(page - 1)
+                                        }
+                                        disabled={page === 0 || pageLoading}
+                                    >
+                                        Previous
+                                    </Button>
+                                    <Button
+                                        variant='secondary'
+                                        size='sm'
+                                        onClick={() =>
+                                            loadLeaderboardPage(page + 1)
+                                        }
+                                        disabled={
+                                            (page + 1) *
+                                                LEADERBOARD_PAGE_SIZE >=
+                                                leaderboardTotal || pageLoading
+                                        }
+                                    >
+                                        Next
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                     </Card>
                 )}
             </section>
@@ -611,6 +789,128 @@ function Levels() {
                     </div>
                 </Card>
             </div>
+
+            {/* XP admin. Correcting a member previously meant editing the
+                database by hand. */}
+            <Card className='p-6 border border-vaded-border'>
+                <h3 className='type-body-sm font-semibold text-vaded-text-primary mb-4 uppercase tracking-wide'>
+                    Manage XP
+                </h3>
+
+                <div className='grid gap-3 sm:grid-cols-[2fr_1fr_1fr_auto] sm:items-end'>
+                    <div>
+                        <Label htmlFor='xp-user' className='text-sm'>
+                            User ID
+                        </Label>
+                        <Input
+                            id='xp-user'
+                            type='text'
+                            inputMode='numeric'
+                            value={xpUserId}
+                            onChange={(e) => setXpUserId(e.target.value)}
+                            placeholder='Right-click a member → Copy User ID'
+                            className='mt-1.5'
+                        />
+                    </div>
+
+                    <div>
+                        <Label htmlFor='xp-mode' className='text-sm'>
+                            Action
+                        </Label>
+                        <select
+                            id='xp-mode'
+                            value={xpMode}
+                            onChange={(e) =>
+                                setXpMode(e.target.value as 'add' | 'set')
+                            }
+                            className='mt-1.5 w-full rounded-md bg-vaded-bg-tertiary border border-vaded-border p-2 text-sm text-white'
+                        >
+                            <option value='add'>Add / remove</option>
+                            <option value='set'>Set to</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <Label htmlFor='xp-amount' className='text-sm'>
+                            Amount
+                        </Label>
+                        <Input
+                            id='xp-amount'
+                            type='number'
+                            value={xpAmount}
+                            onChange={(e) => setXpAmount(e.target.value)}
+                            placeholder={xpMode === 'add' ? '250 or -250' : '0'}
+                            className='mt-1.5'
+                        />
+                    </div>
+
+                    <Button
+                        onClick={handleAdjustXp}
+                        disabled={adjustingXp || !xpUserId || xpAmount === ''}
+                        loading={adjustingXp}
+                    >
+                        Apply
+                    </Button>
+                </div>
+
+                <p className='text-xs text-vaded-text-tertiary mt-2'>
+                    {xpMode === 'add'
+                        ? 'A negative amount removes XP. Levels are recalculated from the new total.'
+                        : 'Writes an absolute XP total, replacing whatever the member had.'}
+                </p>
+
+                <div className='mt-6 pt-4 border-t border-vaded-border flex items-center justify-between gap-4'>
+                    <div>
+                        <p className='type-body-sm font-medium text-vaded-text-primary'>
+                            Reset all XP
+                        </p>
+                        <p className='text-xs text-vaded-text-tertiary'>
+                            Wipes every member&apos;s XP and level in this
+                            server. Cannot be undone.
+                        </p>
+                    </div>
+                    <Button
+                        variant='destructive'
+                        onClick={() => setConfirmingReset(true)}
+                        disabled={resetting || leaderboardTotal === 0}
+                    >
+                        Reset
+                    </Button>
+                </div>
+            </Card>
+
+            <Dialog
+                open={confirmingReset}
+                onOpenChange={(open) => !open && setConfirmingReset(false)}
+            >
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Reset all XP?</DialogTitle>
+                        <DialogDescription>
+                            Every member in {selectedGuild.name} loses their XP
+                            and level, and any reward roles they earned stop
+                            being reapplied. This cannot be undone.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button
+                            variant='secondary'
+                            onClick={() => setConfirmingReset(false)}
+                            disabled={resetting}
+                        >
+                            {t('common.cancel') || 'Cancel'}
+                        </Button>
+                        <Button
+                            variant='destructive'
+                            onClick={handleResetXp}
+                            disabled={resetting}
+                            loading={resetting}
+                        >
+                            Reset all XP
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }
