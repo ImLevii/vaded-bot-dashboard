@@ -12,8 +12,12 @@ import { api } from '@/services/api'
 import { ApiError } from '@/services/ApiError'
 import { useGuildStore } from '@/stores/guildStore'
 import { TrashIcon } from 'lucide-react'
-import type { MemberXP, LevelReward } from '@/services/levelsApi'
-import type { GuildRoleOption } from '@/types'
+import type {
+    MemberXP,
+    LevelReward,
+    LevelAnnounceMode,
+} from '@/services/levelsApi'
+import type { GuildRoleOption, GuildChannelOption } from '@/types'
 
 // Mirrors the PATCH /levels/config bounds (xpPerMessage >= 1,
 // xpCooldownMs >= 1000) and the LevelConfig model defaults, so the form can
@@ -44,6 +48,13 @@ function Levels() {
     const [xpPerMessage, setXpPerMessage] = useState(DEFAULT_XP_PER_MESSAGE)
     const [xpCooldownMs, setXpCooldownMs] = useState(DEFAULT_XP_COOLDOWN_MS)
     const [announceChannel, setAnnounceChannel] = useState('')
+    const [announceMode, setAnnounceMode] =
+        useState<LevelAnnounceMode>('channel')
+    const [levelUpMessage, setLevelUpMessage] = useState('')
+    const [stackRewards, setStackRewards] = useState(true)
+    const [ignoredChannels, setIgnoredChannels] = useState<string[]>([])
+    const [ignoredRoles, setIgnoredRoles] = useState<string[]>([])
+    const [channels, setChannels] = useState<GuildChannelOption[]>([])
 
     useEffect(() => {
         if (!selectedGuild) {
@@ -57,32 +68,49 @@ function Levels() {
             setLoading(true)
             setRolesError(false)
             try {
-                const [configData, leaderboardData, rewardsData, rbacData] =
-                    await Promise.all([
-                        api.levels.getConfig(selectedGuild.id),
-                        api.levels.getLeaderboard(selectedGuild.id, 20),
-                        api.levels.getRewards(selectedGuild.id),
-                        // RBAC failure is isolated so it can't blank the whole
-                        // page, but it must be surfaced (not silently swallowed):
-                        // an empty role list then means "failed to load", which
-                        // rolesError distinguishes from "no roles configured".
-                        api.guilds.getRbac(selectedGuild.id).catch(() => {
-                            if (mounted) setRolesError(true)
-                            return { data: { roles: [] } }
-                        }),
-                    ])
+                const [
+                    configData,
+                    leaderboardData,
+                    rewardsData,
+                    rbacData,
+                    channelsData,
+                ] = await Promise.all([
+                    api.levels.getConfig(selectedGuild.id),
+                    api.levels.getLeaderboard(selectedGuild.id, 20),
+                    api.levels.getRewards(selectedGuild.id),
+                    // RBAC failure is isolated so it can't blank the whole
+                    // page, but it must be surfaced (not silently swallowed):
+                    // an empty role list then means "failed to load", which
+                    // rolesError distinguishes from "no roles configured".
+                    api.guilds.getRbac(selectedGuild.id).catch(() => {
+                        if (mounted) setRolesError(true)
+                        return { data: { roles: [] } }
+                    }),
+                    // Channel list powers the announce/ignore pickers, which
+                    // replaced free-text ID boxes. Isolated for the same
+                    // reason as RBAC above.
+                    api.guilds.getChannels(selectedGuild.id).catch(() => ({
+                        data: { channels: [] },
+                    })),
+                ])
 
                 if (!mounted) return
 
                 setLeaderboard(leaderboardData)
                 setRewards(rewardsData)
                 setRoles(rbacData.data.roles)
+                setChannels(channelsData.data.channels ?? [])
 
                 if (configData) {
                     setEnabled(configData.enabled)
                     setXpPerMessage(configData.xpPerMessage)
                     setXpCooldownMs(configData.xpCooldownMs)
                     setAnnounceChannel(configData.announceChannel || '')
+                    setAnnounceMode(configData.announceMode ?? 'channel')
+                    setLevelUpMessage(configData.levelUpMessage ?? '')
+                    setStackRewards(configData.stackRewards ?? true)
+                    setIgnoredChannels(configData.ignoredChannels ?? [])
+                    setIgnoredRoles(configData.ignoredRoles ?? [])
                 } else {
                     // No config row yet — show the model defaults rather than
                     // zeros, which the PATCH schema would reject on save.
@@ -126,6 +154,11 @@ function Levels() {
                 xpPerMessage: Math.max(MIN_XP_PER_MESSAGE, xpPerMessage),
                 xpCooldownMs: Math.max(MIN_XP_COOLDOWN_MS, xpCooldownMs),
                 announceChannel: announceChannel || null,
+                announceMode,
+                levelUpMessage: levelUpMessage.trim() || null,
+                stackRewards,
+                ignoredChannels,
+                ignoredRoles,
             })
             toast.success(t('levels.levelSettingsSaved'))
         } catch (error) {
@@ -311,19 +344,163 @@ function Levels() {
                         </div>
 
                         <div>
-                            <Label htmlFor='channel' className='text-sm'>
-                                {t('levels.announceChannel')}
+                            <Label htmlFor='announce-mode' className='text-sm'>
+                                Announce level-ups
                             </Label>
-                            <Input
-                                id='channel'
-                                type='text'
-                                value={announceChannel}
+                            <select
+                                id='announce-mode'
+                                value={announceMode}
                                 onChange={(e) =>
-                                    setAnnounceChannel(e.target.value)
+                                    setAnnounceMode(
+                                        e.target.value as LevelAnnounceMode,
+                                    )
                                 }
-                                placeholder={t('levels.channelIdOptional')}
-                                className='mt-1.5'
+                                className='mt-1.5 w-full rounded-md bg-vaded-bg-tertiary border border-vaded-border p-2 text-sm text-white'
+                            >
+                                <option value='channel'>
+                                    In a specific channel
+                                </option>
+                                <option value='current'>
+                                    In the channel they were chatting in
+                                </option>
+                                <option value='dm'>Direct message</option>
+                                <option value='off'>Don&apos;t announce</option>
+                            </select>
+                        </div>
+
+                        {announceMode === 'channel' && (
+                            <div>
+                                <Label htmlFor='channel' className='text-sm'>
+                                    {t('levels.announceChannel')}
+                                </Label>
+                                {/* A picker, not a free-text ID box: the
+                                    channel list is already loaded, and a
+                                    mistyped snowflake silently disabled
+                                    announcements. */}
+                                <select
+                                    id='channel'
+                                    value={announceChannel}
+                                    onChange={(e) =>
+                                        setAnnounceChannel(e.target.value)
+                                    }
+                                    className='mt-1.5 w-full rounded-md bg-vaded-bg-tertiary border border-vaded-border p-2 text-sm text-white'
+                                >
+                                    <option value=''>
+                                        {t('levels.channelIdOptional')}
+                                    </option>
+                                    {channels.map((channel) => (
+                                        <option
+                                            key={channel.id}
+                                            value={channel.id}
+                                        >
+                                            #{channel.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
+                        <div>
+                            <Label
+                                htmlFor='levelup-message'
+                                className='text-sm'
+                            >
+                                Level-up message
+                            </Label>
+                            <textarea
+                                id='levelup-message'
+                                value={levelUpMessage}
+                                onChange={(e) =>
+                                    setLevelUpMessage(e.target.value)
+                                }
+                                rows={2}
+                                placeholder='🎉 {user} reached level {level}!'
+                                className='mt-1.5 w-full rounded-md bg-vaded-bg-tertiary border border-vaded-border p-2 text-sm text-white'
                             />
+                            <p className='text-xs text-vaded-text-tertiary mt-1'>
+                                Tokens: {'{user}'} {'{level}'} {'{rewards}'} —
+                                leave blank for the default.
+                            </p>
+                        </div>
+
+                        <div className='flex items-center justify-between gap-4'>
+                            <div>
+                                <Label className='text-sm'>Stack rewards</Label>
+                                <p className='text-xs text-vaded-text-tertiary'>
+                                    Keep earlier reward roles. Off replaces them
+                                    so members wear only their current tier.
+                                </p>
+                            </div>
+                            <Switch
+                                checked={stackRewards}
+                                onCheckedChange={setStackRewards}
+                                aria-label='Stack reward roles'
+                            />
+                        </div>
+
+                        <div className='grid gap-3 sm:grid-cols-2'>
+                            <div>
+                                <Label
+                                    htmlFor='ignored-channels'
+                                    className='text-sm'
+                                >
+                                    Channels that earn no XP
+                                </Label>
+                                <select
+                                    id='ignored-channels'
+                                    multiple
+                                    size={4}
+                                    value={ignoredChannels}
+                                    onChange={(e) =>
+                                        setIgnoredChannels(
+                                            Array.from(
+                                                e.target.selectedOptions,
+                                                (o) => o.value,
+                                            ),
+                                        )
+                                    }
+                                    className='mt-1.5 w-full rounded-md bg-vaded-bg-tertiary border border-vaded-border p-2 text-sm text-white'
+                                >
+                                    {channels.map((channel) => (
+                                        <option
+                                            key={channel.id}
+                                            value={channel.id}
+                                        >
+                                            #{channel.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div>
+                                <Label
+                                    htmlFor='ignored-roles'
+                                    className='text-sm'
+                                >
+                                    Roles that earn no XP
+                                </Label>
+                                <select
+                                    id='ignored-roles'
+                                    multiple
+                                    size={4}
+                                    value={ignoredRoles}
+                                    onChange={(e) =>
+                                        setIgnoredRoles(
+                                            Array.from(
+                                                e.target.selectedOptions,
+                                                (o) => o.value,
+                                            ),
+                                        )
+                                    }
+                                    className='mt-1.5 w-full rounded-md bg-vaded-bg-tertiary border border-vaded-border p-2 text-sm text-white'
+                                >
+                                    {roles.map((role) => (
+                                        <option key={role.id} value={role.id}>
+                                            @{role.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
 
                         <Button
@@ -401,14 +578,25 @@ function Levels() {
                             <Label htmlFor='newRole' className='text-sm'>
                                 {t('levels.roleIdLabel')}
                             </Label>
-                            <Input
+                            {/* Picker rather than a free-text snowflake: the
+                                role list is already loaded to render names
+                                below, and a mistyped ID produced a reward that
+                                could never be granted. */}
+                            <select
                                 id='newRole'
-                                type='text'
-                                placeholder={t('levels.roleIdPlaceholder')}
                                 value={newRoleId}
                                 onChange={(e) => setNewRoleId(e.target.value)}
-                                className='mt-1.5'
-                            />
+                                className='mt-1.5 w-full rounded-md bg-vaded-bg-tertiary border border-vaded-border p-2 text-sm text-white'
+                            >
+                                <option value=''>
+                                    {t('levels.roleIdPlaceholder')}
+                                </option>
+                                {roles.map((role) => (
+                                    <option key={role.id} value={role.id}>
+                                        @{role.name}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
 
                         <Button

@@ -1,5 +1,8 @@
 import type { AxiosInstance } from 'axios'
 
+/** Where a level-up is announced. */
+export type LevelAnnounceMode = 'channel' | 'current' | 'dm' | 'off'
+
 export interface LevelConfig {
     id: string
     guildId: string
@@ -7,6 +10,11 @@ export interface LevelConfig {
     xpPerMessage: number
     xpCooldownMs: number
     announceChannel: string | null
+    ignoredChannels: string[]
+    ignoredRoles: string[]
+    announceMode: LevelAnnounceMode
+    levelUpMessage: string | null
+    stackRewards: boolean
     createdAt: string
     updatedAt: string
 }
@@ -35,6 +43,17 @@ export interface UpdateLevelConfigInput {
     xpPerMessage?: number
     xpCooldownMs?: number
     announceChannel?: string | null
+    ignoredChannels?: string[]
+    ignoredRoles?: string[]
+    announceMode?: LevelAnnounceMode
+    levelUpMessage?: string | null
+    stackRewards?: boolean
+}
+
+export interface AdjustXpInput {
+    userId: string
+    amount: number
+    mode?: 'add' | 'set'
 }
 
 export interface AddRewardInput {
@@ -72,6 +91,42 @@ export function createLevelsApi(client: AxiosInstance) {
                 { params: { limit } },
             )
             return res.data.leaderboard
+        },
+
+        /** Paginated variant; `total` drives the page controls. */
+        async getLeaderboardPage(
+            guildId: string,
+            limit = 10,
+            offset = 0,
+        ): Promise<{ leaderboard: MemberXP[]; total: number }> {
+            const res = await client.get<{
+                leaderboard: MemberXP[]
+                total: number
+            }>(`/guilds/${guildId}/levels/leaderboard`, {
+                params: { limit, offset },
+            })
+            return {
+                leaderboard: res.data.leaderboard,
+                total: res.data.total ?? res.data.leaderboard.length,
+            }
+        },
+
+        async adjustXp(
+            guildId: string,
+            data: AdjustXpInput,
+        ): Promise<MemberXP> {
+            const res = await client.post<{ member: MemberXP }>(
+                `/guilds/${guildId}/levels/xp`,
+                data,
+            )
+            return res.data.member
+        },
+
+        async resetGuildXp(guildId: string): Promise<number> {
+            const res = await client.delete<{ removed: number }>(
+                `/guilds/${guildId}/levels/xp`,
+            )
+            return res.data.removed
         },
 
         async getRank(

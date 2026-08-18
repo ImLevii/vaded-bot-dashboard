@@ -56,6 +56,11 @@ const mockRoles: GuildRoleOption[] = [
     { id: 'role-2', name: 'Legend', color: 0, position: 2 },
 ]
 
+const mockChannels = [
+    { id: '999', name: 'level-ups', type: 0 },
+    { id: '1000', name: 'bot-spam', type: 0 },
+]
+
 const mockConfig: LevelConfig = {
     id: 'config-1',
     guildId: '123456',
@@ -63,6 +68,11 @@ const mockConfig: LevelConfig = {
     xpPerMessage: 15,
     xpCooldownMs: 60000,
     announceChannel: '999',
+    ignoredChannels: [],
+    ignoredRoles: [],
+    announceMode: 'channel',
+    levelUpMessage: null,
+    stackRewards: true,
     createdAt: new Date('2024-01-01').toISOString(),
     updatedAt: new Date('2024-01-01').toISOString(),
 }
@@ -81,6 +91,11 @@ describe('Levels', () => {
         vi.mocked(api.levels.getRewards).mockResolvedValue(mockRewards)
         vi.mocked(api.guilds.getRbac).mockResolvedValue({
             data: { roles: mockRoles },
+        } as never)
+        // The announce/ignore pickers replaced free-text ID boxes, so the page
+        // now loads the channel list too.
+        vi.mocked(api.guilds.getChannels).mockResolvedValue({
+            data: { channels: mockChannels },
         } as never)
     })
 
@@ -153,10 +168,8 @@ describe('Levels', () => {
         expect(cooldownInput).toBeDefined()
         expect(Number(cooldownInput?.value)).toBe(60000)
 
-        const channelInput = screen.getByPlaceholderText(
-            /channel id \(optional\)/i,
-        )
-        expect(channelInput).toHaveValue('999')
+        // Announce channel is a picker now, not a free-text snowflake box.
+        expect(screen.getByLabelText(/announce channel/i)).toHaveValue('999')
     })
 
     test('loads and displays role rewards', async () => {
@@ -211,6 +224,11 @@ describe('Levels', () => {
                 xpPerMessage: 15,
                 xpCooldownMs: 60000,
                 announceChannel: '999',
+                announceMode: 'channel',
+                levelUpMessage: null,
+                stackRewards: true,
+                ignoredChannels: [],
+                ignoredRoles: [],
             })
         })
 
@@ -297,22 +315,23 @@ describe('Levels', () => {
         expect(cooldownInput.value).toBe('90000')
     })
 
-    test('updates announce channel input', async () => {
+    test('selects an announce channel from the picker', async () => {
         mockGuildStore()
         render(<Levels />)
 
         await waitFor(() => {
             expect(
-                screen.getByPlaceholderText(/channel id \(optional\)/i),
+                screen.getByLabelText(/announce channel/i),
             ).toBeInTheDocument()
         })
 
-        const channelInput = screen.getByPlaceholderText(
-            /channel id \(optional\)/i,
-        ) as HTMLInputElement
-        fireEvent.change(channelInput, { target: { value: '888' } })
+        const channelSelect = screen.getByLabelText(
+            /announce channel/i,
+        ) as HTMLSelectElement
+        // Only real channels are selectable, so a mistyped ID is impossible.
+        fireEvent.change(channelSelect, { target: { value: '1000' } })
 
-        expect(channelInput.value).toBe('888')
+        expect(channelSelect.value).toBe('1000')
     })
 
     test('adds a new reward successfully', async () => {
@@ -321,7 +340,7 @@ describe('Levels', () => {
             id: '3',
             guildId: '123456',
             level: 15,
-            roleId: 'role-3',
+            roleId: 'role-2',
         }
         vi.mocked(api.levels.addReward).mockResolvedValue(newReward)
         const { toast } = await import('sonner')
@@ -333,17 +352,17 @@ describe('Levels', () => {
         })
 
         const levelInput = screen.getByPlaceholderText('e.g. 5')
-        const roleInput = screen.getByPlaceholderText('Role ID')
+        const roleInput = screen.getByLabelText(/role id/i)
         const addButton = screen.getByRole('button', { name: /add reward/i })
 
         fireEvent.change(levelInput, { target: { value: '15' } })
-        fireEvent.change(roleInput, { target: { value: 'role-3' } })
+        fireEvent.change(roleInput, { target: { value: 'role-2' } })
         fireEvent.click(addButton)
 
         await waitFor(() => {
             expect(api.levels.addReward).toHaveBeenCalledWith('123456', {
                 level: 15,
-                roleId: 'role-3',
+                roleId: 'role-2',
             })
         })
 
@@ -378,11 +397,11 @@ describe('Levels', () => {
         })
 
         const levelInput = screen.getByPlaceholderText('e.g. 5')
-        const roleInput = screen.getByPlaceholderText('Role ID')
+        const roleInput = screen.getByLabelText(/role id/i)
         const addButton = screen.getByRole('button', { name: /add reward/i })
 
         fireEvent.change(levelInput, { target: { value: '20' } })
-        fireEvent.change(roleInput, { target: { value: 'role-4' } })
+        fireEvent.change(roleInput, { target: { value: 'role-1' } })
         fireEvent.click(addButton)
 
         await waitFor(() => {
@@ -499,7 +518,9 @@ describe('Levels', () => {
             expect(api.levels.getConfig).toHaveBeenCalled()
         })
 
-        const toggle = await screen.findByRole('switch')
+        // Scoped by name: the settings card also renders a "Stack rewards"
+        // switch, so a bare role query is ambiguous.
+        const toggle = await screen.findByRole('switch', { name: /enable xp/i })
         expect(toggle).toBeChecked()
     })
 
@@ -580,11 +601,11 @@ describe('Levels', () => {
         })
 
         const levelInput = screen.getByPlaceholderText('e.g. 5')
-        const roleInput = screen.getByPlaceholderText('Role ID')
+        const roleInput = screen.getByLabelText(/role id/i)
         const addButton = screen.getByRole('button', { name: /add reward/i })
 
         fireEvent.change(levelInput, { target: { value: '15' } })
-        fireEvent.change(roleInput, { target: { value: 'role-3' } })
+        fireEvent.change(roleInput, { target: { value: 'role-2' } })
         fireEvent.click(addButton)
 
         await waitFor(() => {
