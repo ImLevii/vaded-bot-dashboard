@@ -146,3 +146,17 @@ packages/*/reports/stryker-incremental.json
 # (generated from .env by deploy/pterodactyl/.generate-egg.mjs --local).
 # The tracked egg-vaded-gaming.json always ships with empty/placeholder defaults.
 deploy/pterodactyl/*.local.json
+# Same thing re-downloaded from the panel, which mangles the name into
+# "egg-<display name>.json" (spaces become dashes, so "LOCAL" arrives as
+# "-l-o-c-a-l"). Root-anchored so deploy/pterodactyl/egg-*.json stays tracked.
+/egg-*.json
+
+# yt-dlp on Windows: the equivalent of /.bin/ above, dropped at the repo root
+# by a manual download. 18MB, and streamBridge.ts resolves it via YT_DLP_PATH.
+/yt-dlp.exe
+
+# Ad-hoc media drops at the repo root (AI image/video generator downloads,
+# gif grabs). Committed art belongs under assets/ with a meaningful name.
+/grok-image-*
+/imagine-*
+/[0-9]*-*.gif
