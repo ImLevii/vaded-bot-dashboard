@@ -157,6 +157,11 @@ COPY --from=build /app/packages/shared/dist ./packages/shared/dist
 COPY --from=build /app/packages/shared/src/generated ./packages/shared/src/generated
 COPY --from=build /app/packages/shared/src/generated ./packages/shared/dist/generated
 COPY --from=build /app/packages/bot/dist ./packages/bot/dist
+# vinyl.gif is attached to the now-playing embeds, which reference it as
+# attachment://vinyl.gif. Without the file the embed still sends, it just
+# renders an empty thumbnail — silent, so it's easy to miss that the image
+# only ever worked on checkout-based deploys (Pterodactyl) and never here.
+COPY assets/vinyl.gif ./assets/vinyl.gif
 COPY --from=build /app/prisma ./prisma
 # Bake the Prisma engines. `prisma`/`@prisma/engines` are devDeps, so the
 # deps-production `npm ci --omit=dev` above ships node_modules WITHOUT the

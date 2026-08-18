@@ -1,5 +1,9 @@
 import { QueryType } from 'discord-player'
-import type { ChatInputCommandInteraction, GuildMember } from 'discord.js'
+import type {
+    ChatInputCommandInteraction,
+    GuildMember,
+    VoiceBasedChannel,
+} from 'discord.js'
 
 const SPOTIFY_EXTRACTOR_ID = 'com.discord-player.itsmaat.spotifyextractor'
 import type { CustomClient } from '../../../../types'
@@ -8,7 +12,10 @@ import {
     requireDJRole,
 } from '../../../../utils/command/commandValidations'
 import { resolveGuildQueue } from '../../../../utils/music/queueResolver'
-import { buildPlayResponseEmbed } from '../../../../utils/music/nowPlayingEmbed'
+import {
+    buildPlayResponseEmbed,
+    buildVinylAttachment,
+} from '../../../../utils/music/nowPlayingEmbed'
 import {
     createMusicControlButtons,
     createMusicActionButtons,
@@ -17,11 +24,18 @@ import { createErrorEmbed } from '../../../../utils/general/embeds'
 import { interactionReply } from '../../../../utils/general/interactionReply'
 import { createUserFriendlyError } from '@lucky/shared/utils/general/errorSanitizer'
 import { errorLog, debugLog, warnLog } from '@lucky/shared/utils'
+import { ENVIRONMENT_CONFIG } from '@lucky/shared/config'
 import { withTimeout } from '@lucky/shared/utils/async'
 import { assertDefined } from '@lucky/shared/utils/guards'
 import { isUrl } from './urlNormalization'
 
-export { isUrl, normalizeSoundCloudUrl, normalizeYoutubeUrl, normalizeSpotifyUrl, cleanQueryInput } from './urlNormalization'
+export {
+    isUrl,
+    normalizeSoundCloudUrl,
+    normalizeYoutubeUrl,
+    normalizeSpotifyUrl,
+    cleanQueryInput,
+} from './urlNormalization'
 
 export const DISCORD_UNKNOWN_INTERACTION_CODE = 10062
 
@@ -122,6 +136,21 @@ export function resolveSearchEngine(
     }
 }
 
+/**
+ * IDs of the humans currently in the voice channel, recorded as queue metadata
+ * for the vote-based commands. Shared by /play and /playtop|/playskip so both
+ * capture the same audience.
+ */
+export function collectVoiceMemberIds(
+    voiceChannel: VoiceBasedChannel,
+    clientUser?: { id: string } | null,
+): string[] {
+    if (!voiceChannel.members) return []
+    return Array.from(voiceChannel.members.values())
+        .filter((m) => m.id !== clientUser?.id)
+        .map((m) => m.id)
+}
+
 type PlayAtTopOptions = {
     client: CustomClient
     interaction: ChatInputCommandInteraction
@@ -171,11 +200,33 @@ export async function executePlayAtTop({
 
     try {
         const searchEngine = resolveSearchEngine(query)
+        const vcMemberIds = collectVoiceMemberIds(voiceChannel, client.user)
+        // Same option shape executePlayHandler builds for /play. Omitting
+        // `requestedBy` leaves the resulting Track with no requester, and
+        // sendNowPlayingEmbed reads exactly that field — so a song a user
+        // asked for came back as "Requested by: 🤖 Autoplay / Added
+        // automatically". nodeOptions only take effect when this call is what
+        // creates the queue, but without them a queue first opened by
+        // /playtop has no metadata.channel and never gets a Now Playing embed.
+        const playOptions = {
+            nodeOptions: {
+                metadata: {
+                    channel: interaction.channel,
+                    requestedBy: interaction.user,
+                    vcMemberIds,
+                },
+                connectionTimeout: ENVIRONMENT_CONFIG.PLAYER.CONNECTION_TIMEOUT,
+                leaveOnEmpty: true,
+                leaveOnEmptyCooldown: 30_000,
+                leaveOnEnd: true,
+                leaveOnEndCooldown: 300_000,
+            },
+            requestedBy: interaction.user,
+            searchEngine,
+        }
         let result
         try {
-            result = await client.player.play(voiceChannel, query, {
-                searchEngine,
-            })
+            result = await client.player.play(voiceChannel, query, playOptions)
         } catch (primaryError) {
             if (searchEngine !== QueryType.AUTO) {
                 warnLog({
@@ -187,7 +238,12 @@ export async function executePlayAtTop({
                     },
                 })
                 try {
+                    // Spread playOptions: a fallback arm that rebuilds the
+                    // options from scratch drops the requester and the queue
+                    // metadata, which is how the misattribution above survived
+                    // even after the primary call was fixed.
                     result = await client.player.play(voiceChannel, query, {
+                        ...playOptions,
                         searchEngine: QueryType.YOUTUBE_SEARCH,
                         blockExtractors: [SPOTIFY_EXTRACTOR_ID],
                     })
@@ -198,6 +254,7 @@ export async function executePlayAtTop({
                         data: { query, error: String(youtubeError) },
                     })
                     result = await client.player.play(voiceChannel, query, {
+                        ...playOptions,
                         searchEngine: QueryType.SOUNDCLOUD_SEARCH,
                         blockExtractors: [SPOTIFY_EXTRACTOR_ID],
                     })
@@ -222,15 +279,20 @@ export async function executePlayAtTop({
             return
         }
 
+        // Read after the play() above: when nothing was already playing the
+        // track went straight to the player and never landed in `tracks`, so
+        // an empty list here means "this is playing now", not "position #1".
         const tracks = queue.tracks.toArray()
-        if (tracks.length > 0) {
+        const startedImmediately = tracks.length === 0
+        if (!startedImmediately) {
             queue.node.remove(track)
             queue.insertTrack(track, 0)
             if (skipCurrent) queue.node.skip()
         }
 
+        const showAsNowPlaying = skipCurrent || startedImmediately
         const embed = buildPlayResponseEmbed(
-            skipCurrent
+            showAsNowPlaying
                 ? { kind: 'nowPlaying', track, requestedBy: interaction.user }
                 : {
                       kind: 'addedToQueue',
@@ -239,11 +301,15 @@ export async function executePlayAtTop({
                       queuePosition: 1,
                   },
         )
+        // See executePlayHandler: the nowPlaying layout references
+        // attachment://vinyl.gif, so the file has to be sent with it.
+        const vinyl = showAsNowPlaying ? buildVinylAttachment() : null
 
         await interactionReply({
             interaction,
             content: {
                 embeds: [embed],
+                ...(vinyl ? { files: [vinyl] } : {}),
                 components: [
                     createMusicControlButtons(queue),
                     createMusicActionButtons(queue),

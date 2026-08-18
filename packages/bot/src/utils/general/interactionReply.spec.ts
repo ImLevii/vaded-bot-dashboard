@@ -153,6 +153,29 @@ describe('interactionReply', () => {
             expect(callArgs.embeds).toBeDefined()
         })
 
+        it('forwards attachments and components through to editReply', async () => {
+            // convertTextToEmbed's declared return type mentions only
+            // content/embeds/ephemeral; everything else survives purely because
+            // the implementation spreads. The now-playing embeds reference
+            // attachment://vinyl.gif, so a dropped `files` array renders an
+            // empty thumbnail rather than failing loudly.
+            const file = { name: 'vinyl.gif' }
+            const row = { type: 1, components: [] }
+
+            await interactionReply({
+                interaction: mockInteraction,
+                content: {
+                    embeds: [],
+                    files: [file],
+                    components: [row],
+                } as never,
+            })
+
+            const callArgs = mockInteraction.editReply.mock.calls[0][0]
+            expect(callArgs.files).toEqual([file])
+            expect(callArgs.components).toEqual([row])
+        })
+
         it('does not convert empty content string', async () => {
             await interactionReply({
                 interaction: mockInteraction,

@@ -9,10 +9,14 @@ import { interactionReply } from '../../../../../utils/general/interactionReply'
 import { createUserFriendlyError } from '@lucky/shared/utils/general/errorSanitizer'
 import { collaborativePlaylistService } from '../../../../../utils/music/collaborativePlaylist'
 import { moveUserTrackToPriority } from '../../../../../utils/music/queueManipulation'
-import { buildPlayResponseEmbed } from '../../../../../utils/music/nowPlayingEmbed'
+import {
+    buildPlayResponseEmbed,
+    buildVinylAttachment,
+} from '../../../../../utils/music/nowPlayingEmbed'
 import { registerNowPlayingMessage } from '../../../../../handlers/player/trackNowPlaying'
 import { resolveGuildQueue } from '../../../../../utils/music/queueResolver'
 import {
+    collectVoiceMemberIds,
     isUnknownInteractionError,
     resolveSearchEngine,
     normalizeSoundCloudUrl,
@@ -48,7 +52,10 @@ export async function executePlayHandler({
     }
 
     const member = interaction.member as GuildMember
-    const voiceChannel = assertDefined(member.voice.channel, 'Voice channel guaranteed by requireVoiceChannel check')
+    const voiceChannel = assertDefined(
+        member.voice.channel,
+        'Voice channel guaranteed by requireVoiceChannel check',
+    )
 
     try {
         await interaction.deferReply()
@@ -57,11 +64,15 @@ export async function executePlayHandler({
         throw error
     }
 
-    const rawQuery = cleanQueryInput(interaction.options.getString('query', true))
+    const rawQuery = cleanQueryInput(
+        interaction.options.getString('query', true),
+    )
     // Expand SoundCloud short links first (on.soundcloud.com → full URL)
     const expandedQuery = await expandSoundCloudShortUrl(rawQuery)
     // Then normalize (strip ?in= params, strip unresolvable YouTube mix params)
-    const query = normalizeSpotifyUrl(normalizeYoutubeUrl(normalizeSoundCloudUrl(expandedQuery)))
+    const query = normalizeSpotifyUrl(
+        normalizeYoutubeUrl(normalizeSoundCloudUrl(expandedQuery)),
+    )
     const provider = interaction.options.getString('provider')
     const collaborativeCheck = collaborativePlaylistService.canAddTracks(
         interaction.guildId,
@@ -92,7 +103,10 @@ export async function executePlayHandler({
             try {
                 const deferredMsg = await interaction.fetchReply()
                 registerNowPlayingMessage(
-                    assertDefined(interaction.guildId, 'Guild ID guaranteed by requireGuild check'),
+                    assertDefined(
+                        interaction.guildId,
+                        'Guild ID guaranteed by requireGuild check',
+                    ),
                     deferredMsg.id,
                     interaction.channelId,
                 )
@@ -102,11 +116,7 @@ export async function executePlayHandler({
         }
 
         const searchEngine = resolveSearchEngine(query, provider)
-        const vcMemberIds = voiceChannel.members
-            ? Array.from(voiceChannel.members.values())
-                  .filter((m) => m.id !== client.user?.id)
-                  .map((m) => m.id)
-            : []
+        const vcMemberIds = collectVoiceMemberIds(voiceChannel, client.user)
         const playOptions = {
             nodeOptions: {
                 metadata: {
@@ -177,6 +187,12 @@ export async function executePlayHandler({
                     : queuedTracks.length
                 : 0
 
+        // queuePosition 0 means nothing was pending, so this track went
+        // straight to the player rather than into the queue. Reporting
+        // "Added to Queue" for it contradicted the Position field directly
+        // below, which already rendered `Now` for the same value.
+        const startedImmediately =
+            !result.searchResult.playlist && queuePosition === 0
         const embed = result.searchResult.playlist
             ? buildPlayResponseEmbed({
                   kind: 'playlistQueued',
@@ -189,11 +205,15 @@ export async function executePlayHandler({
                   },
               })
             : buildPlayResponseEmbed({
-                  kind: 'addedToQueue',
+                  kind: startedImmediately ? 'nowPlaying' : 'addedToQueue',
                   track,
                   requestedBy: interaction.user,
                   queuePosition,
               })
+        // The nowPlaying layout puts the spinning vinyl in the thumbnail slot
+        // via attachment://vinyl.gif, so the file has to ride along or Discord
+        // renders an empty thumbnail.
+        const vinyl = startedImmediately ? buildVinylAttachment() : null
 
         try {
             collaborativePlaylistService.recordContribution(
@@ -210,14 +230,17 @@ export async function executePlayHandler({
 
         await interactionReply({
             interaction,
-            content: { embeds: [embed] },
+            content: { embeds: [embed], ...(vinyl ? { files: [vinyl] } : {}) },
         })
 
         // Fire-and-forget: each op is isolated inside runPostPlayBackgroundOps so a
         // single failure never silently skips the others (#1085).
         void runPostPlayBackgroundOps({
             queue,
-            guildId: assertDefined(interaction.guildId, 'Guild ID guaranteed by requireGuild check'),
+            guildId: assertDefined(
+                interaction.guildId,
+                'Guild ID guaranteed by requireGuild check',
+            ),
             track,
             hadQueueBeforePlay,
             isPlaylist,

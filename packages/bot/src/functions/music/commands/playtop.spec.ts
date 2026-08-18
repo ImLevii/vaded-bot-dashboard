@@ -2,7 +2,11 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 
 // Mock discord-player
 jest.mock('discord-player', () => ({
-    QueryType: { AUTO: 'AUTO', SPOTIFY_SEARCH: 'SPOTIFY_SEARCH', YOUTUBE_SEARCH: 'YOUTUBE_SEARCH' },
+    QueryType: {
+        AUTO: 'AUTO',
+        SPOTIFY_SEARCH: 'SPOTIFY_SEARCH',
+        YOUTUBE_SEARCH: 'YOUTUBE_SEARCH',
+    },
 }))
 
 // Mock dependencies before importing the command
@@ -11,12 +15,16 @@ jest.mock('../../../utils/general/interactionReply', () => ({
 }))
 
 jest.mock('../../../utils/general/embeds', () => ({
-    createErrorEmbed: jest.fn((title: string, desc?: string) => ({ title, description: desc })),
+    createErrorEmbed: jest.fn((title: string, desc?: string) => ({
+        title,
+        description: desc,
+    })),
     errorEmbed: jest.fn(),
 }))
 
 jest.mock('../../../utils/music/nowPlayingEmbed', () => ({
     buildPlayResponseEmbed: jest.fn(() => ({ test: 'embed' })),
+    buildVinylAttachment: jest.fn(() => null),
 }))
 
 jest.mock('../../../utils/music/buttonComponents', () => ({
@@ -110,7 +118,10 @@ describe('playtop command', () => {
     it('replies with error when guildId is missing', async () => {
         const interaction = createMockInteraction({ guildId: null })
 
-        await playTopCommand.execute({ client: createMockClient(), interaction } as any)
+        await playTopCommand.execute({
+            client: createMockClient(),
+            interaction,
+        } as any)
 
         expect(interactionReply).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -123,7 +134,7 @@ describe('playtop command', () => {
     })
 
     it('returns early when requireVoiceChannel fails', async () => {
-        (requireVoiceChannel as jest.Mock).mockResolvedValueOnce(false)
+        ;(requireVoiceChannel as jest.Mock).mockResolvedValueOnce(false)
         const client = createMockClient()
         const interaction = createMockInteraction()
 
@@ -133,10 +144,14 @@ describe('playtop command', () => {
     })
 
     it('calls player.play with correct query and search engine', async () => {
-        (requireVoiceChannel as jest.Mock).mockResolvedValueOnce(true)
+        ;(requireVoiceChannel as jest.Mock).mockResolvedValueOnce(true)
         const client = createMockClient()
         const queue = createMockQueue()
-        const interaction = createMockInteraction({ options: { getString: jest.fn().mockReturnValue('spotify:track:abc') } })
+        const interaction = createMockInteraction({
+            options: {
+                getString: jest.fn().mockReturnValue('spotify:track:abc'),
+            },
+        })
         ;(resolveGuildQueue as jest.Mock).mockReturnValue({ queue })
 
         const mockTrack = { id: 'track-1', title: 'Test Track' }
@@ -154,8 +169,68 @@ describe('playtop command', () => {
         )
     })
 
+    it('passes the requesting user so the now-playing embed can attribute the track', async () => {
+        ;(requireVoiceChannel as jest.Mock).mockResolvedValueOnce(true)
+        const client = createMockClient()
+        const queue = createMockQueue()
+        const interaction = createMockInteraction()
+        ;(resolveGuildQueue as jest.Mock).mockReturnValue({ queue })
+
+        client.player.play.mockResolvedValueOnce({
+            track: { id: 'track-1', title: 'Test Track' },
+            searchResult: { playlist: null, tracks: [] },
+        })
+
+        await playTopCommand.execute({ client, interaction } as any)
+
+        expect(client.player.play).toHaveBeenCalledWith(
+            interaction.member.voice.channel,
+            'test query',
+            expect.objectContaining({
+                requestedBy: interaction.user,
+                nodeOptions: expect.objectContaining({
+                    metadata: expect.objectContaining({
+                        requestedBy: interaction.user,
+                    }),
+                }),
+            }),
+        )
+    })
+
+    it('keeps the requesting user on the YouTube fallback arm', async () => {
+        ;(requireVoiceChannel as jest.Mock).mockResolvedValueOnce(true)
+        const client = createMockClient()
+        const queue = createMockQueue()
+        const interaction = createMockInteraction()
+        ;(resolveGuildQueue as jest.Mock).mockReturnValue({ queue })
+
+        client.player.play
+            .mockRejectedValueOnce(new Error('no spotify results'))
+            .mockResolvedValueOnce({
+                track: { id: 'track-1', title: 'Test Track' },
+                searchResult: { playlist: null, tracks: [] },
+            })
+
+        await playTopCommand.execute({ client, interaction } as any)
+
+        expect(client.player.play).toHaveBeenNthCalledWith(
+            2,
+            interaction.member.voice.channel,
+            'test query',
+            expect.objectContaining({
+                searchEngine: 'YOUTUBE_SEARCH',
+                requestedBy: interaction.user,
+                nodeOptions: expect.objectContaining({
+                    metadata: expect.objectContaining({
+                        requestedBy: interaction.user,
+                    }),
+                }),
+            }),
+        )
+    })
+
     it('inserts track at position 0 when queue has tracks', async () => {
-        (requireVoiceChannel as jest.Mock).mockResolvedValueOnce(true)
+        ;(requireVoiceChannel as jest.Mock).mockResolvedValueOnce(true)
         const client = createMockClient()
         const existingTrack = { id: 'track-existing', title: 'Existing' }
         const queue = createMockQueue({
@@ -177,7 +252,7 @@ describe('playtop command', () => {
     })
 
     it('does NOT reposition track when queue is empty', async () => {
-        (requireVoiceChannel as jest.Mock).mockResolvedValueOnce(true)
+        ;(requireVoiceChannel as jest.Mock).mockResolvedValueOnce(true)
         const client = createMockClient()
         const queue = createMockQueue({
             tracks: { toArray: jest.fn().mockReturnValue([]) },
@@ -198,7 +273,7 @@ describe('playtop command', () => {
     })
 
     it('shows error embed when player.play throws', async () => {
-        (requireVoiceChannel as jest.Mock).mockResolvedValueOnce(true)
+        ;(requireVoiceChannel as jest.Mock).mockResolvedValueOnce(true)
         const client = createMockClient()
         const interaction = createMockInteraction()
         ;(resolveGuildQueue as jest.Mock).mockReturnValue({ queue: null })
@@ -220,10 +295,39 @@ describe('playtop command', () => {
     })
 
     it('shows nowPlaying embed on success', async () => {
-        (requireVoiceChannel as jest.Mock).mockResolvedValueOnce(true)
+        ;(requireVoiceChannel as jest.Mock).mockResolvedValueOnce(true)
         const client = createMockClient()
         const queue = createMockQueue({
             tracks: { toArray: jest.fn().mockReturnValue([]) },
+        })
+        const interaction = createMockInteraction()
+        ;(resolveGuildQueue as jest.Mock).mockReturnValue({ queue })
+
+        const mockTrack = { id: 'track-1', title: 'Test Track' }
+        client.player.play.mockResolvedValueOnce({
+            track: mockTrack,
+            searchResult: { playlist: null, tracks: [] },
+        })
+
+        await playTopCommand.execute({ client, interaction } as any)
+
+        // Empty queue: player.play() started the track outright rather than
+        // queueing it, so reporting position #1 would contradict reality.
+        expect(buildPlayResponseEmbed).toHaveBeenCalledWith(
+            expect.objectContaining({
+                kind: 'nowPlaying',
+                track: mockTrack,
+            }),
+        )
+        expect(interactionReply).toHaveBeenCalled()
+    })
+
+    it('reports a queue position when the track was actually queued', async () => {
+        ;(requireVoiceChannel as jest.Mock).mockResolvedValueOnce(true)
+        const client = createMockClient()
+        const existingTrack = { id: 'track-existing', title: 'Existing' }
+        const queue = createMockQueue({
+            tracks: { toArray: jest.fn().mockReturnValue([existingTrack]) },
         })
         const interaction = createMockInteraction()
         ;(resolveGuildQueue as jest.Mock).mockReturnValue({ queue })
@@ -243,6 +347,5 @@ describe('playtop command', () => {
                 queuePosition: 1,
             }),
         )
-        expect(interactionReply).toHaveBeenCalled()
     })
 })

@@ -33,6 +33,7 @@ jest.mock('../../../../utils/music/queueResolver', () => ({
 jest.mock('../../../../utils/music/nowPlayingEmbed', () => ({
     buildPlayResponseEmbed: (...args: unknown[]) =>
         buildPlayResponseEmbedMock(...args),
+    buildVinylAttachment: () => null,
 }))
 jest.mock('../../../../utils/music/buttonComponents', () => ({
     createMusicControlButtons: (...args: unknown[]) =>

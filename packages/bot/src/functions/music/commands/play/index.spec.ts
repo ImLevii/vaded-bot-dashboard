@@ -140,6 +140,7 @@ jest.mock('../../../../utils/general/interactionReply', () => ({
 jest.mock('../../../../utils/music/nowPlayingEmbed', () => ({
     buildPlayResponseEmbed: (payload: unknown) =>
         buildPlayResponseEmbedMock(payload),
+    buildVinylAttachment: () => null,
 }))
 
 jest.mock('../../../../utils/music/buttonComponents', () => ({

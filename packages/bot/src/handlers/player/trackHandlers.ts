@@ -14,6 +14,7 @@ import {
     updateLastFmNowPlaying,
     scrobbleCurrentTrackIfLastFm,
     deleteSongInfoMessage,
+    getSongInfoMessage,
 } from './trackNowPlaying'
 import { musicWatchdogService } from '../../utils/music/watchdog'
 import { musicSessionSnapshotService } from '../../utils/music/sessionSnapshots'
@@ -97,7 +98,6 @@ function isRecommendationAutoplay(track: Track): boolean {
     const metadata = track.metadata as { isAutoplay?: boolean } | undefined
     return metadata?.isAutoplay === true
 }
-
 
 async function recordImplicitTrackFeedback(
     track: Track,
@@ -251,9 +251,21 @@ const handlePlayerStart = async (
 
         try {
             // set "Listening to <track>" bot status
-            client.user?.setActivity(track.title, { type: ActivityType.Listening })
-            // always post a fresh embed so every track gets its own message
-            deleteSongInfoMessage(queue.guild.id)
+            client.user?.setActivity(track.title, {
+                type: ActivityType.Listening,
+            })
+            // Every track gets its own message — except the one /play
+            // pre-registers for the track it is about to start. That
+            // registration carries no trackUrl yet (executePlayHandler has no
+            // track when it registers), which is what distinguishes it from a
+            // previous track's now-playing message. Dropping it unconditionally
+            // made sendNowPlayingEmbed's edit path unreachable on the first
+            // track, so the command's own reply was always followed by a
+            // second, near-identical embed.
+            const registered = getSongInfoMessage(queue.guild.id)
+            if (registered?.trackUrl !== undefined) {
+                deleteSongInfoMessage(queue.guild.id)
+            }
             await sendNowPlayingEmbed(queue, track, isAutoplay)
             await updateLastFmNowPlaying(queue, track)
             await voiceStatus.setTrackStatus(queue)
