@@ -222,6 +222,29 @@ function spawnService(service) {
     return child
 }
 
+// Hosts that use this launcher (Pterodactyl et al.) have no yt-dlp on PATH.
+// The egg's install.sh downloads a static build into .bin/, but that download
+// is non-fatal when it fails, and an AUTO_UPDATE rebuild never re-provisions
+// it — so the stack can come up without one. The bot then spawns `yt-dlp` per
+// track, gets ENOENT, and silently degrades to the SoundCloud bridge (which
+// fails outright for anything SoundCloud has no match for). The dev launcher
+// (packages/bot/scripts/start.mjs) already self-heals this; do the same here so
+// it doesn't depend on which entry point started the bot. Children are spawned
+// with `env: process.env`, so the YT_DLP_PATH set below reaches them.
+try {
+    const { ensureYtDlp } = await import(
+        '../packages/bot/scripts/ensureYtDlp.mjs'
+    )
+    await ensureYtDlp()
+} catch (error) {
+    // Never block startup on this: everything but yt-dlp-backed sources works.
+    // Also covers images that ship dist without packages/bot/scripts.
+    console.error(
+        '[panel] yt-dlp provisioning skipped:',
+        error instanceof Error ? error.message : error,
+    )
+}
+
 for (const service of services) {
     service.process = spawnService(service)
 }

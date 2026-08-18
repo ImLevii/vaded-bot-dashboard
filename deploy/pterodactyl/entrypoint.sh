@@ -63,13 +63,18 @@ export DIRECT_URL="${DIRECT_URL:-$DATABASE_URL}"
 export METRICS_DISABLED="${METRICS_DISABLED:-true}"
 
 # Static yt-dlp provisioned by install.sh; streamBridge.ts resolves it via
-# YT_DLP_PATH. Missing binary is a warning, not a boot failure — everything
-# except yt-dlp-backed sources still works.
+# YT_DLP_PATH. Probe it by actually running it rather than testing -x: the
+# standalone release is a PyInstaller one-file bundle, so a truncated download
+# is still an executable file that fails every extraction. Exporting
+# YT_DLP_PATH for such a copy would suppress the self-heal in
+# scripts/start-panel.mjs, which only re-downloads when the var is unset.
+# Missing binary is a note, not a boot failure — the launcher fetches one, and
+# everything except yt-dlp-backed sources works meanwhile.
 if [ -z "${YT_DLP_PATH:-}" ]; then
-    if [ -x /home/container/.bin/yt-dlp ]; then
+    if /home/container/.bin/yt-dlp --version >/dev/null 2>&1; then
         export YT_DLP_PATH=/home/container/.bin/yt-dlp
     else
-        echo "[entrypoint] WARNING: /home/container/.bin/yt-dlp not found — YouTube/SoundCloud playback via yt-dlp will fail. Reinstall the server to restore it." >&2
+        echo "[entrypoint] NOTE: /home/container/.bin/yt-dlp is missing or unusable — the launcher will download a fresh static build at startup. If that also fails, YouTube playback falls back to SoundCloud and may not resolve every track." >&2
     fi
 fi
 
