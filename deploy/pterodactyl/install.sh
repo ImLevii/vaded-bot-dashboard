@@ -166,12 +166,28 @@ case "$ARCH" in
 esac
 log "Downloading static yt-dlp (${YTDLP_ASSET})..."
 mkdir -p .bin
-if curl -fsSL --connect-timeout 10 --max-time 180 -o .bin/yt-dlp \
+# Download to a temp name and move it into place only once it is complete and
+# executable. Writing straight to .bin/yt-dlp left a partial, non-executable
+# (0644) file behind whenever curl failed midway — which reads as "present" to
+# every later check and fails every spawn with EACCES instead of the missing
+# binary the entrypoint knows how to replace.
+if curl -fsSL --connect-timeout 10 --max-time 180 -o .bin/yt-dlp.download \
     "https://github.com/yt-dlp/yt-dlp/releases/latest/download/${YTDLP_ASSET}"; then
-    chmod 755 .bin/yt-dlp
+    chmod 755 .bin/yt-dlp.download
+    if .bin/yt-dlp.download --version >/dev/null 2>&1; then
+        mv -f .bin/yt-dlp.download .bin/yt-dlp
+    else
+        # A binary that spawns but won't report its version is a truncated or
+        # unusable bundle; keeping it would mask the problem behind per-track
+        # failures for the life of the install.
+        rm -f .bin/yt-dlp.download
+        echo "[install] WARNING: downloaded yt-dlp failed --version; discarding it." \
+             "YouTube playback falls back to SoundCloud until the launcher fetches a working copy." >&2
+    fi
 else
     # Non-fatal: only YouTube/SoundCloud playback via yt-dlp is affected, and
     # the entrypoint prints a warning when the binary is missing.
+    rm -f .bin/yt-dlp.download
     echo "[install] WARNING: yt-dlp download failed; YouTube playback will not work" \
          "until /home/container/.bin/yt-dlp exists." >&2
 fi

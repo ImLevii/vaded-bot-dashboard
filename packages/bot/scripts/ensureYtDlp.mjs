@@ -1,10 +1,15 @@
 /**
- * Self-heals a missing yt-dlp binary on hosts that don't have one on PATH
- * (e.g. Pterodactyl's generic nodejs egg, which has no Python/yt-dlp baked
- * in, unlike this project's own Docker image). Downloads yt-dlp's
- * standalone release binary once into a persisted local cache dir and
- * points YT_DLP_PATH at it so streamBridge.ts's resolveYtDlpExecutable()
- * picks it up without any further configuration.
+ * Self-heals a missing *or unusable* yt-dlp binary on hosts that don't have one
+ * on PATH (e.g. Pterodactyl's generic nodejs egg, which has no Python/yt-dlp
+ * baked in, unlike this project's own Docker image). Downloads yt-dlp's
+ * standalone release binary once into a persisted local cache dir and points
+ * YT_DLP_PATH at it so streamBridge.ts's resolveYtDlpExecutable() picks it up
+ * without any further configuration.
+ *
+ * Every candidate is verified by running it, including an inherited
+ * YT_DLP_PATH. resolveYtDlpExecutable() passes that value straight to spawn, so
+ * an unrunnable one is not a configuration detail — it is every track failing
+ * with the same EACCES/ENOENT until someone reads the logs.
  */
 import { spawnSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
@@ -44,8 +49,51 @@ function isOnPath() {
     return runsSuccessfully('yt-dlp')
 }
 
+/**
+ * Restores the executable bit on a binary that is present but won't spawn.
+ * The static release needs nothing but +x, and a copy that landed without it
+ * — install.sh only chmods when its curl succeeds, so a failed download leaves
+ * a 0644 file behind — fails every spawn with EACCES, forever. Repairing costs
+ * one syscall; re-downloading costs 30MB and can fail on its own.
+ */
+async function repairExecutableBit(path) {
+    try {
+        await chmod(path, 0o755)
+    } catch {
+        return false
+    }
+    return runsSuccessfully(path)
+}
+
 export async function ensureYtDlp() {
-    if (process.env.YT_DLP_PATH?.trim()) return
+    const configuredPath = process.env.YT_DLP_PATH?.trim()
+    if (configuredPath) {
+        // Verify rather than trust. resolveYtDlpExecutable() hands this value
+        // straight to spawn, so a stale or unusable YT_DLP_PATH (an older
+        // entrypoint exported it without probing; a panel variable points at a
+        // binary that never downloaded) made every track fail identically
+        // while this self-heal returned early on the strength of the variable
+        // alone — the one case it exists for.
+        if (runsSuccessfully(configuredPath)) return
+
+        if (existsSync(configuredPath)) {
+            if (await repairExecutableBit(configuredPath)) {
+                console.warn(
+                    `[ensureYtDlp] restored the executable bit on YT_DLP_PATH=${configuredPath}`,
+                )
+                return
+            }
+        }
+
+        // Leaving it set would keep pointing the bridge at a binary that
+        // cannot run; clearing it lets the PATH lookup and the download below
+        // take over.
+        console.warn(
+            `[ensureYtDlp] YT_DLP_PATH=${configuredPath} cannot be executed — ignoring it and re-provisioning`,
+        )
+        delete process.env.YT_DLP_PATH
+    }
+
     if (isOnPath()) return
 
     const assetName = releaseAssetName()
@@ -59,6 +107,15 @@ export async function ensureYtDlp() {
 
     if (existsSync(targetPath)) {
         if (runsSuccessfully(targetPath)) {
+            process.env.YT_DLP_PATH = targetPath
+            return
+        }
+        // A cached copy that only lost its executable bit is intact; fix it
+        // before spending a fresh download on it.
+        if (await repairExecutableBit(targetPath)) {
+            console.warn(
+                `[ensureYtDlp] restored the executable bit on ${targetPath}`,
+            )
             process.env.YT_DLP_PATH = targetPath
             return
         }

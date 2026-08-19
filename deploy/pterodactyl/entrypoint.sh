@@ -70,7 +70,24 @@ export METRICS_DISABLED="${METRICS_DISABLED:-true}"
 # scripts/start-panel.mjs, which only re-downloads when the var is unset.
 # Missing binary is a note, not a boot failure — the launcher fetches one, and
 # everything except yt-dlp-backed sources works meanwhile.
+#
+# An inherited YT_DLP_PATH gets the same probe rather than a free pass: a panel
+# variable (or an older entrypoint that exported the path without checking it)
+# pointing at a binary that never downloaded made every track fail with
+# `spawn ... EACCES` while suppressing both self-heals.
+if [ -n "${YT_DLP_PATH:-}" ] && ! "$YT_DLP_PATH" --version >/dev/null 2>&1; then
+    echo "[entrypoint] NOTE: YT_DLP_PATH=${YT_DLP_PATH} cannot be run (missing, not executable, or a truncated download) — ignoring it so the launcher can provision a working copy." >&2
+    unset YT_DLP_PATH
+fi
+
 if [ -z "${YT_DLP_PATH:-}" ]; then
+    # install.sh only chmods when its curl succeeded, so a failed download can
+    # leave a non-executable file that looks present. One chmod is cheaper than
+    # the 30MB re-download the launcher would otherwise do.
+    if [ -f /home/container/.bin/yt-dlp ] && [ ! -x /home/container/.bin/yt-dlp ]; then
+        chmod 755 /home/container/.bin/yt-dlp 2>/dev/null || true
+    fi
+
     if /home/container/.bin/yt-dlp --version >/dev/null 2>&1; then
         export YT_DLP_PATH=/home/container/.bin/yt-dlp
     else
