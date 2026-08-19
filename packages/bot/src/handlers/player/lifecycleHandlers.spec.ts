@@ -89,6 +89,37 @@ describe('setupLifecycleHandlers', () => {
         expect(watchdogArmMock).toHaveBeenCalledWith(queue)
     })
 
+    // watchdog.ts orphan recovery and sessionStartupRestore.ts connect a queue
+    // and restore its snapshot themselves (with their own options — e.g.
+    // skipCurrentTrack), then this handler also fires on the same connect().
+    // Without the flag both restores raced: restoreSnapshot() no-ops once
+    // queue.currentTrack is set, so whichever call lost the race silently
+    // reported restoredCount: 0 while the winner had already started playback,
+    // ignoring the caller's own options entirely.
+    it('does not restore when the queue opts out via metadata', async () => {
+        const handlers: Record<string, PlayerEventHandler> = {}
+        const player = {
+            events: {
+                on: jest.fn((event: string, handler: PlayerEventHandler) => {
+                    handlers[event] = handler
+                }),
+            },
+        }
+        setupLifecycleHandlers(player)
+
+        const queue = {
+            guild: { id: 'guild-1', name: 'Guild 1' },
+            metadata: { skipConnectionEventRestore: true },
+            connection: { state: { status: 'ready' }, joinConfig: {} },
+        } as unknown as GuildQueue
+
+        await handlers.connection(queue)
+
+        expect(restoreSnapshotMock).not.toHaveBeenCalled()
+        // The caller still needs stall detection once it's done restoring.
+        expect(watchdogArmMock).toHaveBeenCalledWith(queue)
+    })
+
     it('aborts the restore and continues with an empty queue when it exceeds the deadline', async () => {
         jest.useFakeTimers()
         let capturedSignal: AbortSignal | undefined

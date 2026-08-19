@@ -114,4 +114,29 @@ describe('restoreSessionsOnStartup', () => {
         expect(deleteSnapshotMock).toHaveBeenCalledWith('g1')
         expect(restoreSnapshotMock).not.toHaveBeenCalled()
     })
+
+    // connect() fires discord-player's 'connection' event, which
+    // lifecycleHandlers.ts also uses to restore the same snapshot. Without this
+    // flag both calls race: restoreSnapshot() no-ops once queue.currentTrack is
+    // set, so whichever call loses silently reports restoredCount: 0 while the
+    // other has already started playback.
+    it('marks the queue so the connection-event handler does not also restore', async () => {
+        listGuildIdsMock.mockResolvedValue(['g1'])
+        getSnapshotMock.mockResolvedValue({
+            savedAt: Date.now() - 60_000,
+            voiceChannelId: 'vc-1',
+        })
+
+        const client = clientWith('g1')
+        await restoreSessionsOnStartup(client)
+
+        expect(client.player.nodes.create).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.objectContaining({
+                metadata: expect.objectContaining({
+                    skipConnectionEventRestore: true,
+                }),
+            }),
+        )
+    })
 })

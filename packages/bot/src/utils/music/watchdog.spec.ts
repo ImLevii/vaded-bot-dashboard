@@ -234,7 +234,15 @@ describe('MusicWatchdogService — orphan session monitor', () => {
         const service = new MusicWatchdogService()
         await service.scanOrphanSessions(player)
 
-        expect(nodes.create).toHaveBeenCalledWith(guild)
+        // The metadata flag stops lifecycleHandlers.ts's 'connection' handler
+        // from ALSO restoring this snapshot. Both would otherwise race:
+        // restoreSnapshot() no-ops once queue.currentTrack is set, so whichever
+        // call lost reported restoredCount: 0 while the other had already
+        // started playback — replaying the track skipCurrentTrack (below)
+        // exists specifically to avoid, in a loop, every scan interval.
+        expect(nodes.create).toHaveBeenCalledWith(guild, {
+            metadata: { skipConnectionEventRestore: true },
+        })
         expect(queue.connect).toHaveBeenCalledWith(voiceChannel)
         expect(restoreSnapshotMock).toHaveBeenCalledWith(queue, undefined, {
             skipCurrentTrack: true,

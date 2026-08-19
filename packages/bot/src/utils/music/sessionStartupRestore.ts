@@ -85,8 +85,19 @@ export async function restoreSessionsOnStartup(
                 continue
             }
 
+            // skipConnectionEventRestore: this function owns the restore call
+            // below, so the 'connection' event handler in lifecycleHandlers.ts
+            // must not also restore. Without it, the two calls race — whichever
+            // wins consumes the snapshot (restoreSnapshot() no-ops once
+            // queue.currentTrack is set) and the loser silently reports
+            // restoredCount: 0, undermining the diagnostics and any options
+            // passed only to the call below.
             const queue = client.player.nodes.create(guild, {
-                metadata: { channel: null, requestedBy: null },
+                metadata: {
+                    channel: null,
+                    requestedBy: null,
+                    skipConnectionEventRestore: true,
+                },
             })
 
             if (!queue.connection) {

@@ -54,8 +54,11 @@ export const setupLifecycleHandlers = (player: {
             })
         }
 
-        if (ENVIRONMENT_CONFIG.MUSIC.SESSION_RESTORE_ENABLED) {
-            const metadata = queue.metadata as QueueMetadata | undefined
+        const metadata = queue.metadata as QueueMetadata | undefined
+        if (
+            ENVIRONMENT_CONFIG.MUSIC.SESSION_RESTORE_ENABLED &&
+            !metadata?.skipConnectionEventRestore
+        ) {
             // Abort the restore if the deadline wins the race, so a slow restore
             // can't keep enqueueing tracks after we've moved on with an empty queue.
             const restoreController = new AbortController()

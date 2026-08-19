@@ -337,7 +337,11 @@ export class MusicWatchdogService {
             data: { guildId, voiceChannelId, snapshotAgeMs: ageMs },
         })
 
-        const queue = existingQueue ?? player.nodes.create(guild)
+        const queue =
+            existingQueue ??
+            player.nodes.create(guild, {
+                metadata: { skipConnectionEventRestore: true },
+            })
         const createdQueue = !existingQueue
         if (createdQueue) {
             // Deliberately does NOT set repeat mode 3 (AUTOPLAY). It used to:
@@ -345,6 +349,15 @@ export class MusicWatchdogService {
             // the guild's setting, so when the restore below found nothing,
             // autoplay pulled the last track out of history and played it —
             // the bot rejoining an ended session and replaying the song.
+            //
+            // metadata.skipConnectionEventRestore stops the 'connection' event
+            // handler (lifecycleHandlers.ts) from ALSO restoring this snapshot.
+            // Both connect() and the explicit restoreSnapshot() below race
+            // otherwise: restoreSnapshot() no-ops once queue.currentTrack is
+            // set, so whichever call lost the race reported
+            // restoredCount: 0 here while the *other* one had already started
+            // playback — replaying the exact track skipCurrentTrack below
+            // exists to avoid, on a loop, every time this scan ran.
             await queue.connect(voiceChannel)
         }
 
