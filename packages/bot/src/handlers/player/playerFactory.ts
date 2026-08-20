@@ -24,6 +24,17 @@ export const createPlayer = ({ client }: CreatePlayerParams): Rainlink => {
                     enable: true,
                     engine: 'youtube',
                 },
+                // rainlink's own defaults (3s / 15 attempts) hammer the node
+                // every ~3s regardless of why it disconnected. Fine for a
+                // transient blip, actively counterproductive against a node
+                // that just rejected us for connecting too often — reproduced
+                // in production against a rate-limited public node ("Too many
+                // websocket connections attempt for this bot, try again
+                // later"): the tight retry loop never let the rate limit
+                // window reset. 30s apart, 10 attempts (5 minutes total)
+                // gives a real cooldown before giving up.
+                retryTimeout: 30_000,
+                retryCount: 10,
             },
         })
 
