@@ -1,4 +1,4 @@
-import type { GuildQueue } from 'discord-player'
+import type { RainlinkQueueAdapter as GuildQueue } from '../utils/music/rainlinkAdapter'
 import type { VoiceBasedChannel } from 'discord.js'
 import { debugLog, errorLog } from '@lucky/shared/utils'
 

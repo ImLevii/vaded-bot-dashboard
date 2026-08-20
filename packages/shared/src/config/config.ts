@@ -263,6 +263,14 @@ export const ENVIRONMENT_CONFIG = {
             CLIENT_SECRET: process.env.SPOTIFY_CLIENT_SECRET,
         }
     },
+    get LAVALINK() {
+        return {
+            HOST: process.env.LAVALINK_HOST ?? 'localhost',
+            PORT: parseIntEnv('LAVALINK_PORT', 2333),
+            PASSWORD: process.env.LAVALINK_PASSWORD ?? 'youshallnotpass',
+            SECURE: process.env.LAVALINK_SECURE === 'true',
+        }
+    },
 }
 
 export type EnvironmentConfig = typeof ENVIRONMENT_CONFIG

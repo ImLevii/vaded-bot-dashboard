@@ -1,97 +1,21 @@
-﻿import { SlashCommandBuilder } from '@discordjs/builders'
+import { SlashCommandBuilder } from '@discordjs/builders'
 import Command from '../../../models/Command'
 import { interactionReply } from '../../../utils/general/interactionReply'
-import { createErrorEmbed, createSuccessEmbed } from '../../../utils/general/embeds'
+import { createErrorEmbed } from '../../../utils/general/embeds'
 import type { CommandExecuteParams } from '../../../types/CommandData'
-import type { ChatInputCommandInteraction } from 'discord.js'
-import type { GuildQueue, QueueFilters } from 'discord-player'
-import {
-    requireGuild,
-    requireQueue,
-    requireIsPlaying,
-    requireDJRole,
-} from '../../../utils/command/commandValidations'
-import { resolveGuildQueue } from '../../../utils/music/queueResolver'
-import { assertDefined } from '@lucky/shared/utils/guards'
 
-const BASS_BOOST_LEVELS: Record<number, (keyof QueueFilters)[]> = {
-    0: [],
-    1: ['bassboost_low'],
-    2: ['bassboost_low'],
-    3: ['bassboost'],
-    4: ['bassboost'],
-    5: ['bassboost_high'],
-}
-
-async function replyError(interaction: ChatInputCommandInteraction, message: string): Promise<void> {
-    await interactionReply({ interaction, content: { embeds: [createErrorEmbed('Error', message)] } })
-}
-
-async function handleBassBoost(
-    queue: GuildQueue,
-    level: number,
-    interaction: ChatInputCommandInteraction,
-): Promise<void> {
-    if (level < 0 || level > 5) {
-        await replyError(interaction, '🔊 Bass boost level must be between 0 and 5!')
-        return
-    }
-
-    try {
-        const filters = BASS_BOOST_LEVELS[level] ?? []
-        if (filters.length > 0) {
-            await queue.filters.ffmpeg.toggle(filters)
-        } else {
-            await queue.filters.ffmpeg.toggle(['bassboost_high'])
-            await queue.filters.ffmpeg.toggle(['bassboost_high'])
-        }
-
-        const message = level === 0 ? 'Bass boost disabled' : `Bass boost level set to ${level}`
-        await interactionReply({
-            interaction,
-            content: { embeds: [createSuccessEmbed('Bass boost', `🔊 ${message}`)] },
-        })
-    } catch {
-        await replyError(interaction, 'Failed to apply bass boost effect.')
-    }
-}
-
-async function handleNightcore(
-    queue: GuildQueue,
-    interaction: ChatInputCommandInteraction,
-): Promise<void> {
-    try {
-        const enabled = queue.filters.resampler?.toggleFilter('nightcore') ?? false
-        const message = enabled ? 'Nightcore enabled' : 'Nightcore disabled'
-        await interactionReply({
-            interaction,
-            content: { embeds: [createSuccessEmbed('Nightcore', `<a:music:741605543046807626> ${message}`)] },
-        })
-    } catch {
-        await replyError(interaction, 'Failed to toggle nightcore effect.')
-    }
-}
-
-async function handleReset(
-    queue: GuildQueue,
-    interaction: ChatInputCommandInteraction,
-): Promise<void> {
-    try {
-        await queue.filters.ffmpeg.setFilters([])
-        queue.filters.resampler?.toggleFilter('nightcore')
-        await interactionReply({
-            interaction,
-            content: { embeds: [createSuccessEmbed('Effects reset', '✨ All effects have been cleared.')] },
-        })
-    } catch {
-        await replyError(interaction, 'Failed to reset effects.')
-    }
-}
-
+// Temporarily unavailable — this command drove discord-player's FFmpeg-based
+// filter chain (queue.filters.ffmpeg/.resampler), which has no direct
+// equivalent under rainlink (Lavalink applies filters server-side via
+// RainlinkPlayer#filter, a different prebuilt-filter-name model). Needs a
+// dedicated rewrite, not part of the core-playback scope of the Lavalink
+// migration.
 export default new Command({
     data: new SlashCommandBuilder()
         .setName('effects')
-        .setDescription('<a:music:741605543046807626> Apply audio effects to the current track')
+        .setDescription(
+            '<a:music:741605543046807626> Apply audio effects to the current track',
+        )
         .addSubcommand((sub) =>
             sub
                 .setName('bassboost')
@@ -111,28 +35,21 @@ export default new Command({
                 .setDescription('Toggle nightcore audio effect'),
         )
         .addSubcommand((sub) =>
-            sub
-                .setName('reset')
-                .setDescription('Clear all audio effects'),
+            sub.setName('reset').setDescription('Clear all audio effects'),
         ),
     category: 'music',
-    execute: async ({ client, interaction }: CommandExecuteParams) => {
-        if (!(await requireGuild(interaction))) return
-        if (!(await requireDJRole(interaction, assertDefined(interaction.guildId, 'Guild ID required after requireGuild check')))) return
-
-        const { queue } = resolveGuildQueue(client, interaction.guildId ?? '')
-        if (!(await requireQueue(queue, interaction))) return
-        if (!(await requireIsPlaying(queue, interaction))) return
-
-        const subcommand = interaction.options.getSubcommand()
-
-        if (subcommand === 'bassboost') {
-            const level = interaction.options.getInteger('level', true)
-            await handleBassBoost(assertDefined(queue, 'queue present after requireQueue guard'), level, interaction)
-        } else if (subcommand === 'nightcore') {
-            await handleNightcore(assertDefined(queue, 'queue present after requireQueue guard'), interaction)
-        } else if (subcommand === 'reset') {
-            await handleReset(assertDefined(queue, 'queue present after requireQueue guard'), interaction)
-        }
+    execute: async ({ interaction }: CommandExecuteParams) => {
+        await interactionReply({
+            interaction,
+            content: {
+                embeds: [
+                    createErrorEmbed(
+                        'Temporarily unavailable',
+                        'Audio effects are being rebuilt for the new Lavalink-based player and are not available right now.',
+                    ),
+                ],
+                ephemeral: true,
+            },
+        })
     },
 })

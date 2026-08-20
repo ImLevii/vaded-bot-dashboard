@@ -126,7 +126,7 @@ export default new Command({
             return
         }
 
-        queue?.node.seek(targetMs)
+        await queue?.node.seek(targetMs)
 
         const formattedTime = formatMs(targetMs)
         const trackEmbed = buildCommandTrackEmbed(

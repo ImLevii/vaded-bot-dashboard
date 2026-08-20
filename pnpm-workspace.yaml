@@ -2,10 +2,15 @@ packages:
   - 'packages/*'
 
 allowBuilds:
+  '@discordjs/opus': true
   '@prisma/engines': true
+  '@swc/core': true
+  esbuild: true
+  ffmpeg-static: true
   msgpackr-extract: true
   prisma: true
   unrs-resolver: true
+  youtube-dl-exec: true
 
 blockExoticSubdeps: true
 minimumReleaseAge: 10080

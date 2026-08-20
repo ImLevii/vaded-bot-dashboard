@@ -1,14 +1,12 @@
-import { QueryType, type Track, type GuildQueue } from 'discord-player'
+import type {
+    RainlinkTrackAdapter as Track,
+    RainlinkQueueAdapter as GuildQueue,
+} from './rainlinkAdapter'
 import { errorLog } from '@lucky/shared/utils'
-import { replenishQueue } from './autoplay/replenisher'
 
 const HISTORY_SEED_LIMIT = 3
 const QUEUE_RESCUE_PROBE_TIMEOUT_MS = Number.parseInt(
     process.env.QUEUE_RESCUE_PROBE_TIMEOUT_MS ?? '5000',
-    10,
-)
-const QUEUE_RESCUE_REFILL_THRESHOLD = Number.parseInt(
-    process.env.QUEUE_RESCUE_REFILL_THRESHOLD ?? '3',
     10,
 )
 
@@ -37,7 +35,7 @@ async function probeTrackResolvable(
     let timeoutId: ReturnType<typeof setTimeout> | undefined
     try {
         const result = await Promise.race([
-            queue.player.search(query, { searchEngine: QueryType.AUTO }),
+            queue.search(query),
             new Promise<null>(
                 (resolve) =>
                     (timeoutId = setTimeout(() => resolve(null), timeoutMs)),
@@ -60,7 +58,6 @@ export async function rescueQueue(
     const {
         probeResolvable = false,
         probeTimeoutMs = QUEUE_RESCUE_PROBE_TIMEOUT_MS,
-        refillThreshold = QUEUE_RESCUE_REFILL_THRESHOLD,
     } = opts
 
     try {
@@ -92,16 +89,13 @@ export async function rescueQueue(
             queue.addTrack(track)
         }
 
-        const beforeReplenish = queue.tracks.size
-        if (queue.currentTrack && queue.tracks.size < refillThreshold) {
-            await replenishQueue(queue)
-        }
-        const addedTracks = Math.max(0, queue.tracks.size - beforeReplenish)
-
+        // Auto-replenishment after a rescue is autoplay-engine functionality,
+        // currently deferred — see
+        // decisions/2026-06-10-defer-autoplay-engine-extraction.md.
         return {
             removedTracks,
             keptTracks: keptTracks.length,
-            addedTracks,
+            addedTracks: 0,
         }
     } catch (error) {
         errorLog({ message: 'Error rescuing queue:', error })
@@ -114,15 +108,7 @@ export async function rescueQueue(
 }
 
 function getAllHistoryTracks(queue: GuildQueue): Track[] {
-    const history = queue.history as
-        | { tracks?: { toArray?: () => Track[]; data?: Track[] } }
-        | undefined
-
-    if (!history?.tracks) return []
-    if (typeof history.tracks.toArray === 'function')
-        return history.tracks.toArray()
-    if (Array.isArray(history.tracks.data)) return history.tracks.data
-    return []
+    return queue.history.tracks.data
 }
 
 export function getHistoryTracks(queue: GuildQueue): Track[] {

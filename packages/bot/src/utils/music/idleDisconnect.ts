@@ -1,10 +1,9 @@
-import type { GuildQueue } from 'discord-player'
+import type { RainlinkQueueAdapter as GuildQueue } from './rainlinkAdapter'
 import { guildSettingsService } from '@lucky/shared/services'
 import { debugLog, errorLog } from '@lucky/shared/utils'
 import { musicWatchdogService } from './watchdog'
 import { musicSessionSnapshotService } from './sessionSnapshots'
 import { collaborativePlaylistService } from './collaborativePlaylist'
-import type { QueueMetadata } from '../../types/QueueMetadata'
 
 const idleTimers = new Map<string, ReturnType<typeof setTimeout>>()
 
@@ -52,12 +51,12 @@ async function disconnectIdle(queue: GuildQueue): Promise<void> {
     debugLog({ message: 'Idle disconnect triggered', data: { guildId } })
 
     try {
-        const metadata = queue.metadata as QueueMetadata | undefined
+        const metadata = queue.metadata
         musicWatchdogService.markIntentionalStop(guildId)
         // Otherwise the snapshot outlives the intentional-stop window and the
         // next orphan sweep rejoins the channel the bot just left for idleness.
         await musicSessionSnapshotService.deleteSnapshot(guildId)
-        queue.delete()
+        await queue.delete()
         // Clear collaborative state only after the queue is actually torn
         // down, so a delete failure doesn't reset state for a live session.
         collaborativePlaylistService.clearGuildState(guildId)

@@ -1,5 +1,4 @@
-import type { Track, GuildQueue } from 'discord-player'
-import { QueueRepeatMode } from 'discord-player'
+import { RainlinkLoopMode } from 'rainlink'
 import type { ColorResolvable } from 'discord.js'
 import { EmbedBuilder } from 'discord.js'
 import { LRUCache } from 'lru-cache'
@@ -11,7 +10,10 @@ import {
     createMusicControlButtons,
     createMusicActionButtons,
 } from '../../utils/music/buttonComponents'
-import type { QueueMetadata } from '../../types/QueueMetadata'
+import type {
+    RainlinkQueueAdapter,
+    RainlinkTrackAdapter,
+} from '../../utils/music/rainlinkAdapter'
 import { getPerSourceAcceptanceRateCached } from '../../utils/music/autoplay/autoplayAcceptanceCache'
 import {
     isLastFmConfigured,
@@ -20,7 +22,6 @@ import {
     updateNowPlaying as lastFmUpdateNowPlaying,
     scrobble as lastFmScrobble,
 } from '../../lastfm'
-import { getStreamBridgeFallbackLabel } from './streamBridge'
 
 /**
  * Manages per-guild now-playing state with automatic TTL + explicit cleanup
@@ -86,7 +87,7 @@ const trackNowPlayingState = new TrackNowPlayingState()
 /**
  * Register an existing message as the "now playing" display for a guild.
  * Used by the /play command to pre-register its interaction reply so that
- * the playerStart handler edits it (with buttons) instead of sending a
+ * the trackStart handler edits it (with buttons) instead of sending a
  * duplicate "Now Playing" message.
  */
 export function registerNowPlayingMessage(
@@ -118,14 +119,11 @@ export function cleanupGuildState(guildId: string): void {
 }
 
 function getLastFmRequesterId(
-    queue: GuildQueue,
-    track: Track,
+    queue: RainlinkQueueAdapter,
+    track: RainlinkTrackAdapter,
 ): string | undefined {
-    const metadataRequester = (
-        track.metadata as { requestedById?: unknown } | undefined
-    )?.requestedById
-    const queueRequester = (queue.metadata as QueueMetadata | undefined)
-        ?.requestedBy?.id
+    const metadataRequester = track.metadata.requestedById
+    const queueRequester = queue.metadata.requestedBy?.id
     const fallbackRequester =
         typeof metadataRequester === 'string' ? metadataRequester : undefined
     return track.requestedBy?.id ?? fallbackRequester ?? queueRequester
@@ -161,83 +159,71 @@ async function appendAcceptanceRate(
     }
 }
 
-function buildProgressBar(posMs: number, durMs: number): string {
-    const width = 18
-    if (!durMs || durMs <= 0) return `${'▬'.repeat(width)}◉`
-    const ratio = Math.min(posMs / durMs, 1)
-    const filled = Math.round(ratio * width)
-    return '▬'.repeat(filled) + '◉' + '─'.repeat(Math.max(0, width - filled))
-}
-
 function msToTimestamp(ms: number): string {
     const secs = Math.floor(ms / 1000)
     return `${Math.floor(secs / 60)}:${(secs % 60).toString().padStart(2, '0')}`
 }
 
-function repeatModeLabel(mode: QueueRepeatMode): string {
+function repeatModeLabel(mode: RainlinkLoopMode): string {
     switch (mode) {
-        case QueueRepeatMode.TRACK:
+        case RainlinkLoopMode.SONG:
             return 'Track'
-        case QueueRepeatMode.QUEUE:
+        case RainlinkLoopMode.QUEUE:
             return 'Queue'
-        case QueueRepeatMode.AUTOPLAY:
-            return 'Autoplay'
         default:
             return 'Off'
     }
 }
 
+/**
+ * Now-playing embed, styled after =VG=MUSIC-BOT (ByteBlaze)'s trackStart.ts:
+ * author line + description + three inline fields (Author/Duration/
+ * Requested by) + thumbnail + single accent color, on top of vaded's own
+ * progress-bar/volume/mode line and Last.fm/autoplay-counter integration.
+ */
 export async function sendNowPlayingEmbed(
-    queue: GuildQueue,
-    track: Track,
+    queue: RainlinkQueueAdapter,
+    track: RainlinkTrackAdapter,
     isAutoplay: boolean,
 ): Promise<void> {
-    const metadata = queue.metadata as QueueMetadata | undefined
+    const metadata = queue.metadata
     if (!metadata?.channel) return
 
     const requester = track.requestedBy
-    const requesterInfo = requester
-        ? `Added by ${requester.username}`
-        : 'Added automatically'
-    const requestedByDisplay = requester
-        ? `**${requester.username}**`
-        : '🤖 Autoplay'
-    const trackMetadata = (track.metadata ?? {}) as {
+    const requestedByDisplay = requester ? `${requester}` : '🤖 Autoplay'
+    const trackMetadata = track.metadata as {
         recommendationReason?: string
         recommendationSource?: string
     }
     const autoplayCount = isAutoplay
         ? await getAutoplayCount(queue.guild.id)
         : null
-    const baseFooter = isAutoplay
+    const footer = isAutoplay
         ? `🤖 Autoplay • ${autoplayCount ?? 0}/${constants.MAX_AUTOPLAY_TRACKS ?? 50} tracks`
-        : `🎧 ${requesterInfo}`
-    let footer = baseFooter
-    const fallbackLabel = getStreamBridgeFallbackLabel(track)
-    if (fallbackLabel) footer = `${footer} • via fallback: ${fallbackLabel}`
+        : requester
+          ? `Added by ${requester.username}`
+          : 'Added automatically'
 
-    // Progress bar
     const posMs = queue.node.streamTime ?? 0
     const durMs = track.durationMS ?? 0
-    const progressBar = buildProgressBar(posMs, durMs)
     const timestamp = `\`${msToTimestamp(posMs)} / ${msToTimestamp(durMs)}\``
-
-    // Status line matching image: Volume | Mode | Shuffle
     const vol = `${queue.node.volume}%`
     const mode = repeatModeLabel(queue.repeatMode)
-    // discord-player no longer exposes queue-level shuffle state.
-    const shuffle = 'Off'
 
-    const descLines = [
-        `[**${track.title}**](${track.url})`,
-        '',
-        `**Artist:** ${track.author}`,
-        `**Requested by:** ${requestedByDisplay}`,
-        `**Volume:** ${vol} | **Mode:** ${mode} | **Shuffle:** ${shuffle}`,
-        '',
-        progressBar,
-        timestamp,
-    ]
+    const embed = new EmbedBuilder()
+        .setAuthor({ name: 'Now Playing' })
+        .setDescription(`**${track.title}**`)
+        .addFields([
+            { name: 'Author', value: track.author || 'Unknown', inline: true },
+            { name: 'Duration', value: track.duration, inline: true },
+            { name: 'Requested by', value: requestedByDisplay, inline: true },
+        ])
+        .setColor(EMBED_COLORS.MUSIC as ColorResolvable)
+        .setThumbnail(track.thumbnail ?? null)
+        .setFooter({
+            text: `${footer} • Volume: ${vol} | Mode: ${mode} • ${timestamp}`,
+        })
+        .setTimestamp()
 
     if (isAutoplay && trackMetadata.recommendationReason) {
         const reasonWithRate = await appendAcceptanceRate(
@@ -245,16 +231,8 @@ export async function sendNowPlayingEmbed(
             trackMetadata.recommendationSource,
             queue.guild.id,
         )
-        descLines.push('', `*${reasonWithRate}*`)
+        embed.addFields([{ name: 'Why this track', value: reasonWithRate }])
     }
-
-    const embed = new EmbedBuilder()
-        .setColor(EMBED_COLORS.MUSIC as ColorResolvable)
-        .setTitle('<a:music:741605543046807626> Now Playing')
-        .setDescription(descLines.join('\n'))
-        .setThumbnail(track.thumbnail ?? null)
-        .setFooter({ text: footer })
-        .setTimestamp()
 
     const previousMessage = getSongInfoMessage(queue.guild.id)
     if (previousMessage && previousMessage.channelId === metadata.channel.id) {
@@ -271,12 +249,11 @@ export async function sendNowPlayingEmbed(
                     createMusicActionButtons(queue),
                 ],
             })
-            // Refresh the cached trackUrl
             registerNowPlayingMessage(
                 queue.guild.id,
                 previousMessage.messageId,
                 metadata.channel.id,
-                track.url,
+                track.url ?? undefined,
             )
             debugLog({
                 message: 'Updated now playing message in channel',
@@ -313,7 +290,7 @@ export async function sendNowPlayingEmbed(
         queue.guild.id,
         message.id,
         metadata.channel.id,
-        track.url,
+        track.url ?? undefined,
     )
 
     debugLog({
@@ -323,8 +300,8 @@ export async function sendNowPlayingEmbed(
 }
 
 export async function updateLastFmNowPlaying(
-    queue: GuildQueue,
-    track: Track,
+    queue: RainlinkQueueAdapter,
+    track: RainlinkTrackAdapter,
 ): Promise<void> {
     if (!isLastFmConfigured()) return
     const requesterId = getLastFmRequesterId(queue, track)
@@ -367,8 +344,8 @@ export async function updateLastFmNowPlaying(
 }
 
 export async function scrobbleCurrentTrackIfLastFm(
-    queue: GuildQueue,
-    track?: Track,
+    queue: RainlinkQueueAdapter,
+    track?: RainlinkTrackAdapter,
 ): Promise<void> {
     const trackToScrobble = track ?? queue.currentTrack
     if (!trackToScrobble || !isLastFmConfigured()) return

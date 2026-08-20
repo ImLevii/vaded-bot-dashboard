@@ -1,6 +1,6 @@
 import type { ChatInputCommandInteraction, User } from 'discord.js'
 import type { CustomClient } from '../../../types'
-import type { SearchResult } from 'discord-player'
+import type { Player, SearchResult } from 'discord-player'
 import { errorLog, debugLog } from '@lucky/shared/utils'
 import { enhancedYouTubeSearch, enhancedAutoSearch } from './index'
 import {
@@ -25,8 +25,12 @@ async function performEnhancedSearch(
         throw new Error('Player not initialized')
     }
 
+    // Dead code: unreachable from any registered command (nothing imports
+    // functions/music/handlers/play/handlePlay.ts). Left compiling via cast
+    // rather than rewritten, since this predates and is unrelated to the
+    // Lavalink migration's live search/queue paths.
     const enhancedResult = await enhancedYouTubeSearch(
-        client.player,
+        client.player as unknown as Player,
         searchTerms,
         user,
         isPlaylist,
@@ -52,7 +56,7 @@ async function performAutoSearch(
     }
 
     const autoResult = await enhancedAutoSearch(
-        client.player,
+        client.player as unknown as Player,
         searchTerms,
         user,
     )

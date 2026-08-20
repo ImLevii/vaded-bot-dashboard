@@ -6,7 +6,7 @@ import type {
     TrackSearchOptions,
     TrackCacheOptions,
 } from './types'
-import type { Track } from 'discord-player'
+import type { RainlinkTrackAdapter as Track } from '../rainlinkAdapter'
 
 /**
  * Main track utilities service

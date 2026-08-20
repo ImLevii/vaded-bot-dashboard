@@ -1,14 +1,18 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js'
-import type { GuildQueue } from 'discord-player'
-import { QueueRepeatMode } from 'discord-player'
+import type { RainlinkQueueAdapter } from './rainlinkAdapter'
 import {
     MUSIC_BUTTON_IDS,
     QUEUE_BUTTON_PREFIX,
     LEADERBOARD_BUTTON_PREFIX,
 } from '../../types/musicButtons'
 
+// Button row layout/emoji styling modeled after =VG=MUSIC-BOT (ByteBlaze)'s
+// utilities/PlayerControlButton.ts — emoji-forward, all Secondary style,
+// keeping vaded's existing customId scheme (MUSIC_BUTTON_IDS) unchanged so
+// musicButtonHandler.ts's routing doesn't need to change.
+
 export function createMusicControlButtons(
-    queue: GuildQueue,
+    queue: RainlinkQueueAdapter,
 ): ActionRowBuilder<ButtonBuilder> {
     const isPaused = queue.node.isPaused()
     const hasHistory = queue.history.tracks.data.length > 0
@@ -17,32 +21,27 @@ export function createMusicControlButtons(
     const previousButton = new ButtonBuilder()
         .setCustomId(MUSIC_BUTTON_IDS.PREVIOUS)
         .setEmoji('⏮️')
-        .setLabel('Previous')
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(!hasHistory)
 
     const pauseResumeButton = new ButtonBuilder()
         .setCustomId(MUSIC_BUTTON_IDS.PAUSE_RESUME)
-        .setLabel(isPaused ? 'Resume' : 'Pause')
         .setEmoji(isPaused ? '▶️' : '⏸️')
-        .setStyle(ButtonStyle.Primary)
+        .setStyle(ButtonStyle.Secondary)
 
     const stopButton = new ButtonBuilder()
         .setCustomId(MUSIC_BUTTON_IDS.STOP)
         .setEmoji('⏹️')
-        .setLabel('Stop')
-        .setStyle(ButtonStyle.Danger)
+        .setStyle(ButtonStyle.Secondary)
 
     const skipButton = new ButtonBuilder()
         .setCustomId(MUSIC_BUTTON_IDS.SKIP)
         .setEmoji('⏭️')
-        .setLabel('Skip')
         .setStyle(ButtonStyle.Secondary)
 
     const shuffleButton = new ButtonBuilder()
         .setCustomId(MUSIC_BUTTON_IDS.SHUFFLE)
         .setEmoji('🔀')
-        .setLabel('Shuffle')
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(!canShuffle)
 
@@ -56,23 +55,23 @@ export function createMusicControlButtons(
 }
 
 export function createMusicActionButtons(
-    queue: GuildQueue,
+    // call-site/signature compatibility; will gate on autoplay state again
+    // once the Phase 2 autoplay-on-rainlink follow-up lands.
+    _queue: RainlinkQueueAdapter,
 ): ActionRowBuilder<ButtonBuilder> {
-    const isAutoplay = queue.repeatMode === QueueRepeatMode.AUTOPLAY
+    // No AUTOPLAY loop mode in rainlink — autoplay is deferred (see
+    // decisions/2026-06-10-defer-autoplay-engine-extraction.md), so this
+    // button stays disabled until that follow-up lands.
+    const isAutoplay = false
 
-    // Stop lives in createMusicControlButtons's row already — repeating its
-    // custom_id here makes Discord reject the whole message with
-    // COMPONENT_CUSTOM_ID_DUPLICATED once both rows are sent together.
     const clearQueueButton = new ButtonBuilder()
         .setCustomId(MUSIC_BUTTON_IDS.CLEAR_QUEUE)
         .setEmoji('🗑️')
-        .setLabel('Clear')
         .setStyle(ButtonStyle.Secondary)
 
     const clearAutoplayButton = new ButtonBuilder()
         .setCustomId(MUSIC_BUTTON_IDS.CLEAR_AUTOPLAY)
         .setEmoji('🤖')
-        .setLabel('Clear Autoplay')
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(!isAutoplay)
 

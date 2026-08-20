@@ -1,11 +1,12 @@
-import type { GuildQueue, Track } from 'discord-player'
+import type {
+    RainlinkQueueAdapter as GuildQueue,
+    RainlinkTrackAdapter as Track,
+} from '../../utils/music/rainlinkAdapter'
 import { errorLog } from '@lucky/shared/utils'
 import { musicWatchdogService } from '../../utils/music/watchdog'
 import { musicSessionSnapshotService } from '../../utils/music/sessionSnapshots'
 import * as voiceStatus from '../../services/VoiceChannelStatusService'
-import {
-    setReplenishSuppressed,
-} from '../../utils/music/replenishSuppressionStore'
+import { setReplenishSuppressed } from '../../utils/music/replenishSuppressionStore'
 
 /**
  * Handles queue exhaustion logic shared between finish and skip events.

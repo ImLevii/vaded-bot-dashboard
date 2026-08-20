@@ -2,21 +2,7 @@
 import Command from '../../../models/Command'
 import { interactionReply } from '../../../utils/general/interactionReply'
 import { createErrorEmbed } from '../../../utils/general/embeds'
-import { errorLog } from '@lucky/shared/utils'
 import type { CommandExecuteParams } from '../../../types/CommandData'
-import { resolveGuildQueue } from '../../../utils/music/queueResolver'
-import {
-    handleSkipAutoplayTrack,
-    handleClearAutoplayTracks,
-    handleAutoplayStatus,
-} from './autoplay/queueHandlers'
-import {
-    handleAutoplayMode,
-    handleAutoplayGenre,
-    handleAutoplayAnalytics,
-    handleAutoplaySertanejo,
-} from './autoplay/settingsHandlers'
-import { handleAutoplayArtist } from './autoplay/artistHandlers'
 
 export default new Command({
     data: new SlashCommandBuilder()
@@ -169,12 +155,13 @@ export default new Command({
                 ),
         ),
     category: 'music',
-    execute: async ({ client, interaction }: CommandExecuteParams) => {
-        const guildId = interaction.guildId
-        if (!guildId) return
-
-        const { queue } = resolveGuildQueue(client, guildId)
-
+    // Autoplay is temporarily unavailable — the recommendation engine
+    // (autoplay/queueHandlers.ts, settingsHandlers.ts, artistHandlers.ts) is
+    // built around discord-player's GuildQueue/QueueRepeatMode.AUTOPLAY,
+    // which the Lavalink migration doesn't have an equivalent for yet. See
+    // decisions/2026-06-10-defer-autoplay-engine-extraction.md — this stays
+    // deferred to a follow-up rather than silently breaking.
+    execute: async ({ interaction }: CommandExecuteParams) => {
         try {
             await interaction.deferReply({ flags: MessageFlags.Ephemeral })
         } catch (error) {
@@ -187,83 +174,17 @@ export default new Command({
             throw error
         }
 
-        try {
-            const subcommandGroup =
-                interaction.options.getSubcommandGroup(false)
-            const subcommand = interaction.options.getSubcommand(false)
-
-            if (subcommandGroup === 'genre') {
-                await handleAutoplayGenre(interaction, subcommand)
-                return
-            }
-
-            if (subcommandGroup === 'artist') {
-                await handleAutoplayArtist(interaction)
-                return
-            }
-
-            switch (subcommand) {
-                case 'skip':
-                case 'clear':
-                case 'status':
-                    if (!queue) {
-                        await interactionReply({
-                            interaction,
-                            content: {
-                                embeds: [
-                                    createErrorEmbed(
-                                        'No Active Queue',
-                                        'No music is currently playing.',
-                                    ),
-                                ],
-                                ephemeral: true,
-                            },
-                        })
-                        return
-                    }
-                    if (subcommand === 'skip')
-                        await handleSkipAutoplayTrack(interaction, queue)
-                    else if (subcommand === 'clear')
-                        await handleClearAutoplayTracks(interaction, queue)
-                    else await handleAutoplayStatus(interaction, queue)
-                    break
-                case 'analytics':
-                    await handleAutoplayAnalytics(interaction)
-                    break
-                case 'mode':
-                    await handleAutoplayMode(interaction)
-                    break
-                case 'sertanejo':
-                    await handleAutoplaySertanejo(interaction)
-                    break
-                default:
-                    await interactionReply({
-                        interaction,
-                        content: {
-                            embeds: [
-                                createErrorEmbed(
-                                    'Unknown Subcommand',
-                                    'Please use skip, clear, status, analytics, or mode.',
-                                ),
-                            ],
-                            ephemeral: true,
-                        },
-                    })
-            }
-        } catch (error) {
-            errorLog({ message: 'Error in autoplay command:', error })
-            await interactionReply({
-                interaction,
-                content: {
-                    embeds: [
-                        createErrorEmbed(
-                            'Error',
-                            'An error occurred while processing your request.',
-                        ),
-                    ],
-                    ephemeral: true,
-                },
-            })
-        }
+        await interactionReply({
+            interaction,
+            content: {
+                embeds: [
+                    createErrorEmbed(
+                        'Autoplay temporarily unavailable',
+                        'Autoplay is being rebuilt for the new Lavalink-based player and is not available right now.',
+                    ),
+                ],
+                ephemeral: true,
+            },
+        })
     },
 })

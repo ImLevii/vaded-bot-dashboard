@@ -1,6 +1,6 @@
 import { EmbedBuilder } from 'discord.js'
 import type { User } from 'discord.js'
-import type { Track } from 'discord-player'
+import type { RainlinkTrackAdapter as Track } from '../../music/rainlinkAdapter'
 import type { TrackMetadata } from '@lucky/shared/types'
 import { detectSource } from '../../music/nowPlayingEmbed'
 import { trackSource } from '../../music/trackFields'
@@ -27,16 +27,12 @@ const KIND_LABELS: Record<TrackEmbedKind, string> = {
 }
 
 type TrackDataSource = Pick<
-    Track<TrackMetadata>,
+    Track,
     'title' | 'author' | 'url' | 'thumbnail' | 'durationMS' | 'source'
 > &
-    Partial<Pick<Track<TrackMetadata>, 'metadata'>>
+    Partial<Pick<Track, 'metadata'>>
 
-type PlayerTrackDataSource = Pick<
-    Track<unknown>,
-    'title' | 'author' | 'url' | 'thumbnail' | 'durationMS' | 'source'
-> &
-    Partial<Pick<Track<unknown>, 'metadata'>>
+type PlayerTrackDataSource = TrackDataSource
 
 export type TrackEmbedOptions = {
     /**
@@ -126,23 +122,28 @@ export function playerTrackToData(track: PlayerTrackDataSource): TrackData {
         thumbnail: track.thumbnail,
         durationMS: track.durationMS,
         source: track.source,
-        metadata: normalizeTrackMetadata(track.metadata),
+        metadata: (normalizeTrackMetadata(track.metadata) ?? undefined) as
+            Record<string, unknown> | undefined,
     })
 }
 
 export function trackToData(track: TrackDataSource): TrackData {
     const recommendationReason = track.metadata?.recommendationReason
+    const reason =
+        typeof recommendationReason === 'string'
+            ? recommendationReason
+            : undefined
 
     return {
         title: track.title,
         author: track.author,
-        url: track.url,
-        thumbnail: track.thumbnail,
+        url: track.url ?? undefined,
+        thumbnail: track.thumbnail ?? undefined,
         duration: track.durationMS
             ? formatDurationClock(Math.floor(track.durationMS / 1000))
             : undefined,
         source: trackSource(track) ?? null,
-        ...(recommendationReason ? { recommendationReason } : {}),
+        ...(reason ? { recommendationReason: reason } : {}),
     }
 }
 

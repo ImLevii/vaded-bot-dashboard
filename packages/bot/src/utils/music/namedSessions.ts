@@ -1,5 +1,7 @@
-import type { GuildQueue, Track } from 'discord-player'
-import { QueryType } from 'discord-player'
+import type {
+    RainlinkQueueAdapter as GuildQueue,
+    RainlinkTrackAdapter as Track,
+} from './rainlinkAdapter'
 import type { User } from 'discord.js'
 import { getPrismaClient, debugLog, errorLog } from '@lucky/shared/utils'
 import type { Prisma } from '@lucky/shared/utils'
@@ -30,7 +32,6 @@ const NAME_REGEX = /^[a-z0-9-]{1,32}$/i
 
 type SearchOptions = {
     requestedBy?: User
-    searchEngine: QueryType
 }
 
 /** Row shape this service reads from the `named_queues` table. */
@@ -195,7 +196,6 @@ export class NamedSessionService {
             }
 
             const searchOptions: SearchOptions = {
-                searchEngine: QueryType.AUTO,
                 ...(requestedBy ? { requestedBy } : {}),
             }
 
@@ -208,12 +208,12 @@ export class NamedSessionService {
             for (const entry of tracksToRestore) {
                 const query =
                     entry.url || `${entry.title} ${entry.author}`.trim()
-                const result = await queue.player.search(query, searchOptions)
+                const result = await queue.search(query, searchOptions)
                 const track = result.tracks[0]
                 if (!track) continue
 
                 applySnapshotMetadata(
-                    track as Track,
+                    track,
                     name,
                     entry.recommendationReason,
                     entry.isAutoplay,

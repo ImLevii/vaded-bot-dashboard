@@ -18,7 +18,7 @@ import {
 import { clearSessionMoodCache } from '../../../utils/music/autoplay/replenisher'
 import type { CommandExecuteParams } from '../../../types/CommandData'
 import type { ChatInputCommandInteraction } from 'discord.js'
-import type { GuildQueue } from 'discord-player'
+import type { RainlinkQueueAdapter as GuildQueue } from '../../../utils/music/rainlinkAdapter'
 import { resolveGuildQueue } from '../../../utils/music/queueResolver'
 
 async function handleNotPlaying(
@@ -41,9 +41,8 @@ async function playPreviousTrack(
     queue: GuildQueue,
     guildId: string,
 ): Promise<boolean> {
-    // discord-player's history.previous() throws NoResultError when history is empty
     // Per #1239: when no previous track, restart current track from beginning
-    const historyWasEmpty = queue.history.isEmpty()
+    const historyWasEmpty = !queue.history.previousTrack
     if (historyWasEmpty) {
         const currentTrack = queue.currentTrack
         if (currentTrack) {
@@ -53,7 +52,7 @@ async function playPreviousTrack(
             })
         }
     } else {
-        await queue.history.previous(true)
+        await queue.history.back()
         debugLog({
             message: `Played previous track in guild ${guildId}`,
         })
@@ -67,7 +66,7 @@ async function playPreviousTrack(
                 if (queue.tracks.size > 0) {
                     await queue.node.play()
                 } else if (queue.currentTrack) {
-                    await queue.node.play(queue.currentTrack, { queue: false })
+                    await queue.node.play(queue.currentTrack)
                 }
             }
         })().catch((error: unknown) => {
@@ -135,11 +134,22 @@ async function handlePreviousError(
 export default new Command({
     data: new SlashCommandBuilder()
         .setName('previous')
-        .setDescription('⏮️ Play the previous track or restart the current one.'),
+        .setDescription(
+            '⏮️ Play the previous track or restart the current one.',
+        ),
     category: 'music',
     execute: async ({ client, interaction }: CommandExecuteParams) => {
         if (!(await requireGuild(interaction))) return
-        if (!(await requireDJRole(interaction, assertDefined(interaction.guildId, 'Guild ID required after requireGuild check')))) return
+        if (
+            !(await requireDJRole(
+                interaction,
+                assertDefined(
+                    interaction.guildId,
+                    'Guild ID required after requireGuild check',
+                ),
+            ))
+        )
+            return
 
         const { queue } = resolveGuildQueue(client, interaction.guildId ?? '')
 
@@ -153,7 +163,10 @@ export default new Command({
         }
 
         try {
-            const historyWasEmpty = await playPreviousTrack(queue, interaction.guildId ?? '')
+            const historyWasEmpty = await playPreviousTrack(
+                queue,
+                interaction.guildId ?? '',
+            )
             await sendPreviousSuccess(interaction, queue, historyWasEmpty)
         } catch (error) {
             await handlePreviousError(error, interaction)

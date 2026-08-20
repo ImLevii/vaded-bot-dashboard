@@ -1,37 +1,10 @@
-import { QueueRepeatMode } from 'discord-player'
-import { guildSettingsService } from '@lucky/shared/services'
-import { debugLog, warnLog } from '@lucky/shared/utils'
-
+/**
+ * Autoplay is deferred pending the Lavalink migration's Phase 2 (rainlink has
+ * no AUTOPLAY loop mode) — see
+ * decisions/2026-06-10-defer-autoplay-engine-extraction.md. Stubbed as a
+ * no-op rather than removed so callers don't need to branch on it.
+ */
 export async function applyStoredAutoplayPreference(
-    queue: {
-        repeatMode: QueueRepeatMode
-        setRepeatMode: (mode: QueueRepeatMode) => void
-    },
-    guildId: string,
-): Promise<void> {
-    try {
-        const settings = await guildSettingsService.getGuildSettings(guildId)
-        const repeatMode =
-            (settings?.autoPlayEnabled ?? true)
-                ? QueueRepeatMode.AUTOPLAY
-                : QueueRepeatMode.OFF
-
-        if (queue.repeatMode !== repeatMode) {
-            queue.setRepeatMode(repeatMode)
-        }
-
-        debugLog({
-            message: 'Applied stored autoplay preference to queue',
-            data: {
-                guildId,
-                autoPlayEnabled: settings?.autoPlayEnabled ?? true,
-            },
-        })
-    } catch (error) {
-        warnLog({
-            message: 'Failed to apply stored autoplay preference',
-            error,
-            data: { guildId },
-        })
-    }
-}
+    _queue: unknown,
+    _guildId: string,
+): Promise<void> {}

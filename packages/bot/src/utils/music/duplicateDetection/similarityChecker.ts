@@ -1,4 +1,4 @@
-import type { Track } from 'discord-player'
+import type { RainlinkTrackAdapter as Track } from '../rainlinkAdapter'
 import type { TrackHistoryEntry } from '@lucky/shared/services'
 import { levenshteinSimilarity } from '@lucky/shared/utils/similarity'
 import type { SimilarityConfig } from './types'

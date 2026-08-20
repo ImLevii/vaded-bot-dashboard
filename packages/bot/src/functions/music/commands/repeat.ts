@@ -1,104 +1,75 @@
 import { SlashCommandBuilder } from '@discordjs/builders'
-import { QueueRepeatMode } from 'discord-player'
+import { RainlinkLoopMode } from 'rainlink'
 import Command from '../../../models/Command'
-import { interactionReply } from "../../../utils/general/interactionReply"
-import { createSuccessEmbed } from "../../../utils/general/embeds"
-import type { CommandExecuteParams } from "../../../types/CommandData"
-import { requireQueue } from "../../../utils/command/commandValidations"
+import { interactionReply } from '../../../utils/general/interactionReply'
+import { createSuccessEmbed } from '../../../utils/general/embeds'
+import type { CommandExecuteParams } from '../../../types/CommandData'
+import { requireQueue } from '../../../utils/command/commandValidations'
 import { resolveGuildQueue } from '../../../utils/music/queueResolver'
 
 /**
- * Handle track repeat mode
+ * "Repeat N times" has no rainlink primitive (it only tracks a loop mode,
+ * not a remaining-count) — this Map preserves that behavior; trackHandlers.ts
+ * decrements it on trackEnd and turns the loop off once it hits zero.
  */
-function handleTrackRepeat(
-    times: number | null,
-    guildId: string,
-): { mode: QueueRepeatMode; description: string } {
-    const repeatMode = QueueRepeatMode.TRACK
-    if (times !== null && times !== undefined && times > 1) {
-        guildRepeatCounts.set(guildId, {
-            count: times,
-            originalMode: repeatMode,
-        })
-        return {
-            mode: repeatMode,
-            description: `Repeating current song **${times} times**`,
-        }
-    } else {
-        return {
-            mode: repeatMode,
-            description: 'Repeating current song **infinitely**',
-        }
-    }
-}
+export const guildRepeatCounts = new Map<
+    string,
+    { count: number; originalMode: RainlinkLoopMode }
+>()
 
-/**
- * Handle queue repeat mode
- */
-function handleQueueRepeat(
-    times: number | null,
-    guildId: string,
-): { mode: QueueRepeatMode; description: string } {
-    const repeatMode = QueueRepeatMode.QUEUE
-    if (times !== null && times !== undefined && times > 1) {
-        guildRepeatCounts.set(guildId, {
-            count: times,
-            originalMode: repeatMode,
-        })
-        return {
-            mode: repeatMode,
-            description: `Repeating queue **${times} times**`,
-        }
-    } else {
-        return {
-            mode: repeatMode,
-            description: 'Repeating queue **infinitely**',
-        }
-    }
-}
-
-/**
- * Get repeat mode configuration
- */
 function getRepeatModeConfig(
     mode: string,
     times: number | null,
     guildId: string,
-): { mode: QueueRepeatMode; description: string } {
+): { mode: RainlinkLoopMode; description: string } {
     switch (mode) {
+        case 'track': {
+            const repeatMode = RainlinkLoopMode.SONG
+            if (times !== null && times > 1) {
+                guildRepeatCounts.set(guildId, {
+                    count: times,
+                    originalMode: repeatMode,
+                })
+                return {
+                    mode: repeatMode,
+                    description: `Repeating current song **${times} times**`,
+                }
+            }
+            return {
+                mode: repeatMode,
+                description: 'Repeating current song **infinitely**',
+            }
+        }
+        case 'queue': {
+            const repeatMode = RainlinkLoopMode.QUEUE
+            if (times !== null && times > 1) {
+                guildRepeatCounts.set(guildId, {
+                    count: times,
+                    originalMode: repeatMode,
+                })
+                return {
+                    mode: repeatMode,
+                    description: `Repeating queue **${times} times**`,
+                }
+            }
+            return {
+                mode: repeatMode,
+                description: 'Repeating queue **infinitely**',
+            }
+        }
         case 'off':
-            return {
-                mode: QueueRepeatMode.OFF,
-                description: 'Repeat **turned off**',
-            }
-        case 'track':
-            return handleTrackRepeat(times, guildId)
-        case 'queue':
-            return handleQueueRepeat(times, guildId)
-        case 'infinite':
-            return {
-                mode: QueueRepeatMode.AUTOPLAY,
-                description:
-                    '**Infinite** repeat activated (continuous autoplay)',
-            }
         default:
             return {
-                mode: QueueRepeatMode.OFF,
+                mode: RainlinkLoopMode.NONE,
                 description: 'Repeat **turned off**',
             }
     }
 }
 
-// Store repeat counts for each guild
-const guildRepeatCounts = new Map<
-    string,
-    { count: number; originalMode: QueueRepeatMode }
->()
-
 export default new Command({
     data: new SlashCommandBuilder()
         .setName('repeat')
-        .setDescription('🔁 Set the repeat mode with time or infinite options.')
+        .setDescription('🔁 Set the repeat mode with an optional repeat count.')
         .addStringOption((option) =>
             option
                 .setName('mode')
@@ -108,10 +79,6 @@ export default new Command({
                     { name: 'off - Turn off', value: 'off' },
                     { name: 'track - Repeat current song', value: 'track' },
                     { name: 'queue - Repeat queue', value: 'queue' },
-                    {
-                        name: 'infinite - Repeat infinitely',
-                        value: 'infinite',
-                    },
                 ),
         )
         .addIntegerOption((option) =>
@@ -153,5 +120,3 @@ export default new Command({
         })
     },
 })
-
-export { guildRepeatCounts }

@@ -36,20 +36,14 @@ export const getTotalMemberCount = (client: CustomClient): number => {
 }
 
 export const getActiveMusicSessions = (client: CustomClient): number => {
-    const nodes = (
-        client.player as {
-            nodes?: { cache?: { values: () => Iterable<unknown> } }
-        }
-    )?.nodes?.cache
-
-    if (!nodes?.values) {
+    const players = client.player?.players?.values
+    if (!players) {
         return 0
     }
 
     let count = 0
-    for (const node of nodes.values()) {
-        const currentTrack = (node as { currentTrack?: unknown })?.currentTrack
-        if (currentTrack) {
+    for (const player of players) {
+        if (player.queue.current) {
             count += 1
         }
     }

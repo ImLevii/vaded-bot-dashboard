@@ -12,7 +12,7 @@ import {
 } from '../../../utils/command/commandValidations'
 import type { CommandExecuteParams } from '../../../types/CommandData'
 import type { ChatInputCommandInteraction } from 'discord.js'
-import type { GuildQueue } from 'discord-player'
+import type { RainlinkQueueAdapter as GuildQueue } from '../../../utils/music/rainlinkAdapter'
 import { resolveGuildQueue } from '../../../utils/music/queueResolver'
 import { musicSessionSnapshotService } from '../../../utils/music/sessionSnapshots'
 

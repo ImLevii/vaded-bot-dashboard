@@ -1,16 +1,14 @@
-import type { GuildQueue, Player } from 'discord-player'
-import type { Guild, VoiceChannel } from 'discord.js'
+import type { Rainlink } from 'rainlink'
+import type { Client, Guild, VoiceChannel } from 'discord.js'
 import { ChannelType } from 'discord.js'
 import { debugLog, errorLog, infoLog } from '@lucky/shared/utils'
 import { parseIntEnv } from '@lucky/shared/utils/env'
 import { musicSessionSnapshotService } from './sessionSnapshots'
+import type { RainlinkQueueAdapter } from './rainlinkAdapter'
+import { wrapPlayer } from './rainlinkAdapter'
 
 export type RecoveryAction =
-    | 'none'
-    | 'rejoin'
-    | 'requeue_current'
-    | 'play_next'
-    | 'failed'
+    'none' | 'rejoin' | 'requeue_current' | 'play_next' | 'failed'
 
 export type WatchdogGuildState = {
     guildId: string
@@ -70,11 +68,10 @@ export class MusicWatchdogService {
         return created
     }
 
-    private async waitForConnectionReady(
-        connection: GuildQueue['connection'],
+    private async waitForVoiceReady(
+        queue: RainlinkQueueAdapter,
     ): Promise<boolean> {
-        if (!connection) return true
-        if (this.isConnectionReady(connection)) return true
+        if (queue.isVoiceConnected) return true
 
         const deadline = Date.now() + this.recoveryWaitTimeoutMs
         while (Date.now() < deadline) {
@@ -82,16 +79,10 @@ export class MusicWatchdogService {
                 setTimeout(resolve, this.recoveryPollIntervalMs),
             )
 
-            if (this.isConnectionReady(connection)) {
-                return true
-            }
+            if (queue.isVoiceConnected) return true
         }
 
-        return this.isConnectionReady(connection)
-    }
-
-    private isConnectionReady(connection: GuildQueue['connection']): boolean {
-        return connection?.state?.status === 'ready'
+        return queue.isVoiceConnected
     }
 
     touch(guildId: string, now = Date.now()): void {
@@ -129,7 +120,7 @@ export class MusicWatchdogService {
         }
     }
 
-    arm(queue: GuildQueue): void {
+    arm(queue: RainlinkQueueAdapter): void {
         const guildId = queue.guild.id
         this.clear(guildId)
         this.touch(guildId)
@@ -146,7 +137,7 @@ export class MusicWatchdogService {
      * pause read as a stall and the watchdog resumed playback seconds after the
      * user deliberately stopped it.
      */
-    private skipRecoveryReason(queue: GuildQueue): string | null {
+    private skipRecoveryReason(queue: RainlinkQueueAdapter): string | null {
         if (this.intentionalStops.has(queue.guild.id)) return 'intentional_stop'
         if (queue.node.isPlaying()) return 'queue_playing'
         if (queue.node.isPaused()) return 'queue_paused'
@@ -155,16 +146,16 @@ export class MusicWatchdogService {
 
     /** Rejoins if needed (twice before giving up). `failure` is a state detail. */
     private async ensureConnectionReady(
-        queue: GuildQueue,
+        queue: RainlinkQueueAdapter,
     ): Promise<{ rejoined: boolean; failure: string | null }> {
-        if (queue.connection?.state?.status === 'ready') {
+        if (queue.isVoiceConnected) {
             return { rejoined: false, failure: null }
         }
 
-        queue.connection?.rejoin?.()
-        if (!(await this.waitForConnectionReady(queue.connection))) {
-            queue.connection?.rejoin?.()
-            if (!(await this.waitForConnectionReady(queue.connection))) {
+        await queue.rejoinVoice()
+        if (!(await this.waitForVoiceReady(queue))) {
+            await queue.rejoinVoice()
+            if (!(await this.waitForVoiceReady(queue))) {
                 return {
                     rejoined: true,
                     failure: 'connection_not_ready_after_rejoin_retry',
@@ -172,7 +163,7 @@ export class MusicWatchdogService {
             }
         }
 
-        if (!this.isConnectionReady(queue.connection)) {
+        if (!queue.isVoiceConnected) {
             return {
                 rejoined: true,
                 failure: 'connection_not_ready_after_rejoin',
@@ -182,7 +173,9 @@ export class MusicWatchdogService {
         return { rejoined: true, failure: null }
     }
 
-    async checkAndRecover(queue: GuildQueue): Promise<RecoveryAction> {
+    async checkAndRecover(
+        queue: RainlinkQueueAdapter,
+    ): Promise<RecoveryAction> {
         const guildId = queue.guild.id
         const state = this.ensureState(guildId)
 
@@ -205,12 +198,7 @@ export class MusicWatchdogService {
             }
 
             if (queue.currentTrack) {
-                // Explicit track, and `queue: false` so it plays rather than
-                // re-enqueues. A bare play() dispatches from `tracks`, which is
-                // empty on the last song of a queue — discord-player then
-                // emitted NoResultError ("track was not provided") on every
-                // recovery of the very case this branch exists for.
-                await queue.node.play(queue.currentTrack, { queue: false })
+                await queue.node.play(queue.currentTrack)
                 action = 'requeue_current'
                 detail = connection.rejoined
                     ? 'rejoined_and_requeued_current'
@@ -245,11 +233,15 @@ export class MusicWatchdogService {
         return action
     }
 
-    startOrphanSessionMonitor(player: Player, intervalMs = 60_000): void {
+    startOrphanSessionMonitor(
+        rainlink: Rainlink,
+        client: Client,
+        intervalMs = 60_000,
+    ): void {
         if (this.orphanMonitorInterval) return
 
         this.orphanMonitorInterval = setInterval(() => {
-            void this.scanOrphanSessions(player)
+            void this.scanOrphanSessions(rainlink, client)
         }, intervalMs)
 
         debugLog({ message: 'Music watchdog orphan session monitor started' })
@@ -262,12 +254,15 @@ export class MusicWatchdogService {
         }
     }
 
-    async scanOrphanSessions(player: Player): Promise<void> {
+    async scanOrphanSessions(
+        rainlink: Rainlink,
+        client: Client,
+    ): Promise<void> {
         const guildIds = await musicSessionSnapshotService.listGuildIds()
 
         for (const guildId of guildIds) {
             try {
-                await this.recoverOrphanSession(player, guildId)
+                await this.recoverOrphanSession(rainlink, client, guildId)
             } catch (error) {
                 errorLog({
                     message: 'Watchdog orphan recovery error',
@@ -283,7 +278,7 @@ export class MusicWatchdogService {
      * is not a recovery candidate at all.
      */
     private async resolveOrphanTarget(
-        player: Player,
+        client: Client,
         guildId: string,
     ): Promise<{
         guild: Guild
@@ -297,7 +292,7 @@ export class MusicWatchdogService {
         const ageMs = Date.now() - snapshot.savedAt
         if (ageMs > SNAPSHOT_MAX_AGE_MS) return null
 
-        const guild = player.client.guilds.cache.get(guildId)
+        const guild = client.guilds.cache.get(guildId)
         if (!guild) return null
 
         const voiceChannelId = snapshot.voiceChannelId
@@ -314,7 +309,8 @@ export class MusicWatchdogService {
     }
 
     private async recoverOrphanSession(
-        player: Player,
+        rainlink: Rainlink,
+        client: Client,
         guildId: string,
     ): Promise<void> {
         // A deliberate stop is not an orphan. checkAndRecover has always
@@ -323,42 +319,49 @@ export class MusicWatchdogService {
         // just left and resumed the session the user ended.
         if (this.intentionalStops.has(guildId)) return
 
-        const existingQueue = player.nodes.get(guildId)
+        const existingPlayer = rainlink.players.get(guildId)
+        const existingQueue = existingPlayer ? wrapPlayer(existingPlayer) : null
         if (existingQueue?.node.isPlaying()) return
         // Paused counts as live for the same reason it does in checkAndRecover.
         if (existingQueue?.node.isPaused()) return
 
-        const target = await this.resolveOrphanTarget(player, guildId)
+        const target = await this.resolveOrphanTarget(client, guildId)
         if (!target) return
-        const { guild, voiceChannel, voiceChannelId, ageMs } = target
+        const { guild, voiceChannelId, ageMs } = target
 
         infoLog({
             message: 'Watchdog detected orphan session, attempting rejoin',
             data: { guildId, voiceChannelId, snapshotAgeMs: ageMs },
         })
 
-        const queue =
-            existingQueue ??
-            player.nodes.create(guild, {
-                metadata: { skipConnectionEventRestore: true },
-            })
         const createdQueue = !existingQueue
-        if (createdQueue) {
-            // Deliberately does NOT set repeat mode 3 (AUTOPLAY). It used to:
-            // a recovery queue arrived with autoplay forced on regardless of
-            // the guild's setting, so when the restore below found nothing,
-            // autoplay pulled the last track out of history and played it —
-            // the bot rejoining an ended session and replaying the song.
+        let queue: RainlinkQueueAdapter
+        if (existingQueue) {
+            queue = existingQueue
+        } else {
+            // rainlink connects at creation time — no separate connect() step.
+            // No dedicated text channel is known from the snapshot (only
+            // voiceChannelId), so the voice channel id is reused as textId;
+            // most guild voice channels also support their own text chat.
+            const rainlinkPlayer = await rainlink.create({
+                guildId,
+                textId: voiceChannelId,
+                voiceId: voiceChannelId,
+                shardId: guild.shardId,
+            })
+            queue = wrapPlayer(rainlinkPlayer)
+            // Deliberately does NOT force a repeat/loop mode. It used to force
+            // autoplay on regardless of the guild's setting, so when the
+            // restore below found nothing, autoplay pulled the last track out
+            // of history and played it — the bot rejoining an ended session
+            // and replaying the song.
             //
-            // metadata.skipConnectionEventRestore stops the 'connection' event
-            // handler (lifecycleHandlers.ts) from ALSO restoring this snapshot.
-            // Both connect() and the explicit restoreSnapshot() below race
-            // otherwise: restoreSnapshot() no-ops once queue.currentTrack is
-            // set, so whichever call lost the race reported
-            // restoredCount: 0 here while the *other* one had already started
-            // playback — replaying the exact track skipCurrentTrack below
-            // exists to avoid, on a loop, every time this scan ran.
-            await queue.connect(voiceChannel)
+            // skipConnectionEventRestore stops the lifecycle handler's
+            // playerConnect listener from ALSO restoring this snapshot. Both
+            // race otherwise: restoreSnapshot() no-ops once queue.currentTrack
+            // is set, so whichever call lost the race reported restoredCount:
+            // 0 here while the *other* one had already started playback.
+            queue.setMetadata({ skipConnectionEventRestore: true, client })
         }
 
         const restoreResult = await musicSessionSnapshotService.restoreSnapshot(
@@ -370,7 +373,7 @@ export class MusicWatchdogService {
             await musicSessionSnapshotService.deleteSnapshot(guildId)
             // Nothing to play, so don't sit in the channel we just joined for
             // this. A queue that was already there is left alone.
-            if (createdQueue) queue.delete()
+            if (createdQueue) await queue.delete()
 
             const state = this.ensureState(guildId)
             state.lastRecoveryAction = 'failed'
@@ -404,7 +407,7 @@ export class MusicWatchdogService {
     }
 
     async scanOrphanedSessions(
-        getQueue: (guildId: string) => GuildQueue | null,
+        getQueue: (guildId: string) => RainlinkQueueAdapter | null,
     ): Promise<string[]> {
         const recovered: string[] = []
         try {
@@ -431,7 +434,9 @@ export class MusicWatchdogService {
         return recovered
     }
 
-    startPeriodicScan(getQueue: (guildId: string) => GuildQueue | null): void {
+    startPeriodicScan(
+        getQueue: (guildId: string) => RainlinkQueueAdapter | null,
+    ): void {
         if (this.scanTimer) return
 
         infoLog({

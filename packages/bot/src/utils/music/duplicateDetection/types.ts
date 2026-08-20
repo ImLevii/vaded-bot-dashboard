@@ -1,16 +1,14 @@
-import type { Track } from 'discord-player'
+import type { RainlinkTrackAdapter as Track } from '../rainlinkAdapter'
 import { LRUCache } from 'lru-cache'
 import type { TrackHistoryEntry } from '@lucky/shared/services'
 import type { TrackMetadata } from '@lucky/shared/types'
 
 // Legacy in-memory maps for backward compatibility (fallback when Redis is unavailable)
 // Using LRU caches with TTL to prevent unbounded memory growth on long-running bot
-export const recentlyPlayedTracks = new LRUCache<string, TrackHistoryEntry[]>(
-    {
-        max: 5000,
-        ttl: 30 * 60 * 1000, // 30 minutes
-    },
-)
+export const recentlyPlayedTracks = new LRUCache<string, TrackHistoryEntry[]>({
+    max: 5000,
+    ttl: 30 * 60 * 1000, // 30 minutes
+})
 export const trackIdSet = new LRUCache<string, Set<string>>({
     max: 5000,
     ttl: 30 * 60 * 1000, // 30 minutes

@@ -1,5 +1,5 @@
 import { type ButtonInteraction, type GuildMember } from 'discord.js'
-import { QueueRepeatMode } from 'discord-player'
+import { RainlinkLoopMode } from 'rainlink'
 import { debugLog, errorLog } from '@lucky/shared/utils'
 import { createErrorEmbed } from '../utils/general/embeds'
 import {
@@ -14,7 +14,7 @@ import {
 } from '../utils/music/buttonComponents'
 import { createQueueEmbed } from '../functions/music/commands/queue/queueEmbed'
 import { shuffleQueue } from '../utils/music/queueManipulation'
-import type { GuildQueue } from 'discord-player'
+import type { RainlinkQueueAdapter as GuildQueue } from '../utils/music/rainlinkAdapter'
 import { resolveGuildQueue } from '../utils/music/queueResolver'
 import type { CustomClient } from '../types'
 import { buildListPageEmbed } from '../utils/general/responseEmbeds'
@@ -147,9 +147,9 @@ async function handlePauseResume(
     queue: NonNullQueue,
 ): Promise<void> {
     if (queue.node.isPaused()) {
-        queue.node.resume()
+        await queue.node.resume()
     } else {
-        queue.node.pause()
+        await queue.node.pause()
     }
 
     await interaction.editReply({
@@ -164,7 +164,7 @@ async function handleSkip(
     interaction: ButtonInteraction,
     queue: NonNullQueue,
 ): Promise<void> {
-    queue.node.skip()
+    await queue.node.skip()
     debugLog({ message: 'Track skipped via button' })
 }
 
@@ -176,18 +176,18 @@ async function handleShuffle(
     debugLog({ message: 'Queue shuffled via button' })
 }
 
-const LOOP_MODE_NAMES: Record<number, string> = {
-    [QueueRepeatMode.OFF]: 'Off',
-    [QueueRepeatMode.TRACK]: 'Track',
-    [QueueRepeatMode.QUEUE]: 'Queue',
-    [QueueRepeatMode.AUTOPLAY]: 'Autoplay',
+// No AUTOPLAY loop mode in rainlink — deferred, see
+// decisions/2026-06-10-defer-autoplay-engine-extraction.md.
+const LOOP_MODE_NAMES: Record<RainlinkLoopMode, string> = {
+    [RainlinkLoopMode.NONE]: 'Off',
+    [RainlinkLoopMode.SONG]: 'Track',
+    [RainlinkLoopMode.QUEUE]: 'Queue',
 }
 
 const LOOP_MODE_ORDER = [
-    QueueRepeatMode.OFF,
-    QueueRepeatMode.TRACK,
-    QueueRepeatMode.QUEUE,
-    QueueRepeatMode.AUTOPLAY,
+    RainlinkLoopMode.NONE,
+    RainlinkLoopMode.SONG,
+    RainlinkLoopMode.QUEUE,
 ]
 
 async function handleLoop(
@@ -196,7 +196,7 @@ async function handleLoop(
 ): Promise<void> {
     const currentIdx = LOOP_MODE_ORDER.indexOf(queue.repeatMode)
     const nextIdx = (currentIdx + 1) % LOOP_MODE_ORDER.length
-    const newMode = LOOP_MODE_ORDER[nextIdx]
+    const newMode = LOOP_MODE_ORDER[nextIdx] ?? RainlinkLoopMode.NONE
     queue.setRepeatMode(newMode)
 
     const modeName = LOOP_MODE_NAMES[newMode] ?? 'Off'
@@ -210,7 +210,7 @@ async function handleStop(
     interaction: ButtonInteraction,
     queue: NonNullQueue,
 ): Promise<void> {
-    queue.delete()
+    await queue.delete()
     setReplenishSuppressed(queue.guild.id, 30_000)
     await interaction.editReply({
         embeds: [
@@ -238,7 +238,7 @@ async function handleClearAutoplay(
     interaction: ButtonInteraction,
     queue: NonNullQueue,
 ): Promise<void> {
-    queue.setRepeatMode(QueueRepeatMode.OFF)
+    queue.setRepeatMode(RainlinkLoopMode.NONE)
     await interaction.editReply({
         components: [
             createMusicControlButtons(queue),

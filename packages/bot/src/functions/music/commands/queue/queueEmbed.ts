@@ -1,4 +1,4 @@
-import type { GuildQueue } from 'discord-player'
+import type { RainlinkQueueAdapter as GuildQueue } from '../../../../utils/music/rainlinkAdapter'
 import {
     createEmbed,
     EMBED_COLORS,

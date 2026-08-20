@@ -1,14 +1,17 @@
 import { SlashCommandBuilder } from '@discordjs/builders'
 import Command from '../../../models/Command'
-import { interactionReply } from "../../../utils/general/interactionReply"
-import { createErrorEmbed, createSuccessEmbed } from "../../../utils/general/embeds"
+import { interactionReply } from '../../../utils/general/interactionReply'
+import {
+    createErrorEmbed,
+    createSuccessEmbed,
+} from '../../../utils/general/embeds'
 import {
     requireGuild,
     requireQueue,
     requireCurrentTrack,
-} from "../../../utils/command/commandValidations"
-import type { CommandExecuteParams } from "../../../types/CommandData"
-import type { GuildQueue } from 'discord-player'
+} from '../../../utils/command/commandValidations'
+import type { CommandExecuteParams } from '../../../types/CommandData'
+import type { RainlinkQueueAdapter as GuildQueue } from '../../../utils/music/rainlinkAdapter'
 import type { ChatInputCommandInteraction } from 'discord.js'
 import { resolveGuildQueue } from '../../../utils/music/queueResolver'
 
@@ -22,7 +25,10 @@ async function handleEmptyQueue(
         interaction,
         content: {
             embeds: [
-                createErrorEmbed('Empty queue', '🗑️ The queue is already empty!'),
+                createErrorEmbed(
+                    'Empty queue',
+                    '🗑️ The queue is already empty!',
+                ),
             ],
         },
     })
@@ -59,7 +65,7 @@ function moveTrackInQueue(
     const [moved] = tracks.splice(from, 1)
     tracks.splice(to, 0, moved)
     queue.tracks.clear()
-    queue.tracks.add(tracks)
+    for (const track of tracks) queue.addTrack(track)
     return moved
 }
 

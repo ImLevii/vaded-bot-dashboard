@@ -13,6 +13,20 @@ import {
 } from '../../../utils/command/commandValidations'
 import { resolveGuildQueue } from '../../../utils/music/queueResolver'
 
+function buildProgressBar(posMs: number, durMs: number): string {
+    const length = 18
+    if (!durMs || durMs <= 0) return `${'▬'.repeat(length)}◉`
+    const ratio = Math.min(posMs / durMs, 1)
+    const filled = Math.round(ratio * length)
+    const bar =
+        '▬'.repeat(filled) + '◉' + '─'.repeat(Math.max(0, length - filled))
+    const toClock = (ms: number): string => {
+        const secs = Math.floor(ms / 1000)
+        return `${Math.floor(secs / 60)}:${(secs % 60).toString().padStart(2, '0')}`
+    }
+    return `${bar}\n\`${toClock(posMs)} / ${toClock(durMs)}\``
+}
+
 export default new Command({
     data: new SlashCommandBuilder()
         .setName('songinfo')
@@ -35,9 +49,9 @@ export default new Command({
         )
         // Snapshot the current playback position as a progress bar with
         // elapsed/total timecodes. Null for livestreams / no-duration tracks.
-        const progressBar =
-            queue?.node.createProgressBar({ length: 18, timecodes: true }) ??
-            null
+        const progressBar = track?.durationMS
+            ? buildProgressBar(queue?.node.streamTime ?? 0, track.durationMS)
+            : null
         const embed = buildTrackEmbed(
             trackData,
             'playing',

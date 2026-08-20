@@ -18,7 +18,7 @@ import {
 import { clearSessionMoodCache } from '../../../utils/music/autoplay/replenisher'
 import type { CommandExecuteParams } from '../../../types/CommandData'
 import type { ChatInputCommandInteraction } from 'discord.js'
-import type { GuildQueue } from 'discord-player'
+import type { RainlinkQueueAdapter as GuildQueue } from '../../../utils/music/rainlinkAdapter'
 import { resolveGuildQueue } from '../../../utils/music/queueResolver'
 
 async function handleNotPlaying(
@@ -41,7 +41,7 @@ async function skipCurrentSong(
     queue: GuildQueue,
     guildId: string,
 ): Promise<void> {
-    queue.node.skip()
+    await queue.node.skip()
     clearSessionMoodCache(guildId)
 
     debugLog({
@@ -117,7 +117,16 @@ export default new Command({
     category: 'music',
     execute: async ({ client, interaction }: CommandExecuteParams) => {
         if (!(await requireGuild(interaction))) return
-        if (!(await requireDJRole(interaction, assertDefined(interaction.guildId, 'guildId guaranteed by requireGuild guard')))) return
+        if (
+            !(await requireDJRole(
+                interaction,
+                assertDefined(
+                    interaction.guildId,
+                    'guildId guaranteed by requireGuild guard',
+                ),
+            ))
+        )
+            return
 
         const { queue } = resolveGuildQueue(client, interaction.guildId ?? '')
 

@@ -1,4 +1,4 @@
-import type { Track } from 'discord-player'
+import type { RainlinkTrackAdapter as Track } from '../../../../utils/music/rainlinkAdapter'
 import { getTrackInfo } from '../../../../utils/music/trackUtils'
 import { isSimilarTitle } from '../../../../utils/music/titleComparison'
 import type { TrackDisplayInfo, QueueDisplayOptions } from './types'
@@ -17,9 +17,9 @@ export async function formatTrackForDisplay(
     return {
         title: track.title,
         author: track.author,
-        url: track.url,
+        url: track.url ?? '',
         duration: trackInfo.duration || 'Unknown',
-        thumbnail: track.thumbnail,
+        thumbnail: track.thumbnail ?? undefined,
         requestedBy: track.requestedBy?.username,
         position,
         isAutoplay: metadata.isAutoplay,

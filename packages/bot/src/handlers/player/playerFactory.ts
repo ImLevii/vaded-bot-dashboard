@@ -1,60 +1,35 @@
-import { Player } from 'discord-player'
-import type { BaseExtractor } from 'discord-player'
-import { FFmpeg } from '@discord-player/ffmpeg'
-import {
-    SoundCloudExtractor,
-    AppleMusicExtractor,
-    VimeoExtractor,
-    AttachmentExtractor,
-} from '@discord-player/extractor'
-import { SpotifyExtractor } from 'discord-player-spotify'
-import { existsSync, readdirSync } from 'fs'
-import { join } from 'path'
-import * as playdl from 'play-dl'
+import { Rainlink, Library, type RainlinkNodeOptions } from 'rainlink'
+import { SpotifyPlugin } from 'rainlink-spotify'
 import type { CustomClient } from '../../types'
 import { errorLog, infoLog, warnLog } from '@lucky/shared/utils'
-import { createResilientStream } from './streamBridge'
-import { withTimeout } from './withTimeout'
-
-function resolveWingetFfmpeg(): string | null {
-    if (process.platform !== 'win32' || !process.env.LOCALAPPDATA) return null
-    const packages = join(process.env.LOCALAPPDATA, 'Microsoft', 'WinGet', 'Packages')
-    if (!existsSync(packages)) return null
-    const dir = readdirSync(packages).find((d) => d.startsWith('yt-dlp.FFmpeg_'))
-    if (!dir) return null
-    // winget FFmpeg package layout: <name>\<build-name>\bin\ffmpeg.exe
-    const binDir = join(packages, dir)
-    const buildDir = readdirSync(binDir).find((d) => d.startsWith('ffmpeg-'))
-    if (!buildDir) return null
-    const exe = join(binDir, buildDir, 'bin', 'ffmpeg.exe')
-    return existsSync(exe) ? exe : null
-}
-
-function registerWingetFfmpeg(): void {
-    const exe = resolveWingetFfmpeg()
-    if (!exe) return
-    // Prepend the absolute path so it's tried before the generic 'ffmpeg' name.
-    // @discord-player/ffmpeg typings restrict `name` to known literals, but
-    // runtime accepts absolute executable paths as documented in FFmpegSource.
-    FFmpeg.sources.unshift({ name: exe, module: false } as any)
-    infoLog({ message: `Registered winget ffmpeg: ${exe}` })
-}
+import { ENVIRONMENT_CONFIG } from '@lucky/shared/config'
 
 type CreatePlayerParams = {
     client: CustomClient
 }
 
-export const createPlayer = ({ client }: CreatePlayerParams): Player => {
+export const createPlayer = ({ client }: CreatePlayerParams): Rainlink => {
     try {
-        infoLog({ message: 'Creating player...' })
+        infoLog({ message: 'Creating rainlink player...' })
 
-        registerWingetFfmpeg()
-        const player = new Player(client)
-        registerExtractors(player)
+        const player = new Rainlink({
+            library: new Library.DiscordJS(client),
+            nodes: [buildNodeOptions()],
+            plugins: buildPlugins(),
+            options: {
+                resume: true,
+                resumeTimeout: 600,
+                defaultSearchEngine: 'youtube',
+                searchFallback: {
+                    enable: true,
+                    engine: 'youtube',
+                },
+            },
+        })
 
         player.setMaxListeners(20)
 
-        infoLog({ message: 'Player created successfully' })
+        infoLog({ message: 'Rainlink player created successfully' })
         return player
     } catch (error) {
         errorLog({ message: 'Error creating player:', error })
@@ -62,176 +37,38 @@ export const createPlayer = ({ client }: CreatePlayerParams): Player => {
     }
 }
 
-const registerExtractors = (player: Player): void => {
-    // Register all extractors asynchronously in initialization order:
-    //   Spotify → play-dl SoundCloud init (yt-dlp bridge) → YouTube → SoundCloud extractor → Apple Music → Vimeo → Attachments
-    // Fire without awaiting so createPlayer() returns synchronously.
-    registerExtractorsInOrder(player).catch((error) => {
-        errorLog({
-            message: 'Extractor init failed — music features degraded',
-            error,
-        })
-    })
-}
-
-const registerExtractorsInOrder = async (player: Player): Promise<void> => {
-    // 1. Spotify — first priority for searches and Spotify URLs
-    await registerSpotifyExtractor(player)
-
-    // 2. YouTube — register BEFORE the play-dl SoundCloud init. play-dl is
-    //    unmaintained and getFreeClientID() is a network call; sequencing it
-    //    ahead of YouTube meant a slow/hanging play-dl call delayed YouTube
-    //    registration, leaving #play of YouTube URLs returning "No results
-    //    found" until the call resolved (#1468). Extractor priority is
-    //    unchanged (Spotify → YouTube → SoundCloud …).
-    await loadYoutubeExtractor(player)
-
-    // 3. play-dl SoundCloud client id — used only at stream time by the bridge;
-    //    bounded so a hang cannot stall the remaining registrations.
-    await initPlayDlSoundCloud()
-
-    // 4. SoundCloud, Apple Music, Vimeo, Attachments
-    await registerRemainingExtractors(player)
-}
-
-const registerSpotifyExtractor = async (player: Player): Promise<void> => {
-    try {
-        const registered = await player.extractors.register(SpotifyExtractor, {
-            clientId: process.env.SPOTIFY_CLIENT_ID ?? undefined,
-            clientSecret: process.env.SPOTIFY_CLIENT_SECRET ?? undefined,
-            market: 'US',
-        })
-        if (!registered) {
-            warnLog({
-                message:
-                    'SpotifyExtractor registration returned null — Spotify searches degraded',
-            })
-            return
-        }
-        infoLog({ message: 'Registered SpotifyExtractor (priority 1)' })
-    } catch (error) {
-        warnLog({
-            message:
-                'SpotifyExtractor failed to register — Spotify searches degraded',
-            error,
-        })
+const buildNodeOptions = (): RainlinkNodeOptions => {
+    const { HOST, PORT, PASSWORD, SECURE } = ENVIRONMENT_CONFIG.LAVALINK
+    return {
+        name: 'main',
+        host: HOST,
+        port: PORT,
+        auth: PASSWORD,
+        secure: SECURE,
     }
 }
 
-const registerRemainingExtractors = async (player: Player): Promise<void> => {
-    const extractors = [
-        { extractor: SoundCloudExtractor, name: 'SoundCloud' },
-        { extractor: AppleMusicExtractor, name: 'Apple Music' },
-        { extractor: VimeoExtractor, name: 'Vimeo' },
-        { extractor: AttachmentExtractor, name: 'Attachments' },
-    ]
+const buildPlugins = () => {
+    const plugins = []
+    const { CLIENT_ID, CLIENT_SECRET } = ENVIRONMENT_CONFIG.SPOTIFY
 
-    for (const { extractor, name } of extractors) {
-        try {
-            const registered = await player.extractors.register(extractor, {})
-            if (!registered) {
-                warnLog({
-                    message: `${name} extractor registration returned null`,
-                })
-            }
-        } catch (error) {
-            warnLog({ message: `${name} extractor failed to register`, error })
-        }
-    }
-
-    infoLog({
-        message: 'Registered: SoundCloud, Apple Music, Vimeo, Attachments',
-    })
-}
-
-const initPlayDlSoundCloud = async (): Promise<void> => {
-    try {
-        const clientId = await withTimeout(
-            playdl.getFreeClientID(),
-            10_000,
-            'play-dl getFreeClientID',
+    if (CLIENT_ID && CLIENT_SECRET) {
+        plugins.push(
+            new SpotifyPlugin({
+                clientId: CLIENT_ID,
+                clientSecret: CLIENT_SECRET,
+                playlistPageLimit: 1,
+                albumPageLimit: 1,
+                searchLimit: 10,
+            }),
         )
-        await playdl.setToken({ soundcloud: { client_id: clientId } })
-        infoLog({ message: 'play-dl: SoundCloud client ID initialized' })
-    } catch (error) {
+        infoLog({ message: 'Registered rainlink Spotify plugin' })
+    } else {
         warnLog({
             message:
-                'play-dl: SoundCloud client ID init failed — bridge may not stream',
-            error,
+                'SPOTIFY_CLIENT_ID/SPOTIFY_CLIENT_SECRET not set — Spotify search disabled',
         })
     }
+
+    return plugins
 }
-
-type YoutubeExtractorModule = {
-    YoutubeExtractor?: typeof BaseExtractor<object>
-    YoutubeiExtractor?: typeof BaseExtractor<object>
-}
-
-const YOUTUBE_REGISTER_ATTEMPTS = 2
-
-const loadYoutubeExtractor = async (player: Player): Promise<void> => {
-    // Retry: a transient import/activation failure here used to be swallowed,
-    // leaving the bot with NO YouTube extractor until the next restart — every
-    // #play of a YouTube URL then returns "No results found" (#1468).
-    for (let attempt = 1; attempt <= YOUTUBE_REGISTER_ATTEMPTS; attempt++) {
-        try {
-            const mod =
-                (await import('discord-player-youtubei')) as YoutubeExtractorModule
-
-            // v3 renamed YoutubeiExtractor → YoutubeExtractor
-            const YoutubeExtractor =
-                mod.YoutubeExtractor ?? mod.YoutubeiExtractor
-            if (!YoutubeExtractor) {
-                warnLog({
-                    message:
-                        'discord-player-youtubei: no extractor export found — skipping YouTube extractor',
-                })
-                return
-            }
-
-            const registered = await player.extractors.register(
-                YoutubeExtractor,
-                { createStream: createResilientStream },
-            )
-
-            if (registered) {
-                infoLog({
-                    message:
-                        'Registered YoutubeExtractor (SoundCloud bridge + YouTube fallback)',
-                })
-                return
-            }
-
-            warnLog({
-                message: `YoutubeExtractor registration returned null (attempt ${attempt}/${YOUTUBE_REGISTER_ATTEMPTS})`,
-            })
-        } catch (error) {
-            warnLog({
-                message: `YouTube extractor registration failed (attempt ${attempt}/${YOUTUBE_REGISTER_ATTEMPTS})`,
-                error,
-            })
-        }
-
-        if (attempt < YOUTUBE_REGISTER_ATTEMPTS) {
-            await new Promise((resolve) => setTimeout(resolve, 1_000))
-        }
-    }
-
-    // Escalate to errorLog (not warn): the bot is now running degraded and
-    // YouTube playback will fail until restart — this must be visible.
-    errorLog({
-        message:
-            'YouTube extractor unavailable after retries — #play of YouTube URLs will fail until restart. Falling back to SoundCloud/Spotify only.',
-    })
-}
-
-export {
-    streamViaYtDlp,
-    streamViaYtDlpSearch,
-    createResilientStream,
-} from './streamBridge'
-export {
-    streamViaSoundCloud,
-    findMatchingSoundCloudResult,
-    parseDurationString,
-} from './soundcloudMatcher'

@@ -1,15 +1,18 @@
 import { SlashCommandBuilder } from '@discordjs/builders'
 import Command from '../../../models/Command'
-import { interactionReply } from "../../../utils/general/interactionReply"
-import { createErrorEmbed, createSuccessEmbed } from "../../../utils/general/embeds"
+import { interactionReply } from '../../../utils/general/interactionReply'
+import {
+    createErrorEmbed,
+    createSuccessEmbed,
+} from '../../../utils/general/embeds'
 import {
     requireGuild,
     requireQueue,
     requireCurrentTrack,
     requireVoiceChannel,
-} from "../../../utils/command/commandValidations"
-import type { CommandExecuteParams } from "../../../types/CommandData"
-import type { GuildQueue } from 'discord-player'
+} from '../../../utils/command/commandValidations'
+import type { CommandExecuteParams } from '../../../types/CommandData'
+import type { RainlinkQueueAdapter as GuildQueue } from '../../../utils/music/rainlinkAdapter'
 import { resolveGuildQueue } from '../../../utils/music/queueResolver'
 
 /**
@@ -33,7 +36,7 @@ function validateRemovePosition(pos: number, queueSize: number): string | null {
 function removeTrackFromQueue(queue: GuildQueue, pos: number): unknown {
     const tracks = queue.tracks.toArray()
     const removed = tracks[pos]
-    queue.tracks.remove((_, i) => i === pos)
+    queue.tracks.remove(pos)
     return removed
 }
 

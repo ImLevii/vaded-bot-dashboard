@@ -4,14 +4,14 @@ import {
     type MusicCommand,
     type MusicCommandResult,
 } from '@lucky/shared/services'
-import { ENVIRONMENT_CONFIG } from '@lucky/shared/config'
 import { buildQueueState } from './mappers'
 import { resolveGuildQueue } from '../../utils/music/queueResolver'
 import {
     normalizeSpotifyUrl,
     normalizeYoutubeUrl,
 } from '../../functions/music/commands/play/urlNormalization'
-import { buildWebNodeOptions, resolveWebPlayContext } from './playContext'
+import { wrapPlayer } from '../../utils/music/rainlinkAdapter'
+import { resolveWebPlayContext } from './playContext'
 import { musicSessionSnapshotService } from '../../utils/music/sessionSnapshots'
 
 type Result = MusicCommandResult
@@ -66,11 +66,12 @@ export async function handleQueueRemove(
     if (!queue) return fail(cmd.id, cmd.guildId, 'No active queue')
 
     const index = cmd.data?.index as number
-    if (index < 0 || index >= queue.tracks.toArray().length) {
+    const tracksArray = queue.tracks.toArray()
+    if (index < 0 || index >= tracksArray.length) {
         return fail(cmd.id, cmd.guildId, 'Invalid track index')
     }
 
-    queue.removeTrack(index)
+    queue.removeTrack(tracksArray[index])
     const state = await buildQueueState(client, cmd.guildId)
     await musicControlService.publishState(state)
     return ok(cmd.id, cmd.guildId)
@@ -112,9 +113,6 @@ export async function handleImportPlaylist(
     const requestedBy = await client.users
         .fetch(cmd.userId)
         .catch(() => undefined)
-    const result = await client.player.search(url, { requestedBy })
-    if (!result?.tracks.length)
-        return fail(cmd.id, cmd.guildId, 'No tracks found in playlist')
 
     let queue = resolveGuildQueue(client, cmd.guildId).queue
 
@@ -132,39 +130,37 @@ export async function handleImportPlaylist(
         )
         if (!resolved.ok) return fail(cmd.id, cmd.guildId, resolved.error)
 
-        // Play the first track to establish the queue and connection.
         // metadata.channel must be a real text channel: trackNowPlaying.ts
         // returns early without one, which silently suppressed the Now
         // Playing embed for every web-started session.
-        await client.player.play(
-            resolved.context.voiceChannel,
-            result.tracks[0],
-            {
-                requestedBy,
-                nodeOptions: buildWebNodeOptions(
-                    resolved.context,
-                    ENVIRONMENT_CONFIG.PLAYER.CONNECTION_TIMEOUT,
-                ),
-            },
-        )
-        // Add remaining tracks to the newly created queue
-        queue = resolveGuildQueue(client, cmd.guildId).queue
-        if (queue && result.tracks.length > 1) {
-            for (const track of result.tracks.slice(1)) queue.addTrack(track)
+        const rainlinkPlayer = await client.player.create({
+            guildId: cmd.guildId,
+            textId:
+                resolved.context.textChannel?.id ??
+                resolved.context.voiceChannel.id,
+            voiceId: resolved.context.voiceChannel.id,
+            shardId: guild.shardId,
+        })
+        queue = wrapPlayer(rainlinkPlayer)
+        queue.setMetadata({
+            channel: resolved.context.textChannel,
+            requestedBy: resolved.context.requestedBy ?? null,
+        })
+    }
+
+    const result = await queue.search(url, { requestedBy })
+    if (!result?.tracks.length)
+        return fail(cmd.id, cmd.guildId, 'No tracks found in playlist')
+
+    const existingUrls = new Set(queue.tracks.toArray().map((t) => t.url))
+    for (const track of result.tracks) {
+        if (!track.url || !existingUrls.has(track.url)) {
+            queue.addTrack(track)
+            if (track.url) existingUrls.add(track.url)
         }
-    } else {
-        // Deduplicate against tracks already in the queue by URL
-        const existingUrls = new Set(
-            queue.tracks.toArray().map((t: { url: string }) => t.url),
-        )
-        for (const track of result.tracks) {
-            if (!existingUrls.has(track.url)) {
-                queue.addTrack(track)
-                existingUrls.add(track.url)
-            }
-        }
-        if (!queue.node.isPlaying() && !queue.node.isPaused())
-            await queue.node.play()
+    }
+    if (!queue.node.isPlaying() && !queue.node.isPaused()) {
+        await queue.node.play()
     }
 
     const state = await buildQueueState(client, cmd.guildId)
@@ -172,7 +168,7 @@ export async function handleImportPlaylist(
 
     return ok(cmd.id, cmd.guildId, {
         tracksAdded: result.tracks.length,
-        playlistName: result.playlist?.title ?? 'Unknown Playlist',
+        playlistName: result.playlistName ?? 'Unknown Playlist',
         source: detectSource(url),
     })
 }

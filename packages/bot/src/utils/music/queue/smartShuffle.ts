@@ -7,7 +7,7 @@ export interface SmartShuffleTrack {
     author: string
     duration: string
     source: string
-    requestedBy: { id: string } | null
+    requestedBy: { id: string } | null | undefined
 }
 
 function parseDurationSeconds(duration: string): number {
@@ -38,7 +38,11 @@ export function smartShuffle<T extends SmartShuffleTrack>(
 
     const streakLimit = options?.streakLimit ?? 2
 
-    const scored = tracks.map((t, i) => ({ track: t, score: energyScore(t), idx: i }))
+    const scored = tracks.map((t, i) => ({
+        track: t,
+        score: energyScore(t),
+        idx: i,
+    }))
 
     // Fisher-Yates shuffle within scored to randomize same-score ties
     for (let i = scored.length - 1; i > 0; i--) {
@@ -72,7 +76,8 @@ export function smartShuffle<T extends SmartShuffleTrack>(
                 ? result.slice(-streakLimit).map(requesterId)
                 : []
         const streakId =
-            lastIds.length === streakLimit && lastIds.every((id) => id === lastIds[0])
+            lastIds.length === streakLimit &&
+            lastIds.every((id) => id === lastIds[0])
                 ? lastIds[0]
                 : null
 

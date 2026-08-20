@@ -1,8 +1,9 @@
-import type { GuildQueue, Track } from 'discord-player'
-import { QueueRepeatMode } from 'discord-player'
+import type {
+    RainlinkQueueAdapter as GuildQueue,
+    RainlinkTrackAdapter as Track,
+} from '../../../../../utils/music/rainlinkAdapter'
 import { errorLog } from '@lucky/shared/utils'
 import { addBreadcrumb } from '@lucky/shared/utils/monitoring'
-import { blendAutoplayTracks } from '../../../../../utils/music/queueManipulation'
 import { applyStoredAutoplayPreference } from './autoplayPreference'
 import { clearAutoplayPause } from '../../../../../utils/music/autoplay/skipCircuitBreaker'
 import { clearSessionMoodCache } from '../../../../../utils/music/autoplay/replenisher'
@@ -70,7 +71,10 @@ async function withSingleRetry(fn: () => Promise<void>): Promise<void> {
 export async function runPostPlayBackgroundOps(
     input: PostPlayBackgroundOpsInput,
 ): Promise<void> {
-    const { queue, guildId, track, hadQueueBeforePlay, isPlaylist } = input
+    // Autoplay (preference application, cross-fade blending) is deferred —
+    // rainlink has no AUTOPLAY loop mode. See
+    // decisions/2026-06-10-defer-autoplay-engine-extraction.md.
+    const { queue, guildId, hadQueueBeforePlay } = input
 
     await runIsolated('clearAutoplayPause', guildId, () =>
         clearAutoplayPause(guildId),
@@ -85,12 +89,6 @@ export async function runPostPlayBackgroundOps(
             withSingleRetry(() =>
                 applyStoredAutoplayPreference(queue, guildId),
             ),
-        )
-    }
-
-    if (!isPlaylist && queue && queue.repeatMode === QueueRepeatMode.AUTOPLAY) {
-        await runIsolated('blendAutoplayTracks', guildId, () =>
-            blendAutoplayTracks(queue, track),
         )
     }
 }

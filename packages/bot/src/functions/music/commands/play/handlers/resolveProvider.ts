@@ -1,35 +1,16 @@
-import { QueryType } from 'discord-player'
-import type {
-    Player,
-    PlayerNodeInitializerOptions,
-    PlayerNodeInitializationResult,
-} from 'discord-player'
-import type { VoiceBasedChannel } from 'discord.js'
+import type { SendableChannels, User, VoiceBasedChannel } from 'discord.js'
+import { RainlinkSearchResultType, type Rainlink } from 'rainlink'
 import { warnLog } from '@lucky/shared/utils'
 import { addBreadcrumb } from '@lucky/shared/utils/monitoring'
-
-const SPOTIFY_EXTRACTOR_ID = 'com.discord-player.itsmaat.spotifyextractor'
-const ATTACHMENT_EXTRACTOR_ID = 'com.discord-player.attachmentextractor'
-
-// Extractors whose validate() ignores queryType and will therefore claim a
-// plain text search they cannot serve. Blocked on the text-search fallback
-// arms so the query reaches the provider the arm is actually named after.
-//
-// SpotifyExtractor was the first offender. AttachmentExtractor is the second:
-// with the YouTube extractor degraded it captured both the YOUTUBE_SEARCH and
-// SOUNDCLOUD_SEARCH arms, so every arm failed as
-// "NoResultError (Extractor: com.discord-player.attachmentextractor)" and the
-// SoundCloud fallback never actually ran (#1930).
-const TEXT_SEARCH_BLOCKED_EXTRACTORS = [
-    SPOTIFY_EXTRACTOR_ID,
-    ATTACHMENT_EXTRACTOR_ID,
-]
+import type {
+    RainlinkQueueAdapter,
+    RainlinkTrackAdapter,
+} from '../../../../../utils/music/rainlinkAdapter'
+import { wrapPlayer } from '../../../../../utils/music/rainlinkAdapter'
+import { resolveGuildQueue } from '../../../../../utils/music/queueResolver'
 
 export type PlayResolutionArm =
-    | 'primary'
-    | 'youtube-fallback'
-    | 'soundcloud-fallback'
-    | 'failed'
+    'primary' | 'youtube-fallback' | 'soundcloud-fallback' | 'failed'
 
 interface ResolutionTelemetry {
     resolvedVia: PlayResolutionArm
@@ -38,19 +19,53 @@ interface ResolutionTelemetry {
     errorClass?: string
 }
 
+export type PlaylistInfo = {
+    title: string
+    url: string
+}
+
+export type PlayResolutionResult = {
+    track: RainlinkTrackAdapter
+    queue: RainlinkQueueAdapter
+    hadQueueBeforePlay: boolean
+    searchResult: {
+        playlist: PlaylistInfo | null
+        tracks: RainlinkTrackAdapter[]
+    }
+}
+
+type ResolveParams = {
+    client: { player: Rainlink }
+    guildId: string
+    textId: string
+    channel: SendableChannels | null
+    voiceChannel: VoiceBasedChannel
+    query: string
+    requestedProvider: string
+    requestedBy: User
+    vcMemberIds: string[]
+}
+
 /**
- * Resolve a query via the discord-player with fallback chain.
- * Emits telemetry breadcrumbs for observability.
+ * Gets or creates the guild's rainlink player, searches (with an engine
+ * fallback chain since Lavalink's own `defaultSearchEngine`/`searchFallback`
+ * only covers the primary attempt), and enqueues the result.
+ *
+ * Unlike discord-player's `Player#play()`, rainlink has no single "resolve +
+ * create queue + connect + enqueue" call — this reconstructs that flow.
  */
-export async function resolveQueryWithFallbacks(
-    player: Player,
-    voiceChannel: VoiceBasedChannel,
-    query: string,
-    requestedProvider: string,
-    searchEngine: QueryType,
-    playOptions: PlayerNodeInitializerOptions<unknown>,
-): Promise<{
-    result: PlayerNodeInitializationResult<unknown>
+export async function resolveQueryWithFallbacks({
+    client,
+    guildId,
+    textId,
+    channel,
+    voiceChannel,
+    query,
+    requestedProvider,
+    requestedBy,
+    vcMemberIds,
+}: ResolveParams): Promise<{
+    result: PlayResolutionResult
     telemetry: ResolutionTelemetry
 }> {
     const startTime = Date.now()
@@ -60,70 +75,91 @@ export async function resolveQueryWithFallbacks(
         requestedProvider,
     }
 
-    try {
-        // Attempt primary resolution
-        const result = await player.play(voiceChannel, query, playOptions)
-        telemetry.latencyMs = Date.now() - startTime
-        telemetry.resolvedVia = 'primary'
-        return { result, telemetry }
-    } catch (primaryError) {
-        if (searchEngine !== QueryType.AUTO) {
-            warnLog({
-                message: 'Primary search failed, falling back to YouTube',
-                data: {
-                    query,
-                    requestedProvider,
-                    searchEngine: String(searchEngine),
-                    error: String(primaryError),
-                },
+    const existing = resolveGuildQueue(client, guildId).queue
+    const hadQueueBeforePlay = Boolean(existing)
+    const queue =
+        existing ??
+        wrapPlayer(
+            await client.player.create({
+                guildId,
+                textId,
+                voiceId: voiceChannel.id,
+                shardId: voiceChannel.guild.shardId,
+            }),
+        )
+    if (!existing) {
+        queue.setMetadata({ channel, requestedBy, vcMemberIds })
+    }
+
+    const attempts: { engine: string | undefined; arm: PlayResolutionArm }[] = [
+        { engine: undefined, arm: 'primary' },
+        { engine: 'youtube', arm: 'youtube-fallback' },
+        { engine: 'soundcloud', arm: 'soundcloud-fallback' },
+    ]
+
+    let lastError: unknown
+    for (const attempt of attempts) {
+        try {
+            const searchResult = await queue.search(query, {
+                requestedBy,
+                engine: attempt.engine,
             })
-
-            try {
-                // Attempt YouTube fallback. See TEXT_SEARCH_BLOCKED_EXTRACTORS
-                // for why these are excluded.
-                const result = await player.play(voiceChannel, query, {
-                    ...playOptions,
-                    searchEngine: QueryType.YOUTUBE_SEARCH,
-                    blockExtractors: TEXT_SEARCH_BLOCKED_EXTRACTORS,
-                })
-                telemetry.latencyMs = Date.now() - startTime
-                telemetry.resolvedVia = 'youtube-fallback'
-                return { result, telemetry }
-            } catch (_youtubeError) {
-                warnLog({
-                    message:
-                        'YouTube search failed, falling back to SoundCloud',
-                    data: { query, error: String(_youtubeError) },
-                })
-
-                try {
-                    // Attempt SoundCloud fallback — same block reason as above
-                    const result = await player.play(voiceChannel, query, {
-                        ...playOptions,
-                        searchEngine: QueryType.SOUNDCLOUD_SEARCH,
-                        blockExtractors: TEXT_SEARCH_BLOCKED_EXTRACTORS,
-                    })
-                    telemetry.latencyMs = Date.now() - startTime
-                    telemetry.resolvedVia = 'soundcloud-fallback'
-                    return { result, telemetry }
-                } catch (soundcloudError) {
-                    // All fallbacks exhausted
-                    telemetry.latencyMs = Date.now() - startTime
-                    telemetry.resolvedVia = 'failed'
-                    telemetry.errorClass = (
-                        soundcloudError as Error
-                    ).constructor.name
-                    throw soundcloudError
-                }
+            if (searchResult.tracks.length === 0) {
+                lastError = new Error('No results found')
+                continue
             }
-        } else {
-            // No fallbacks available for AUTO
+
             telemetry.latencyMs = Date.now() - startTime
-            telemetry.resolvedVia = 'failed'
-            telemetry.errorClass = (primaryError as Error).constructor.name
-            throw primaryError
+            telemetry.resolvedVia = attempt.arm
+
+            const isPlaylist =
+                searchResult.type === RainlinkSearchResultType.PLAYLIST
+            for (const track of searchResult.tracks) {
+                queue.addTrack(track)
+            }
+            if (!queue.node.isPlaying() && !queue.node.isPaused()) {
+                await queue.node.play()
+            }
+
+            return {
+                result: {
+                    track: searchResult.tracks[0],
+                    queue,
+                    hadQueueBeforePlay,
+                    searchResult: {
+                        playlist: isPlaylist
+                            ? {
+                                  title: searchResult.playlistName ?? query,
+                                  url: query,
+                              }
+                            : null,
+                        tracks: searchResult.tracks,
+                    },
+                },
+                telemetry,
+            }
+        } catch (error) {
+            lastError = error
+            if (attempt.arm === 'primary') {
+                warnLog({
+                    message: 'Primary search failed, falling back to YouTube',
+                    data: {
+                        query,
+                        requestedProvider,
+                        error: String(error),
+                    },
+                })
+            }
         }
     }
+
+    telemetry.latencyMs = Date.now() - startTime
+    telemetry.resolvedVia = 'failed'
+    telemetry.errorClass =
+        lastError instanceof Error ? lastError.constructor.name : 'Error'
+    // A newly-created, still-empty queue shouldn't be left connected to voice.
+    if (!hadQueueBeforePlay) await queue.delete()
+    throw lastError instanceof Error ? lastError : new Error('No results found')
 }
 
 /**
@@ -151,3 +187,5 @@ export function emitPlayResolutionTelemetry(
         // Telemetry must never break the play flow
     }
 }
+
+export { RainlinkSearchResultType }

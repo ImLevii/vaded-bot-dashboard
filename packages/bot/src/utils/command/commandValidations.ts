@@ -1,6 +1,10 @@
 import type { ChatInputCommandInteraction, GuildMember } from 'discord.js'
-import { GuildMemberRoleManager, PermissionsBitField, PermissionFlagsBits } from 'discord.js'
-import type { GuildQueue } from 'discord-player'
+import {
+    GuildMemberRoleManager,
+    PermissionsBitField,
+    PermissionFlagsBits,
+} from 'discord.js'
+import type { RainlinkQueueAdapter as GuildQueue } from '../music/rainlinkAdapter'
 import { errorEmbed, createErrorEmbed } from '../general/embeds'
 import { interactionReply } from '../general/interactionReply'
 import {

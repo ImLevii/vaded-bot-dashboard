@@ -1,12 +1,11 @@
-import type { GuildQueue } from 'discord-player'
+import type { Rainlink, RainlinkPlayer } from 'rainlink'
 import type { Client } from 'discord.js'
 import { infoLog, debugLog } from '@lucky/shared/utils'
 import * as voiceStatus from '../../services/VoiceChannelStatusService'
 import { ENVIRONMENT_CONFIG } from '@lucky/shared/config'
 import { musicWatchdogService } from '../../utils/music/watchdog'
 import { musicSessionSnapshotService } from '../../utils/music/sessionSnapshots'
-import { replenishQueue } from '../../utils/music/queueOperations'
-import type { QueueMetadata } from '../../types/QueueMetadata'
+import { wrapPlayer } from '../../utils/music/rainlinkAdapter'
 
 export const setupVoiceKickDetection = (client: Client): void => {
     client.on('voiceStateUpdate', async (oldState, newState) => {
@@ -16,7 +15,7 @@ export const setupVoiceKickDetection = (client: Client): void => {
         if (wasInChannel && nowDisconnected && oldState.guild) {
             const guildId = oldState.guild.id
             musicWatchdogService.markIntentionalStop(guildId)
-            // The connectionDestroyed/disconnect handlers below fire *before*
+            // The playerDestroy/playerDisconnect handlers below fire *before*
             // this event when the disconnect came from Discord's side, so they
             // save a snapshot while the stop is not yet flagged. Dropping it
             // here closes that race: without it the orphan scan found a fresh
@@ -29,32 +28,55 @@ export const setupVoiceKickDetection = (client: Client): void => {
     })
 }
 
-export const setupLifecycleHandlers = (player: {
-    events: { on: (event: string, handler: Function) => void }
-}): void => {
-    player.events.on('debug', (queue: GuildQueue, message: string) => {
-        debugLog({
-            message: `Player debug from ${queue.guild.name}: ${message}`,
-        })
+/**
+ * rainlink has no built-in "voice channel became empty" event (discord-player's
+ * emptyChannel) — reimplemented here by watching voiceStateUpdate for members
+ * leaving a channel the bot occupies.
+ */
+export const setupEmptyChannelDetection = (
+    client: Client,
+    rainlink: Rainlink,
+): void => {
+    client.on('voiceStateUpdate', async (oldState) => {
+        if (!oldState.channelId || !oldState.guild) return
+        const rainlinkPlayer = rainlink.players.get(oldState.guild.id)
+        if (!rainlinkPlayer || rainlinkPlayer.voiceId !== oldState.channelId)
+            return
+
+        const channel = oldState.channel
+        if (!channel) return
+        const nonBotMembers = channel.members.filter((m) => !m.user.bot)
+        if (nonBotMembers.size > 0) return
+
+        const queue = wrapPlayer(rainlinkPlayer)
+        infoLog({ message: `Channel is empty in guild ${queue.guild.id}` })
+        await voiceStatus.clearStatus(queue)
+        await musicSessionSnapshotService.saveSnapshot(queue)
+        musicWatchdogService.clear(queue.guild.id)
+    })
+}
+
+export const setupLifecycleHandlers = (player: Rainlink): void => {
+    player.on('debug', (logs: string) => {
+        debugLog({ message: `Player debug: ${logs}` })
     })
 
-    player.events.on('connection', async (queue: GuildQueue) => {
+    // rainlink has no separate "voice connected" event — playerCreate fires
+    // once the player (and its voice connection) is created.
+    player.on('playerCreate', async (rainlinkPlayer: RainlinkPlayer) => {
+        const queue = wrapPlayer(rainlinkPlayer)
         infoLog({
-            message: `Created connection to voice channel in ${queue.guild.name}`,
+            message: `Created connection to voice channel in guild ${queue.guild.id}`,
+        })
+        debugLog({
+            message: 'Voice connection details',
+            data: {
+                connected: queue.isVoiceConnected,
+                voiceId: queue.voiceId,
+            },
         })
 
-        if (queue.connection) {
-            debugLog({
-                message: 'Voice connection details',
-                data: {
-                    state: queue.connection.state?.status,
-                    joinConfig: queue.connection.joinConfig,
-                    ready: queue.connection.state?.status === 'ready',
-                },
-            })
-        }
-
-        const metadata = queue.metadata as QueueMetadata | undefined
+        const metadata = queue.metadata
         if (
             ENVIRONMENT_CONFIG.MUSIC.SESSION_RESTORE_ENABLED &&
             !metadata?.skipConnectionEventRestore
@@ -67,7 +89,7 @@ export const setupLifecycleHandlers = (player: {
                     () =>
                         reject(
                             new Error(
-                                `Session restore timed out in ${queue.guild.name}`,
+                                `Session restore timed out in guild ${queue.guild.id}`,
                             ),
                         ),
                     2000,
@@ -101,9 +123,14 @@ export const setupLifecycleHandlers = (player: {
         musicWatchdogService.arm(queue)
     })
 
-    player.events.on('connectionDestroyed', async (queue: GuildQueue) => {
+    // rainlink has no separate "voice disconnected" event distinct from
+    // "player destroyed" — playerDestroy covers both /stop-style teardown
+    // and Discord-side disconnects, so this merges what used to be two
+    // discord-player handlers (connectionDestroyed + disconnect) into one.
+    player.on('playerDestroy', async (rainlinkPlayer: RainlinkPlayer) => {
+        const queue = wrapPlayer(rainlinkPlayer)
         infoLog({
-            message: `Destroyed connection to voice channel in ${queue.guild.name}`,
+            message: `Destroyed connection to voice channel in guild ${queue.guild.id}`,
         })
 
         await voiceStatus.clearStatus(queue)
@@ -113,34 +140,14 @@ export const setupLifecycleHandlers = (player: {
         // scan restored it a minute later.
         if (!musicWatchdogService.isIntentionalStop(queue.guild.id)) {
             await musicSessionSnapshotService.saveSnapshot(queue)
-        }
-    })
-
-    player.events.on('emptyChannel', async (queue: GuildQueue) => {
-        infoLog({ message: `Channel is empty in ${queue.guild.name}` })
-        await voiceStatus.clearStatus(queue)
-        await musicSessionSnapshotService.saveSnapshot(queue)
-        musicWatchdogService.clear(queue.guild.id)
-    })
-
-    player.events.on('emptyQueue', async (queue: GuildQueue) => {
-        const isAutoplayEnabled = queue.repeatMode === 3
-        if (isAutoplayEnabled && queue.currentTrack) {
-            await replenishQueue(queue)
-        } else {
-            musicWatchdogService.markIntentionalStop(queue.guild.id)
-        }
-    })
-
-    player.events.on('disconnect', async (queue: GuildQueue) => {
-        infoLog({
-            message: `Disconnected from voice channel in ${queue.guild.name}`,
-        })
-
-        await voiceStatus.clearStatus(queue)
-        if (!musicWatchdogService.isIntentionalStop(queue.guild.id)) {
-            await musicSessionSnapshotService.saveSnapshot(queue)
             await musicWatchdogService.checkAndRecover(queue)
         }
+    })
+
+    player.on('queueEmpty', (rainlinkPlayer: RainlinkPlayer) => {
+        const queue = wrapPlayer(rainlinkPlayer)
+        // Autoplay replenishment is deferred — see
+        // decisions/2026-06-10-defer-autoplay-engine-extraction.md.
+        musicWatchdogService.markIntentionalStop(queue.guild.id)
     })
 }

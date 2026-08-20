@@ -5,22 +5,19 @@ import {
     type MusicCommand,
     type MusicCommandResult,
 } from '@lucky/shared/services'
-import { ENVIRONMENT_CONFIG } from '@lucky/shared/config'
 import { buildQueueState, repeatModeToEnum } from './mappers'
 import { resolveGuildQueue } from '../../utils/music/queueResolver'
 import { setReplenishSuppressed } from '../../utils/music/replenishSuppressionStore'
 import { musicWatchdogService } from '../../utils/music/watchdog'
 import { musicSessionSnapshotService } from '../../utils/music/sessionSnapshots'
 import { clearSessionMoodCache } from '../../utils/music/autoplay/replenisher'
-import { QueryType } from 'discord-player'
 import {
     normalizeYoutubeUrl,
     normalizeSpotifyUrl,
     cleanQueryInput,
-    isUrl,
 } from '../../functions/music/commands/play/urlNormalization'
 import { resolveQueryWithFallbacks } from '../../functions/music/commands/play/handlers/resolveProvider'
-import { buildWebNodeOptions, resolveWebPlayContext } from './playContext'
+import { resolveWebPlayContext } from './playContext'
 
 type Result = MusicCommandResult
 
@@ -78,35 +75,38 @@ async function startWebSession(
     if (!resolved.ok) return fail(cmd.id, cmd.guildId, resolved.error)
 
     setReplenishSuppressed(cmd.guildId, 0)
-    const { result: playResult } = await resolveQueryWithFallbacks(
-        client.player,
-        resolved.context.voiceChannel,
-        query,
-        'default',
-        // Mirrors resolveSearchEngine(query, null) without importing
-        // queryUtils, which is documented as too heavy for this handler
-        // (it drags in the Discord/Prisma chain). URLs resolve as-is;
-        // bare text prefers Spotify for its better metadata, and
-        // resolveQueryWithFallbacks handles the YouTube/SoundCloud arms.
-        isUrl(query) ? QueryType.AUTO : QueryType.SPOTIFY_SEARCH,
-        {
-            requestedBy: resolved.context.requestedBy,
-            nodeOptions: buildWebNodeOptions(
-                resolved.context,
-                ENVIRONMENT_CONFIG.PLAYER.CONNECTION_TIMEOUT,
-            ),
-        },
+    const vcMemberIds = Array.from(
+        resolved.context.voiceChannel.members.values(),
     )
+        .filter((member) => !member.user.bot)
+        .map((member) => member.id)
+
+    if (!resolved.context.requestedBy) {
+        return fail(cmd.id, cmd.guildId, 'Could not resolve requesting user')
+    }
+
+    const { result } = await resolveQueryWithFallbacks({
+        client,
+        guildId: cmd.guildId,
+        textId:
+            resolved.context.textChannel?.id ??
+            resolved.context.voiceChannel.id,
+        channel: resolved.context.textChannel,
+        voiceChannel: resolved.context.voiceChannel,
+        query,
+        requestedProvider: 'default',
+        requestedBy: resolved.context.requestedBy,
+        vcMemberIds,
+    })
 
     const state = await buildQueueState(client, cmd.guildId)
     await musicControlService.publishState(state)
 
-    const isPlaylist = !!playResult.searchResult.playlist
+    const isPlaylist = !!result.searchResult.playlist
     return ok(cmd.id, cmd.guildId, {
-        tracksAdded: isPlaylist ? playResult.searchResult.tracks.length : 1,
+        tracksAdded: isPlaylist ? result.searchResult.tracks.length : 1,
         isPlaylist,
-        title:
-            playResult.searchResult.playlist?.title ?? playResult.track.title,
+        title: result.searchResult.playlist?.title ?? result.track.title,
     })
 }
 
@@ -135,28 +135,25 @@ export async function handlePlay(
     const requestedBy = await client.users
         .fetch(cmd.userId)
         .catch(() => undefined)
-    const result = await client.player.search(query, { requestedBy })
+    const result = await existingQueue.search(query, { requestedBy })
     if (!result?.tracks.length)
         return fail(cmd.id, cmd.guildId, 'No results found')
 
     const queue = existingQueue
 
     setReplenishSuppressed(cmd.guildId, 0)
-    if (result.playlist) {
-        for (const track of result.tracks) queue.addTrack(track)
-    } else {
-        queue.addTrack(result.tracks[0])
-    }
+    for (const track of result.tracks) queue.addTrack(track)
 
     if (!queue.node.isPlaying() && !queue.node.isPaused())
         await queue.node.play()
 
+    const isPlaylist = result.tracks.length > 1
     const state = await buildQueueState(client, cmd.guildId)
     await musicControlService.publishState(state)
     return ok(cmd.id, cmd.guildId, {
-        tracksAdded: result.playlist ? result.tracks.length : 1,
-        isPlaylist: !!result.playlist,
-        title: result.playlist?.title ?? result.tracks[0].title,
+        tracksAdded: isPlaylist ? result.tracks.length : 1,
+        isPlaylist,
+        title: result.playlistName ?? result.tracks[0].title,
     })
 }
 
@@ -166,7 +163,7 @@ export async function handlePause(
 ): Promise<Result> {
     const queue = getQueue(client, cmd.guildId)
     if (!queue) return fail(cmd.id, cmd.guildId, 'No active queue')
-    queue.node.pause()
+    await queue.node.pause()
     return publishAndOk(client, cmd)
 }
 
@@ -176,7 +173,7 @@ export async function handleResume(
 ): Promise<Result> {
     const queue = getQueue(client, cmd.guildId)
     if (!queue) return fail(cmd.id, cmd.guildId, 'No active queue')
-    queue.node.resume()
+    await queue.node.resume()
     return publishAndOk(client, cmd)
 }
 
@@ -208,9 +205,9 @@ export async function handleStop(
     await musicSessionSnapshotService.deleteSnapshot(cmd.guildId)
     clearSessionMoodCache(cmd.guildId)
 
-    queue.node.stop()
+    await queue.node.stop()
     queue.clear()
-    queue.delete()
+    await queue.delete()
     setReplenishSuppressed(cmd.guildId, 30_000)
     return publishAndOk(client, cmd)
 }
@@ -221,7 +218,7 @@ export async function handleVolume(
 ): Promise<Result> {
     const queue = getQueue(client, cmd.guildId)
     if (!queue) return fail(cmd.id, cmd.guildId, 'No active queue')
-    queue.node.setVolume(cmd.data?.volume as number)
+    await queue.node.setVolume(cmd.data?.volume as number)
     return publishAndOk(client, cmd)
 }
 
@@ -263,13 +260,13 @@ export async function handlePrevious(
     if (!queue) return fail(cmd.id, cmd.guildId, 'No active queue')
 
     // Per #1239: when no previous track, restart current track from beginning
-    if (queue.history.isEmpty()) {
+    if (!queue.history.previousTrack) {
         const currentTrack = queue.currentTrack
         if (currentTrack) {
             await queue.node.seek(0)
         }
     } else {
-        await queue.history.previous(true)
+        await queue.history.back()
     }
 
     if (!queue.node.isPlaying()) await queue.node.play()

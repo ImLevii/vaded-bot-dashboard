@@ -79,25 +79,31 @@ export async function setupWebMusicHandler(
             },
         )
 
-        client.player.events.on(
-            'playerStart',
-            async (q: { guild: { id: string } }) => {
-                const state = await buildQueueState(client, q.guild.id)
+        client.player.on(
+            'trackStart',
+            async (rainlinkPlayer: { guildId: string }) => {
+                const state = await buildQueueState(
+                    client,
+                    rainlinkPlayer.guildId,
+                )
                 await musicControlService.publishState(state)
             },
         )
 
-        client.player.events.on(
-            'playerFinish',
-            async (q: { guild: { id: string } }) => {
+        client.player.on(
+            'trackEnd',
+            async (rainlinkPlayer: { guildId: string }) => {
                 setTimeout(() => {
                     void (async () => {
-                        const state = await buildQueueState(client, q.guild.id)
+                        const state = await buildQueueState(
+                            client,
+                            rainlinkPlayer.guildId,
+                        )
                         await musicControlService.publishState(state)
                     })().catch((error) => {
                         errorLog({
                             message:
-                                'Error publishing queue state after playerFinish:',
+                                'Error publishing queue state after trackEnd:',
                             error,
                         })
                     })
@@ -105,41 +111,51 @@ export async function setupWebMusicHandler(
             },
         )
 
-        client.player.events.on(
-            'audioTracksAdd',
-            async (q: { guild: { id: string } }) => {
-                const state = await buildQueueState(client, q.guild.id)
+        client.player.on(
+            'queueAdd',
+            async (rainlinkPlayer: { guildId: string }) => {
+                const state = await buildQueueState(
+                    client,
+                    rainlinkPlayer.guildId,
+                )
                 await musicControlService.publishState(state)
             },
         )
 
-        client.player.events.on(
-            'emptyQueue',
-            async (q: { guild: { id: string } }) => {
-                const state = await buildQueueState(client, q.guild.id)
+        client.player.on(
+            'queueEmpty',
+            async (rainlinkPlayer: { guildId: string }) => {
+                const state = await buildQueueState(
+                    client,
+                    rainlinkPlayer.guildId,
+                )
                 await musicControlService.publishState(state)
             },
         )
 
-        client.player.events.on(
-            'error',
-            async (q: { guild: { id: string } }) => {
+        client.player.on(
+            'playerException',
+            async (rainlinkPlayer: { guildId: string }) => {
                 setTimeout(() => {
                     void (async () => {
-                        const state = await buildQueueState(client, q.guild.id)
+                        const state = await buildQueueState(
+                            client,
+                            rainlinkPlayer.guildId,
+                        )
                         await musicControlService.publishState(state)
                     })().catch(() => {})
                 }, 500)
             },
         )
 
-        // queueDelete fires when queue.delete() is called (e.g. /stop from Discord).
-        // The queue is gone by the time the handler runs, so publish empty state directly.
-        client.player.events.on(
-            'queueDelete',
-            async (q: { guild: { id: string } }) => {
+        // playerDestroy fires when the player is torn down (e.g. /stop from
+        // Discord). The queue is gone by the time the handler runs, so
+        // publish empty state directly.
+        client.player.on(
+            'playerDestroy',
+            async (rainlinkPlayer: { guildId: string }) => {
                 await musicControlService.publishState({
-                    guildId: q.guild.id,
+                    guildId: rainlinkPlayer.guildId,
                     currentTrack: null,
                     tracks: [],
                     isPlaying: false,
@@ -156,13 +172,16 @@ export async function setupWebMusicHandler(
             },
         )
 
-        // disconnect fires when the bot leaves the voice channel.
-        client.player.events.on(
-            'disconnect',
-            async (q: { guild: { id: string } }) => {
+        // playerDestroy fires when the bot leaves the voice channel.
+        client.player.on(
+            'playerDestroy',
+            async (rainlinkPlayer: { guildId: string }) => {
                 setTimeout(() => {
                     void (async () => {
-                        const state = await buildQueueState(client, q.guild.id)
+                        const state = await buildQueueState(
+                            client,
+                            rainlinkPlayer.guildId,
+                        )
                         await musicControlService.publishState(state)
                     })().catch(() => {})
                 }, 300)
@@ -177,9 +196,12 @@ export async function setupWebMusicHandler(
         }
         webMusicPublishInterval = setInterval(async () => {
             try {
-                for (const queue of client.player.nodes.cache.values()) {
-                    if (!queue) continue
-                    const state = await buildQueueState(client, queue.guild.id)
+                for (const rainlinkPlayer of client.player.players.values) {
+                    if (!rainlinkPlayer) continue
+                    const state = await buildQueueState(
+                        client,
+                        rainlinkPlayer.guildId,
+                    )
                     // Only publish if queue is active (playing or has tracks)
                     if (state.isPlaying || state.tracks.length > 0) {
                         await musicControlService.publishState(state)

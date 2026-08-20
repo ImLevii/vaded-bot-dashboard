@@ -2,7 +2,7 @@
  * Track utilities types and interfaces
  */
 
-import type { Track } from 'discord-player'
+import type { RainlinkTrackAdapter as Track } from '../rainlinkAdapter'
 
 export type TrackInfo = {
     title: string

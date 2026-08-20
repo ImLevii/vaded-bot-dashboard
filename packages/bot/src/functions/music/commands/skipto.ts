@@ -31,7 +31,16 @@ export default new Command({
     execute: async ({ client, interaction }: CommandExecuteParams) => {
         if (!(await requireGuild(interaction))) return
         if (!(await requireVoiceChannel(interaction))) return
-        if (!(await requireDJRole(interaction, assertDefined(interaction.guildId, 'guildId guaranteed by requireGuild guard')))) return
+        if (
+            !(await requireDJRole(
+                interaction,
+                assertDefined(
+                    interaction.guildId,
+                    'guildId guaranteed by requireGuild guard',
+                ),
+            ))
+        )
+            return
 
         const { queue } = resolveGuildQueue(client, interaction.guildId ?? '')
 
@@ -56,10 +65,17 @@ export default new Command({
             return
         }
 
+        // rainlink has no skipTo(index) — remove the tracks ahead of the
+        // target, then skip the current track so playback advances to what
+        // is now the front of the queue (originally at `targetIndex`).
         const targetIndex = position - 1
-        queue?.node.skipTo(targetIndex)
+        const tracksBefore = queue?.tracks.toArray().slice(0, targetIndex) ?? []
+        for (const track of tracksBefore) {
+            queue?.removeTrack(track)
+        }
+        await queue?.node.skip()
 
-        const targetTrack = queue?.tracks.toArray?.()?.[targetIndex]
+        const targetTrack = queue?.currentTrack
         if (!targetTrack) {
             await interactionReply({
                 interaction,

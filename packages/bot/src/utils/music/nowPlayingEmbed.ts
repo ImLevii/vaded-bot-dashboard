@@ -1,5 +1,5 @@
 ﻿import { EmbedBuilder, AttachmentBuilder } from 'discord.js'
-import type { Track } from 'discord-player'
+import type { RainlinkTrackAdapter as Track } from './rainlinkAdapter'
 import type { User } from 'discord.js'
 import { existsSync } from 'node:fs'
 import { COLOR } from '@lucky/shared/constants'
@@ -71,7 +71,7 @@ const DEFAULT_BADGE: SourceBadge = {
  * URL sniffing for reliability.
  */
 export function detectSource(track: {
-    url?: string
+    url?: string | null
     source?: string | null
 }): SourceBadge {
     const sourceHint = (track.source ?? '').toLowerCase()

@@ -1,4 +1,8 @@
-import type { Track, GuildQueue } from 'discord-player'
+import { RainlinkLoopMode } from 'rainlink'
+import type {
+    RainlinkTrackAdapter as Track,
+    RainlinkQueueAdapter as GuildQueue,
+} from '../../../../utils/music/rainlinkAdapter'
 import type { ColorResolvable } from 'discord.js'
 import { createEmbed, EMBED_COLORS } from '../../../../utils/general/embeds'
 import { getTrackInfo } from '../../../../utils/music/trackUtils'
@@ -124,7 +128,10 @@ export function formatQueueStatistics(
     queue: GuildQueue | null,
     data: FormattedQueueData,
 ): { name: string; value: string } {
-    const repeatMode = queue?.repeatMode ? 'Enabled' : 'Disabled'
+    const repeatMode =
+        queue?.repeatMode && queue.repeatMode !== RainlinkLoopMode.NONE
+            ? 'Enabled'
+            : 'Disabled'
     const volume = queue?.node.volume ?? 100
     const trackCount = queue?.tracks?.size ?? 0
     const manualCount = data.manualTracks.length

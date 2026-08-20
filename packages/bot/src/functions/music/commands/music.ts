@@ -24,7 +24,8 @@ import {
     type QueueResolutionResult,
 } from '../../../utils/music/queueResolver'
 import { recommendationFeedbackService } from '../../../services/musicRecommendation/feedbackService'
-import type { GuildQueue } from 'discord-player'
+import { RainlinkLoopMode } from 'rainlink'
+import type { RainlinkQueueAdapter as GuildQueue } from '../../../utils/music/rainlinkAdapter'
 
 function formatProviderHealth(statuses: ProviderStatus[]): string {
     if (statuses.length === 0) {
@@ -42,10 +43,9 @@ function formatProviderHealth(statuses: ProviderStatus[]): string {
         .join('\n')
 }
 
-function formatRepeatMode(mode: number): string {
-    if (mode === 1) return 'track'
-    if (mode === 2) return 'queue'
-    if (mode === 3) return 'autoplay'
+function formatRepeatMode(mode: RainlinkLoopMode): string {
+    if (mode === RainlinkLoopMode.SONG) return 'track'
+    if (mode === RainlinkLoopMode.QUEUE) return 'queue'
     return 'off'
 }
 

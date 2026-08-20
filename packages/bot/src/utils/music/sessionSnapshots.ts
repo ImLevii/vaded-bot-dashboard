@@ -1,5 +1,7 @@
-import type { GuildQueue, Track } from 'discord-player'
-import { QueryType } from 'discord-player'
+import type {
+    RainlinkQueueAdapter as GuildQueue,
+    RainlinkTrackAdapter as Track,
+} from './rainlinkAdapter'
 import type { User } from 'discord.js'
 import { randomUUID } from 'crypto'
 import { getPrismaClient, debugLog, errorLog } from '@lucky/shared/utils'
@@ -53,7 +55,6 @@ const DEFAULT_MAX_SNAPSHOT_AGE_MS = 30 * 60 * 1_000
 
 type SearchOptions = {
     requestedBy?: User
-    searchEngine: QueryType
 }
 
 /** Row shape this service reads from the `music_session_snapshots` table. */
@@ -82,7 +83,7 @@ export function toSnapshotTrack(track: Track): SnapshotTrack {
     return {
         title: track.title,
         author: track.author,
-        url: track.url,
+        url: track.url ?? '',
         duration: toDurationString(track.duration),
         source: trackSource(track) ?? 'unknown',
         recommendationReason: metadata.recommendationReason,
@@ -314,7 +315,6 @@ export class MusicSessionSnapshotService {
             }
 
             const searchOptions: SearchOptions = {
-                searchEngine: QueryType.AUTO,
                 ...(requestedBy ? { requestedBy } : {}),
             }
 
@@ -334,7 +334,7 @@ export class MusicSessionSnapshotService {
             const undoRestoredTracks = () => {
                 for (const t of restoredTracks) {
                     try {
-                        queue.node.remove(t)
+                        queue.removeTrack(t)
                     } catch {
                         // best-effort: track may already have been consumed
                     }
@@ -351,10 +351,7 @@ export class MusicSessionSnapshotService {
                     }
                     const query =
                         entry.url || `${entry.title} ${entry.author}`.trim()
-                    const result = await queue.player.search(
-                        query,
-                        searchOptions,
-                    )
+                    const result = await queue.search(query, searchOptions)
                     // Re-check after the await — the deadline may have elapsed during
                     // the search, so don't enqueue this track post-abort.
                     if (options.signal?.aborted) {
@@ -365,14 +362,14 @@ export class MusicSessionSnapshotService {
                     if (!track) continue
 
                     applySnapshotMetadata(
-                        track as Track,
+                        track,
                         snapshot.sessionSnapshotId,
                         entry.recommendationReason,
                         entry.isAutoplay,
                         entry.requestedById,
                     )
                     queue.addTrack(track)
-                    restoredTracks.push(track as Track)
+                    restoredTracks.push(track)
                     restoredCount += 1
                 }
             } catch (loopError) {

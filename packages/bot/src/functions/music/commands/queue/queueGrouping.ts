@@ -1,4 +1,7 @@
-import type { Track, GuildQueue } from 'discord-player'
+import type {
+    RainlinkTrackAdapter as Track,
+    RainlinkQueueAdapter as GuildQueue,
+} from '../../../../utils/music/rainlinkAdapter'
 import { debugLog, errorLog } from '@lucky/shared/utils'
 import { isSimilarTitle } from '../../../../utils/music/titleComparison'
 import type { CustomClient } from '../../../../types'

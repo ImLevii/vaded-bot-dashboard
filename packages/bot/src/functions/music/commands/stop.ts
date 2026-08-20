@@ -25,16 +25,25 @@ export default new Command({
         const { queue } = resolveGuildQueue(client, interaction.guildId ?? '')
 
         if (!(await requireQueue(queue, interaction))) return
-        if (!(await requireDJRole(interaction, assertDefined(interaction.guildId, 'Guild ID required after requireGuild check')))) return
+        if (
+            !(await requireDJRole(
+                interaction,
+                assertDefined(
+                    interaction.guildId,
+                    'Guild ID required after requireGuild check',
+                ),
+            ))
+        )
+            return
 
         if (queue) {
             musicWatchdogService.markIntentionalStop(queue.guild.id)
             await musicSessionSnapshotService.deleteSnapshot(queue.guild.id)
             clearSessionMoodCache(queue.guild.id)
         }
-        queue?.node.stop()
+        await queue?.node.stop()
         queue?.clear()
-        queue?.delete()
+        await queue?.delete()
 
         await interactionReply({
             interaction,

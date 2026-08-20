@@ -1,17 +1,14 @@
-import { QueryType } from 'discord-player'
 import type {
     ChatInputCommandInteraction,
     GuildMember,
+    SendableChannels,
     VoiceBasedChannel,
 } from 'discord.js'
-
-const SPOTIFY_EXTRACTOR_ID = 'com.discord-player.itsmaat.spotifyextractor'
 import type { CustomClient } from '../../../../types'
 import {
     requireVoiceChannel,
     requireDJRole,
 } from '../../../../utils/command/commandValidations'
-import { resolveGuildQueue } from '../../../../utils/music/queueResolver'
 import {
     buildPlayResponseEmbed,
     buildVinylAttachment,
@@ -24,10 +21,10 @@ import { createErrorEmbed } from '../../../../utils/general/embeds'
 import { interactionReply } from '../../../../utils/general/interactionReply'
 import { createUserFriendlyError } from '@lucky/shared/utils/general/errorSanitizer'
 import { errorLog, debugLog, warnLog } from '@lucky/shared/utils'
-import { ENVIRONMENT_CONFIG } from '@lucky/shared/config'
 import { withTimeout } from '@lucky/shared/utils/async'
 import { assertDefined } from '@lucky/shared/utils/guards'
 import { isUrl } from './urlNormalization'
+import { resolveQueryWithFallbacks } from './handlers/resolveProvider'
 
 export {
     isUrl,
@@ -116,26 +113,6 @@ export async function expandSoundCloudShortUrl(url: string): Promise<string> {
     }
 }
 
-export function resolveSearchEngine(
-    query: string,
-    provider?: string | null,
-): QueryType {
-    if (isUrl(query)) return QueryType.AUTO
-
-    switch (provider) {
-        case 'youtube':
-            return QueryType.YOUTUBE_SEARCH
-        case 'soundcloud':
-            return QueryType.SOUNDCLOUD_SEARCH
-        case 'spotify':
-            return QueryType.SPOTIFY_SEARCH
-        default:
-            // Spotify first: best metadata (titles, artwork, artist).
-            // Fallback chain in play/index.ts tries YouTube then AUTO if Spotify throws.
-            return QueryType.SPOTIFY_SEARCH
-    }
-}
-
 /**
  * IDs of the humans currently in the voice channel, recorded as queue metadata
  * for the vote-based commands. Shared by /play and /playtop|/playskip so both
@@ -199,95 +176,31 @@ export async function executePlayAtTop({
     const query = interaction.options.getString('query', true)
 
     try {
-        const searchEngine = resolveSearchEngine(query)
         const vcMemberIds = collectVoiceMemberIds(voiceChannel, client.user)
-        // Same option shape executePlayHandler builds for /play. Omitting
-        // `requestedBy` leaves the resulting Track with no requester, and
-        // sendNowPlayingEmbed reads exactly that field — so a song a user
-        // asked for came back as "Requested by: 🤖 Autoplay / Added
-        // automatically". nodeOptions only take effect when this call is what
-        // creates the queue, but without them a queue first opened by
-        // /playtop has no metadata.channel and never gets a Now Playing embed.
-        const playOptions = {
-            nodeOptions: {
-                metadata: {
-                    channel: interaction.channel,
-                    requestedBy: interaction.user,
-                    vcMemberIds,
-                },
-                connectionTimeout: ENVIRONMENT_CONFIG.PLAYER.CONNECTION_TIMEOUT,
-                leaveOnEmpty: true,
-                leaveOnEmptyCooldown: 30_000,
-                leaveOnEnd: true,
-                leaveOnEndCooldown: 300_000,
-            },
+        const { result } = await resolveQueryWithFallbacks({
+            client,
+            guildId: interaction.guildId,
+            textId: interaction.channelId,
+            channel: interaction.channel as SendableChannels | null,
+            voiceChannel,
+            query,
+            requestedProvider: 'default',
             requestedBy: interaction.user,
-            searchEngine,
-        }
-        let result
-        try {
-            result = await client.player.play(voiceChannel, query, playOptions)
-        } catch (primaryError) {
-            if (searchEngine !== QueryType.AUTO) {
-                warnLog({
-                    message: 'Primary search failed, falling back to YouTube',
-                    data: {
-                        query,
-                        searchEngine: String(searchEngine),
-                        error: String(primaryError),
-                    },
-                })
-                try {
-                    // Spread playOptions: a fallback arm that rebuilds the
-                    // options from scratch drops the requester and the queue
-                    // metadata, which is how the misattribution above survived
-                    // even after the primary call was fixed.
-                    result = await client.player.play(voiceChannel, query, {
-                        ...playOptions,
-                        searchEngine: QueryType.YOUTUBE_SEARCH,
-                        blockExtractors: [SPOTIFY_EXTRACTOR_ID],
-                    })
-                } catch (youtubeError) {
-                    warnLog({
-                        message:
-                            'YouTube search failed, falling back to SoundCloud',
-                        data: { query, error: String(youtubeError) },
-                    })
-                    result = await client.player.play(voiceChannel, query, {
-                        ...playOptions,
-                        searchEngine: QueryType.SOUNDCLOUD_SEARCH,
-                        blockExtractors: [SPOTIFY_EXTRACTOR_ID],
-                    })
-                }
-            } else {
-                throw primaryError
-            }
-        }
+            vcMemberIds,
+        })
         const track = result.track
+        const queue = result.queue
 
-        const { queue } = resolveGuildQueue(client, interaction.guildId)
-        if (!queue) {
-            await interactionReply({
-                interaction,
-                content: {
-                    embeds: [
-                        createErrorEmbed('Error', 'Could not create queue'),
-                    ],
-                    ephemeral: true,
-                },
-            })
-            return
-        }
-
-        // Read after the play() above: when nothing was already playing the
-        // track went straight to the player and never landed in `tracks`, so
-        // an empty list here means "this is playing now", not "position #1".
+        // Read after resolveQueryWithFallbacks above: when nothing was
+        // already playing the track went straight to the player and never
+        // landed in `tracks`, so an empty list here means "this is playing
+        // now", not "position #1".
         const tracks = queue.tracks.toArray()
         const startedImmediately = tracks.length === 0
         if (!startedImmediately) {
-            queue.node.remove(track)
+            queue.removeTrack(track)
             queue.insertTrack(track, 0)
-            if (skipCurrent) queue.node.skip()
+            if (skipCurrent) await queue.node.skip()
         }
 
         const showAsNowPlaying = skipCurrent || startedImmediately

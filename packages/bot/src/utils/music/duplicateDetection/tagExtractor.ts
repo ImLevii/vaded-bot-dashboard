@@ -1,4 +1,4 @@
-import type { Track } from 'discord-player'
+import type { RainlinkTrackAdapter as Track } from '../rainlinkAdapter'
 import { debugLog } from '@lucky/shared/utils'
 
 function _getGenreKeywords(): string[] {
@@ -61,11 +61,8 @@ export function extractTags(track: Track): string[] {
         const titleWords = _extractWordsFromText(track.title)
         addGenreTagsFromWords(tags, titleWords)
 
-        if (track.description) {
-            const descWords = _extractWordsFromText(track.description)
-            addGenreTagsFromWords(tags, descWords)
-        }
-
+        // Lavalink tracks carry no description field (unlike discord-player's
+        // extractor-supplied one), so genre tags only come from title/author.
         if (track.author) {
             const artistWords = _extractWordsFromText(track.author)
             addGenreTagsFromWords(tags, artistWords)

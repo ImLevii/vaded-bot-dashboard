@@ -1,4 +1,4 @@
-import { QueueRepeatMode } from 'discord-player'
+import { RainlinkLoopMode } from 'rainlink'
 import type { GuildMember, VoiceBasedChannel } from 'discord.js'
 import type {
     MusicTrackInfo as TrackInfo,
@@ -58,30 +58,29 @@ function mapListeners(
 }
 
 export function repeatModeToString(
-    mode: QueueRepeatMode,
+    mode: RainlinkLoopMode,
 ): 'off' | 'track' | 'queue' | 'autoplay' {
     switch (mode) {
-        case QueueRepeatMode.TRACK:
+        case RainlinkLoopMode.SONG:
             return 'track'
-        case QueueRepeatMode.QUEUE:
+        case RainlinkLoopMode.QUEUE:
             return 'queue'
-        case QueueRepeatMode.AUTOPLAY:
-            return 'autoplay'
         default:
             return 'off'
     }
 }
 
-export function repeatModeToEnum(mode: string): QueueRepeatMode {
+// 'autoplay' has no rainlink loop mode — deferred, see
+// decisions/2026-06-10-defer-autoplay-engine-extraction.md; falls back to
+// NONE like any other unrecognized value.
+export function repeatModeToEnum(mode: string): RainlinkLoopMode {
     switch (mode) {
         case 'track':
-            return QueueRepeatMode.TRACK
+            return RainlinkLoopMode.SONG
         case 'queue':
-            return QueueRepeatMode.QUEUE
-        case 'autoplay':
-            return QueueRepeatMode.AUTOPLAY
+            return RainlinkLoopMode.QUEUE
         default:
-            return QueueRepeatMode.OFF
+            return RainlinkLoopMode.NONE
     }
 }
 

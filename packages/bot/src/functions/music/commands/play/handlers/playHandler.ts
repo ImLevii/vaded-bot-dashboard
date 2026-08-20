@@ -1,7 +1,5 @@
-import type { GuildMember } from 'discord.js'
-import type { PlayerNodeInitializationResult } from 'discord-player'
+import type { GuildMember, SendableChannels } from 'discord.js'
 import type { CommandExecuteParams } from '../../../../../types/CommandData'
-import { ENVIRONMENT_CONFIG } from '@lucky/shared/config'
 import { errorLog, debugLog, warnLog } from '@lucky/shared/utils'
 import { assertDefined } from '@lucky/shared/utils/guards'
 import { createErrorEmbed } from '../../../../../utils/general/embeds'
@@ -18,7 +16,6 @@ import { resolveGuildQueue } from '../../../../../utils/music/queueResolver'
 import {
     collectVoiceMemberIds,
     isUnknownInteractionError,
-    resolveSearchEngine,
     normalizeSoundCloudUrl,
     normalizeYoutubeUrl,
     normalizeSpotifyUrl,
@@ -115,36 +112,27 @@ export async function executePlayHandler({
             }
         }
 
-        const searchEngine = resolveSearchEngine(query, provider)
         const vcMemberIds = collectVoiceMemberIds(voiceChannel, client.user)
-        const playOptions = {
-            nodeOptions: {
-                metadata: {
-                    channel: interaction.channel,
-                    requestedBy: interaction.user,
-                    vcMemberIds,
-                },
-                connectionTimeout: ENVIRONMENT_CONFIG.PLAYER.CONNECTION_TIMEOUT,
-                leaveOnEmpty: true,
-                leaveOnEmptyCooldown: 30_000,
-                leaveOnEnd: true,
-                leaveOnEndCooldown: 300_000,
-            },
-            requestedBy: interaction.user,
-            searchEngine,
-        }
 
-        let result: PlayerNodeInitializationResult<unknown>
+        let result: Awaited<
+            ReturnType<typeof resolveQueryWithFallbacks>
+        >['result']
         let resolutionTelemetry
         try {
-            const resolution = await resolveQueryWithFallbacks(
-                client.player,
+            const resolution = await resolveQueryWithFallbacks({
+                client,
+                guildId: assertDefined(
+                    interaction.guildId,
+                    'Guild ID guaranteed by the guard above',
+                ),
+                textId: interaction.channelId,
+                channel: interaction.channel as SendableChannels | null,
                 voiceChannel,
                 query,
-                provider ?? 'default',
-                searchEngine,
-                playOptions,
-            )
+                requestedProvider: provider ?? 'default',
+                requestedBy: interaction.user,
+                vcMemberIds,
+            })
             result = resolution.result
             resolutionTelemetry = resolution.telemetry
             emitPlayResolutionTelemetry(resolutionTelemetry)
@@ -165,27 +153,26 @@ export async function executePlayHandler({
         }
 
         const track = result.track
+        const queue = result.queue
 
         const isPlaylist = !!result.searchResult.playlist
         if (!isPlaylist && !track.title) {
             throw new Error('YouTube: track metadata unavailable')
         }
-        const { queue } = resolveGuildQueue(client, interaction.guildId ?? '')
 
-        if (!isPlaylist && queue) {
+        if (!isPlaylist) {
             moveUserTrackToPriority(queue, track)
         }
 
-        const queuedTracks = queue ? (queue.tracks.toArray?.() ?? []) : []
+        const queuedTracks = queue.tracks.toArray()
         const trackIndex = queuedTracks.findIndex(
             (t) => t === track || (track.id && t.id === track.id),
         )
-        const queuePosition =
-            hadQueueBeforePlay && queue
-                ? trackIndex >= 0
-                    ? trackIndex + 1
-                    : queuedTracks.length
-                : 0
+        const queuePosition = result.hadQueueBeforePlay
+            ? trackIndex >= 0
+                ? trackIndex + 1
+                : queuedTracks.length
+            : 0
 
         // queuePosition 0 means nothing was pending, so this track went
         // straight to the player rather than into the queue. Reporting

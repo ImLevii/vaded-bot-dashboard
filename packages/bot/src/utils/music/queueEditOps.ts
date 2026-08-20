@@ -1,11 +1,12 @@
-import { type Track, type GuildQueue } from 'discord-player'
+import type {
+    RainlinkTrackAdapter as Track,
+    RainlinkQueueAdapter as GuildQueue,
+} from './rainlinkAdapter'
 import { randomInt } from 'node:crypto'
 import { debugLog, errorLog } from '@lucky/shared/utils'
 import { assertDefined } from '@lucky/shared/utils/guards'
-import { replenishQueue } from './autoplay/replenisher'
 import { markAsAutoplayTrack } from './autoplay/queueMarkers'
 import { recordRecommendationOutcome } from '../../services/musicRecommendation/recommendationTelemetry'
-
 
 function randomIndex(maxExclusive: number): number {
     if (maxExclusive <= 1) return 0
@@ -115,7 +116,7 @@ export async function removeTrackFromQueue(
         if (position < 0 || position >= tracks.length) return null
 
         const track = tracks[position]
-        queue.node.remove(track)
+        queue.removeTrack(track)
         debugLog({
             message: 'Track removed from queue',
             data: { position, track: track.title },
@@ -143,7 +144,7 @@ export async function moveTrackInQueue(
             return null
 
         const track = tracks[fromPosition]
-        queue.node.remove(track)
+        queue.removeTrack(track)
 
         const newTracks = queue.tracks.toArray()
         if (toPosition >= newTracks.length) {
@@ -170,13 +171,16 @@ export function extractSpotifyTrackId(track: Track): string | null {
     return match?.[1] ?? null
 }
 
-export { markAsAutoplayTrack}
+export { markAsAutoplayTrack }
 
 export function moveUserTrackToPriority(queue: GuildQueue, track: Track): void {
     const tracks = queue.tracks.toArray()
     let trackIndex = -1
     for (let i = tracks.length - 1; i >= 0; i--) {
-        const t = assertDefined(tracks[i], 'Array index guaranteed by loop bounds')
+        const t = assertDefined(
+            tracks[i],
+            'Array index guaranteed by loop bounds',
+        )
         if (
             t === track ||
             (Boolean(track.id) && t.id === track.id) ||
@@ -204,10 +208,13 @@ export function moveUserTrackToPriority(queue: GuildQueue, track: Track): void {
         return
     }
 
-    const queuedTrack = assertDefined(tracks[trackIndex], 'Track index guaranteed by prior check')
+    const queuedTrack = assertDefined(
+        tracks[trackIndex],
+        'Track index guaranteed by prior check',
+    )
 
     try {
-        queue.node.remove(queuedTrack)
+        queue.removeTrack(queuedTrack)
     } catch {
         return
     }
@@ -268,7 +275,7 @@ export async function blendAutoplayTracks(
 
     for (const track of toRemove) {
         try {
-            queue.node.remove(track)
+            queue.removeTrack(track)
         } catch {
             // Track may already be removed
         }
@@ -282,7 +289,7 @@ export async function blendAutoplayTracks(
         },
     })
 
-    // Wait for telemetry to settle before replenishing queue
+    // Replenishing after a blend is autoplay-engine functionality, currently
+    // deferred — see decisions/2026-06-10-defer-autoplay-engine-extraction.md.
     await Promise.all(cancellationWrites)
-    await replenishQueue(queue)
 }

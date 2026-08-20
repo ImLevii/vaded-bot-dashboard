@@ -1,4 +1,7 @@
-import type { Track, GuildQueue } from 'discord-player'
+import type {
+    RainlinkTrackAdapter as Track,
+    RainlinkQueueAdapter as GuildQueue,
+} from './rainlinkAdapter'
 import type { TrackValidationResult, TrackManagementOptions } from './types'
 import { debugLog } from '@lucky/shared/utils'
 import {

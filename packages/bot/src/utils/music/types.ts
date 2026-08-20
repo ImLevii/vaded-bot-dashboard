@@ -1,4 +1,4 @@
-import type { Track } from 'discord-player'
+import type { RainlinkTrackAdapter as Track } from './rainlinkAdapter'
 import type { User } from 'discord.js'
 
 export type TrackManagementOptions = {

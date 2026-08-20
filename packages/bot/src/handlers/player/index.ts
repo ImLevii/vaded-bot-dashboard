@@ -1,10 +1,11 @@
-import type { Player } from 'discord-player'
+import type { Rainlink } from 'rainlink'
 import type { CustomClient } from '../../types'
 import { createPlayer } from './playerFactory'
 import { setupErrorHandlers } from './errorHandlers'
 import {
     setupLifecycleHandlers,
     setupVoiceKickDetection,
+    setupEmptyChannelDetection,
 } from './lifecycleHandlers'
 import { setupTrackHandlers } from './trackHandlers'
 
@@ -14,28 +15,16 @@ type CreatePlayerParams = {
 
 export const createPlayerWithHandlers = ({
     client,
-}: CreatePlayerParams): Player => {
+}: CreatePlayerParams): Rainlink => {
     const player = createPlayer({ client })
 
-    player.events.removeAllListeners()
+    player.removeAllListeners()
 
-    setupErrorHandlers(
-        player as unknown as {
-            events: { on: (event: string, handler: Function) => void }
-        },
-    )
-    setupLifecycleHandlers(
-        player as unknown as {
-            events: { on: (event: string, handler: Function) => void }
-        },
-    )
-    setupTrackHandlers({
-        player: player as unknown as {
-            events: { on: (event: string, handler: Function) => void }
-        },
-        client,
-    })
+    setupErrorHandlers(player)
+    setupLifecycleHandlers(player)
+    setupTrackHandlers({ player, client })
     setupVoiceKickDetection(client)
+    setupEmptyChannelDetection(client, player)
 
     return player
 }

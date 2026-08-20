@@ -1,4 +1,4 @@
-import type { Track } from 'discord-player'
+import type { RainlinkTrackAdapter as Track } from '../rainlinkAdapter'
 import { debugLog, errorLog } from '@lucky/shared/utils'
 import { trackHistoryService } from '@lucky/shared/services'
 import { areTracksSimilar, calculateSimilarityScore } from './similarityChecker'
@@ -33,11 +33,11 @@ async function checkSimilarTracks(
             isDuplicate: true,
             reason: `Similar track found (${Math.round(maxSimilarity * 100)}% similarity)`,
             similarTracks: similarTracks.map((t) => ({
-                trackId: t.id || t.url,
+                trackId: t.id || t.url || '',
                 title: t.title,
                 author: t.author,
                 duration: t.duration,
-                url: t.url,
+                url: t.url ?? '',
                 timestamp: Date.now(),
                 guildId: guildId,
                 playedBy: t.requestedBy?.id || 'unknown',
@@ -64,11 +64,11 @@ async function checkSameArtistTracks(
             isDuplicate: true,
             reason: 'Too many tracks from the same artist recently',
             similarTracks: sameArtistTracks.slice(0, 3).map((t) => ({
-                trackId: t.id || t.url,
+                trackId: t.id || t.url || '',
                 title: t.title,
                 author: t.author,
                 duration: t.duration,
-                url: t.url,
+                url: t.url ?? '',
                 timestamp: Date.now(),
                 guildId: guildId,
                 playedBy: t.requestedBy?.id || 'unknown',
@@ -140,14 +140,14 @@ export async function addTrackToHistory(
 
         await trackHistoryService.addTrackToHistory(
             {
-                id: track.id || track.url,
+                id: track.id || track.url || '',
                 title: track.title,
                 author: track.author,
                 duration:
                     typeof track.duration === 'string'
                         ? track.duration
                         : String(track.duration),
-                url: track.url,
+                url: track.url ?? '',
                 metadata: { isAutoplay: Boolean(metadata?.isAutoplay) },
             },
             guildId,

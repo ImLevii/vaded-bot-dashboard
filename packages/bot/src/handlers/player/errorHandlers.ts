@@ -1,416 +1,134 @@
-import { QueryType, type GuildQueue } from 'discord-player'
-import type { User } from 'discord.js'
-import {
-    errorLog,
-    debugLog,
-    warnLog,
-    captureException,
-    sanitizeErrorMessage,
-    sanitizeStack,
-} from '@lucky/shared/utils'
+import type {
+    Rainlink,
+    RainlinkNode,
+    RainlinkPlayer,
+    RainlinkTrack,
+} from 'rainlink'
+import { errorLog, debugLog, captureException } from '@lucky/shared/utils'
 import { createErrorEmbed } from '../../utils/general/embeds'
-import {
-    analyzeYouTubeError,
-    logYouTubeError,
-} from '../../utils/music/youtubeErrorHandler'
-import { youtubeConfig } from '@lucky/shared/config'
-import {
-    providerFromTrack,
-    providerHealthService,
-} from '../../utils/music/search/providerHealth'
-import type { QueueMetadata } from '../../types/QueueMetadata'
-import { cleanTitle } from '../../utils/music/searchQueryCleaner'
+import { wrapPlayer } from '../../utils/music/rainlinkAdapter'
 
-type PlayerEvents = {
-    events: {
-        on: (event: string, handler: Function) => void
-    }
-    on?: (event: string, handler: Function) => void
-}
+/**
+ * Lavalink resolves/streams tracks server-side, so the discord-player/yt-dlp-
+ * bridge-specific recovery this file used to do (YouTube parser error
+ * detection, "Bridge exhausted" alternative-track search-and-reinsert) has no
+ * equivalent here — this is intentionally a much smaller handler: log, notify
+ * the channel, skip to the next track.
+ */
 
-async function notifyChannelStreamFailed(
-    queue: GuildQueue,
+async function notifyChannelTrackFailed(
+    queue: ReturnType<typeof wrapPlayer>,
     trackTitle: string,
+    reason: string,
 ): Promise<void> {
-    const channel = (queue.metadata as QueueMetadata | undefined)?.channel
+    const channel = queue.metadata.channel
     if (!channel) return
     try {
         await channel.send({
             embeds: [
                 createErrorEmbed(
                     '⚠️ Could not play track',
-                    `**${trackTitle || 'this track'}** could not be streamed from any source. It may be unavailable in your region or not on SoundCloud. Skipping to next track.`,
+                    `**${trackTitle || 'this track'}** ${reason}. Skipping to next track.`,
                 ),
             ],
         })
     } catch (error) {
         debugLog({
-            message: 'Failed to notify channel about stream failure',
+            message: 'Failed to notify channel about track failure',
             error,
             data: { guildId: queue.guild.id, trackTitle },
         })
     }
 }
 
-function toErrorDetails(error: unknown): {
-    errorMessage: string
-    errorStack?: string
-    errorName?: string
-} {
-    if (error instanceof Error) {
-        return {
-            errorMessage: error.message,
-            errorStack: sanitizeStack(error) ?? sanitizeErrorMessage(error),
-            errorName: error.name,
-        }
-    }
-
-    return {
-        errorMessage: String(error),
-        errorName: typeof error,
-    }
-}
-
-function toErrorInstance(error: unknown): Error | undefined {
-    return error instanceof Error ? error : undefined
-}
-
-function safeErrorLog(payload: {
-    message: string
-    error?: Error
-    data?: Record<string, unknown>
-}): void {
-    try {
-        errorLog(payload)
-    } catch (error) {
-        debugLog({ message: 'errorHandlers: errorLog failed', error })
-    }
-}
-
-function normalizeText(value?: string): string {
-    return (value ?? '')
-        .toLowerCase()
-        .replaceAll(/[^a-z0-9]+/g, '')
-        .trim()
-}
-
-function isSameTrack(
-    currentTrack: { title?: string; author?: string; url?: string },
-    alternativeTrack: { title?: string; author?: string; url?: string },
-): boolean {
-    if (
-        currentTrack.url &&
-        alternativeTrack.url &&
-        currentTrack.url === alternativeTrack.url
-    ) {
-        return true
-    }
-    const currentNorm = normalizeText(cleanTitle(currentTrack.title ?? ''))
-    const altNorm = normalizeText(cleanTitle(alternativeTrack.title ?? ''))
-    return currentNorm.length > 3 && currentNorm === altNorm
-}
-
-function logHandlerFailure(message: string, error: unknown): void {
-    safeErrorLog({
-        message,
-        error: toErrorInstance(error),
-        data: toErrorDetails(error),
-    })
-}
-
-function runSafely(message: string, fn: () => void): void {
-    try {
-        fn()
-    } catch (error) {
-        logHandlerFailure(message, error)
-    }
-}
-
-async function runSafelyAsync(
-    message: string,
-    fn: () => Promise<void>,
-): Promise<void> {
-    try {
-        await fn()
-    } catch (error) {
-        logHandlerFailure(message, error)
-    }
-}
-
-export const setupErrorHandlers = (player: PlayerEvents): void => {
-    player.events.on('error', (queue: GuildQueue, error: Error) => {
-        runSafely('Queue error handler failed:', () => {
-            const details = toErrorDetails(error)
-            safeErrorLog({
-                message: `Error in queue ${queue?.guild?.name || 'unknown'}:`,
-                error: toErrorInstance(error),
-                data: {
-                    guildId: queue?.guild?.id ?? 'unknown',
-                    guildName: queue?.guild?.name ?? 'unknown',
-                    ...details,
-                },
-            })
-            captureException(
-                toErrorInstance(error) ?? new Error(details.errorMessage),
-                {
-                    context: 'player-queue-error',
-                    guildId: queue?.guild?.id ?? undefined,
-                },
-            )
-
-            const isConnectionError =
-                details.errorMessage.includes('ECONNRESET') ||
-                details.errorMessage.includes('ECONNREFUSED') ||
-                details.errorMessage.includes('ETIMEDOUT') ||
-                details.errorMessage.includes('Connection reset by peer') ||
-                details.errorName === 'AbortError'
-
-            const connection = queue?.connection
-            if (isConnectionError && connection) {
-                debugLog({
-                    message:
-                        'Detected connection error, attempting recovery...',
-                })
-                runSafely('Failed to recover from connection error:', () => {
-                    if (connection.state.status !== 'ready') {
-                        connection.rejoin()
-                        debugLog({
-                            message:
-                                'Attempting to recover from connection error',
-                        })
-                    }
-                })
-            }
-        })
-    })
-
-    player.events.on('playerError', (queue: GuildQueue, error: Error) => {
-        void runSafelyAsync('Player error event handler failed:', async () => {
-            await handlePlayerError(queue, error)
-        })
-    })
-
-    player.events.on('debug', (queue: GuildQueue, message: string) => {
-        runSafely('Player queue debug handler failed:', () => {
-            debugLog({
-                message: `Player debug from ${queue?.guild?.name ?? 'unknown'}: ${message}`,
-            })
-        })
-    })
-
-    if (typeof player.on === 'function') {
-        player.on('error', (error: Error) => {
-            runSafely('Player top-level error handler failed:', () => {
-                safeErrorLog({
-                    message: 'Unhandled player error:',
-                    error: toErrorInstance(error),
-                    data: toErrorDetails(error),
+export const setupErrorHandlers = (player: Rainlink): void => {
+    player.on(
+        'playerException',
+        (rainlinkPlayer: RainlinkPlayer, data: Record<string, unknown>) => {
+            void (async () => {
+                const queue = wrapPlayer(rainlinkPlayer)
+                const track = queue.currentTrack
+                errorLog({
+                    message: `Player exception in guild ${queue.guild.id}:`,
+                    data: { guildId: queue.guild.id, ...data },
                 })
                 captureException(
-                    toErrorInstance(error) ??
-                        new Error(toErrorDetails(error).errorMessage),
-                    { context: 'player-unhandled-error' },
+                    new Error(String(data?.exception ?? 'playerException')),
+                    { context: 'player-exception', guildId: queue.guild.id },
                 )
+                await notifyChannelTrackFailed(
+                    queue,
+                    track?.title ?? '',
+                    'could not be played',
+                )
+                await queue.node.skip()
+            })().catch((error: unknown) => {
+                errorLog({ message: 'playerException handler failed:', error })
             })
-        })
-
-        player.on('debug', (message: string) => {
-            runSafely('Player top-level debug handler failed:', () => {
-                debugLog({
-                    message: `Player runtime debug: ${message}`,
-                })
-            })
-        })
-    }
-}
-
-function handleYouTubeParserError(
-    queue: GuildQueue,
-    error: Error,
-    youtubeErrorInfo: ReturnType<typeof analyzeYouTubeError>,
-): void {
-    const requestedBy: User | undefined =
-        queue.currentTrack?.requestedBy ??
-        (queue.metadata as QueueMetadata | undefined)?.requestedBy ??
-        undefined
-    logYouTubeError(
-        error,
-        `player error in ${queue.guild.name}`,
-        requestedBy?.id ?? 'unknown',
-    )
-
-    debugLog({
-        message: 'YouTube parser error detected, skipping current track',
-        data: {
-            errorType: youtubeErrorInfo.isCompositeVideoError
-                ? 'CompositeVideoPrimaryInfo'
-                : youtubeErrorInfo.isHypePointsError
-                  ? 'HypePointsFactoid'
-                  : youtubeErrorInfo.isTypeMismatchError
-                    ? 'TypeMismatch'
-                    : 'Parser',
         },
-    })
-
-    if (youtubeConfig.errorHandling.skipOnParserError) {
-        queue.node.skip()
-    }
-}
-
-async function recoverFromStreamExtractionError(
-    queue: GuildQueue,
-    currentTrack: NonNullable<GuildQueue['currentTrack']>,
-): Promise<void> {
-    debugLog({
-        message: `Problematic URL: ${currentTrack.url}`,
-    })
-
-    const requestedByUser: User | undefined =
-        currentTrack.requestedBy ??
-        (queue.metadata as QueueMetadata | undefined)?.requestedBy ??
-        undefined
-    if (!requestedByUser) {
-        warnLog({
-            message: 'Stream failed, skipping — no requestedBy to search with',
-            data: { title: currentTrack.title, guildId: queue.guild.id },
-        })
-        await notifyChannelStreamFailed(queue, currentTrack.title)
-        queue.node.skip()
-        return
-    }
-
-    if (!currentTrack.title) {
-        warnLog({
-            message: 'Stream failed, track has no title — skipping recovery',
-            data: { guildId: queue.guild.id },
-        })
-        await notifyChannelStreamFailed(queue, currentTrack.title)
-        queue.node.skip()
-        return
-    }
-
-    // Timeout guard: if YouTube search hangs (no response in 10s), skip the
-    // track rather than blocking the player indefinitely.
-    const searchTimeout = new Promise<null>((resolve) =>
-        setTimeout(() => resolve(null), 10_000).unref(),
-    )
-    const searchResult = await Promise.race([
-        queue.player.search(currentTrack.title, {
-            requestedBy: requestedByUser,
-            searchEngine: QueryType.YOUTUBE_SEARCH,
-        }),
-        searchTimeout,
-    ])
-
-    if (!searchResult || searchResult.tracks.length === 0) {
-        warnLog({
-            message: 'Stream failed, YouTube recovery found nothing — skipping',
-            data: { title: currentTrack.title, guildId: queue.guild.id },
-        })
-        await notifyChannelStreamFailed(queue, currentTrack.title)
-        queue.node.skip()
-        return
-    }
-
-    const alternativeTrack = searchResult.tracks.find(
-        (track) => !isSameTrack(currentTrack, track),
     )
 
-    if (alternativeTrack) {
-        queue.insertTrack(alternativeTrack, 0)
-        queue.node.skip()
-        providerHealthService.recordSuccess(providerFromTrack(currentTrack))
-        debugLog({
-            message: 'Successfully recovered from stream extraction error',
-            data: {
-                title: currentTrack.title,
-                alternativeUrl: alternativeTrack.url,
-            },
-        })
-    } else {
-        const allSameTrack = searchResult.tracks.some((track) =>
-            isSameTrack(currentTrack, track),
-        )
-        warnLog({
-            message: allSameTrack
-                ? 'Stream failed, YouTube returned same track alternative — skipping instead of reinsert'
-                : 'Stream failed, all YouTube alternatives already in queue — skipping',
-            data: { title: currentTrack.title, guildId: queue.guild.id },
-        })
-        await notifyChannelStreamFailed(queue, currentTrack.title)
-        queue.node.skip()
-    }
-}
-
-const handlePlayerError = async (
-    queue: GuildQueue,
-    error: Error,
-): Promise<void> => {
-    try {
-        const currentTrackProvider = providerFromTrack(
-            queue.currentTrack ?? undefined,
-        )
-        providerHealthService.recordFailure(
-            currentTrackProvider,
-            Date.now(),
-            error.message,
-        )
-
-        const youtubeErrorInfo = analyzeYouTubeError(error)
-
-        if (youtubeErrorInfo.isParserError) {
-            handleYouTubeParserError(queue, error, youtubeErrorInfo)
-            return
-        }
-
-        errorLog({
-            message: `Player error in queue ${queue.guild.name}:`,
-            error: toErrorInstance(error),
-            data: {
-                guildId: queue.guild.id,
-                guildName: queue.guild.name,
-                ...toErrorDetails(error),
-            },
-        })
-        captureException(toErrorInstance(error) ?? new Error(String(error)), {
-            context: 'player-error',
-            guildId: queue.guild.id,
-            provider: currentTrackProvider,
-            trackUrl: queue.currentTrack?.url,
-        })
-
-        const isStreamExtractionError =
-            error.message.includes('Could not extract stream') ||
-            error.message.includes('Streaming data not available') ||
-            error.message.includes('chooseFormat') ||
-            error.message.includes('Bridge exhausted')
-
-        if (isStreamExtractionError) {
-            debugLog({
-                message:
-                    'Detected stream extraction error, attempting recovery...',
-            })
-
-            try {
-                const currentTrack = queue.currentTrack
-                if (currentTrack) {
-                    await recoverFromStreamExtractionError(queue, currentTrack)
-                } else {
-                    queue.node.skip()
-                }
-            } catch (recoveryError) {
-                logHandlerFailure(
-                    'Failed to recover from stream extraction error:',
-                    recoveryError,
+    player.on(
+        'trackStuck',
+        (rainlinkPlayer: RainlinkPlayer, data: Record<string, unknown>) => {
+            void (async () => {
+                const queue = wrapPlayer(rainlinkPlayer)
+                const track = queue.currentTrack
+                errorLog({
+                    message: `Track stuck in guild ${queue.guild.id}:`,
+                    data: { guildId: queue.guild.id, ...data },
+                })
+                await notifyChannelTrackFailed(
+                    queue,
+                    track?.title ?? '',
+                    'got stuck while playing',
                 )
-                const failedTrack = queue.currentTrack
-                if (failedTrack) {
-                    await notifyChannelStreamFailed(queue, failedTrack.title)
-                }
-                queue.node.skip()
-            }
-        }
-    } catch (handlerError) {
-        logHandlerFailure('Error in player error handler:', handlerError)
-    }
+                await queue.node.skip()
+            })().catch((error: unknown) => {
+                errorLog({ message: 'trackStuck handler failed:', error })
+            })
+        },
+    )
+
+    player.on(
+        'trackResolveError',
+        (
+            rainlinkPlayer: RainlinkPlayer,
+            track: RainlinkTrack,
+            message: string,
+        ) => {
+            const queue = wrapPlayer(rainlinkPlayer)
+            errorLog({
+                message: `Track resolve error in guild ${queue.guild.id}:`,
+                data: { guildId: queue.guild.id, track: track?.title, message },
+            })
+            void notifyChannelTrackFailed(
+                queue,
+                track?.title ?? '',
+                'could not be resolved',
+            ).catch((error: unknown) => {
+                errorLog({ message: 'trackResolveError notify failed:', error })
+            })
+        },
+    )
+
+    player.on('nodeError', (node: RainlinkNode, error: Error) => {
+        errorLog({
+            message: `Lavalink node error (${node.options.name}):`,
+            error,
+        })
+        captureException(error, {
+            context: 'lavalink-node-error',
+            node: node.options.name,
+        })
+    })
+
+    player.on(
+        'nodeDisconnect',
+        (node: RainlinkNode, code: number, reason: Buffer | string) => {
+            errorLog({
+                message: `Lavalink node disconnected (${node.options.name}): code=${code} reason=${String(reason)}`,
+            })
+        },
+    )
 }

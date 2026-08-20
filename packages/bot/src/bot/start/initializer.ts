@@ -91,7 +91,7 @@ export class BotInitializer {
                 client: this.client,
             })
             this.client.player = player
-            musicWatchdogService.startOrphanSessionMonitor(player)
+            musicWatchdogService.startOrphanSessionMonitor(player, this.client)
         }
     }
 

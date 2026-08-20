@@ -1,4 +1,7 @@
-import type { Track, GuildQueue } from 'discord-player'
+import type {
+    RainlinkTrackAdapter as Track,
+    RainlinkQueueAdapter as GuildQueue,
+} from './rainlinkAdapter'
 import type { QueueState } from './types'
 import { debugLog } from '@lucky/shared/utils'
 
@@ -13,7 +16,7 @@ export function getQueueState(queue: GuildQueue): QueueState {
         const queueSize = queue.tracks.size
         const repeatMode = queue.repeatMode.toString()
         const volume = queue.node.volume
-        const position = queue.node.getTimestamp()?.current?.valueOf() || 0
+        const position = queue.node.streamTime || 0
         const duration =
             typeof currentTrack?.duration === 'number'
                 ? currentTrack.duration

@@ -1,4 +1,4 @@
-import type { Track } from 'discord-player'
+import type { RainlinkTrackAdapter as Track } from '../rainlinkAdapter'
 // import { errorLog } from "../../general/log"
 import { isSimilarTitle } from '../titleComparison'
 import { safeSetInterval } from '@lucky/shared/utils'
