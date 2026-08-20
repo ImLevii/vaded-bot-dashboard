@@ -42,7 +42,7 @@
         "rainlink": "^1.2.9",
         "rainlink-spotify": "^1.0.5",
         "ws": "^8.21.0",
-        "youtube-dl-exec": "^3.1.9",
+        "youtube-dl-exec": "^3.1.12",
         "youtubei.js": "^16.0.1",
         "rss-parser": "^3.13.0"
     },
