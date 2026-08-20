@@ -1,5 +1,9 @@
-import { type ButtonInteraction, type GuildMember } from 'discord.js'
-import { RainlinkLoopMode } from 'rainlink'
+import {
+    type ButtonInteraction,
+    type GuildMember,
+    type StringSelectMenuInteraction,
+} from 'discord.js'
+import { RainlinkLoopMode, type RainlinkFilterMode } from 'rainlink'
 import { debugLog, errorLog } from '@lucky/shared/utils'
 import { createErrorEmbed } from '../utils/general/embeds'
 import {
@@ -115,6 +119,12 @@ async function routeButtonAction(
             return handleClearQueue(interaction, queue)
         case MUSIC_BUTTON_IDS.CLEAR_AUTOPLAY:
             return handleClearAutoplay(interaction, queue)
+        case MUSIC_BUTTON_IDS.VOLUME_UP:
+            return handleVolumeStep(interaction, queue, VOLUME_STEP)
+        case MUSIC_BUTTON_IDS.VOLUME_DOWN:
+            return handleVolumeStep(interaction, queue, -VOLUME_STEP)
+        case MUSIC_BUTTON_IDS.QUEUE:
+            return handleShowQueue(interaction, queue)
         default:
             if (customId.startsWith(QUEUE_BUTTON_PREFIX)) {
                 return handleQueuePage(interaction, queue)
@@ -123,6 +133,113 @@ async function routeButtonAction(
                 return handleLeaderboardPage(interaction)
             }
     }
+}
+
+/**
+ * Filter picker under the now-playing embed. Lavalink applies these
+ * server-side, so this is just a mode switch — no re-encode, no local FFmpeg.
+ */
+export async function handleMusicFilterSelect(
+    interaction: StringSelectMenuInteraction,
+): Promise<void> {
+    try {
+        await interaction.deferUpdate()
+
+        const member = interaction.member as GuildMember
+        if (!member.voice.channel) {
+            await interaction.followUp({
+                embeds: [
+                    createErrorEmbed(
+                        'Not in Voice',
+                        'Join a voice channel first',
+                    ),
+                ],
+                ephemeral: true,
+            })
+            return
+        }
+
+        const { queue } = resolveGuildQueue(
+            interaction.client as unknown as Pick<CustomClient, 'player'>,
+            interaction.guildId ?? '',
+        )
+        if (!queue) {
+            await interaction.followUp({
+                embeds: [
+                    createErrorEmbed(
+                        'No Music',
+                        'Nothing is playing right now',
+                    ),
+                ],
+                ephemeral: true,
+            })
+            return
+        }
+
+        const mode = interaction.values[0] as RainlinkFilterMode
+        await queue.setFilter(mode)
+
+        await interaction.followUp({
+            content:
+                mode === 'clear'
+                    ? '✨ Filters cleared'
+                    : `🎛️ Filter applied: **${mode}**`,
+            ephemeral: true,
+        })
+        debugLog({ message: `Filter "${mode}" applied via select menu` })
+    } catch (error) {
+        errorLog({ message: 'Music filter select error', error })
+        await interaction
+            .followUp({
+                embeds: [
+                    createErrorEmbed('Error', 'Could not apply that filter'),
+                ],
+                ephemeral: true,
+            })
+            .catch(() => {})
+    }
+}
+
+/** Percentage points each volume button press moves, matching /volume's 1-200 range. */
+const VOLUME_STEP = 10
+const VOLUME_MIN = 0
+const VOLUME_MAX = 200
+
+async function handleVolumeStep(
+    interaction: ButtonInteraction,
+    queue: NonNullQueue,
+    delta: number,
+): Promise<void> {
+    const current = queue.node.volume
+    const next = Math.min(VOLUME_MAX, Math.max(VOLUME_MIN, current + delta))
+
+    if (next === current) {
+        await interaction.followUp({
+            content: `🔊 Volume is already at ${current === VOLUME_MIN ? 'minimum' : 'maximum'} (${current}%)`,
+            ephemeral: true,
+        })
+        return
+    }
+
+    await queue.node.setVolume(next)
+    await interaction.followUp({
+        content: `🔊 Volume: **${next}%**`,
+        ephemeral: true,
+    })
+    debugLog({ message: `Volume set to ${next} via button` })
+}
+
+async function handleShowQueue(
+    interaction: ButtonInteraction,
+    queue: NonNullQueue,
+): Promise<void> {
+    const { embed, components } = await createQueueEmbed(queue, undefined, 0)
+    await interaction.followUp({
+        embeds: [embed],
+        components,
+        ephemeral: true,
+    })
+    debugLog({ message: 'Queue shown via button' })
 }
 
 async function handlePrevious(

@@ -25,7 +25,11 @@ import { handleAuditEvents } from './auditHandler'
 import { handleExternalScrobbler } from './externalScrobbler'
 import { handleReactionEvents } from './reactionHandler'
 import { scheduledEventNotificationService } from '../services/ScheduledEventNotificationService'
-import { handleMusicButtonInteraction } from './musicButtonHandler'
+import {
+    handleMusicButtonInteraction,
+    handleMusicFilterSelect,
+} from './musicButtonHandler'
+import { MUSIC_FILTER_SELECT_ID } from '../types/musicButtons'
 import { executeContextMenu } from './commandsHandler'
 import {
     handleMoveMessageSelect,
@@ -275,6 +279,14 @@ async function handleInteractionCreate(
     try {
         if (interaction.isAutocomplete()) {
             await handleAutocomplete(interaction)
+            return
+        }
+
+        if (
+            interaction.isStringSelectMenu() &&
+            interaction.customId === MUSIC_FILTER_SELECT_ID
+        ) {
+            await handleMusicFilterSelect(interaction)
             return
         }
 

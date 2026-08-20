@@ -1,20 +1,17 @@
-import { RainlinkLoopMode } from 'rainlink'
 import type { ColorResolvable } from 'discord.js'
 import { EmbedBuilder } from 'discord.js'
 import { LRUCache } from 'lru-cache'
 import { debugLog, errorLog, warnLog } from '@lucky/shared/utils'
 import { EMBED_COLORS } from '../../utils/general/embeds'
-import { getAutoplayCount } from '../../utils/music/autoplayManager'
-import { constants } from '@lucky/shared/config'
 import {
     createMusicControlButtons,
     createMusicActionButtons,
+    createMusicFilterSelect,
 } from '../../utils/music/buttonComponents'
 import type {
     RainlinkQueueAdapter,
     RainlinkTrackAdapter,
 } from '../../utils/music/rainlinkAdapter'
-import { getPerSourceAcceptanceRateCached } from '../../utils/music/autoplay/autoplayAcceptanceCache'
 import {
     isLastFmConfigured,
     getSessionKeyForUser,
@@ -129,57 +126,17 @@ function getLastFmRequesterId(
     return track.requestedBy?.id ?? fallbackRequester ?? queueRequester
 }
 
-/**
- * Append the per-source acceptance rate to the recommendation reason.
- * Returns the original reason if the rate is unavailable or if reading fails.
- */
-async function appendAcceptanceRate(
-    reason: string,
-    recommendationSource: string | undefined,
-    guildId: string,
-): Promise<string> {
-    // Graceful omission if source is not available
-    if (!recommendationSource) {
-        return reason
-    }
-
-    try {
-        const rows = await getPerSourceAcceptanceRateCached(guildId)
-        const sourceRow = rows.find((r) => r.source === recommendationSource)
-
-        if (!sourceRow || sourceRow.acceptanceRate === null) {
-            return reason
-        }
-
-        const ratePercent = Math.round(sourceRow.acceptanceRate * 100)
-        return `${reason} · ${ratePercent}% accepted`
-    } catch {
-        // On any error (cache issue, service issue), omit the rate gracefully
-        return reason
-    }
-}
-
-function msToTimestamp(ms: number): string {
-    const secs = Math.floor(ms / 1000)
-    return `${Math.floor(secs / 60)}:${(secs % 60).toString().padStart(2, '0')}`
-}
-
-function repeatModeLabel(mode: RainlinkLoopMode): string {
-    switch (mode) {
-        case RainlinkLoopMode.SONG:
-            return 'Track'
-        case RainlinkLoopMode.QUEUE:
-            return 'Queue'
-        default:
-            return 'Off'
-    }
-}
+/** Animated music emoji ByteBlaze uses as the embed's author icon. */
+const TRACK_ICON_URL =
+    'https://cdn.discordapp.com/emojis/741605543046807626.gif'
 
 /**
- * Now-playing embed, styled after =VG=MUSIC-BOT (ByteBlaze)'s trackStart.ts:
- * author line + description + three inline fields (Author/Duration/
- * Requested by) + thumbnail + single accent color, on top of vaded's own
- * progress-bar/volume/mode line and Last.fm/autoplay-counter integration.
+ * Now-playing embed, matching =VG=MUSIC-BOT (ByteBlaze)'s trackStart.ts
+ * one-for-one: "Started Playing" author line with the animated music icon, a
+ * bold linked title, and three inline fields whose labels are the same
+ * backtick-wrapped-emoji strings from its en/event.player.yaml. No footer or
+ * timestamp — ByteBlaze renders neither, and the reference layout is the
+ * whole point of this embed.
  */
 export async function sendNowPlayingEmbed(
     queue: RainlinkQueueAdapter,
@@ -191,48 +148,45 @@ export async function sendNowPlayingEmbed(
 
     const requester = track.requestedBy
     const requestedByDisplay = requester ? `${requester}` : '🤖 Autoplay'
-    const trackMetadata = track.metadata as {
-        recommendationReason?: string
-        recommendationSource?: string
-    }
-    const autoplayCount = isAutoplay
-        ? await getAutoplayCount(queue.guild.id)
-        : null
-    const footer = isAutoplay
-        ? `🤖 Autoplay • ${autoplayCount ?? 0}/${constants.MAX_AUTOPLAY_TRACKS ?? 50} tracks`
-        : requester
-          ? `Added by ${requester.username}`
-          : 'Added automatically'
 
-    const posMs = queue.node.streamTime ?? 0
-    const durMs = track.durationMS ?? 0
-    const timestamp = `\`${msToTimestamp(posMs)} / ${msToTimestamp(durMs)}\``
-    const vol = `${queue.node.volume}%`
-    const mode = repeatModeLabel(queue.repeatMode)
+    // Linked title, per ByteBlaze's getTitle(). A track with no uri (rare,
+    // but rainlink types it nullable) falls back to plain text rather than
+    // rendering a dead "[title]()" link.
+    const title = track.url
+        ? `[${track.title}](${track.url})`
+        : (track.title ?? 'Unknown')
 
     const embed = new EmbedBuilder()
-        .setAuthor({ name: 'Now Playing' })
-        .setDescription(`**${track.title}**`)
+        .setAuthor({ name: 'Started Playing', iconURL: TRACK_ICON_URL })
+        .setDescription(`**${title}**`)
         .addFields([
-            { name: 'Author', value: track.author || 'Unknown', inline: true },
-            { name: 'Duration', value: track.duration, inline: true },
-            { name: 'Requested by', value: requestedByDisplay, inline: true },
+            {
+                name: '`✒️` | Author:',
+                value: track.author || 'Unknown',
+                inline: true,
+            },
+            {
+                name: '`🕒` | Song Duration:',
+                value: track.duration,
+                inline: true,
+            },
+            {
+                name: '`👤` | Requester:',
+                value: requestedByDisplay,
+                inline: true,
+            },
         ])
         .setColor(EMBED_COLORS.MUSIC as ColorResolvable)
-        .setThumbnail(track.thumbnail ?? null)
-        .setFooter({
-            text: `${footer} • Volume: ${vol} | Mode: ${mode} • ${timestamp}`,
-        })
-        .setTimestamp()
-
-    if (isAutoplay && trackMetadata.recommendationReason) {
-        const reasonWithRate = await appendAcceptanceRate(
-            trackMetadata.recommendationReason,
-            trackMetadata.recommendationSource,
-            queue.guild.id,
+        .setThumbnail(
+            track.thumbnail ??
+                `https://img.youtube.com/vi/${track.identifier}/hqdefault.jpg`,
         )
-        embed.addFields([{ name: 'Why this track', value: reasonWithRate }])
-    }
+
+    const components = [
+        createMusicFilterSelect(),
+        createMusicControlButtons(queue),
+        createMusicActionButtons(queue),
+    ]
 
     const previousMessage = getSongInfoMessage(queue.guild.id)
     if (previousMessage && previousMessage.channelId === metadata.channel.id) {
@@ -244,10 +198,7 @@ export async function sendNowPlayingEmbed(
                 content: null,
                 embeds: [embed],
                 files: [],
-                components: [
-                    createMusicControlButtons(queue),
-                    createMusicActionButtons(queue),
-                ],
+                components,
             })
             registerNowPlayingMessage(
                 queue.guild.id,
@@ -280,10 +231,7 @@ export async function sendNowPlayingEmbed(
     const message = await metadata.channel.send({
         embeds: [embed],
         files: [],
-        components: [
-            createMusicControlButtons(queue),
-            createMusicActionButtons(queue),
-        ],
+        components,
     })
 
     registerNowPlayingMessage(

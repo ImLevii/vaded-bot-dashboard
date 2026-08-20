@@ -8,6 +8,7 @@ import {
     RainlinkLoopMode,
     RainlinkSearchResultType,
     VoiceConnectState,
+    type RainlinkFilterMode,
     type RainlinkPlayer,
     type RainlinkTrack,
 } from 'rainlink'
@@ -353,6 +354,19 @@ export class RainlinkQueueAdapter {
     /** RainlinkQueue extends Array, so a plain splice works for insertion. */
     insertTrack(track: RainlinkTrackAdapter, position: number): void {
         this.player.queue.splice(position, 0, track.raw)
+    }
+
+    /**
+     * Apply one of Lavalink's prebuilt filters (or clear them). Unlike
+     * discord-player's client-side FFmpeg chain, these are applied
+     * server-side by Lavalink, so there's no re-encode on our end.
+     */
+    async setFilter(mode: RainlinkFilterMode): Promise<void> {
+        if (mode === 'clear') {
+            await this.player.filter.clear()
+            return
+        }
+        await this.player.filter.set(mode)
     }
 }
 
