@@ -43,7 +43,7 @@
         "rainlink-spotify": "^1.0.5",
         "ws": "^8.21.0",
         "youtube-dl-exec": "^3.1.9",
-        "youtubei.js": "^16.0.1",
+        "youtubei.js": "^18.0.0",
         "rss-parser": "^3.13.0"
     },
     "devDependencies": {
