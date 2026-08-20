@@ -3,6 +3,7 @@ import { ENVIRONMENT_CONFIG } from '@lucky/shared/config'
 import { errorLog, infoLog, warnLog } from '@lucky/shared/utils'
 import { musicSessionSnapshotService } from './sessionSnapshots'
 import { wrapPlayer } from './rainlinkAdapter'
+import { createGuildPlayer } from './createGuildPlayer'
 
 const STARTUP_MAX_AGE_MS = 30 * 60 * 1_000 // 30 minutes
 
@@ -98,11 +99,11 @@ export async function restoreSessionsOnStartup(
             // front), so there's no separate connect step. No dedicated text
             // channel is known here, so the voice channel id is reused as
             // textId — most guild voice channels also support text chat.
-            const rainlinkPlayer = await client.player.create({
-                guildId: guild.id,
+            const rainlinkPlayer = await createGuildPlayer({
+                rainlink: client.player,
+                guild,
+                voiceChannel: channel,
                 textId: snapshot.voiceChannelId,
-                voiceId: channel.id,
-                shardId: guild.shardId,
             })
             const queue = wrapPlayer(rainlinkPlayer)
             queue.setMetadata({

@@ -11,6 +11,7 @@ import {
     normalizeYoutubeUrl,
 } from '../../functions/music/commands/play/urlNormalization'
 import { wrapPlayer } from '../../utils/music/rainlinkAdapter'
+import { createGuildPlayer } from '../../utils/music/createGuildPlayer'
 import { resolveWebPlayContext } from './playContext'
 import { musicSessionSnapshotService } from '../../utils/music/sessionSnapshots'
 
@@ -133,13 +134,13 @@ export async function handleImportPlaylist(
         // metadata.channel must be a real text channel: trackNowPlaying.ts
         // returns early without one, which silently suppressed the Now
         // Playing embed for every web-started session.
-        const rainlinkPlayer = await client.player.create({
-            guildId: cmd.guildId,
+        const rainlinkPlayer = await createGuildPlayer({
+            rainlink: client.player,
+            guild,
+            voiceChannel: resolved.context.voiceChannel,
             textId:
                 resolved.context.textChannel?.id ??
                 resolved.context.voiceChannel.id,
-            voiceId: resolved.context.voiceChannel.id,
-            shardId: guild.shardId,
         })
         queue = wrapPlayer(rainlinkPlayer)
         queue.setMetadata({

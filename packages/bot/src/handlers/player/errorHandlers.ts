@@ -4,7 +4,7 @@ import type {
     RainlinkPlayer,
     RainlinkTrack,
 } from 'rainlink'
-import { errorLog, debugLog, captureException } from '@lucky/shared/utils'
+import { errorLog, debugLog, infoLog, captureException } from '@lucky/shared/utils'
 import { createErrorEmbed } from '../../utils/general/embeds'
 import { wrapPlayer } from '../../utils/music/rainlinkAdapter'
 
@@ -111,6 +111,16 @@ export const setupErrorHandlers = (player: Rainlink): void => {
             })
         },
     )
+
+    // Log the success side too: with only the error/disconnect handlers below,
+    // "is Lavalink actually connected?" was unanswerable from the logs —
+    // a healthy node and a node that never finished connecting looked
+    // identical (silence).
+    player.on('nodeConnect', (node: RainlinkNode) => {
+        infoLog({
+            message: `Lavalink node connected (${node.options.name}) at ${node.options.host}:${node.options.port}`,
+        })
+    })
 
     player.on('nodeError', (node: RainlinkNode, error: Error) => {
         errorLog({

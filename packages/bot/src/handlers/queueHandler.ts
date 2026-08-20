@@ -7,6 +7,7 @@ import type {
 import type { CustomClient } from '../types'
 import type { RainlinkQueueAdapter as GuildQueue } from '../utils/music/rainlinkAdapter'
 import { wrapPlayer } from '../utils/music/rainlinkAdapter'
+import { createGuildPlayer } from '../utils/music/createGuildPlayer'
 
 class ValidationError extends Error {
     constructor(
@@ -54,11 +55,11 @@ export const createQueue = async ({
         })
     }
 
-    const rainlinkPlayer = await client.player.create({
-        guildId: interaction.guild.id,
+    const rainlinkPlayer = await createGuildPlayer({
+        rainlink: client.player,
+        guild: interaction.guild,
+        voiceChannel,
         textId: interaction.channelId,
-        voiceId: voiceChannel.id,
-        shardId: interaction.guild.shardId,
     })
 
     const queue = wrapPlayer(rainlinkPlayer)

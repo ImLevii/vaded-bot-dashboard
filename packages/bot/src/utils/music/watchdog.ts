@@ -6,6 +6,7 @@ import { parseIntEnv } from '@lucky/shared/utils/env'
 import { musicSessionSnapshotService } from './sessionSnapshots'
 import type { RainlinkQueueAdapter } from './rainlinkAdapter'
 import { wrapPlayer } from './rainlinkAdapter'
+import { createGuildPlayer } from './createGuildPlayer'
 
 export type RecoveryAction =
     'none' | 'rejoin' | 'requeue_current' | 'play_next' | 'failed'
@@ -327,7 +328,7 @@ export class MusicWatchdogService {
 
         const target = await this.resolveOrphanTarget(client, guildId)
         if (!target) return
-        const { guild, voiceChannelId, ageMs } = target
+        const { guild, voiceChannel, voiceChannelId, ageMs } = target
 
         infoLog({
             message: 'Watchdog detected orphan session, attempting rejoin',
@@ -343,11 +344,11 @@ export class MusicWatchdogService {
             // No dedicated text channel is known from the snapshot (only
             // voiceChannelId), so the voice channel id is reused as textId;
             // most guild voice channels also support their own text chat.
-            const rainlinkPlayer = await rainlink.create({
-                guildId,
+            const rainlinkPlayer = await createGuildPlayer({
+                rainlink,
+                guild,
+                voiceChannel,
                 textId: voiceChannelId,
-                voiceId: voiceChannelId,
-                shardId: guild.shardId,
             })
             queue = wrapPlayer(rainlinkPlayer)
             // Deliberately does NOT force a repeat/loop mode. It used to force

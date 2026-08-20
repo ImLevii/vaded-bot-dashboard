@@ -7,6 +7,7 @@ import type {
     RainlinkTrackAdapter,
 } from '../../../../../utils/music/rainlinkAdapter'
 import { wrapPlayer } from '../../../../../utils/music/rainlinkAdapter'
+import { createGuildPlayer } from '../../../../../utils/music/createGuildPlayer'
 import { resolveGuildQueue } from '../../../../../utils/music/queueResolver'
 
 export type PlayResolutionArm =
@@ -80,11 +81,11 @@ export async function resolveQueryWithFallbacks({
     const queue =
         existing ??
         wrapPlayer(
-            await client.player.create({
-                guildId,
+            await createGuildPlayer({
+                rainlink: client.player,
+                guild: voiceChannel.guild,
+                voiceChannel,
                 textId,
-                voiceId: voiceChannel.id,
-                shardId: voiceChannel.guild.shardId,
             }),
         )
     if (!existing) {
