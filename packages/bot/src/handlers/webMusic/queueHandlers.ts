@@ -160,7 +160,11 @@ export async function handleImportPlaylist(
             if (track.url) existingUrls.add(track.url)
         }
     }
-    if (!queue.node.isPlaying() && !queue.node.isPaused()) {
+    // See handlers/webMusic/commandHandlers.ts#handlePlay: a fresh
+    // RainlinkPlayer is paused=true from construction, so `!isPaused()`
+    // is never true for a queue's first tracks — check what's actually
+    // loaded instead.
+    if (!queue.currentTrack) {
         await queue.node.play()
     }
 

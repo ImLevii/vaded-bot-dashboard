@@ -118,7 +118,12 @@ export async function resolveQueryWithFallbacks({
             for (const track of searchResult.tracks) {
                 queue.addTrack(track)
             }
-            if (!queue.node.isPlaying() && !queue.node.isPaused()) {
+            // Not `!isPlaying() && !isPaused()` — see the identical fix (and
+            // why) in handlers/webMusic/commandHandlers.ts#handlePlay: a
+            // fresh RainlinkPlayer is paused=true from construction, so this
+            // guard was never true and .play() never ran for a queue's first
+            // tracks.
+            if (!queue.currentTrack) {
                 await queue.node.play()
             }
 

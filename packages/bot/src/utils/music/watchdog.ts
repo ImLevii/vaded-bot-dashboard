@@ -141,7 +141,12 @@ export class MusicWatchdogService {
     private skipRecoveryReason(queue: RainlinkQueueAdapter): string | null {
         if (this.intentionalStops.has(queue.guild.id)) return 'intentional_stop'
         if (queue.node.isPlaying()) return 'queue_playing'
-        if (queue.node.isPaused()) return 'queue_paused'
+        // A fresh RainlinkPlayer is paused=true from construction, before
+        // anything has ever loaded (see handlers/webMusic/commandHandlers.ts
+        // #handlePlay) — isPaused() alone can't distinguish "deliberately
+        // paused mid-track" from "never started". Only the former should
+        // block recovery.
+        if (queue.node.isPaused() && queue.currentTrack) return 'queue_paused'
         return null
     }
 
@@ -323,8 +328,10 @@ export class MusicWatchdogService {
         const existingPlayer = rainlink.players.get(guildId)
         const existingQueue = existingPlayer ? wrapPlayer(existingPlayer) : null
         if (existingQueue?.node.isPlaying()) return
-        // Paused counts as live for the same reason it does in checkAndRecover.
-        if (existingQueue?.node.isPaused()) return
+        // Paused counts as live for the same reason it does in
+        // skipRecoveryReason — but only when something is actually loaded;
+        // see the comment there.
+        if (existingQueue?.node.isPaused() && existingQueue.currentTrack) return
 
         const target = await this.resolveOrphanTarget(client, guildId)
         if (!target) return

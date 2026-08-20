@@ -144,8 +144,13 @@ export async function handlePlay(
     setReplenishSuppressed(cmd.guildId, 0)
     for (const track of result.tracks) queue.addTrack(track)
 
-    if (!queue.node.isPlaying() && !queue.node.isPaused())
-        await queue.node.play()
+    // Not `!isPlaying() && !isPaused()`: a freshly-created RainlinkPlayer
+    // starts with paused=true (rainlink's own constructor default, before
+    // anything has ever loaded), so that guard was never true on a queue's
+    // first tracks and .play() silently never got called — tracks queued up
+    // forever with no error and no audio. Whether something is actually
+    // loaded is the real signal.
+    if (!queue.currentTrack) await queue.node.play()
 
     const isPlaylist = result.tracks.length > 1
     const state = await buildQueueState(client, cmd.guildId)
