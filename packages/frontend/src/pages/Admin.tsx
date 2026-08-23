@@ -3,6 +3,7 @@ import Skeleton from '@/components/ui/Skeleton'
 import Button from '@/components/ui/Button'
 import GlobalTogglesSection from '@/components/Features/GlobalTogglesSection'
 import BotGuildsSection from '@/components/Admin/BotGuildsSection'
+import LavalinkNodesSection from '@/components/Admin/LavalinkNodesSection'
 import FeatureErrorBanner from '@/components/Features/FeatureErrorBanner'
 import { useAuthStore } from '@/stores/authStore'
 import { useFeatures } from '@/hooks/useFeatures'
@@ -193,6 +194,30 @@ export default function AdminPage() {
                         </p>
                     </div>
                     <BotGuildsSection />
+                </section>
+
+                {/* Lavalink Nodes Section — vg-music-bot node health & control */}
+                <section
+                    aria-labelledby='lavalink-nodes-heading'
+                    className='space-y-4'
+                >
+                    <div className='space-y-1'>
+                        <h2
+                            id='lavalink-nodes-heading'
+                            className='text-base font-semibold text-vaded-text-primary uppercase tracking-wide'
+                            style={{ fontFamily: 'Sora' }}
+                        >
+                            Lavalink Nodes
+                        </h2>
+                        <p
+                            className='text-xs text-vaded-text-tertiary'
+                            style={{ fontFamily: 'Manrope' }}
+                        >
+                            View, add, remove, and switch the music bot's
+                            Lavalink nodes
+                        </p>
+                    </div>
+                    <LavalinkNodesSection />
                 </section>
             </div>
         </main>

@@ -26,6 +26,7 @@ import { setupServiceGuildRoutes } from './serviceGuild'
 import { setupServiceAnnounceRoutes } from './serviceAnnounce'
 import { setupWebhookApiRoutes, setupWebhookPublicRoutes } from './webhooks'
 import { setupAdminRoutes } from './admin'
+import { setupLavalinkAdminRoutes } from './lavalinkAdmin'
 import { apiLimiter, writeLimiter } from '../middleware/rateLimit'
 import { requireAuth } from '../middleware/auth'
 import { requireAdmin } from '../middleware/requireAdmin'
@@ -144,6 +145,7 @@ export function setupRoutes(
     app.use('/api/toggles/global', requireAuth, requireAdmin, writeLimiter)
     setupWebhookApiRoutes(app)
     setupAdminRoutes(app)
+    setupLavalinkAdminRoutes(app)
 
     for (const config of guildGuardConfigs) {
         const middleware = config.mode
