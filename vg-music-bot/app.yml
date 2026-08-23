@@ -1,0 +1,107 @@
+# ByteBlaze config file via .yml
+# Version 5.0.0
+# You can use ${} to pass an enviroment varible from .env file
+# Eg:
+# something: ${DATA}
+# You can config the full bot at here (example avalible at example.full.app.yml)
+# or by going to src/services/ConfigDataService.ts
+
+bot:
+  # You can add more than 1 token to clone the bot
+  # Note that performance will be dreaded and you can't set each config for each cloned bot
+  # Config data of each bot will be the same
+  TOKEN: '${DISCORD_TOKEN}'
+  OWNER_ID: '180892352150241280'
+
+player:
+  SPOTIFY:
+    # Your Spotify ID and Secret, you can get it from here: https://developer.spotify.com
+    # If you don't have or don't want, you can disable it
+    enable: true
+    id: '1713edce8de0435691fe27284973a106'
+    secret: 'f91e36886772428b9d4af04aa0b2f441'
+
+  # Default search suggestion for auto complete, leave it empty will use default
+  AUTOCOMPLETE_SEARCH: []
+
+  # Enable this if you want to use realtime duation in nowplaying command
+  NP_REALTIME: false
+
+  # The number of leave time you want
+  LEAVE_TIMEOUT: 60000
+
+  # Must not over 1000 or bot crash
+  DEFAULT_VOLUME: 100
+
+  # Enable this to avoid your bot get suspended (Recommended to be enable)
+  AVOID_SUSPEND: false
+
+  # The number of tracks you want to limit
+  LIMIT_TRACK: 50
+
+  # The number of playlist you want to limit
+  LIMIT_PLAYLIST: 10
+  NODES:
+    #- host: lavalink.jirayu.net
+    #  port: 13592
+    #  auth: "youshallnotpass"
+    #  secure: false
+      # In rainlink, it support lavalink v3, lavalink v4 and nodelink v2 as driver
+      # If you put the wrong driver identify here or not put anything here,
+      # it will fallback to lavalink v4 driver
+      # Driver identify and support range:
+      # | Type     | Support versions | Driver Name       |
+      # | -------- | ---------------- | ----------------- |
+      # | Lavalink | v4.0.0 - v4.x.x  | lavalink/v4/koinu |
+      # | Lavalink | v3.0.0 - v3.7.x  | lavalink/v3/koto  |
+      # | Nodelink | v2.0.0 - v2.x.x  | lavalink/v3/koto  |
+    #  driver: 'lavalink@4'    
+    - host: lavalinkv4.serenetia.com
+      port: 443
+      auth: "https://seretia.link/discord"
+      secure: true
+      # In rainlink, it support lavalink v3, lavalink v4 and nodelink v2 as driver
+      # If you put the wrong driver identify here or not put anything here,
+      # it will fallback to lavalink v4 driver
+      # Driver identify and support range:
+      # | Type     | Support versions | Driver Name       |
+      # | -------- | ---------------- | ----------------- |
+      # | Lavalink | v4.0.0 - v4.x.x  | lavalink/v4/koinu |
+      # | Lavalink | v3.0.0 - v3.7.x  | lavalink/v3/koto  |
+      # | Nodelink | v2.0.0 - v2.x.x  | lavalink/v3/koto  |
+      driver: 'lavalink@4'
+    - host: lava-v4.millhost.my.id
+      port: 443
+      auth: "https://discord.gg/mjS5J2K3ep"
+      secure: true
+      driver: 'lavalink@4'
+    - host: free-lava.heavencloud.in
+      port: 4000
+      auth: "heavencloud.in"
+      secure: false
+      driver: 'lavalink@4'
+utilities:
+  # Enable debug tools for execute code from bot
+  # use dokdo package, owner only, no prefix changes
+  # You have to enable message_content to use
+  # use: sudo rdc help, for more command
+  DEBUG_TOOLS: true
+  # Log register premium activities
+  PREMIUM_LOG_CHANNEL: '960030893236428810'
+  # Log all the guild that bot joined or leaved
+  GUILD_LOG_CHANNEL: '960030893236428810'
+  # Log all unhandled, error, warnings on discord
+  LOG_CHANNEL: '960030893236428810'
+  # The timeout for deleting msg
+  DELETE_MSG_TIMEOUT: 3000
+  # Auto resume when bot restarted suddenly
+  AUTO_RESUME: false
+
+  # Fix the Lavalink server when the current is down
+  # Disabled: falling back to random public/community nodes is unreliable
+  # (they go down without notice, e.g. connect ETIMEDOUT). Instead the bot
+  # will just keep retrying the nodes configured in player.NODES above.
+  AUTOFIX_LAVALINK:
+    enable: false
+    retryCount: 10
+    retryTimeout: 3000

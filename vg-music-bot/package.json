@@ -1,0 +1,111 @@
+{
+  "name": "byteblaze",
+  "version": "5.2.5",
+  "description": "A versatile and powerful music bot for Discord that brings rhythm and melody to your server. This is a big upgrade of Cylane!",
+  "exports": "./dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "byteblaze": {
+    "autofix": {
+      "version": "5.1.0",
+      "codename": "kaito_auto"
+    },
+    "codename": "kaito"
+  },
+  "scripts": {
+    "build": "tsc --build --verbose",
+    "build:full": "npm run build:prettier && npm run build",
+    "start": "node --no-deprecation ./dist/index.js",
+    "start:shard": "node --no-deprecation ./dist/cluster/index.js",
+    "dev": "npx nodemon ./src/index.ts",
+    "build:prettier": "npx prettier -w ./src",
+    "start:pm2": "npx pm2-runtime start ecosystem.config.cjs --env production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RainyXeon/ByteBlaze.git"
+  },
+  "keywords": [
+    "discordbot"
+  ],
+  "author": "RainyXeon",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/RainyXeon/ByteBlaze/issues"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "*.database.json"
+    ],
+    "execMap": {
+      "ts": "tsx"
+    }
+  },
+  "homepage": "https://github.com/RainyXeon/ByteBlaze#readme",
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": false,
+    "singleQuote": true,
+    "printWidth": 100
+  },
+  "dependencies": {
+    "@execaman/lyricist": "^2.0.2",
+    "@fastify/websocket": "^10.0.1",
+    "@hammerhq/localization": "^2.2.0",
+    "@sapphire/ratelimits": "^2.4.9",
+    "chalk": "^5.3.0",
+    "common-tags": "^1.8.2",
+    "discord.js": "^14.16.1",
+    "dotenv": "^16.4.5",
+    "dreamvast.quick.db": "10.0.0-unsupported",
+    "fastify": "^4.28.1",
+    "humanize-duration": "^3.32.1",
+    "js-yaml": "^4.1.0",
+    "markdown-it": "^14.1.0",
+    "mongoose": "^8.6.1",
+    "mysql2": "^3.11.0",
+    "node-cron": "^3.0.3",
+    "pg": "^8.12.0",
+    "pidusage": "^3.0.2",
+    "pretty-ms": "^9.1.0",
+    "rainlink": "^1.2.9",
+    "rainlink-apple": "^1.0.5",
+    "rainlink-deezer": "^1.0.9",
+    "rainlink-nico": "^1.0.7",
+    "rainlink-spotify": "^1.0.5",
+    "recursive-readdir": "^2.2.3",
+    "voucher-code-generator": "^1.3.0",
+    "winston": "^3.14.2",
+    "write-file-atomic": "^5.0.1"
+  },
+  "devDependencies": {
+    "@types/chillout": "^5.0.6",
+    "@types/common-tags": "^1.8.4",
+    "@types/js-yaml": "^4.0.9",
+    "@types/lodash": "^4.17.7",
+    "@types/markdown-it": "^13.0.9",
+    "@types/node": "^20.16.4",
+    "@types/node-cron": "^3.0.11",
+    "@types/pidusage": "^2.0.5",
+    "@types/recursive-readdir": "^2.2.4",
+    "@types/voucher-code-generator": "^1.1.3",
+    "copy-dir": "^1.3.0",
+    "dir-archiver": "^2.1.0",
+    "nodemon": "^3.1.4",
+    "plsargs": "^0.1.6",
+    "pm2": "^5.4.2",
+    "prettier": "^3.3.3",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4"
+  },
+  "pnpm": {
+    "overrides": {
+      "marked@<4.0.10": ">=4.0.10",
+      "undici@<5.26.2": ">=5.26.2"
+    }
+  }
+}
