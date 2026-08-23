@@ -1,0 +1,202 @@
+import {
+  Client,
+  GatewayIntentBits,
+  ColorResolvable,
+  Message,
+  Collection as DJSCollection,
+  InteractionCollector,
+  ButtonInteraction,
+  StringSelectMenuOptionBuilder,
+  StringSelectMenuInteraction,
+} from 'discord.js'
+import { DatabaseService } from './database/index.js'
+import { resolve } from 'path'
+import { LoggerService } from './services/LoggerService.js'
+import { join, dirname } from 'path'
+import { fileURLToPath } from 'url'
+import { WebServer } from './web/server.js'
+import { ManifestService } from './services/ManifestService.js'
+import { config } from 'dotenv'
+import { initHandler } from './handlers/index.js'
+import { DeployService } from './services/DeployService.js'
+import { RainlinkInit } from './structures/Rainlink.js'
+import { Metadata } from './@types/Metadata.js'
+import { Config, Emojis } from './@types/Config.js'
+import { DatabaseTable } from './database/@types.js'
+import { LavalinkDataType, LavalinkUsingDataType } from './@types/Lavalink.js'
+import { Rainlink } from 'rainlink'
+import { Command } from './structures/Command.js'
+import { PlayerButton } from './@types/Button.js'
+import { GlobalMsg } from './structures/CommandHandler.js'
+import { RainlinkFilterData, RainlinkPlayer } from 'rainlink'
+import { TopggService } from './services/TopggService.js'
+import { Collection } from './structures/Collection.js'
+import { Localization } from './structures/Localization.js'
+import { ClusterManager } from './cluster/core.js'
+import cluster, { Cluster } from 'node:cluster'
+import { ManifestInterface } from './@types/Manifest.js'
+config()
+
+function getShard(clusterManager: ClusterManager) {
+  const shardListData = clusterManager.getShard(cluster.worker.id)
+  return {
+    shards: shardListData,
+    shardCount: clusterManager.totalShards,
+  }
+}
+
+export class Manager extends Client {
+  public cluster: { id: number | 0; data: Cluster | null }
+  public manifest: ManifestInterface
+  public logger: LoggerService
+  public db!: DatabaseTable
+  public owner: string
+  public color: ColorResolvable
+  public i18n: Localization
+  public prefix: string
+  public isDatabaseConnected: boolean
+  public lavalinkList: LavalinkDataType[]
+  public lavalinkUsing: LavalinkUsingDataType[]
+  public lavalinkUsed: LavalinkUsingDataType[]
+  public rainlink: Rainlink
+  public commands: DJSCollection<string, Command>
+  public interval: Collection<NodeJS.Timer>
+  public sentQueue: Collection<boolean>
+  public nplayingMsg: Collection<{
+    filterColl: InteractionCollector<StringSelectMenuInteraction<'cached'>>
+    coll: InteractionCollector<ButtonInteraction<'cached'>>
+    msg: Message
+  }>
+  public aliases: Collection<string>
+  public plButton: Collection<PlayerButton>
+  public leaveDelay: Collection<NodeJS.Timeout>
+  public nowPlaying: Collection<{ interval: NodeJS.Timeout; msg: GlobalMsg }>
+  public wsl: Collection<{ send: (data: Record<string, unknown>) => void }>
+  public UpdateMusic!: (player: RainlinkPlayer) => Promise<void | Message<true>>
+  public UpdateQueueMsg!: (player: RainlinkPlayer) => Promise<void | Message<true>>
+  public topgg?: TopggService
+  public icons: Emojis
+  public REGEX: RegExp[]
+  public selectMenuOptions: StringSelectMenuOptionBuilder[] = []
+
+  constructor(
+    public config: Config,
+    isMsgEnable: boolean,
+    public clusterManager?: ClusterManager
+  ) {
+    super({
+      shards: clusterManager ? getShard(clusterManager).shards : 'auto',
+      shardCount: clusterManager ? getShard(clusterManager).shardCount : 1,
+      allowedMentions: {
+        parse: ['roles', 'users', 'everyone'],
+        repliedUser: false,
+      },
+      intents: isMsgEnable
+        ? [
+            GatewayIntentBits.Guilds,
+            GatewayIntentBits.GuildVoiceStates,
+            GatewayIntentBits.GuildMessages,
+            GatewayIntentBits.MessageContent,
+          ]
+        : [
+            GatewayIntentBits.Guilds,
+            GatewayIntentBits.GuildVoiceStates,
+            GatewayIntentBits.GuildMessages,
+          ],
+    })
+
+    // Initial basic bot config
+    const __dirname = dirname(fileURLToPath(import.meta.url))
+    this.cluster = {
+      data: clusterManager ? cluster : null,
+      id: clusterManager ? cluster.worker.id : 0,
+    }
+    this.logger = new LoggerService(this, this.cluster.id)
+    this.manifest = new ManifestService().data
+    this.owner = this.config.bot.OWNER_ID
+    this.color = (this.config.bot.EMBED_COLOR || '#2b2d31') as ColorResolvable
+    this.i18n = new Localization({
+      defaultLocale: this.config.bot.LANGUAGE || 'en',
+      directory: resolve(join(__dirname, '..', 'languages')),
+    })
+    this.prefix = this.config.utilities.MESSAGE_CONTENT.commands.prefix || 'd!'
+    this.REGEX = [
+      /(?:https?:\/\/)?(?:www\.|music\.)?youtu(?:\.be\/|be.com\/\S*(?:watch|embed|v|shorts)(?:(?:(?=\/[-a-zA-Z0-9_]{11,}(?!\S))\/)|(?:\S*v=|v\/|embed\/|v\/|shorts\/)))([-a-zA-Z0-9_]{11,})/,
+      /^.*(youtu.be\/|list=)([^#\&\?]*).*/,
+      /^(?:spotify:|https:\/\/[a-z]+\.spotify\.com\/(track\/|user\/(.*)\/playlist\/|playlist\/))(.*)$/,
+      /^https?:\/\/(?:www\.)?deezer\.com\/[a-z]+\/(track|album|playlist)\/(\d+)$/,
+      /^(?:(https?):\/\/)?(?:(?:www|m)\.)?(soundcloud\.com|snd\.sc)\/(.*)$/,
+      /(?:https:\/\/music\.apple\.com\/)(?:.+)?(artist|album|music-video|playlist)\/([\w\-\.]+(\/)+[\w\-\.]+|[^&]+)\/([\w\-\.]+(\/)+[\w\-\.]+|[^&]+)/,
+      /^https?:\/\/(?:www\.|secure\.|sp\.)?nicovideo\.jp\/watch\/([a-z]{2}[0-9]+)/,
+      /(?:https:\/\/spotify\.link)\/([A-Za-z0-9]+)/,
+      /^https:\/\/deezer\.page\.link\/[a-zA-Z0-9]{12}$/,
+      /^https?:\/\//,
+    ]
+
+    // Initial autofix lavalink varibles
+    this.lavalinkList = []
+    this.lavalinkUsing = []
+    this.lavalinkUsed = []
+
+    // Collections
+    this.commands = new DJSCollection<string, Command>()
+    this.interval = new Collection<NodeJS.Timer>()
+    this.sentQueue = new Collection<boolean>()
+    this.aliases = new Collection<string>()
+    this.nplayingMsg = new Collection<{
+      filterColl: InteractionCollector<StringSelectMenuInteraction<'cached'>>
+      coll: InteractionCollector<ButtonInteraction<'cached'>>
+      msg: Message
+    }>()
+    this.plButton = new Collection<PlayerButton>()
+    this.leaveDelay = new Collection<NodeJS.Timeout>()
+    this.nowPlaying = new Collection<{ interval: NodeJS.Timeout; msg: GlobalMsg }>()
+    this.wsl = new Collection<{ send: (data: Record<string, unknown>) => void }>()
+    this.isDatabaseConnected = false
+
+    // Icons setup
+    this.icons = this.config.emojis
+
+    this.rainlink = new RainlinkInit(this).init
+    for (const key of Object.keys(RainlinkFilterData)) {
+      const firstUpperCase = key.charAt(0).toUpperCase() + key.slice(1)
+      this.selectMenuOptions.push(
+        new StringSelectMenuOptionBuilder()
+          .setLabel(firstUpperCase)
+          .setDescription(
+            key == 'clear'
+              ? 'Reset all current filter'
+              : `${firstUpperCase} filter for better audio experience!`
+          )
+          .setValue(key)
+      )
+    }
+  }
+
+  public start() {
+    this.logger.info('ClientManager', `Booting..`)
+    this.logger.info('ClientManager', `├── Version: ${this.manifest.metadata.bot.version}`)
+    this.logger.info('ClientManager', `├── Codename: ${this.manifest.metadata.bot.codename}`)
+    this.logger.info(
+      'ClientManager',
+      `├── Autofix Version: ${this.manifest.metadata.autofix.version}`
+    )
+    this.logger.info(
+      'ClientManager',
+      `├── Autofix Codename: ${this.manifest.metadata.autofix.codename}`
+    )
+    this.logger.info('ClientManager', `├── Rainlink: ${this.manifest.package.rainlink}`)
+    this.logger.info('ClientManager', `├── discord.js: ${this.manifest.package.discordjs}`)
+    this.logger.info('ClientManager', `└── Total package: ${this.manifest.package.totalAmount}`)
+    if (!this.config.player.AVOID_SUSPEND)
+      this.logger.warn(
+        'ClientManager',
+        'You just disabled AVOID_SUSPEND feature. Enable this on app.yml to avoid discord suspend your bot!'
+      )
+    if (this.config.utilities.WEB_SERVER.enable) new WebServer(this)
+    new DeployService(this)
+    new initHandler(this)
+    new DatabaseService(this)
+    super.login(this.config.bot.TOKEN)
+  }
+}
