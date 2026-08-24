@@ -35,21 +35,9 @@ export const getTotalMemberCount = (client: CustomClient): number => {
     return total
 }
 
-export const getActiveMusicSessions = (client: CustomClient): number => {
-    const players = client.player?.players?.values
-    if (!players) {
-        return 0
-    }
-
-    let count = 0
-    for (const player of players) {
-        if (player.queue.current) {
-            count += 1
-        }
-    }
-
-    return count
-}
+// This bot no longer runs its own player — music plays through vg-music-bot,
+// a separate process this one has no in-process visibility into.
+export const getActiveMusicSessions = (_client: CustomClient): number => 0
 
 export const buildPresenceActivities = ({
     guildCount,

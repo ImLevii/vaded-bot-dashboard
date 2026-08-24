@@ -15,7 +15,7 @@ import {
 import { errorLog } from '@lucky/shared/utils'
 import { createUserFriendlyError } from '@lucky/shared/utils/general/errorSanitizer'
 import { levelService, xpNeededForLevel } from '@lucky/shared/services'
-import { createLeaderboardPaginationButtons } from '../../../utils/music/buttonComponents'
+import { createLeaderboardPaginationButtons } from '../../../utils/general/leaderboardButtons'
 
 export default new Command({
     data: new SlashCommandBuilder()

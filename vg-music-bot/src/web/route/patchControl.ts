@@ -2,6 +2,7 @@ import util from 'node:util'
 import { Manager } from '../../manager.js'
 import Fastify from 'fastify'
 import { RainlinkLoopMode, RainlinkPlayer } from 'rainlink'
+import { incrementAutoplayCounter } from '../../db/postgres.js'
 
 export type TrackRes = {
   title: string
@@ -92,12 +93,55 @@ export class PatchControl {
     return true
   }
 
+  async pause(res: Fastify.FastifyReply, player: RainlinkPlayer, mode: boolean) {
+    if (typeof mode !== 'boolean') {
+      res.code(400)
+      res.send({ error: `pause must be a boolean!` })
+      return false
+    }
+    await player.setPause(mode)
+    return true
+  }
+
+  async shuffle(res: Fastify.FastifyReply, player: RainlinkPlayer, mode: boolean) {
+    if (!mode) return true
+    player.queue.shuffle()
+    return true
+  }
+
+  async autoplay(res: Fastify.FastifyReply, player: RainlinkPlayer, mode: boolean) {
+    if (typeof mode !== 'boolean') {
+      res.code(400)
+      res.send({ error: `autoplay must be a boolean!` })
+      return false
+    }
+    if (!mode) {
+      player.data.set('autoplay', false)
+      player.data.set('identifier', null)
+      player.data.set('requester', null)
+      return true
+    }
+    if (!player.queue.current) {
+      res.code(400)
+      res.send({ error: `Nothing is currently playing!` })
+      return false
+    }
+    player.data.set('autoplay', true)
+    player.data.set('identifier', player.queue.current.identifier)
+    player.data.set('requester', player.queue.current.requester)
+    player.data.set('source', player.queue.current.source)
+    player.data.set('author', player.queue.current.author)
+    player.data.set('title', player.queue.current.title)
+    incrementAutoplayCounter(player.guildId).catch(() => {})
+    return true
+  }
+
   async add(res: Fastify.FastifyReply, player: RainlinkPlayer, uriArray: string) {
     if (!uriArray) return true
     for (const uri of uriArray) {
-      if (!this.isValidHttpUrl(uri)) {
+      if (!uri) {
         res.code(400)
-        res.send({ error: `add property must have a link!` })
+        res.send({ error: `add property must have a link or search query!` })
         return false
       }
       const result = await this.client.rainlink.search(uri)
@@ -117,11 +161,21 @@ export class PatchControl {
         requester: null,
       })
     }
+    if (!player.playing) await player.play()
     return true
   }
 
   async checker(req: Fastify.FastifyRequest, res: Fastify.FastifyReply): Promise<boolean> {
-    const accpetKey: string[] = ['loop', 'skipMode', 'position', 'volume', 'add']
+    const accpetKey: string[] = [
+      'loop',
+      'skipMode',
+      'position',
+      'volume',
+      'add',
+      'pause',
+      'shuffle',
+      'autoplay',
+    ]
     const guildId = (req.params as Record<string, string>)['guildId']
     const player = this.client.rainlink.players.get(guildId)
     if (!player) {
@@ -154,17 +208,5 @@ export class PatchControl {
     this.skiped = false
     this.addedTrack = []
     this.isPrevious = false
-  }
-
-  isValidHttpUrl(string: string) {
-    let url
-
-    try {
-      url = new URL(string)
-    } catch (_) {
-      return false
-    }
-
-    return url.protocol === 'http:' || url.protocol === 'https:'
   }
 }

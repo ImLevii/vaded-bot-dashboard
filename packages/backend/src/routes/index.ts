@@ -18,7 +18,6 @@ import { setupGuildAutomationRoutes } from './guildAutomation'
 import { setupLevelsRoutes } from './levels'
 import { setupStarboardRoutes } from './starboard'
 import { setupMusicRoutes } from './music'
-import { setupMusicRelayProxy } from './musicRelayProxy'
 import { setupArtistsRoutes } from './artists'
 import { setupInternalNotifyRoutes } from './internalNotify'
 import { setupInternalCronRoutes } from './internalCron'
@@ -110,23 +109,7 @@ const routeSetups = [
     setupBatchJobRoutes,
 ]
 
-export interface SetupRoutesOptions {
-    /**
-     * The music subtree (playback/queue/state + its SSE stream) needs a
-     * long-lived process (Redis pub/sub bridge, in-memory SSE client
-     * registry), so it doesn't run inline on the Vercel serverless function
-     * — set to false there and requests are forwarded to the standalone
-     * relay process instead (see `musicRelayServer.ts` /
-     * `musicRelayProxy.ts`). Defaults to true for the Docker/homelab
-     * all-in-one app, which runs the routes directly.
-     */
-    includeMusic?: boolean
-}
-
-export function setupRoutes(
-    app: Express,
-    { includeMusic = true }: SetupRoutesOptions = {},
-): void {
+export function setupRoutes(app: Express): void {
     setupInviteRoute(app)
     setupHealthRoutes(app)
     setupMetricsRoute(app)
@@ -159,11 +142,7 @@ export function setupRoutes(
         setupRoute(app)
     }
 
-    if (includeMusic) {
-        setupMusicRoutes(app)
-    } else {
-        setupMusicRelayProxy(app)
-    }
+    setupMusicRoutes(app)
 
     app.use(errorHandler)
 }

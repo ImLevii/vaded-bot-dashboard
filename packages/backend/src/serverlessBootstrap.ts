@@ -43,7 +43,7 @@ async function initialize(): Promise<Express> {
         })
     }
 
-    return createApp({ includeMusic: false })
+    return createApp()
 }
 
 /**

@@ -1,7 +1,6 @@
 import downloadCommands from './functions/download/commands/index'
 import generalCommands from './functions/general/commands/index'
 import { groupCommands } from './handlers/commandsHandler'
-import musicCommands from './functions/music/commands/index'
 import automodCommands from './functions/automod/commands/index'
 import managementCommands from './functions/management/commands/index'
 import moderationCommands from './functions/moderation/commands/index'
@@ -17,14 +16,12 @@ export const getCommands = async (): Promise<Command[]> => {
         const [
             downloadCommandsList,
             generalCommandsList,
-            musicCommandsList,
             automodCommandsList,
             managementCommandsList,
             moderationCommandsList,
         ] = await Promise.all([
             downloadCommands(),
             generalCommands(),
-            musicCommands(),
             automodCommands(),
             managementCommands(),
             moderationCommands(),
@@ -33,7 +30,6 @@ export const getCommands = async (): Promise<Command[]> => {
         const allCommands = [
             ...downloadCommandsList,
             ...generalCommandsList,
-            ...musicCommandsList,
             ...automodCommandsList,
             ...managementCommandsList,
             ...moderationCommandsList,

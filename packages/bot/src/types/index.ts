@@ -5,4 +5,3 @@
 // (fixed madge cycles 1-2).
 
 export type { CommandType, CustomClient } from './CustomClient'
-export type { QueueMetadata } from './QueueMetadata'

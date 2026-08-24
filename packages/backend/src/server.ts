@@ -3,7 +3,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { infoLog, errorLog } from '@lucky/shared/utils'
 import { parseIntEnv } from '@lucky/shared/utils/env'
-import { setupRoutes, type SetupRoutesOptions } from './routes'
+import { setupRoutes } from './routes'
 import { setupMiddleware } from './middleware'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -18,15 +18,13 @@ const isProduction = process.env.NODE_ENV === 'production'
  * `startWebApp()` (Docker/homelab, below) and by the Vercel serverless
  * entrypoint (`api/[...path].ts`), which needs the bare request handler.
  */
-export function createApp(routeOptions?: SetupRoutesOptions): Express {
+export function createApp(): Express {
     const app = express()
 
-    // See musicRelayServer.ts's createMusicRelayApp() for why this isn't
-    // gated on NODE_ENV=production.
     app.set('trust proxy', 1)
 
     setupMiddleware(app)
-    setupRoutes(app, routeOptions)
+    setupRoutes(app)
 
     if (isProduction) {
         const frontendDistPath = path.join(__dirname, 'frontend', 'dist')

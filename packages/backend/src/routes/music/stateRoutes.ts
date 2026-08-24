@@ -3,8 +3,10 @@ import { requireAuth, type AuthenticatedRequest } from '../../middleware/auth'
 import { asyncHandler } from '../../middleware/asyncHandler'
 import { validateParams } from '../../middleware/validate'
 import { guildIdParam } from '../../schemas/common'
-import { musicControlService, type QueueState } from '@lucky/shared/services'
 import { param, sseClients } from './helpers'
+import { fetchQueueState, emptyQueueState } from './vgMusicBotState'
+
+const POLL_INTERVAL_MS = 2000
 
 export function setupStateRoutes(app: Express): void {
     app.get(
@@ -21,14 +23,14 @@ export function setupStateRoutes(app: Express): void {
                 'X-Accel-Buffering': 'no',
             })
 
-            const currentState = await musicControlService.getState(guildId)
-            if (currentState) {
-                try {
-                    res.write(`data: ${JSON.stringify(currentState)}\n\n`)
-                } catch {
-                    // NOSONAR: Intentionally swallowing exception — client disconnected before initial state send. This is expected and handled by close event.
-                    return
-                }
+            const currentState = await fetchQueueState(guildId)
+            try {
+                res.write(
+                    `data: ${JSON.stringify(currentState ?? emptyQueueState(guildId))}\n\n`,
+                )
+            } catch {
+                // NOSONAR: client disconnected before initial state send.
+                return
             }
 
             let clients = sseClients.get(guildId)
@@ -38,42 +40,30 @@ export function setupStateRoutes(app: Express): void {
             }
             clients.add(res)
 
-            const controller = new AbortController()
-            let heartbeat: ReturnType<typeof setInterval> | null = null
-
-            try {
-                heartbeat = setInterval(() => {
-                    if (
-                        controller.signal.aborted ||
-                        res.writableEnded ||
-                        res.destroyed
-                    ) {
-                        return
-                    }
-                    try {
-                        // Real data: payload (not an SSE comment) so clients can
-                        // treat the heartbeat as a liveness stamp for progress UI.
-                        res.write(
-                            `data: ${JSON.stringify({ type: 'heartbeat' })}\n\n`,
-                        )
-                    } catch {
-                        // NOSONAR: Intentionally swallowing heartbeat write exceptions — client disconnected mid-send. The close event handler will clean up the connection.
-                    }
-                }, 30000)
-            } finally {
-                req.on('close', () => {
-                    controller.abort()
-                    if (heartbeat) {
-                        clearInterval(heartbeat)
-                    }
-                    const guildClients = sseClients.get(guildId)
-                    guildClients?.delete(res)
-
-                    if (guildClients && guildClients.size === 0) {
-                        sseClients.delete(guildId)
-                    }
-                })
+            // Only one poller per guild regardless of how many browser tabs
+            // are watching it — the first SSE client for a guild starts it,
+            // the last one to disconnect stops it.
+            if (!pollers.has(guildId)) {
+                pollers.set(
+                    guildId,
+                    setInterval(
+                        () => broadcastState(guildId),
+                        POLL_INTERVAL_MS,
+                    ),
+                )
             }
+
+            req.on('close', () => {
+                const guildClients = sseClients.get(guildId)
+                guildClients?.delete(res)
+
+                if (guildClients && guildClients.size === 0) {
+                    sseClients.delete(guildId)
+                    const poller = pollers.get(guildId)
+                    if (poller) clearInterval(poller)
+                    pollers.delete(guildId)
+                }
+            })
         },
     )
 
@@ -83,26 +73,25 @@ export function setupStateRoutes(app: Express): void {
         validateParams(guildIdParam),
         asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
             const guildId = param(req.params.guildId)
-            const state = await musicControlService.getState(guildId)
-            res.json(state ?? emptyState(guildId))
+            const state = await fetchQueueState(guildId)
+            res.json(state ?? emptyQueueState(guildId))
         }),
     )
 }
 
-function emptyState(guildId: string): QueueState {
-    return {
-        guildId,
-        currentTrack: null,
-        tracks: [],
-        isPlaying: false,
-        isPaused: false,
-        volume: 50,
-        repeatMode: 'off',
-        shuffled: false,
-        position: 0,
-        voiceChannelId: null,
-        voiceChannelName: null,
-        listeners: [],
-        timestamp: Date.now(),
+const pollers = new Map<string, ReturnType<typeof setInterval>>()
+
+async function broadcastState(guildId: string): Promise<void> {
+    const clients = sseClients.get(guildId)
+    if (!clients?.size) return
+
+    const state = (await fetchQueueState(guildId)) ?? emptyQueueState(guildId)
+    const data = `data: ${JSON.stringify(state)}\n\n`
+    for (const client of clients) {
+        try {
+            client.write(data)
+        } catch {
+            // NOSONAR: client disconnected mid-broadcast; close handler cleans it up.
+        }
     }
 }

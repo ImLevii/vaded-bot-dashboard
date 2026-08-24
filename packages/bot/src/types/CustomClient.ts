@@ -3,7 +3,6 @@ import type {
     Client,
     Collection,
 } from 'discord.js'
-import type { Rainlink } from 'rainlink'
 import type Command from '../models/Command'
 import type ContextMenuCommand from '../models/ContextMenuCommand'
 
@@ -20,7 +19,6 @@ import type ContextMenuCommand from '../models/ContextMenuCommand'
 export type CustomClient = Client & {
     commands: Collection<string, Command>
     contextMenus: Collection<string, ContextMenuCommand>
-    player: Rainlink
     cooldowns: Collection<string, number>
     redis?: unknown
     metrics?: unknown

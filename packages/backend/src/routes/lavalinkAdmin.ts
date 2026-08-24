@@ -3,46 +3,20 @@ import { requireAuth, type AuthenticatedRequest } from '../middleware/auth'
 import { requireAdmin } from '../middleware/requireAdmin'
 import { asyncHandler } from '../middleware/asyncHandler'
 import { errorLog } from '@lucky/shared/utils'
-
-/**
- * Proxies Lavalink node management to vg-music-bot's own web API (see
- * src/web/lavalink.ts in that project) rather than reimplementing node
- * state here — vg-music-bot is a separate bot process and the source of
- * truth for its own Rainlink node manager.
- */
-function vgMusicBotRequest(
-    path: string,
-    init?: Parameters<typeof fetch>[1],
-): Promise<Response> | null {
-    const base = process.env.VG_MUSIC_BOT_URL?.trim()
-    const token = process.env.VG_MUSIC_BOT_TOKEN?.trim()
-    if (!base || !token) return null
-
-    return fetch(new URL(path, base), {
-        ...init,
-        headers: {
-            ...init?.headers,
-            authorization: token,
-            ...(init?.body ? { 'content-type': 'application/json' } : {}),
-        },
-    }) as unknown as Promise<Response>
-}
+import { vgMusicBotRequest } from '../services/vgMusicBotClient'
 
 async function relay(
     res: ExpressResponse,
     path: string,
     init?: Parameters<typeof fetch>[1],
 ): Promise<void> {
-    const upstream = vgMusicBotRequest(path, init)
-    if (!upstream) {
-        res.status(503).json({ error: 'vg-music-bot is not configured' })
-        return
-    }
-
     try {
-        const upstreamRes = await upstream
-        const body = await upstreamRes.json().catch(() => null)
-        res.status(upstreamRes.status).json(body)
+        const upstream = await vgMusicBotRequest(path, init)
+        if (upstream.status === 503 && upstream.body === null) {
+            res.status(503).json({ error: 'vg-music-bot is not configured' })
+            return
+        }
+        res.status(upstream.status).json(upstream.body)
     } catch (error) {
         errorLog({ message: 'vg-music-bot lavalink proxy error', error })
         res.status(502).json({ error: 'vg-music-bot unavailable' })

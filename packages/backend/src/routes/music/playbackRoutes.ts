@@ -5,8 +5,9 @@ import { asyncHandler } from '../../middleware/asyncHandler'
 import { validateParams } from '../../middleware/validate'
 import { guildIdParam } from '../../schemas/common'
 import { AppError } from '../../errors/AppError'
-import { musicControlService } from '@lucky/shared/services'
-import { param, buildCommand } from './helpers'
+import { vgMusicBotRequest } from '../../services/vgMusicBotClient'
+import type { MusicCommandResult } from '@lucky/shared/services'
+import { param } from './helpers'
 
 const playBodySchema = z.object({
     query: z.string().min(1),
@@ -33,6 +34,37 @@ function requireUserId(req: AuthenticatedRequest): string {
     return req.userId
 }
 
+function result(
+    guildId: string,
+    success: boolean,
+    error?: string,
+): MusicCommandResult {
+    return {
+        id: `cmd_${Date.now()}`,
+        guildId,
+        success,
+        error,
+        timestamp: Date.now(),
+    }
+}
+
+async function patchPlayer(
+    guildId: string,
+    body: Record<string, unknown>,
+): Promise<MusicCommandResult> {
+    const res = await vgMusicBotRequest(
+        `/v1/players/${encodeURIComponent(guildId)}`,
+        {
+            method: 'PATCH',
+            body: JSON.stringify(body),
+        },
+    )
+    if (res.ok) return result(guildId, true)
+    const error =
+        (res.body as { error?: string } | null)?.error ?? 'Command failed'
+    return result(guildId, false, error)
+}
+
 export function setupPlaybackRoutes(app: Express): void {
     app.post(
         '/api/guilds/:guildId/music/play',
@@ -47,41 +79,52 @@ export function setupPlaybackRoutes(app: Express): void {
                 throw AppError.badRequest('Query is required')
             }
 
-            const { query, voiceChannelId } = body.data
-            const cmd = buildCommand(guildId, userId, 'play', {
-                query,
-                voiceChannelId,
+            // Idempotent: vg-music-bot 400s if a player already exists for
+            // this guild, which is fine — we only need one to exist before
+            // queueing the track.
+            await vgMusicBotRequest('/v1/players', {
+                method: 'POST',
+                body: JSON.stringify({ guildId, userId }),
             })
-            res.json(await musicControlService.sendCommand(cmd))
+
+            res.json(await patchPlayer(guildId, { add: [body.data.query] }))
         }),
     )
 
-    // pause/resume/skip/previous/stop/shuffle share one shape: no body, fire the
-    // command named by the path segment.
-    const simpleCommands = [
-        'pause',
-        'resume',
-        'skip',
-        'previous',
-        'stop',
-        'shuffle',
-    ] as const
-    for (const command of simpleCommands) {
+    const simpleCommands: Record<string, Record<string, unknown>> = {
+        pause: { pause: true },
+        resume: { pause: false },
+        skip: { skipMode: 'skip' },
+        previous: { skipMode: 'previous' },
+        shuffle: { shuffle: true },
+    }
+    for (const [command, body] of Object.entries(simpleCommands)) {
         app.post(
             `/api/guilds/:guildId/music/${command}`,
             requireAuth,
             validateParams(guildIdParam),
             asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
                 const guildId = param(req.params.guildId)
-                const userId = requireUserId(req)
-                res.json(
-                    await musicControlService.sendCommand(
-                        buildCommand(guildId, userId, command),
-                    ),
-                )
+                requireUserId(req)
+                res.json(await patchPlayer(guildId, body))
             }),
         )
     }
+
+    app.post(
+        '/api/guilds/:guildId/music/stop',
+        requireAuth,
+        validateParams(guildIdParam),
+        asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+            const guildId = param(req.params.guildId)
+            requireUserId(req)
+            const upstream = await vgMusicBotRequest(
+                `/v1/players/${encodeURIComponent(guildId)}`,
+                { method: 'DELETE' },
+            )
+            res.json(result(guildId, upstream.ok))
+        }),
+    )
 
     app.post(
         '/api/guilds/:guildId/music/volume',
@@ -89,20 +132,14 @@ export function setupPlaybackRoutes(app: Express): void {
         validateParams(guildIdParam),
         asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
             const guildId = param(req.params.guildId)
-            const userId = requireUserId(req)
+            requireUserId(req)
             const body = volumeBodySchema.safeParse(req.body)
 
             if (!body.success) {
                 throw AppError.badRequest('Volume must be 0-100')
             }
 
-            res.json(
-                await musicControlService.sendCommand(
-                    buildCommand(guildId, userId, 'volume', {
-                        volume: body.data.volume,
-                    }),
-                ),
-            )
+            res.json(await patchPlayer(guildId, { volume: body.data.volume }))
         }),
     )
 
@@ -112,7 +149,7 @@ export function setupPlaybackRoutes(app: Express): void {
         validateParams(guildIdParam),
         asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
             const guildId = param(req.params.guildId)
-            const userId = requireUserId(req)
+            requireUserId(req)
             const body = repeatBodySchema.safeParse(req.body)
 
             if (!body.success) {
@@ -121,13 +158,16 @@ export function setupPlaybackRoutes(app: Express): void {
                 )
             }
 
-            res.json(
-                await musicControlService.sendCommand(
-                    buildCommand(guildId, userId, 'repeat', {
-                        mode: body.data.mode,
-                    }),
-                ),
-            )
+            const patch: Record<string, unknown> =
+                body.data.mode === 'autoplay'
+                    ? { autoplay: true }
+                    : body.data.mode === 'track'
+                      ? { loop: 'song', autoplay: false }
+                      : body.data.mode === 'queue'
+                        ? { loop: 'queue', autoplay: false }
+                        : { loop: 'none', autoplay: false }
+
+            res.json(await patchPlayer(guildId, patch))
         }),
     )
 
@@ -137,7 +177,7 @@ export function setupPlaybackRoutes(app: Express): void {
         validateParams(guildIdParam),
         asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
             const guildId = param(req.params.guildId)
-            const userId = requireUserId(req)
+            requireUserId(req)
             const body = seekBodySchema.safeParse(req.body)
 
             if (!body.success) {
@@ -147,11 +187,7 @@ export function setupPlaybackRoutes(app: Express): void {
             }
 
             res.json(
-                await musicControlService.sendCommand(
-                    buildCommand(guildId, userId, 'seek', {
-                        position: body.data.position,
-                    }),
-                ),
+                await patchPlayer(guildId, { position: body.data.position }),
             )
         }),
     )

@@ -23,7 +23,6 @@
         "src/services/guildAutomation/moderationExecutor.ts",
         "src/services/guildAutomation/reactionRolesExecutor.ts",
         "src/services/twitch/TwitchControlService.ts",
-        "src/services/music/MusicControlService.ts",
         "src/services/guildAutomation/GuildAutomationOrchestrator.ts"
     ],
     "reporters": ["html", "clear-text", "progress"],

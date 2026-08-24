@@ -4,7 +4,6 @@ import {
     startClient,
     stopPresenceRotation,
 } from '../../handlers/clientHandler/service'
-import { createPlayerWithHandlers } from '../../handlers/player'
 import { setCommands, setContextMenus } from '../../handlers/commandsHandler'
 import { getCommands, getContextMenus } from '../../register'
 import handleEvents from '../../handlers/eventHandler'
@@ -13,18 +12,12 @@ import {
     stopMetricsServer,
 } from '../../utils/monitoring/metricsServer'
 import {
-    setupWebMusicHandler,
-    stopWebMusicHandler,
-} from '../../handlers/webMusic'
-import {
     setupGuildConfigRefresh,
     teardownGuildConfigRefresh,
 } from '../../handlers/guildConfig'
 import type { CustomClient } from '../../types'
 import { ConfigurationError } from '@lucky/shared/types'
 import { redisClient } from '@lucky/shared/services'
-import { initProviderHealth } from '../../utils/music/search/providerHealth'
-import { musicWatchdogService } from '../../utils/music/watchdog'
 import { birthdayScheduler } from '../../utils/general/birthdayScheduler'
 import { reminderScheduler } from '../../utils/general/reminderScheduler'
 import { supportSessionScheduler } from '../../utils/general/supportSessionScheduler'
@@ -60,15 +53,14 @@ export class BotInitializer {
     }
 
     private async initializeRedisServices(): Promise<void> {
-        // Redis only backs music pub/sub plus legacy KV stores that already
-        // degrade to fallbacks (ADR 2026-05-31-redis-scope-reduction). A dead
-        // Redis must not stop the bot: MusicControlService reports unhealthy
-        // and web music controls degrade instead (#1280).
+        // Redis backs rate limiting, batch jobs, and other legacy KV stores
+        // that already degrade to fallbacks (ADR 2026-05-31-redis-scope-
+        // reduction). A dead Redis must not stop the bot.
         const connected = await redisClient.connect()
         if (!connected) {
             warnLog({
                 message:
-                    'Redis unavailable at startup — continuing in degraded mode (music pub/sub disabled, non-music features unaffected)',
+                    'Redis unavailable at startup — continuing in degraded mode',
             })
         }
     }
@@ -80,18 +72,6 @@ export class BotInitializer {
         } catch (error) {
             errorLog({ message: 'Failed to create Discord client', error })
             throw new ConfigurationError('Failed to create Discord client')
-        }
-    }
-
-    private async initializePlayer(
-        options: BotInitializationOptions,
-    ): Promise<void> {
-        if (options.skipPlayer !== true && this.client) {
-            const player = await createPlayerWithHandlers({
-                client: this.client,
-            })
-            this.client.player = player
-            musicWatchdogService.startOrphanSessionMonitor(player, this.client)
         }
     }
 
@@ -140,15 +120,12 @@ export class BotInitializer {
             infoLog({ message: 'Starting bot initialization...' })
 
             await this.initializeRedisServices()
-            await initProviderHealth()
             await this.createDiscordClient()
-            await this.initializePlayer(options)
             await this.setupCommands(options)
             this.setupEventHandlers(options)
             if (this.client) {
                 await startClient({ client: this.client })
                 startMetricsServer(this.client)
-                await setupWebMusicHandler(this.client)
                 await setupGuildConfigRefresh(this.client)
                 weeklyDigestService.start(this.client)
                 heartbeatService.start(this.client)
@@ -171,7 +148,6 @@ export class BotInitializer {
             // this.client here was necessarily created by this failed call.
             if (this.client) {
                 try {
-                    musicWatchdogService.stopOrphanSessionMonitor()
                     await this.shutdown()
                 } catch (shutdownError) {
                     errorLog({
@@ -210,12 +186,6 @@ export class BotInitializer {
         }
 
         // Stop all long-lived timers/intervals
-        try {
-            stopWebMusicHandler()
-        } catch (error) {
-            errorLog({ message: 'Error stopping web music handler:', error })
-        }
-
         try {
             birthdayScheduler.stop()
         } catch (error) {
@@ -342,24 +312,6 @@ export class BotInitializer {
         } catch (error) {
             errorLog({
                 message: 'Error stopping RSS Bridge service:',
-                error,
-            })
-        }
-
-        try {
-            musicWatchdogService.stopOrphanSessionMonitor()
-        } catch (error) {
-            errorLog({
-                message: 'Error stopping watchdog orphan-session monitor:',
-                error,
-            })
-        }
-
-        try {
-            musicWatchdogService.stopPeriodicScan()
-        } catch (error) {
-            errorLog({
-                message: 'Error stopping watchdog periodic scan:',
                 error,
             })
         }

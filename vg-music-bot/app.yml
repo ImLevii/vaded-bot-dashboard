@@ -105,3 +105,21 @@ utilities:
     enable: false
     retryCount: 10
     retryTimeout: 3000
+
+  # WS/REST server used by the dashboard (Lavalink node admin panel +
+  # music proxy) to control this bot. auth is a shared-secret bearer
+  # token — set via env so it isn't committed in plaintext.
+  WEB_SERVER:
+    host: '0.0.0.0'
+    enable: true
+    port: 8080
+    auth: '${VG_MUSIC_BOT_TOKEN}'
+    whitelist: []
+
+  # Default json driver, but pointed into ./data/ so a container deployment
+  # can mount just that folder as a persistent volume.
+  DATABASE:
+    driver: 'json'
+    config:
+      path: './data/cylane.database.json'
+    cacheCleanSchedule: '0 */30 * * * *'

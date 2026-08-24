@@ -8,11 +8,9 @@ import { getServerlessApp } from '../packages/backend/dist/serverlessBootstrap.j
 // so Express still sees the real path (e.g. /api/auth/discord) and routes
 // on it normally. An Express app instance is itself a valid (req, res)
 // request handler, so it can be exported directly — no adapter package
-// needed. The music-control subtree is the one exception: getServerlessApp()
-// builds the app with that subtree forwarded to the standalone relay process
-// instead of handled inline (see packages/backend/src/serverlessBootstrap.ts
-// and musicRelayProxy.ts) since it needs a long-lived process this function
-// can't provide.
+// needed. The music-control subtree proxies to vg-music-bot's own REST API
+// (see packages/backend/src/routes/music/vgMusicBotState.ts), a stateless
+// HTTP call that works fine inline here — no long-lived process needed.
 export default async function handler(
     req: IncomingMessage,
     res: ServerResponse,

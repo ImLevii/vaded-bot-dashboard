@@ -22,14 +22,9 @@ import { createUserFriendlyError } from '@lucky/shared/utils/general/errorSaniti
 import { handleMessageCreate } from './messageHandler'
 import { handleMemberEvents } from './memberHandler'
 import { handleAuditEvents } from './auditHandler'
-import { handleExternalScrobbler } from './externalScrobbler'
 import { handleReactionEvents } from './reactionHandler'
 import { scheduledEventNotificationService } from '../services/ScheduledEventNotificationService'
-import {
-    handleMusicButtonInteraction,
-    handleMusicFilterSelect,
-} from './musicButtonHandler'
-import { MUSIC_FILTER_SELECT_ID } from '../types/musicButtons'
+import { handleLeaderboardPage } from './leaderboardButtonHandler'
 import { executeContextMenu } from './commandsHandler'
 import {
     handleMoveMessageSelect,
@@ -38,8 +33,6 @@ import {
 import { reactionRolesService } from '@lucky/shared/services'
 import { syncAllGuildFollowerRoles } from '../twitch/followerRoleSync'
 import { aiDevToolkitService } from '../services/AiDevToolkitService'
-import { namedSessionService } from '../utils/music/namedSessions'
-import { cleanupGuildState } from './player/trackNowPlaying'
 import {
     recordGuildJoin,
     recordGuildLeave,
@@ -243,29 +236,6 @@ async function handleInteractionError(
 async function handleAutocomplete(interaction: Interaction): Promise<void> {
     try {
         if (!interaction.isAutocomplete()) return
-        if (!interaction.guildId) {
-            await interaction.respond([])
-            return
-        }
-
-        const command = interaction.commandName
-        const subcommand = interaction.options.getSubcommand(false)
-        const focusedOption = interaction.options.getFocused(true)
-
-        if (
-            command === 'session' &&
-            (subcommand === 'restore' || subcommand === 'delete') &&
-            focusedOption.name === 'name'
-        ) {
-            const sessions = await namedSessionService.list(interaction.guildId)
-            const choices = sessions
-                .map((s) => ({ name: s.name, value: s.name }))
-                .slice(0, 25)
-
-            await interaction.respond(choices)
-            return
-        }
-
         await interaction.respond([])
     } catch (error) {
         errorLog({ message: 'Error handling autocomplete:', error })
@@ -282,22 +252,10 @@ async function handleInteractionCreate(
             return
         }
 
-        if (
-            interaction.isStringSelectMenu() &&
-            interaction.customId === MUSIC_FILTER_SELECT_ID
-        ) {
-            await handleMusicFilterSelect(interaction)
-            return
-        }
-
         if (interaction.isButton()) {
             const id = interaction.customId
-            if (
-                id.startsWith('music_') ||
-                id.startsWith('queue_page') ||
-                id.startsWith('leaderboard_page')
-            ) {
-                await handleMusicButtonInteraction(interaction)
+            if (id.startsWith('leaderboard_page')) {
+                await handleLeaderboardPage(interaction)
                 return
             }
             // `/vaga` preview buttons are handled by that command's own
@@ -378,35 +336,6 @@ function handleGuildDelete(client: Client): void {
                 error,
             })
         })
-        try {
-            const duplicateDetection =
-                (await import('../utils/music/duplicateDetection/index.js')) as {
-                    clearHistory: (guildId: string) => void
-                    clearAllGuildCaches: (guildId: string) => void
-                }
-            duplicateDetection.clearHistory(guild.id)
-            duplicateDetection.clearAllGuildCaches(guild.id)
-            cleanupGuildState(guild.id)
-        } catch (err) {
-            errorLog({
-                message: 'Error clearing history on guild delete:',
-                error: err,
-            })
-        }
-    })
-}
-
-function handleChannelDelete(client: Client): void {
-    client.on(Events.ChannelDelete, (channel) => {
-        try {
-            if (channel.isDMBased()) return
-            cleanupGuildState(channel.guildId)
-        } catch (err) {
-            errorLog({
-                message: 'Error clearing state on channel delete:',
-                error: err,
-            })
-        }
     })
 }
 
@@ -433,14 +362,12 @@ export default function handleEvents(client: Client) {
     handleMessageCreate(client)
     handleMemberEvents(client)
     handleAuditEvents(client)
-    handleExternalScrobbler(client)
     handleReactionEvents(client)
     handleError(client)
     handleWarn(client)
     handleDebug(client)
     handleGuildCreate(client)
     handleGuildDelete(client)
-    handleChannelDelete(client)
     handleForumThreadCreate(client)
     handleGuildScheduledEventCreate(client)
 }

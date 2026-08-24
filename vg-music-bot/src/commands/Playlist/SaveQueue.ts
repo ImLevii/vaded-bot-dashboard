@@ -3,6 +3,19 @@ import { Manager } from '../../manager.js'
 import { Accessableby, Command } from '../../structures/Command.js'
 import { CommandHandler } from '../../structures/CommandHandler.js'
 import { RainlinkTrack } from 'rainlink'
+import { insertNamedQueue, SnapshotTrack } from '../../db/postgres.js'
+
+function toSnapshotTrack(track: RainlinkTrack): SnapshotTrack {
+  return {
+    title: track.title,
+    uri: track.uri,
+    identifier: track.identifier,
+    author: track.author,
+    duration: track.duration,
+    artworkUrl: track.artworkUrl,
+    source: track.source,
+  }
+}
 
 const TrackAdd: RainlinkTrack[] = []
 const TrackExist: string[] = []
@@ -126,6 +139,15 @@ export default class implements Command {
         requester: track.requester, // Just case can push
       })
     })
+
+    insertNamedQueue({
+      guildId: handler.guild!.id,
+      name: String(value),
+      savedBy: handler.user!.id,
+      voiceChannelId: player?.voiceId ?? null,
+      currentTrack: current ? toSnapshotTrack(current as RainlinkTrack) : null,
+      upcomingTracks: (queue ?? []).map((track) => toSnapshotTrack(track)),
+    }).catch((err) => client.logger.error('NamedQueueService', err))
 
     TrackAdd.length = 0
     TrackExist.length = 0

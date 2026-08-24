@@ -7,6 +7,20 @@ import { AutoReconnectBuilderService } from '../../services/AutoReconnectBuilder
 import { SongNotiEnum } from '../../database/schema/SongNoti.js'
 import { RainlinkFilterMode, RainlinkPlayer, RainlinkTrack } from 'rainlink'
 import { getTitle } from '../../utilities/GetTitle.js'
+import { randomUUID } from 'node:crypto'
+import { upsertMusicSessionSnapshot, SnapshotTrack } from '../../db/postgres.js'
+
+function toSnapshotTrack(track: RainlinkTrack): SnapshotTrack {
+  return {
+    title: track.title,
+    uri: track.uri,
+    identifier: track.identifier,
+    author: track.author,
+    duration: track.duration,
+    artworkUrl: track.artworkUrl,
+    source: track.source,
+  }
+}
 
 export default class {
   async execute(client: Manager, player: RainlinkPlayer, track: RainlinkTrack) {
@@ -69,6 +83,14 @@ export default class {
         await client.db.autoreconnect.set(`${player.guildId}.queue`, queueUri())
         await client.db.autoreconnect.set(`${player.guildId}.previous`, previousUri())
       }
+
+      upsertMusicSessionSnapshot({
+        guildId: player.guildId,
+        sessionSnapshotId: randomUUID(),
+        currentTrack: player.queue.current ? toSnapshotTrack(player.queue.current) : null,
+        upcomingTracks: [...player.queue].map(toSnapshotTrack),
+        voiceChannelId: player.voiceId,
+      }).catch((err) => client.logger.error('MusicSessionSnapshotService', err))
     }
 
     let data = await client.db.setup.get(`${channel.guild.id}`)
