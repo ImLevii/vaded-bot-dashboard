@@ -9,6 +9,5 @@ export {
 export * from './constants.js'
 export * from './environment.js'
 export * from './featureToggles.js'
-export * from './youtubeConfig.js'
 export * from './titlePatterns.js'
 export * from './types/config.js'
