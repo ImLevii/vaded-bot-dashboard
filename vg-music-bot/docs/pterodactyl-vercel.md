@@ -66,19 +66,17 @@ launch when local lockfiles or `vg-music-bot/app.yml` differ from Git. That
 entrypoint starts the separate bot/backend stack. This music bot uses the
 launcher inside `vg-music-bot/`.
 
-Set Pterodactyl **Startup** to this complete line and start once. It fetches the
-recovery helper without merging over the private configuration, then updates
-and starts the music bot:
+Set Pterodactyl **Startup** to this complete line and start. It reads the
+recovery helper from the dedicated recovery branch, then fast-forwards the
+existing main checkout and starts its music bot. Fetching the helper branch
+does not switch the checkout away from main:
 
 ```sh
-git fetch origin main && music_update=$(mktemp --suffix=.mjs) && git show FETCH_HEAD:vg-music-bot/deploy/pterodactyl/update.mjs > "$music_update" && node "$music_update" && exec node vg-music-bot/deploy/pterodactyl/start.mjs
+git fetch origin fix/pterodactyl-music-recovery && music_update=$(mktemp --suffix=.mjs) && git show FETCH_HEAD:vg-music-bot/deploy/pterodactyl/update.mjs > "$music_update" && node "$music_update" && exec node vg-music-bot/deploy/pterodactyl/start.mjs
 ```
 
-After that first successful update, the permanent Startup command is:
-
-```sh
-node vg-music-bot/deploy/pterodactyl/update.mjs && exec node vg-music-bot/deploy/pterodactyl/start.mjs
-```
+Keep this as the Startup command for subsequent starts. The helper is loaded
+into a temporary file because it may not exist in the main checkout yet.
 
 The updater requires `main` and a fast-forward update. It stops before changing
 files if there are staged changes or unrelated tracked edits. It backs up
