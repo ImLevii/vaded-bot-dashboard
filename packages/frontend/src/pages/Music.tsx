@@ -99,11 +99,24 @@ export default function MusicPage() {
                         listeners={player.state.listeners}
                         voiceChannelName={player.state.voiceChannelName}
                     />
-                    <ConnectionBadge connected={player.isConnected} />
+                    <ConnectionBadge
+                        connected={player.isConnected}
+                        unavailable={Boolean(player.serviceError)}
+                    />
                 </div>
             </header>
 
+            {player.serviceError && (
+                <div
+                    role='alert'
+                    className='type-body-sm text-vaded-warning bg-vaded-warning/10 border border-vaded-warning/20 rounded-lg p-3'
+                >
+                    {player.serviceError}
+                </div>
+            )}
+
             <NowPlayingHero
+                unavailable={Boolean(player.serviceError)}
                 state={player.state}
                 lastStateUpdate={player.lastStateUpdate}
                 controlsEnabled={controlsEnabled}
@@ -193,6 +206,7 @@ export default function MusicPage() {
 const STALE_AFTER_MS = 45_000
 
 function NowPlayingHero({
+    unavailable,
     state,
     lastStateUpdate,
     controlsEnabled,
@@ -204,6 +218,7 @@ function NowPlayingHero({
     onRepeatCycle,
     onVolumeChange,
 }: {
+    unavailable: boolean
     state: QueueState
     lastStateUpdate: number | null
     controlsEnabled: boolean
@@ -255,10 +270,18 @@ function NowPlayingHero({
                             />
                         </div>
                         <p className='type-body font-semibold text-vaded-text-secondary'>
-                            {t('music.nothingPlaying')}
+                            {t(
+                                unavailable
+                                    ? 'music.serviceUnavailable'
+                                    : 'music.nothingPlaying',
+                            )}
                         </p>
                         <p className='type-body-sm text-vaded-text-tertiary mt-1'>
-                            {t('music.searchOrImportToGetStarted')}
+                            {t(
+                                unavailable
+                                    ? 'music.waitingForService'
+                                    : 'music.searchOrImportToGetStarted',
+                            )}
                         </p>
                     </div>
                 </div>
@@ -621,7 +644,13 @@ function formatSeconds(seconds: number): string {
 // never been established yet (fresh page load) still shows immediately.
 const DISCONNECTED_DISPLAY_GRACE_MS = 2000
 
-function ConnectionBadge({ connected }: { connected: boolean }) {
+function ConnectionBadge({
+    connected,
+    unavailable,
+}: {
+    connected: boolean
+    unavailable: boolean
+}) {
     const { t } = useTranslation()
     const [showDisconnected, setShowDisconnected] = useState(!connected)
     const everConnectedRef = useRef(connected)
@@ -645,7 +674,7 @@ function ConnectionBadge({ connected }: { connected: boolean }) {
         return () => clearTimeout(timer)
     }, [connected])
 
-    const displayConnected = !showDisconnected
+    const displayConnected = !unavailable && !showDisconnected
 
     return (
         <div
@@ -658,7 +687,11 @@ function ConnectionBadge({ connected }: { connected: boolean }) {
             aria-label={
                 displayConnected
                     ? t('music.connectedToLiveUpdates')
-                    : t('music.reconnectingToLiveUpdates')
+                    : t(
+                          unavailable
+                              ? 'music.serviceUnavailable'
+                              : 'music.reconnectingToLiveUpdates',
+                      )
             }
         >
             {displayConnected ? (
@@ -669,7 +702,11 @@ function ConnectionBadge({ connected }: { connected: boolean }) {
             <span className='hidden sm:inline'>
                 {displayConnected
                     ? t('music.connected')
-                    : t('music.reconnecting')}
+                    : t(
+                          unavailable
+                              ? 'music.unavailable'
+                              : 'music.reconnecting',
+                      )}
             </span>
         </div>
     )

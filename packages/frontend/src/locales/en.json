@@ -744,6 +744,9 @@
         "daysAgo": "{{days}}d ago"
     },
     "music": {
+        "unavailable": "Unavailable",
+        "serviceUnavailable": "Music service unavailable",
+        "waitingForService": "Waiting for the music bot to reconnect",
         "noServerSelected": "No Server Selected",
         "selectServerToControlMusic": "Select a server to control music playback",
         "musicPlayer": "Music Player",

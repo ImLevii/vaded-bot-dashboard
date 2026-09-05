@@ -1,3 +1,8 @@
+import {
+  hasAvailableUsNode,
+  isNoNodesError,
+  USA_UNAVAILABLE,
+} from '../../autofix/NodeConnection.js'
 import util from 'node:util'
 import { Guild, GuildMember } from 'discord.js'
 import { Manager } from '../../manager.js'
@@ -24,8 +29,21 @@ export class PostCreatePlayer {
       deaf: true,
       volume: this.client.config.player.DEFAULT_VOLUME,
     }
-    this.client.rainlink.create(playerData)
-    res.send(playerData)
+    if (!hasAvailableUsNode(this.client)) {
+      this.clean()
+      return res.code(503).send({ error: USA_UNAVAILABLE })
+    }
+    try {
+      await this.client.rainlink.create(playerData)
+      return res.send(playerData)
+    } catch (error) {
+      if (isNoNodesError(error) || !hasAvailableUsNode(this.client)) {
+        return res.code(503).send({ error: USA_UNAVAILABLE })
+      }
+      throw error
+    } finally {
+      this.clean()
+    }
   }
 
   clean() {

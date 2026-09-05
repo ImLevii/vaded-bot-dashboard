@@ -1,10 +1,69 @@
+import { destroyDisconnectedPlayers } from './DisconnectedPlayers.js'
 import type { Manager } from '../manager.js'
 import type { RainlinkNode } from 'rainlink'
 import type { LavalinkDataType } from '../@types/Lavalink.js'
 import { checkNodeHealth } from './NodeHealth.js'
 import { endpointKey, isUsNode } from './UsNodeRegistry.js'
 
+export const USA_UNAVAILABLE = 'No healthy USA Lavalink servers available'
+export const NODE_COOLDOWN_MS = 30 * 60 * 1000
+const cooldowns = new WeakMap<Manager, Map<string, number>>()
 const removedNodes = new WeakSet<RainlinkNode>()
+
+export function nodeCooldownRemaining(
+  client: Manager,
+  node: Parameters<typeof endpointKey>[0]
+): number {
+  const key = endpointKey(node)
+  const remaining = (cooldowns.get(client)?.get(key) ?? 0) - Date.now()
+  if (remaining <= 0) cooldowns.get(client)?.delete(key)
+  return Math.max(0, remaining)
+}
+
+export function coolDownNode(client: Manager, node: Parameters<typeof endpointKey>[0]): void {
+  let entries = cooldowns.get(client)
+  if (!entries) cooldowns.set(client, (entries = new Map()))
+  entries.set(endpointKey(node), Date.now() + NODE_COOLDOWN_MS)
+}
+
+export function isRateLimited(code: number, reason: Buffer | string): boolean {
+  return code === 1013 || /too many|rate.?limit|try again later/i.test(String(reason))
+}
+
+function isAvailableUsNode(client: Manager, node: RainlinkNode): boolean {
+  return Boolean(
+    node &&
+    node.online &&
+    node.driver.sessionId &&
+    !wasRemoved(node) &&
+    client.rainlink.nodes.get(node.options.name) === node &&
+    isUsNode(node.options) &&
+    !nodeCooldownRemaining(client, node.options) &&
+    client.lavalinkUsing.some(
+      (entry) =>
+        entry.name === node.options.name && endpointKey(entry) === endpointKey(node.options)
+    )
+  )
+}
+
+export function hasAvailableUsNode(client: Manager): boolean {
+  return client.rainlink.nodes.all().some((node) => isAvailableUsNode(client, node))
+}
+
+// Rainlink's default resolver treats socket-open as ready. Returning undefined
+// would fall back to that resolver, so reject explicitly if no session qualifies.
+export function selectAvailableUsNode(client: Manager, nodes: RainlinkNode[]): RainlinkNode {
+  const eligible = nodes.filter((node) => isAvailableUsNode(client, node))
+  if (!eligible.length) throw new Error(USA_UNAVAILABLE)
+  return eligible.sort((left, right) => (left.stats?.players ?? 0) - (right.stats?.players ?? 0))[0]
+}
+
+export function isNoNodesError(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    /no nodes? (?:are )?(?:online|available)|no healthy USA Lavalink/i.test(error.message)
+  )
+}
 
 export function wasRemoved(node: RainlinkNode): boolean {
   return removedNodes.has(node)
@@ -12,8 +71,17 @@ export function wasRemoved(node: RainlinkNode): boolean {
 
 export function removeNode(client: Manager, name: string): void {
   const node = client.rainlink.nodes.get(name)
-  if (node) removedNodes.add(node)
   forgetNode(client, name)
+  if (!node) return
+  if (node) {
+    removedNodes.add(node)
+    // Rainlink may already be sleeping before a reconnect. Removal must also
+    // prevent that deferred callback from reconnecting the discarded instance.
+    node.reconnect = () => {}
+    node.online = false
+    node.driver.sessionId = null
+  }
+  destroyDisconnectedPlayers(client, node)
   client.rainlink.nodes.remove(name)
 }
 
@@ -70,7 +138,12 @@ export function rememberNode(client: Manager, node: RainlinkNode): void {
 }
 
 export function connectUsNode(client: Manager, candidate: LavalinkDataType): Promise<boolean> {
-  if (!isUsNode(candidate) || !client.user || client.rainlink.id !== client.user.id)
+  if (
+    !isUsNode(candidate) ||
+    nodeCooldownRemaining(client, candidate) ||
+    !client.user ||
+    client.rainlink.id !== client.user.id
+  )
     return Promise.resolve(false)
   let pending = connections.get(client)
   if (!pending) connections.set(client, (pending = new Map()))
@@ -84,7 +157,8 @@ export function connectUsNode(client: Manager, candidate: LavalinkDataType): Pro
 
 async function connect(client: Manager, candidate: LavalinkDataType): Promise<boolean> {
   const active = client.lavalinkUsing.find((node) => endpointKey(node) === endpointKey(candidate))
-  if (active) return true
+  const activeNode = active && client.rainlink.nodes.get(active.name)
+  if (activeNode && isAvailableUsNode(client, activeNode)) return true
   const duplicate = client.rainlink.nodes
     .all()
     .find(
@@ -102,12 +176,14 @@ async function connect(client: Manager, candidate: LavalinkDataType): Promise<bo
       clearTimeout(timer)
       client.rainlink.off('nodeConnect', connected)
       client.rainlink.off('nodeClosed', closed)
+      client.rainlink.off('nodeDisconnect', disconnected)
     }
     const finish = (ok: boolean) => {
       if (settled) return
       settled = true
       cleanup()
       if (!ok) {
+        coolDownNode(client, candidate)
         forgetNode(client, candidate.name)
         removeNode(client, candidate.name)
       }
@@ -122,6 +198,10 @@ async function connect(client: Manager, candidate: LavalinkDataType): Promise<bo
     const closed = (node: RainlinkNode) => {
       if (matches(node)) finish(false)
     }
+    const disconnected = (node: RainlinkNode, code: number, reason: Buffer) => {
+      if (matches(node) && isRateLimited(code, reason)) finish(false)
+    }
+    client.rainlink.on('nodeDisconnect', disconnected)
     client.rainlink.on('nodeConnect', connected)
     client.rainlink.on('nodeClosed', closed)
     const { retryCount, retryTimeout } = client.config.utilities.AUTOFIX_LAVALINK

@@ -132,7 +132,7 @@ describe('useMusicPlayer', () => {
         expect(mockCreateSSEConnection).toHaveBeenCalledWith('guild-1')
     })
 
-    test('sets isConnected true when SSE opens', async () => {
+    test('waits for a valid music state before claiming the connection is live', async () => {
         const { sse, listeners } = makeMockSSE()
         mockCreateSSEConnection.mockReturnValue(sse)
 
@@ -140,6 +140,12 @@ describe('useMusicPlayer', () => {
 
         act(() => {
             listeners.onopen?.()
+        })
+        expect(result.current.isConnected).toBe(false)
+        act(() => {
+            listeners.onmessage?.({
+                data: JSON.stringify(makeState('guild-1')),
+            })
         })
 
         await waitFor(() => {
@@ -248,6 +254,12 @@ describe('useMusicPlayer', () => {
 
         act(() => {
             listeners.onopen?.()
+        })
+        expect(result.current.isConnected).toBe(false)
+        act(() => {
+            listeners.onmessage?.({
+                data: JSON.stringify(makeState('guild-1')),
+            })
         })
 
         await waitFor(() => {
@@ -481,5 +493,75 @@ describe('useMusicPlayer', () => {
         expect(result.current.error).toBe(
             'volume: command failed. Queue refresh failed: refresh unavailable',
         )
+    })
+})
+
+describe('music service failures', () => {
+    beforeEach(() => {
+        vi.clearAllMocks()
+        mockGetState.mockReset()
+        mockGetState.mockResolvedValue({ data: makeState('guild-1') })
+    })
+    test('shows initial REST failure without claiming an open stream is healthy', async () => {
+        const { sse, listeners } = makeMockSSE()
+        mockCreateSSEConnection.mockReturnValue(sse)
+        mockGetState.mockRejectedValue(
+            new Error('Music service is not configured'),
+        )
+        const { result } = renderHook(() => useMusicPlayer('guild-1'))
+        act(() => listeners.onopen?.())
+        await waitFor(() =>
+            expect(result.current.serviceError).toBe(
+                'Music service is not configured',
+            ),
+        )
+        expect(result.current.isConnected).toBe(false)
+    })
+    test('keeps the last queue on a service outage and clears the error after recovery', async () => {
+        const { sse, listeners } = makeMockSSE()
+        mockCreateSSEConnection.mockReturnValue(sse)
+        const { result } = renderHook(() => useMusicPlayer('guild-1'))
+        act(() =>
+            listeners.onmessage?.({
+                data: JSON.stringify(makeState('guild-1', 80)),
+            }),
+        )
+        act(() =>
+            listeners.onmessage?.({
+                data: JSON.stringify({
+                    type: 'music_unavailable',
+                    error: 'No healthy USA Lavalink servers available',
+                }),
+            }),
+        )
+        expect(result.current.isConnected).toBe(false)
+        expect(result.current.serviceError).toBe(
+            'No healthy USA Lavalink servers available',
+        )
+        expect(result.current.state.volume).toBe(80)
+        act(() => listeners.onopen?.())
+        expect(result.current.isConnected).toBe(false)
+        act(() =>
+            listeners.onmessage?.({
+                data: JSON.stringify(makeState('guild-1', 60)),
+            }),
+        )
+        expect(result.current.isConnected).toBe(true)
+        expect(result.current.serviceError).toBeNull()
+    })
+    test('a late initial REST error cannot override a newer successful SSE state', async () => {
+        const pending = createDeferred<never>()
+        mockGetState.mockReturnValue(pending.promise)
+        const { sse, listeners } = makeMockSSE()
+        mockCreateSSEConnection.mockReturnValue(sse)
+        const { result } = renderHook(() => useMusicPlayer('guild-1'))
+        act(() =>
+            listeners.onmessage?.({
+                data: JSON.stringify(makeState('guild-1')),
+            }),
+        )
+        await act(async () => pending.reject(new Error('old failure')))
+        expect(result.current.isConnected).toBe(true)
+        expect(result.current.serviceError).toBeNull()
     })
 })

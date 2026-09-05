@@ -4,7 +4,10 @@ import type {
     VoiceListener,
     RepeatMode,
 } from '@lucky/shared/services'
-import { vgMusicBotRequest } from '../../services/vgMusicBotClient'
+import {
+    vgMusicBotRequest,
+    vgMusicBotError,
+} from '../../services/vgMusicBotClient'
 
 interface VgRequester {
     id: string
@@ -99,7 +102,21 @@ export async function fetchQueueState(
     const statusRes = await vgMusicBotRequest<VgStatus>(
         `/v1/players/${encodeURIComponent(guildId)}`,
     )
-    if (!statusRes.ok || !statusRes.body) return null
+    if (!statusRes.ok) {
+        const error = (statusRes.body as { error?: string } | null)?.error
+        if (
+            [400, 404].includes(statusRes.status) &&
+            error === 'Current player not found!'
+        )
+            return null
+        throw vgMusicBotError(statusRes)
+    }
+    if (!statusRes.body || !Array.isArray(statusRes.body.queue)) {
+        throw vgMusicBotError(
+            { ...statusRes, status: 502 },
+            'The music bot returned an invalid player state',
+        )
+    }
     const status = statusRes.body
 
     const listenersRes = await vgMusicBotRequest<{ data: VgListener[] }>(

@@ -10,11 +10,13 @@ Discovery uses the maintainer's JSON API at https://lavalink-list.ajieblogs.eu.o
 
 To add a public USA endpoint, review an explicit hosting-location statement, add its exact endpoint and evidence to the registry, and include its public credentials in the seed list only if it should remain discoverable when the catalog is unavailable. Run the tests and recheck REST/track loading. Never set `online: true` on a seed.
 
-The catalog's listed Miami endpoint, `omega.vexanode.cloud:2031`, is retained as a candidate only. It failed DNS resolution during the September 5, 2026 review; the catalog also returned HTTP 502. No working US endpoint was verified. Unreviewed configured endpoints are ignored, including any previously configured global node.
+The catalog's listed Miami endpoint, `omega.vexanode.cloud:2031`, is retained as a candidate only. It failed DNS resolution during the September 5, 2026 review. The TLS endpoint `lavalinkv4.serenetia.com:443` is also a candidate based on the provider's [USA hosting and free-service statement](https://freelavalink.serenetia.com/about) and [connection details](https://freelavalink.serenetia.com/), but its health check returned HTTP 502. The catalog returned HTTP 530 on the latest check. Neither endpoint is marked available without a successful health check and ready session. No working US endpoint was verified. Unreviewed configured endpoints are ignored, including any previously configured global node.
 
 ## Startup and failures
 
 With `AUTOFIX_LAVALINK.enable: true`, `player.NODES: []` is supported. Discovery runs after Discord is ready, every 30 minutes, and when a node exhausts its configured retries. Overlapping discovery and recovery requests share their work. Failed catalog refreshes retain previous candidates only for fresh health checks.
+
+Rate-limit disconnects clear the session and put the endpoint on a 30-minute cooldown, including already scheduled SDK reconnect attempts. Node selection requires a current, confirmed session; opening a WebSocket is insufficient.
 
 With automatic recovery disabled, only explicitly configured, reviewed US nodes are attempted at startup. USA eligibility always applies.
 

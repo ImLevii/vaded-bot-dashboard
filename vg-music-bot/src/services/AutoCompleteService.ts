@@ -7,7 +7,10 @@ export class AutoCompleteService {
   constructor(client: Manager, interaction: AutocompleteInteraction) {
     this.client = client
     this.interaction = interaction
-    this.execute()
+    void this.execute().catch((error) => {
+      this.client.logger.error(AutoCompleteService.name, error)
+      if (!this.interaction.responded) void this.interaction.respond([]).catch(() => {})
+    })
   }
   async execute() {
     let guildModel = await this.client.db.language.get(`${this.interaction.guild?.id}`)
@@ -43,11 +46,12 @@ export class AutoCompleteService {
     if (!command) return commandNameArray.length == 0
 
     try {
-      ;(command as any).autocomplete
-        ? (command as any).autocomplete(this.client, this.interaction, language)
-        : true
+      if ((command as any).autocomplete) {
+        await (command as any).autocomplete(this.client, this.interaction, language)
+      }
     } catch (error) {
       this.client.logger.error(AutoCompleteService.name, error)
+      if (!this.interaction.responded) await this.interaction.respond([]).catch(() => {})
     }
     return
   }

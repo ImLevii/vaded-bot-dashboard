@@ -3,9 +3,12 @@ import { setupPlaybackRoutes } from './playbackRoutes'
 import { setupQueueRoutes } from './queueRoutes'
 import { setupStateRoutes } from './stateRoutes'
 import { setupAutoplayRoutes } from './autoplayRoutes'
-import { vgMusicBotConfigured } from '../../services/vgMusicBotClient'
+import {
+    vgMusicBotConfigured,
+    MUSIC_BOT_CONFIGURATION_ERROR,
+} from '../../services/vgMusicBotClient'
 
-/** Degrade music CONTROLS to 503 while vg-music-bot isn't configured/reachable. GET state reads pass through — fetchQueueState() already returns null, which the frontend renders as "no active session". */
+/** Reject commands early when the upstream music service has no configuration. */
 function requireMusicService(
     req: Request,
     res: Response,
@@ -15,7 +18,7 @@ function requireMusicService(
         next()
         return
     }
-    res.status(503).json({ error: 'Music service unavailable' })
+    res.status(503).json({ error: MUSIC_BOT_CONFIGURATION_ERROR })
 }
 
 export function setupMusicRoutes(app: Express): void {

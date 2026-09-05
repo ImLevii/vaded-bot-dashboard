@@ -1,3 +1,4 @@
+import { hasAvailableUsNode, USA_UNAVAILABLE } from '../../autofix/NodeConnection.js'
 import util from 'node:util'
 import { User } from 'discord.js'
 import { Manager } from '../../manager.js'
@@ -27,16 +28,20 @@ export async function getSearch(
     res.send({ error: 'Search param not found' })
     return
   }
+  if (!hasAvailableUsNode(client)) {
+    res.code(503).send({ error: USA_UNAVAILABLE })
+    return
+  }
   const result = await client.rainlink
-    .search(query, { requester: user, engine: source })
+    .search(query, { requester: user, engine: validSource })
     .catch(() => ({
       playlistName: 'dreamvast@error@noNode',
       tracks: [],
       type: RainlinkSearchResultType.SEARCH,
     }))
   if (result.tracks.length == 0 && result.playlistName == 'dreamvast@error@noNode') {
-    res.code(404)
-    res.send({ error: 'No node avaliable!' })
+    res.code(503)
+    res.send({ error: USA_UNAVAILABLE })
     return
   }
   res.send({

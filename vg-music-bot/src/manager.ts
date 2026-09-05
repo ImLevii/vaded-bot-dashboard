@@ -16,6 +16,7 @@ import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { WebServer } from './web/server.js'
 import { ManifestService } from './services/ManifestService.js'
+import { runtimeBuildInfo } from './services/BuildInfo.js'
 import { config } from 'dotenv'
 import { initHandler } from './handlers/index.js'
 import { DeployService } from './services/DeployService.js'
@@ -175,6 +176,10 @@ export class Manager extends Client {
 
   public start() {
     this.logger.info('ClientManager', `Booting..`)
+    this.logger.info(
+      'ClientManager',
+      `Runtime build: ${runtimeBuildInfo.sourceHash?.slice(0, 12) ?? 'unverified'}; revision: ${runtimeBuildInfo.revision ?? 'unknown'}`
+    )
     this.logger.info('ClientManager', `├── Version: ${this.manifest.metadata.bot.version}`)
     this.logger.info('ClientManager', `├── Codename: ${this.manifest.metadata.bot.codename}`)
     this.logger.info(

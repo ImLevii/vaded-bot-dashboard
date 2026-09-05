@@ -1,3 +1,4 @@
+import { hasAvailableUsNode } from '../../autofix/NodeConnection.js'
 import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
 import {
   ApplicationCommandOptionType,
@@ -150,17 +151,23 @@ export default class implements Command {
       return
     }
 
-    if (client.lavalinkUsing.length == 0) {
+    if (!hasAvailableUsNode(client)) {
       choice.push({
-        name: `${client.i18n.get(language, 'command.music', 'no_node')}`,
-        value: `${client.i18n.get(language, 'command.music', 'no_node')}`,
+        name: `${client.i18n.get(language, 'error', 'no_node')}`,
+        value: `${client.i18n.get(language, 'error', 'no_node')}`,
       })
+      await (interaction as AutocompleteInteraction).respond(choice).catch(() => {})
       return
     }
-    const searchRes = await client.rainlink.search(url || Random)
+    const searchRes = await client.rainlink.search(url || Random).catch(() => undefined)
+    if (!searchRes) {
+      await (interaction as AutocompleteInteraction).respond([]).catch(() => {})
+      return
+    }
 
     if (searchRes.tracks.length == 0 || !searchRes.tracks) {
-      return choice.push({ name: 'Error song not matches', value: url })
+      await (interaction as AutocompleteInteraction).respond([]).catch(() => {})
+      return
     }
 
     for (let i = 0; i < 10; i++) {

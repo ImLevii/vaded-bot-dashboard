@@ -13,14 +13,14 @@
     "codename": "kaito"
   },
   "scripts": {
-    "build": "tsc --build --verbose",
+    "build": "node scripts/compile.mjs",
     "build:full": "npm run build:prettier && npm run build",
     "start": "node --no-deprecation ./dist/index.js",
     "start:shard": "node --no-deprecation ./dist/cluster/index.js",
     "dev": "npx nodemon ./src/index.ts",
     "build:prettier": "npx prettier -w ./src",
     "start:pm2": "npx pm2-runtime start ecosystem.config.cjs --env production",
-    "test": "node --import tsx --test tests/*.test.ts"
+    "test": "node --import tsx --test tests/*.test.ts scripts/build-info.test.mjs deploy/pterodactyl/start.test.mjs"
   },
   "repository": {
     "type": "git",

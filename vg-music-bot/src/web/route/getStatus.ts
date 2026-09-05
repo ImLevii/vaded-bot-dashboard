@@ -1,3 +1,4 @@
+import { hasAvailableUsNode, USA_UNAVAILABLE } from '../../autofix/NodeConnection.js'
 import util from 'node:util'
 import { User, VoiceChannel } from 'discord.js'
 import { Manager } from '../../manager.js'
@@ -17,6 +18,10 @@ export async function getStatus(
   const guildId = (req.params as Record<string, string>)['guildId']
   const player = client.rainlink.players.get(guildId)
   if (!player) {
+    if (!hasAvailableUsNode(client)) {
+      res.code(503).send({ error: USA_UNAVAILABLE })
+      return
+    }
     res.code(400)
     res.send({ error: 'Current player not found!' })
     return

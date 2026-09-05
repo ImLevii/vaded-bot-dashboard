@@ -21,10 +21,6 @@ export async function deleteNode(
     return
   }
 
-  client.rainlink.players.forEach((player) => {
-    if (player.node.options.name === name) player.destroy().catch(() => {})
-  })
-
   removeNode(client, name)
 
   res.send({ name })

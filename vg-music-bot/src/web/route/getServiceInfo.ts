@@ -1,4 +1,5 @@
 import type { Manager } from '../../manager.js'
+import { runtimeBuildInfo } from '../../services/BuildInfo.js'
 
 // Read from this Discord client, which also owns the player and node routes.
 export function getServiceInfo(client: Manager) {
@@ -14,6 +15,7 @@ export function getServiceInfo(client: Manager) {
     healthyNodes: client.rainlink.nodes
       .all()
       .filter((node) => node.online && confirmed.has(node.options.name)).length,
-    revision: process.env.COMMIT_SHA || null,
+    revision: runtimeBuildInfo.revision,
+    build: runtimeBuildInfo,
   }
 }

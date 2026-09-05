@@ -5,8 +5,26 @@ import { validateParams } from '../../middleware/validate'
 import { guildIdParam } from '../../schemas/common'
 import { param, sseClients } from './helpers'
 import { fetchQueueState, emptyQueueState } from './vgMusicBotState'
+import { AppError } from '../../errors/AppError'
 
 const POLL_INTERVAL_MS = 2000
+const pollers = new Map<string, ReturnType<typeof setInterval>>()
+const pendingPolls = new Set<string>()
+
+async function stateEvent(guildId: string): Promise<string> {
+    try {
+        const state =
+            (await fetchQueueState(guildId)) ?? emptyQueueState(guildId)
+        return `data: ${JSON.stringify(state)}\n\n`
+    } catch (error) {
+        // Opening an SSE transport does not mean the upstream bot is healthy.
+        const message =
+            error instanceof AppError
+                ? error.message
+                : 'Music service unavailable'
+        return `data: ${JSON.stringify({ type: 'music_unavailable', error: message })}\n\n`
+    }
+}
 
 export function setupStateRoutes(app: Express): void {
     app.get(
@@ -15,83 +33,74 @@ export function setupStateRoutes(app: Express): void {
         validateParams(guildIdParam),
         async (req: AuthenticatedRequest, res: Response) => {
             const guildId = param(req.params.guildId)
-
+            let closed = false
+            // Request completion may precede an SSE response in serverless adapters.
+            res.on('close', () => {
+                closed = true
+                const clients = sseClients.get(guildId)
+                clients?.delete(res)
+                if (clients && clients.size === 0) {
+                    sseClients.delete(guildId)
+                    clearInterval(pollers.get(guildId))
+                    pollers.delete(guildId)
+                }
+            })
             res.writeHead(200, {
                 'Content-Type': 'text/event-stream',
                 'Cache-Control': 'no-cache',
                 Connection: 'keep-alive',
                 'X-Accel-Buffering': 'no',
             })
-
-            const currentState = await fetchQueueState(guildId)
+            const initial = await stateEvent(guildId)
+            if (closed) return
             try {
-                res.write(
-                    `data: ${JSON.stringify(currentState ?? emptyQueueState(guildId))}\n\n`,
-                )
+                res.write(initial)
             } catch {
-                // NOSONAR: client disconnected before initial state send.
                 return
             }
-
             let clients = sseClients.get(guildId)
             if (!clients) {
                 clients = new Set()
                 sseClients.set(guildId, clients)
             }
             clients.add(res)
-
-            // Only one poller per guild regardless of how many browser tabs
-            // are watching it — the first SSE client for a guild starts it,
-            // the last one to disconnect stops it.
             if (!pollers.has(guildId)) {
                 pollers.set(
                     guildId,
                     setInterval(
-                        () => broadcastState(guildId),
+                        () => void broadcastState(guildId),
                         POLL_INTERVAL_MS,
                     ),
                 )
             }
-
-            req.on('close', () => {
-                const guildClients = sseClients.get(guildId)
-                guildClients?.delete(res)
-
-                if (guildClients && guildClients.size === 0) {
-                    sseClients.delete(guildId)
-                    const poller = pollers.get(guildId)
-                    if (poller) clearInterval(poller)
-                    pollers.delete(guildId)
-                }
-            })
         },
     )
-
     app.get(
         '/api/guilds/:guildId/music/state',
         requireAuth,
         validateParams(guildIdParam),
         asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
             const guildId = param(req.params.guildId)
-            const state = await fetchQueueState(guildId)
-            res.json(state ?? emptyQueueState(guildId))
+            res.json(
+                (await fetchQueueState(guildId)) ?? emptyQueueState(guildId),
+            )
         }),
     )
 }
 
-const pollers = new Map<string, ReturnType<typeof setInterval>>()
-
 async function broadcastState(guildId: string): Promise<void> {
-    const clients = sseClients.get(guildId)
-    if (!clients?.size) return
-
-    const state = (await fetchQueueState(guildId)) ?? emptyQueueState(guildId)
-    const data = `data: ${JSON.stringify(state)}\n\n`
-    for (const client of clients) {
-        try {
-            client.write(data)
-        } catch {
-            // NOSONAR: client disconnected mid-broadcast; close handler cleans it up.
+    if (!sseClients.get(guildId)?.size || pendingPolls.has(guildId)) return
+    pendingPolls.add(guildId)
+    try {
+        const data = await stateEvent(guildId)
+        for (const client of sseClients.get(guildId) ?? []) {
+            try {
+                client.write(data)
+            } catch {
+                // The connection close handler removes disconnected clients.
+            }
         }
+    } finally {
+        pendingPolls.delete(guildId)
     }
 }

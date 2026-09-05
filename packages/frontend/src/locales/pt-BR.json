@@ -734,6 +734,9 @@
         "daysAgo": "há {{days}}d"
     },
     "music": {
+        "unavailable": "Indisponível",
+        "serviceUnavailable": "Serviço de música indisponível",
+        "waitingForService": "Aguardando a reconexão do bot de música",
         "noServerSelected": "Nenhum Servidor Selecionado",
         "selectServerToControlMusic": "Selecione um servidor para controlar a reprodução de música",
         "musicPlayer": "Reprodutor de Música",

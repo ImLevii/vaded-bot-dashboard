@@ -9,8 +9,8 @@ export interface LocationEvidence {
   reviewedAt: string
 }
 
-// Location evidence is separate from health. This listed Miami endpoint currently
-// fails DNS; it is only a candidate and MUST pass the same probes as every node.
+// Location evidence is separate from health. Reviewed endpoints are candidates
+// only and MUST pass REST and session checks before becoming available.
 // Add endpoints only after reviewing an explicit hosting-location statement.
 // Domain suffixes, server names and CDN geolocation do not establish US hosting.
 export const US_NODE_REGISTRY: readonly LocationEvidence[] = [
@@ -20,6 +20,14 @@ export const US_NODE_REGISTRY: readonly LocationEvidence[] = [
     secure: false,
     country: 'US',
     source: 'https://lavalink.darrennathanael.com/NoSSL/Lavalink-NonSSL/#hosted-by-vexanode',
+    reviewedAt: '2026-09-05',
+  },
+  {
+    host: 'lavalinkv4.serenetia.com',
+    port: 443,
+    secure: true,
+    country: 'US',
+    source: 'https://freelavalink.serenetia.com/about',
     reviewedAt: '2026-09-05',
   },
 ]
@@ -38,6 +46,13 @@ export const US_SEED_NODES: readonly LavalinkDataType[] = [
     ...US_NODE_REGISTRY[0],
     name: 'omega.vexanode.cloud:2031',
     pass: 'https://discord.vexanode.cloud',
+    online: false,
+  },
+  {
+    ...US_NODE_REGISTRY[1],
+    name: 'lavalinkv4.serenetia.com:443',
+    // Public connection details: https://freelavalink.serenetia.com/
+    pass: 'https://seretia.link/discord',
     online: false,
   },
 ]

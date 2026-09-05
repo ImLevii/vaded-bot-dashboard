@@ -1,3 +1,4 @@
+import { hasAvailableUsNode, isNoNodesError } from '../../autofix/NodeConnection.js'
 import {
   PermissionsBitField,
   CommandInteraction,
@@ -223,7 +224,7 @@ export default class {
         })
     }
 
-    if (command.lavalink && client.lavalinkUsing.length == 0) {
+    if (command.lavalink && !hasAvailableUsNode(client)) {
       return interaction.reply({
         embeds: [
           new EmbedBuilder()
@@ -381,16 +382,21 @@ export default class {
         })`
       )
 
-      command.execute(client, handler)
+      await command.execute(client, handler)
     } catch (error) {
       client.logger.error('CommandManager | Interaction', error)
-      interaction.reply({
-        embeds: [
-          new EmbedBuilder()
-            .setDescription(`${client.i18n.get(language, 'error', 'unexpected_error')}\n ${error}`)
-            .setColor(client.color),
-        ],
-      })
+      const errorEmbed = new EmbedBuilder()
+        .setDescription(
+          isNoNodesError(error) || (command.lavalink && !hasAvailableUsNode(client))
+            ? String(client.i18n.get(language, 'error', 'no_node'))
+            : String(client.i18n.get(language, 'error', 'unexpected_error'))
+        )
+        .setColor(client.color)
+      await (
+        interaction.deferred || interaction.replied
+          ? interaction.editReply({ embeds: [errorEmbed] })
+          : interaction.reply({ embeds: [errorEmbed] })
+      ).catch(() => {})
     }
   }
 }

@@ -1,3 +1,4 @@
+import { hasAvailableUsNode, isNoNodesError } from '../../autofix/NodeConnection.js'
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -207,7 +208,7 @@ export default class {
     //////////////////////////////// Permission check end ////////////////////////////////
 
     //////////////////////////////// Check avalibility start ////////////////////////////////
-    if (command.lavalink && client.lavalinkUsing.length == 0) {
+    if (command.lavalink && !hasAvailableUsNode(client)) {
       return message.reply({
         embeds: [
           new EmbedBuilder()
@@ -385,16 +386,17 @@ export default class {
         })`
       )
 
-      command.execute(client, handler)
+      await command.execute(client, handler)
     } catch (error) {
       client.logger.error('CommandManager | Message', error)
-      message.reply({
-        embeds: [
-          new EmbedBuilder()
-            .setDescription(`${client.i18n.get(language, 'error', 'unexpected_error')}\n ${error}`)
-            .setColor(client.color),
-        ],
-      })
+      const errorEmbed = new EmbedBuilder()
+        .setDescription(
+          isNoNodesError(error) || (command.lavalink && !hasAvailableUsNode(client))
+            ? String(client.i18n.get(language, 'error', 'no_node'))
+            : String(client.i18n.get(language, 'error', 'unexpected_error'))
+        )
+        .setColor(client.color)
+      await message.reply({ embeds: [errorEmbed] }).catch(() => {})
     }
   }
 }

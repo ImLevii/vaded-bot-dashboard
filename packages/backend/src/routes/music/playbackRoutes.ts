@@ -5,7 +5,10 @@ import { asyncHandler } from '../../middleware/asyncHandler'
 import { validateParams } from '../../middleware/validate'
 import { guildIdParam } from '../../schemas/common'
 import { AppError } from '../../errors/AppError'
-import { vgMusicBotRequest } from '../../services/vgMusicBotClient'
+import {
+    vgMusicBotRequest,
+    vgMusicBotError,
+} from '../../services/vgMusicBotClient'
 import type { MusicCommandResult } from '@lucky/shared/services'
 import { param } from './helpers'
 
@@ -60,9 +63,7 @@ async function patchPlayer(
         },
     )
     if (res.ok) return result(guildId, true)
-    const error =
-        (res.body as { error?: string } | null)?.error ?? 'Command failed'
-    return result(guildId, false, error)
+    throw vgMusicBotError(res, 'Command failed')
 }
 
 export function setupPlaybackRoutes(app: Express): void {
@@ -79,14 +80,20 @@ export function setupPlaybackRoutes(app: Express): void {
                 throw AppError.badRequest('Query is required')
             }
 
-            // Idempotent: vg-music-bot 400s if a player already exists for
-            // this guild, which is fine — we only need one to exist before
-            // queueing the track.
-            await vgMusicBotRequest('/v1/players', {
+            const created = await vgMusicBotRequest('/v1/players', {
                 method: 'POST',
                 body: JSON.stringify({ guildId, userId }),
             })
 
+            const alreadyExists =
+                created.status === 400 &&
+                (created.body as { error?: string } | null)?.error ===
+                    'Player existed in this guild'
+            if (!created.ok && !alreadyExists)
+                throw vgMusicBotError(
+                    created,
+                    'Could not create a music player',
+                )
             res.json(await patchPlayer(guildId, { add: [body.data.query] }))
         }),
     )

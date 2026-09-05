@@ -41,6 +41,7 @@ export function useMusicPlayer(guildId: string | undefined) {
     )
     const [isConnected, setIsConnected] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [serviceError, setServiceError] = useState<string | null>(null)
     /** Wall-clock ms of the last successful state payload (SSE or REST). */
     const [lastStateUpdate, setLastStateUpdate] = useState<number | null>(null)
     const sseRef = useRef<EventSource | null>(null)
@@ -61,14 +62,19 @@ export function useMusicPlayer(guildId: string | undefined) {
     useLayoutEffect(() => {
         guildRef.current = guildId
         activeCommandsRef.current.clear()
+        retryRef.current = 0
         setState(EMPTY_STATE)
         setError(null)
+        setServiceError(null)
+        setLastStateUpdate(null)
+        setIsConnected(false)
         setPendingAction(null)
         setIsLoading(false)
     }, [guildId])
 
     const applyState = useCallback((next: QueueState) => {
         setState(next)
+        setServiceError(null)
         setLastStateUpdate(Date.now())
     }, [])
 
@@ -81,6 +87,7 @@ export function useMusicPlayer(guildId: string | undefined) {
         }
 
         let cancelled = false
+        let stateEvents = 0
 
         function connect() {
             if (cancelled) return
@@ -90,8 +97,7 @@ export function useMusicPlayer(guildId: string | undefined) {
 
             sse.onopen = () => {
                 if (cancelled) return
-                retryRef.current = 0
-                setIsConnected(true)
+                // A stream can open while the separate music bot is unavailable.
             }
 
             sse.onmessage = (event) => {
@@ -99,12 +105,30 @@ export function useMusicPlayer(guildId: string | undefined) {
                 try {
                     const payload = JSON.parse(event.data) as {
                         type?: string
+                        error?: string
                     } & QueueState
                     // Heartbeat is liveness only; do not clobber queue state.
                     if (payload?.type === 'heartbeat') {
                         setLastStateUpdate(Date.now())
                         return
                     }
+                    if (payload?.type === 'music_unavailable') {
+                        stateEvents++
+                        setServiceError(
+                            payload.error || 'Music service unavailable',
+                        )
+                        setIsConnected(false)
+                        return
+                    }
+                    if (
+                        !payload ||
+                        typeof payload.guildId !== 'string' ||
+                        !Array.isArray(payload.tracks)
+                    )
+                        return
+                    stateEvents++
+                    retryRef.current = 0
+                    setIsConnected(true)
                     applyState(payload)
                 } catch {
                     /* malformed data */
@@ -117,6 +141,11 @@ export function useMusicPlayer(guildId: string | undefined) {
                 sse.close()
                 sseRef.current = null
                 setIsConnected(false)
+                setServiceError(
+                    (previous) =>
+                        previous ??
+                        'Live music updates are unavailable. Reconnecting...',
+                )
 
                 const delay = Math.min(
                     BASE_RECONNECT_DELAY * 2 ** retryRef.current,
@@ -132,9 +161,17 @@ export function useMusicPlayer(guildId: string | undefined) {
         api.music
             .getState(guildId)
             .then((res) => {
-                if (!cancelled) applyState(res.data)
+                if (!cancelled && stateEvents === 0) applyState(res.data)
             })
-            .catch(() => {})
+            .catch((cause: unknown) => {
+                if (cancelled || stateEvents !== 0) return
+                setServiceError(
+                    cause instanceof Error
+                        ? cause.message
+                        : 'Music service unavailable',
+                )
+                setIsConnected(false)
+            })
 
         return () => {
             cancelled = true
@@ -230,6 +267,7 @@ export function useMusicPlayer(guildId: string | undefined) {
         isLoading,
         pendingAction,
         isConnected,
+        serviceError,
         error,
         lastStateUpdate,
         clearError,

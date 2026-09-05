@@ -1,7 +1,7 @@
 import type { Manager } from '../manager.js'
 import type { LavalinkDataType } from '../@types/Lavalink.js'
 import { CheckLavalinkServer } from './CheckLavalinkServer.js'
-import { connectUsNode, removeNode } from './NodeConnection.js'
+import { connectUsNode, hasAvailableUsNode, removeNode } from './NodeConnection.js'
 
 const recoveries = new WeakMap<Manager, Promise<void>>()
 
@@ -33,7 +33,7 @@ export class AutoFixLavalink {
     const nodes: LavalinkDataType[] = await new CheckLavalinkServer(this.client).execute()
     if (!this.client.user) return
     // One connected node is enough. Do not replace a healthy node during refresh.
-    if (this.client.lavalinkUsing.length) return
+    if (hasAvailableUsNode(this.client)) return
     for (const node of nodes.filter((candidate) => candidate.online)) {
       if (await connectUsNode(this.client, node)) return
     }

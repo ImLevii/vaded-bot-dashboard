@@ -1,3 +1,4 @@
+import { hasAvailableUsNode } from '../../autofix/NodeConnection.js'
 import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
 import { stopNowPlaying } from '../../utilities/NowPlayingSession.js'
 import { Manager } from '../../manager.js'
@@ -37,14 +38,23 @@ export default class {
         true,
         data.voice
       )
-      client.rainlink.players.create({
-        guildId: data.guild!,
-        voiceId: data.voice!,
-        textId: data.text!,
-        shardId: guild?.shardId ?? 0,
-        deaf: true,
-        volume: client.config.player.DEFAULT_VOLUME,
-      })
+      if (hasAvailableUsNode(client) && !client.rainlink.players.get(player.guildId)) {
+        try {
+          await client.rainlink.players.create({
+            guildId: data.guild!,
+            voiceId: data.voice!,
+            textId: data.text!,
+            shardId: guild?.shardId ?? 0,
+            deaf: true,
+            volume: client.config.player.DEFAULT_VOLUME,
+          })
+        } catch {
+          client.logger.warn(
+            'PlayerDestroy',
+            '24/7 reconnection failed; saved voice settings were retained.'
+          )
+        }
+      }
     } else await client.db.autoreconnect.delete(player.guildId)
 
     let guildModel = await client.db.language.get(`${channel.guild.id}`)

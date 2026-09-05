@@ -28,7 +28,7 @@ const mockTrack = {
     author: 'Test Artist',
     url: 'https://youtube.com/watch?v=test',
     thumbnail: 'https://example.com/thumb.jpg',
-    duration: 180,
+    duration: 180000,
     durationFormatted: '3:00',
     requestedBy: 'User',
     source: 'youtube' as const,
@@ -109,7 +109,6 @@ describe('MusicPage', () => {
         expect(screen.getByTestId('search-bar')).toBeInTheDocument()
         expect(screen.getByTestId('import-playlist')).toBeInTheDocument()
         expect(screen.getByTestId('queue-list')).toBeInTheDocument()
-        expect(screen.getByTestId('autoplay-genres')).toBeInTheDocument()
     })
 
     test('shows not connected message when no voice channel', () => {
@@ -499,7 +498,7 @@ describe('MusicPage', () => {
             state: {
                 ...mockPlayer.state,
                 tracks: [mockTrack],
-                position: 65,
+                position: 65000,
             },
         } as any)
         render(
@@ -589,4 +588,29 @@ describe('MusicPage', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Dismiss' }))
         expect(clearError).toHaveBeenCalledOnce()
     })
+})
+
+test('shows the service outage immediately instead of Live and Nothing playing', () => {
+    vi.mocked(useGuildSelection).mockReturnValue({
+        selectedGuild: mockGuild,
+    } as any)
+    vi.mocked(useMusicPlayer).mockReturnValue({
+        ...mockPlayer,
+        isConnected: false,
+        serviceError: 'No healthy USA Lavalink servers available',
+    } as any)
+    render(
+        <MemoryRouter>
+            <MusicPage />
+        </MemoryRouter>,
+    )
+    expect(screen.getByRole('alert')).toHaveTextContent(
+        'No healthy USA Lavalink servers available',
+    )
+    expect(screen.getByText('Unavailable')).toBeInTheDocument()
+    expect(screen.queryByText('Live')).not.toBeInTheDocument()
+    expect(screen.queryByText('Nothing playing')).not.toBeInTheDocument()
+    expect(
+        screen.getByText('Waiting for the music bot to reconnect'),
+    ).toBeInTheDocument()
 })

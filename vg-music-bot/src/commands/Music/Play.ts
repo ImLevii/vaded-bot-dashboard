@@ -1,3 +1,4 @@
+import { hasAvailableUsNode } from '../../autofix/NodeConnection.js'
 import { requester } from '../../utilities/MusicFormatting.js'
 import { getTitle } from '../../utilities/GetTitle.js'
 import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
@@ -90,11 +91,11 @@ export default class implements Command {
     player.textId = handler.channel!.id
 
     const result = await player.search(value, { requester: handler.user })
-    const tracks = result.tracks.filter((e) =>
-      typeof maxLength !== 'string' ? e.duration > maxLength : e
+    const tracks = result.tracks.filter(
+      (e) => typeof maxLength !== 'number' || maxLength <= 0 || e.duration <= maxLength * 1000
     )
 
-    if (!result.tracks.length)
+    if (!tracks.length)
       return handler.editReply({
         embeds: [
           new EmbedBuilder()
@@ -112,7 +113,7 @@ export default class implements Command {
 
     if (handler.message) await handler.message.delete().catch(() => null)
 
-    if (!player.playing) player.play()
+    if (!player.playing) await player.play()
 
     const track = tracks[0]
 
@@ -227,19 +228,27 @@ export default class implements Command {
       return
     }
 
-    if (client.lavalinkUsing.length == 0) {
+    if (!hasAvailableUsNode(client)) {
       choice.push({
-        name: `${client.i18n.get(language, 'command.music', 'no_node')}`,
-        value: `${client.i18n.get(language, 'command.music', 'no_node')}`,
+        name: `${client.i18n.get(language, 'error', 'no_node')}`,
+        value: `${client.i18n.get(language, 'error', 'no_node')}`,
       })
+      await (interaction as AutocompleteInteraction).respond(choice).catch(() => {})
       return
     }
-    const searchRes = await client.rainlink.search(url || Random)
+    const searchRes = await client.rainlink.search(url || Random).catch(() => undefined)
+    if (!searchRes) {
+      await (interaction as AutocompleteInteraction).respond([]).catch(() => {})
+      return
+    }
 
-    const tracks = searchRes.tracks.filter((e) => (maxLength ? e.duration > maxLength : e))
+    const tracks = searchRes.tracks.filter(
+      (e) => typeof maxLength !== 'number' || maxLength <= 0 || e.duration <= maxLength * 1000
+    )
 
     if (tracks.length == 0 || !searchRes.tracks) {
-      return choice.push({ name: 'Error song not matches', value: url })
+      await (interaction as AutocompleteInteraction).respond([]).catch(() => {})
+      return
     }
 
     for (let i = 0; i < 10; i++) {

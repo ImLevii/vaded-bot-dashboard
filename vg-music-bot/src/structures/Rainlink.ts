@@ -1,3 +1,4 @@
+import { selectAvailableUsNode } from '../autofix/NodeConnection.js'
 import { Manager } from '../manager.js'
 import { Library, Rainlink, RainlinkAdditionalOptions, RainlinkPlugin } from 'rainlink'
 import { SpotifyPlugin } from 'rainlink-spotify'
@@ -29,6 +30,7 @@ export class RainlinkInit {
       resume: true,
       resumeTimeout: 600,
       defaultSearchEngine: 'youtube',
+      nodeResolver: async (nodes) => selectAvailableUsNode(this.client, nodes),
       structures: {
         player: ExtendedPlayer,
       },

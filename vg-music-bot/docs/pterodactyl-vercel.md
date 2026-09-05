@@ -14,7 +14,7 @@ and port alone do not establish the protocol, server identity, or availability.
    `.env`, and `data/` directory. Use the same Discord bot identity.
 2. Upload the prebuilt music-bot package through Files and extract its contents
    into the existing bot directory. That directory must contain `package.json`,
-   `package-lock.json`, `dist/index.js`, `languages/`, and
+   `package-lock.json`, `dist/index.js`, `dist/build-info.json`, `scripts/`, `languages/`, and
    `deploy/pterodactyl/start.mjs`. Keep the existing runtime files from step 1.
    Do not upload the dashboard monorepo or Windows `node_modules`.
 3. Select the Node.js 24 image, for example
@@ -40,6 +40,18 @@ and port alone do not establish the protocol, server identity, or availability.
    the launcher installs the locked production dependencies with `npm ci`.
    It preserves `app.yml`, `.env`, and `data/`, then starts `dist/index.js`
    from this bot's directory. Allow the first install to finish.
+
+If the Pterodactyl server contains the dashboard repository with a `vg-music-bot/`
+subfolder, use `node vg-music-bot/deploy/pterodactyl/start.mjs` instead. The music
+bot's `app.yml`, private `.env`, and data must be in that same subfolder. The
+launcher resolves its own bot directory even when started from the repository root.
+
+For a source checkout, upload or pull the current source, including `scripts/`.
+The launcher compares the source fingerprint with `dist/build-info.json`. It
+installs build dependencies and rebuilds changed or missing compiled code before
+starting. A failed build stops startup instead of silently running the old files.
+A package without source must include the current prebuilt `dist/build-info.json`.
+The console and authenticated `/v1/info` endpoint report the compiled build ID.
 
 The optional `deploy/pterodactyl/egg-vg-music-bot.json` is a minimal importable
 egg for this upload workflow. Its install step creates no application files:
@@ -94,3 +106,15 @@ npm run build
 Launcher tests do not install dependencies, start the Discord client, or contact
 Pterodactyl/Vercel. They cover allocation validation, shared HTTP token normalization,
 working-directory checks, and dependency reuse across package/platform changes.
+
+## Reported failures
+
+Repeated close code 4000 messages mean the provider is rejecting connections;
+a WebSocket opening is not proof that Lavalink is ready. The bot now applies a
+cooldown and waits for a ready session before using a reviewed USA node. Playback
+commands report unavailable nodes instead of leaving rejected promises unhandled.
+
+A dashboard 503 is a separate API failure. Read its response message: missing
+Vercel settings require the production `VG_MUSIC_BOT_URL` and shared token;
+timeouts mean the configured upstream did not answer; an explicit no-healthy-USA
+message means the bot is reachable but cannot currently play audio.

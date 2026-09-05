@@ -4,9 +4,10 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { readBuildInfo, runtimeBuildPlan, sourceFingerprint } from '../../scripts/build-info.mjs'
 
 const botDirectory = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
-const requiredFiles = ['app.yml', 'package.json', 'package-lock.json', 'dist/index.js']
+const requiredFiles = ['app.yml', 'package.json', 'package-lock.json']
 const corePackages = ['discord.js', 'rainlink', 'fastify']
 
 export function startupConfiguration(env, nodeVersion = process.versions.node) {
@@ -42,6 +43,14 @@ export function validateRuntimeFiles(directory, fileExists = existsSync) {
         `Missing ${file}. Upload the prebuilt vg-music-bot package and retain your existing app.yml, .env, and data directory.`
       )
     }
+  }
+  if (
+    !fileExists(resolve(directory, 'dist/index.js')) &&
+    !fileExists(resolve(directory, 'src/index.ts'))
+  ) {
+    throw new Error(
+      'Missing dist/index.js and src/index.ts. Upload the complete music bot package.'
+    )
   }
 }
 
@@ -85,13 +94,21 @@ async function main() {
   if (existsSync(envFile)) process.loadEnvFile(envFile)
   const env = startupConfiguration(process.env)
   validateRuntimeFiles(botDirectory)
+  const hasSource = existsSync(resolve(botDirectory, 'src/index.ts'))
+  const plan = runtimeBuildPlan({
+    hasSource,
+    hasCompiled: existsSync(resolve(botDirectory, 'dist/index.js')),
+    buildInfo: readBuildInfo(botDirectory),
+    sourceHash: hasSource ? sourceFingerprint(botDirectory) : null,
+  })
 
   const lock = readFileSync(resolve(botDirectory, 'package-lock.json'), 'utf8')
   const expectedStamp = dependencyStamp(lock)
   const stampFile = resolve(botDirectory, 'node_modules/.vg-music-bot-pterodactyl')
   const installedStamp = existsSync(stampFile) ? readFileSync(stampFile, 'utf8').trim() : ''
   const requireFromBot = createRequire(resolve(botDirectory, 'package.json'))
-  const packagesPresent = corePackages.every((name) => {
+  const requiredPackages = plan === 'build' ? [...corePackages, 'typescript'] : corePackages
+  const packagesPresent = requiredPackages.every((name) => {
     try {
       requireFromBot.resolve(name)
       return true
@@ -104,11 +121,29 @@ async function main() {
     console.log(
       '[music-bot] Installing locked production dependencies; runtime configuration and data are preserved.'
     )
-    const exitCode = await runChild('npm', ['ci', '--omit=dev', '--no-audit', '--no-fund'], env)
+    const exitCode = await runChild(
+      'npm',
+      ['ci', plan === 'build' ? '--include=dev' : '--omit=dev', '--no-audit', '--no-fund'],
+      env
+    )
     if (exitCode !== 0) return exitCode
     writeFileSync(stampFile, expectedStamp)
   }
 
+  if (plan === 'build') {
+    console.log('[music-bot] Source changed or dist is missing; building the updated music bot.')
+    const exitCode = await runChild(process.execPath, ['scripts/compile.mjs'], env)
+    if (exitCode !== 0) return exitCode
+  }
+  const build = readBuildInfo(botDirectory)
+  if (!build || (hasSource && build.sourceHash !== sourceFingerprint(botDirectory))) {
+    throw new Error(
+      'The compiled music bot does not match the current source. Build failed or source changed during startup.'
+    )
+  }
+  console.log(
+    `[music-bot] Build ${build.sourceHash.slice(0, 12)}; revision ${build.revision ?? 'unknown'}${build.dirty ? ' (local changes)' : ''}`
+  )
   console.log(`[music-bot] Starting vg-music-bot API on 0.0.0.0:${env.VG_MUSIC_BOT_PORT}`)
   return runChild(process.execPath, ['--no-deprecation', './dist/index.js'], env)
 }

@@ -79,3 +79,13 @@ test('dependency reuse is invalidated by a new lockfile, OS, architecture, or No
   assert.notEqual(stamp, dependencyStamp('lock-one', 'linux', 'arm64', '24.0.0'))
   assert.notEqual(stamp, dependencyStamp('lock-one', 'linux', 'x64', '22.0.0'))
 })
+
+test('source checkout without dist can build instead of requiring an old uploaded dist', () => {
+  const directory = resolve('source-bot')
+  const files = new Set(
+    ['app.yml', 'package.json', 'package-lock.json', 'src/index.ts'].map((file) =>
+      resolve(directory, file)
+    )
+  )
+  validateRuntimeFiles(directory, (file) => files.has(file))
+})
