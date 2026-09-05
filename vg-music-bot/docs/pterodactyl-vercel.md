@@ -58,6 +58,40 @@ egg for this upload workflow. Its install step creates no application files:
 upload the prebuilt package and existing private configuration before starting.
 It does not install the separate moderation bot or dashboard backend.
 
+## Recover a checkout blocked by local configuration
+
+For a monorepo checkout, a Startup command such as
+`git pull origin main && bash deploy/pterodactyl/entrypoint.sh` can stop before
+launch when local lockfiles or `vg-music-bot/app.yml` differ from Git. That
+entrypoint starts the separate bot/backend stack. This music bot uses the
+launcher inside `vg-music-bot/`.
+
+Set Pterodactyl **Startup** to this complete line and start once. It fetches the
+recovery helper without merging over the private configuration, then updates
+and starts the music bot:
+
+```sh
+git fetch origin main && music_update=$(mktemp --suffix=.mjs) && git show FETCH_HEAD:vg-music-bot/deploy/pterodactyl/update.mjs > "$music_update" && node "$music_update" && exec node vg-music-bot/deploy/pterodactyl/start.mjs
+```
+
+After that first successful update, the permanent Startup command is:
+
+```sh
+node vg-music-bot/deploy/pterodactyl/update.mjs && exec node vg-music-bot/deploy/pterodactyl/start.mjs
+```
+
+The updater requires `main` and a fast-forward update. It stops before changing
+files if there are staged changes or unrelated tracked edits. It backs up
+`vg-music-bot/app.yml` and modified root/music-bot lockfiles in a private
+`.git/music-runtime-backups/update-*` directory, printing that directory's
+path. A successful update uses the repository lockfiles and restores the exact
+private `app.yml`; a failed merge restores the backed-up lockfile edits too.
+It never resets the repository or reapplies the old lockfiles over a successful
+update. Untracked `.env` and `data/` stay in place. Backups are retained.
+
+Keep `VG_MUSIC_BOT_TOKEN` configured in Pterodactyl with the same shared API
+token as Vercel. This updater does not change tokens or deploy Vercel.
+
 ## Connect Vercel
 
 Set these in the Vercel project's **Production** environment:

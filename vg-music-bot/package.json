@@ -20,7 +20,7 @@
     "dev": "npx nodemon ./src/index.ts",
     "build:prettier": "npx prettier -w ./src",
     "start:pm2": "npx pm2-runtime start ecosystem.config.cjs --env production",
-    "test": "node --import tsx --test tests/*.test.ts scripts/build-info.test.mjs deploy/pterodactyl/start.test.mjs"
+    "test": "node --import tsx --test tests/*.test.ts scripts/build-info.test.mjs deploy/pterodactyl/*.test.mjs"
   },
   "repository": {
     "type": "git",
