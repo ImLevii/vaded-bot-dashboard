@@ -1,4 +1,5 @@
-import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js'
+import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
+import { ApplicationCommandOptionType } from 'discord.js'
 import { Manager } from '../../manager.js'
 import { AutoReconnectBuilderService } from '../../services/AutoReconnectBuilderService.js'
 import { Accessableby, Command } from '../../structures/Command.js'

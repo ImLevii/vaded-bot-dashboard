@@ -1,8 +1,8 @@
+import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
 import {
   ApplicationCommandOptionType,
   AutocompleteInteraction,
   CommandInteraction,
-  EmbedBuilder,
 } from 'discord.js'
 import { Manager } from '../../manager.js'
 import { Accessableby, Command } from '../../structures/Command.js'

@@ -1,5 +1,7 @@
+import { MusicEmbed as EmbedBuilder } from '../utilities/MusicEmbed.js'
+import { artwork, metadata, requester, isLive, limitLines } from '../utilities/MusicFormatting.js'
 import { Manager } from '../manager.js'
-import { EmbedBuilder, TextChannel } from 'discord.js'
+import { TextChannel } from 'discord.js'
 import { formatDuration } from '../utilities/FormatDuration.js'
 import { RainlinkPlayer } from 'rainlink'
 import { getTitle } from '../utilities/GetTitle.js'
@@ -14,6 +16,7 @@ export class ChannelUpdater {
 
   async loader(client: Manager) {
     client.UpdateQueueMsg = async function (player: RainlinkPlayer) {
+      if (!player.queue.current) return client.UpdateMusic(player)
       let data = await client.db.setup.get(`${player.guildId}`)
       if (!data) return
       if (data.enable === false) return
@@ -38,9 +41,9 @@ export class ChannelUpdater {
         (song, i) =>
           `${client.i18n.get(language, 'event.setup', 'setup_content_queue', {
             index: `${i + 1}`,
-            title: song.title,
-            duration: formatDuration(song.duration),
-            request: `${song.requester}`,
+            title: metadata(song.title, 'Unknown', 100),
+            duration: formatDuration(song.duration, isLive(song)),
+            request: requester(song.requester),
           })}`
       )
 
@@ -61,18 +64,12 @@ export class ChannelUpdater {
         .setDescription(
           `${client.i18n.get(language, 'event.setup', 'setup_desc', {
             title: getTitle(client, cSong!),
-            duration: formatDuration(cSong!.duration),
-            request: `${cSong!.requester}`,
+            duration: formatDuration(cSong!.duration, isLive(cSong!)),
+            request: requester(cSong!.requester),
           })}`
         ) // [${cSong.title}](${cSong.uri}) \`[${formatDuration(cSong.duration)}]\` • ${cSong.requester}
         .setColor(client.color)
-        .setImage(
-          `${
-            cSong!.artworkUrl
-              ? cSong!.artworkUrl
-              : `https://cdn.discordapp.com/avatars/${client.user!.id}/${client.user!.avatar}.jpeg?size=300`
-          }`
-        )
+        .setImage(artwork(cSong!, client.user?.displayAvatarURL()))
         .setFooter({
           text: `${client.i18n.get(language, 'event.setup', 'setup_footer', {
             volume: `${player.volume}`,
@@ -86,7 +83,10 @@ export class ChannelUpdater {
 
       return await playMsg
         .edit({
-          content: player.queue.current && player.queue.size == 0 ? ' ' : queueString,
+          content:
+            player.queue.current && player.queue.size == 0
+              ? ' '
+              : limitLines(queueString.split('\n'), 2000),
           embeds: [embed],
           components: [
             filterSelect(client, false),
@@ -128,9 +128,7 @@ export class ChannelUpdater {
         .setAuthor({
           name: `${client.i18n.get(language, 'event.setup', 'setup_playembed_author')}`,
         })
-        .setImage(
-          `https://cdn.discordapp.com/avatars/${client.user!.id}/${client.user!.avatar}.jpeg?size=300`
-        )
+        .setImage(client.user!.displayAvatarURL({ size: 256 }))
 
       return await playMsg
         .edit({

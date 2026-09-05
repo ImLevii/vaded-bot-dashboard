@@ -1,5 +1,7 @@
+import { requester } from '../../utilities/MusicFormatting.js'
+import { getTitle } from '../../utilities/GetTitle.js'
+import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
 import {
-  EmbedBuilder,
   ApplicationCommandOptionType,
   CommandInteraction,
   AutocompleteInteraction,
@@ -207,14 +209,11 @@ export default class implements Command {
     tracks: RainlinkTrack[],
     value?: string
   ): string {
-    if (client.config.player.AVOID_SUSPEND) return tracks[0].title
-    else {
-      if (type === 'PLAYLIST') {
-        return `[${tracks[0].title}](${value})`
-      } else {
-        return `[${tracks[0].title}](${tracks[0].uri})`
-      }
-    }
+    const track = tracks[0]
+    return getTitle(
+      client,
+      type === 'PLAYLIST' && value ? { title: track?.title, uri: value } : track
+    )
   }
 
   // Autocomplete function

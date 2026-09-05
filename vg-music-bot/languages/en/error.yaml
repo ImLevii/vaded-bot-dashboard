@@ -2,7 +2,7 @@
 number_invalid: '`⚠️` | Please provide a valid number!'
 
 # Execute when invalid
-no_node: '`⚠️` | No Lavalink server was found. Please try again after **5 Minutes**!'
+no_node: '`⚠️` | No healthy USA Lavalink servers available. Please try again later.'
 
 # No song is currently playing!
 no_player: '`⚠️` | No song is currently playing!'

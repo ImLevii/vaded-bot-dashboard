@@ -7,7 +7,7 @@ import { PlayerLoader } from './loadSetup.js'
 
 export class initHandler {
   constructor(client: Manager) {
-    if (client.config.utilities.AUTOFIX_LAVALINK.enable) new Checker(client)
+    new Checker(client)
     new PlayerEventLoader(client)
     new ClientEventsLoader(client)
     new PlayerLoader(client)

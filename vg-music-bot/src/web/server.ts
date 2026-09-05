@@ -7,11 +7,15 @@ import { LavalinkRoute } from './lavalink.js'
 import { getSearch } from './route/getSearch.js'
 import { getCommands } from './route/getCommands.js'
 import http from 'node:http'
+import { getServiceInfo } from './route/getServiceInfo.js'
 
 export class WebServer {
   app: Fastify.FastifyInstance
   server: http.Server
-  constructor(private client: Manager) {
+  constructor(
+    private client: Manager,
+    listen = true
+  ) {
     this.app = Fastify({
       logger: false,
       serverFactory: (handler, opts) => {
@@ -64,6 +68,7 @@ export class WebServer {
           },
           { prefix: 'lavalink' }
         )
+        fastify.get('/info', (_req, res) => res.send(getServiceInfo(client)))
         fastify.get('/search', (req, res) => getSearch(client, req, res))
         fastify.get('/commands', (req, res) => getCommands(client, req, res))
         done()
@@ -87,11 +92,15 @@ export class WebServer {
       reply.send({ byteblaze: response[Math.floor(Math.random() * response.length)] })
     })
 
-    const port = this.client.config.utilities.WEB_SERVER.port
+    if (listen)
+      void this.listen().catch((error) => {
+        this.client.logger.error(WebServer.name, error)
+      })
+  }
 
-    this.app.ready(() => {
-      this.server.listen({ port })
-      this.client.logger.info(WebServer.name, `Server running at port ${port}`)
-    })
+  async listen() {
+    const { port, host } = this.client.config.utilities.WEB_SERVER
+    await this.app.listen({ port, host })
+    this.client.logger.info(WebServer.name, `Server running at port ${port}`)
   }
 }

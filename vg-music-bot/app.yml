@@ -70,15 +70,19 @@ player:
       # | Lavalink | v3.0.0 - v3.7.x  | lavalink/v3/koto  |
       # | Nodelink | v2.0.0 - v2.x.x  | lavalink/v3/koto  |
       driver: 'lavalink@4'
-    - host: lava-v4.millhost.my.id
+    # Replaced free-lava.heavencloud.in (connect ETIMEDOUT) and
+    # lava-v4.millhost.my.id (typo'd host, NXDOMAIN) with a node verified
+    # end-to-end (real /v4/loadtracks response, not just a TCP handshake)
+    # against the live list at https://lavalink-list.ajieblogs.eu.org/All
+    # on 2026-09-03. lavalink.jirayu.net was tried and dropped: its TLS
+    # front door answers but proxies to a dead backend that times out on
+    # every real request — every other free node from that list was either
+    # unreachable or REST-broken too, so this list is intentionally short.
+    # AUTOFIX_LAVALINK below covers future outages dynamically.
+    - host: lava-v4.millohost.my.id
       port: 443
       auth: "https://discord.gg/mjS5J2K3ep"
       secure: true
-      driver: 'lavalink@4'
-    - host: free-lava.heavencloud.in
-      port: 4000
-      auth: "heavencloud.in"
-      secure: false
       driver: 'lavalink@4'
 utilities:
   # Enable debug tools for execute code from bot
@@ -98,11 +102,11 @@ utilities:
   AUTO_RESUME: false
 
   # Fix the Lavalink server when the current is down
-  # Disabled: falling back to random public/community nodes is unreliable
-  # (they go down without notice, e.g. connect ETIMEDOUT). Instead the bot
-  # will just keep retrying the nodes configured in player.NODES above.
+  # Discovers Lavalink v4 nodes through the JSON API and admits only reviewed
+  # USA endpoints after a REST health check and confirmed Rainlink connection.
+  # Non-US and unknown-location configured nodes are ignored. No global fallback.
   AUTOFIX_LAVALINK:
-    enable: false
+    enable: true
     retryCount: 10
     retryTimeout: 3000
 

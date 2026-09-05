@@ -1,3 +1,4 @@
+import { stopNowPlaying } from '../../utilities/NowPlayingSession.js'
 import { TextChannel } from 'discord.js'
 import { Manager } from '../../manager.js'
 import { AutoReconnectBuilderService } from '../../services/AutoReconnectBuilderService.js'
@@ -6,6 +7,7 @@ import { RainlinkPlayer, RainlinkPlayerState } from 'rainlink'
 
 export default class {
   async execute(client: Manager, player: RainlinkPlayer) {
+    stopNowPlaying(client, player.guildId)
     if (!client.isDatabaseConnected)
       return client.logger.warn(
         'DatabaseService',

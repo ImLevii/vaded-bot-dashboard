@@ -1,11 +1,7 @@
+import { requester } from '../utilities/MusicFormatting.js'
+import { MusicEmbed as EmbedBuilder } from '../utilities/MusicEmbed.js'
 import { Manager } from '../manager.js'
-import {
-  EmbedBuilder,
-  Message,
-  GuildMember,
-  TextChannel,
-  StringSelectMenuInteraction,
-} from 'discord.js'
+import { Message, GuildMember, TextChannel, StringSelectMenuInteraction } from 'discord.js'
 import { GlobalInteraction } from '../@types/Interaction.js'
 import { RateLimitManager } from '@sapphire/ratelimits'
 import { convertTime } from '../utilities/ConvertTime.js'
@@ -336,7 +332,7 @@ export class ChannelHandler {
             title: getTitle(this.client, result.tracks[0]),
             duration: convertTime(TotalDuration),
             songs: `${result.tracks.length}`,
-            request: `${result.tracks[0].requester}`,
+            request: requester(result.tracks[0].requester),
           })}`
         )
         .setColor(this.client.color)
@@ -347,7 +343,7 @@ export class ChannelHandler {
           `${this.client.i18n.get(language, 'event.setup', 'play_track', {
             title: getTitle(this.client, result.tracks[0]),
             duration: convertTime(result.tracks[0].duration as number),
-            request: `${result.tracks[0].requester}`,
+            request: requester(result.tracks[0].requester),
           })}`
         )
         .setColor(this.client.color)
@@ -357,7 +353,7 @@ export class ChannelHandler {
         `${this.client.i18n.get(language, 'event.setup', 'play_result', {
           title: getTitle(this.client, result.tracks[0]),
           duration: convertTime(result.tracks[0].duration as number),
-          request: `${result.tracks[0].requester}`,
+          request: requester(result.tracks[0].requester),
         })}`
       )
       msg?.reply({ content: ' ', embeds: [embed] })

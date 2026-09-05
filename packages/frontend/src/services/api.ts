@@ -72,6 +72,14 @@ interface BackendGuild {
     canManageRbac?: boolean
 }
 
+export interface MusicBotServiceInfo {
+    service: 'vg-music-bot'
+    bot: { id: string | null; username: string | null; ready: boolean }
+    capabilities: { musicEmbeds: number; lavalinkRegion: 'US' }
+    healthyNodes: number
+    revision: string | null
+}
+
 export interface LavalinkNodeInfo {
     name: string
     host: string
@@ -120,7 +128,8 @@ apiClient.interceptors.response.use(
 
         const status: number = error.response.status
         const data = error.response.data as
-            { error?: string; details?: unknown } | undefined
+            | { error?: string; details?: unknown }
+            | undefined
         const message = data?.error || error.message || 'An error occurred'
 
         if (
@@ -347,6 +356,8 @@ export const api = {
                 }>
             }>('/admin/guilds'),
         lavalink: {
+            getService: () =>
+                apiClient.get<MusicBotServiceInfo>('/admin/lavalink/service'),
             getNodes: () =>
                 apiClient.get<LavalinkNodeInfo[]>('/admin/lavalink/nodes'),
             addNode: (node: {

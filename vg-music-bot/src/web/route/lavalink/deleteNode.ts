@@ -1,3 +1,4 @@
+import { removeNode } from '../../../autofix/NodeConnection.js'
 import { Manager } from '../../../manager.js'
 import Fastify from 'fastify'
 
@@ -24,7 +25,7 @@ export async function deleteNode(
     if (player.node.options.name === name) player.destroy().catch(() => {})
   })
 
-  client.rainlink.nodes.remove(name)
+  removeNode(client, name)
 
   res.send({ name })
 }

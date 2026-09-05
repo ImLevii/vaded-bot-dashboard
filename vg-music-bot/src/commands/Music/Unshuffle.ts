@@ -1,4 +1,6 @@
-import { EmbedBuilder, User } from 'discord.js'
+import { artwork, requester } from '../../utilities/MusicFormatting.js'
+import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
+import { User } from 'discord.js'
 import { Manager } from '../../manager.js'
 import { Accessableby, Command } from '../../structures/Command.js'
 import { CommandHandler } from '../../structures/CommandHandler.js'
@@ -31,9 +33,8 @@ export default class implements Command {
 
     const song = newQueue.current
 
-    const qduration = `${formatDuration(song!.duration + player.queue.duration)}`
-    const thumbnail =
-      song!.artworkUrl ?? `https://img.youtube.com/vi/${song!.identifier}/hqdefault.jpg`
+    const qduration = `${formatDuration((song?.duration || 0) + player.queue.duration)}`
+    const thumbnail = artwork(song!, client.user?.displayAvatarURL())
 
     let pagesNum = Math.ceil(newQueue.length / 10)
     if (pagesNum === 0) pagesNum = 1
@@ -59,8 +60,8 @@ export default class implements Command {
         .setDescription(
           `${client.i18n.get(handler.language, 'command.music', 'queue_description', {
             title: getTitle(client, song!),
-            request: String(song!.requester),
-            duration: formatDuration(song!.duration),
+            request: requester(song?.requester),
+            duration: formatDuration(song?.duration),
             rest: str == '' ? '  Nothing' : '\n' + str,
           })}`
         )

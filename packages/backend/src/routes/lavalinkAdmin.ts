@@ -24,6 +24,18 @@ async function relay(
 }
 
 export function setupLavalinkAdminRoutes(app: Express): void {
+    // Uses the same configured upstream as every music/player request.
+    app.get(
+        '/api/admin/lavalink/service',
+        requireAuth,
+        requireAdmin,
+        asyncHandler(
+            async (_req: AuthenticatedRequest, res: ExpressResponse) => {
+                await relay(res, '/v1/info')
+            },
+        ),
+    )
+
     app.get(
         '/api/admin/lavalink/nodes',
         requireAuth,

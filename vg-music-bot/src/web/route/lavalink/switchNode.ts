@@ -1,3 +1,4 @@
+import { isUsNode } from '../../../autofix/UsNodeRegistry.js'
 import util from 'node:util'
 import { Manager } from '../../../manager.js'
 import Fastify from 'fastify'
@@ -22,7 +23,12 @@ export async function switchNode(
   }
 
   const targetNode = client.rainlink.nodes.get(targetNodeName)
-  if (!targetNode || !targetNode.online) {
+  if (
+    !targetNode ||
+    !targetNode.online ||
+    !isUsNode(targetNode.options) ||
+    !client.lavalinkUsing.some((node) => node.name === targetNodeName)
+  ) {
     res.code(400)
     res.send({ error: 'Target node not found or not online' })
     return

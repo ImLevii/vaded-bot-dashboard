@@ -1,5 +1,6 @@
+import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
 import { Manager } from '../../manager.js'
-import { EmbedBuilder, TextChannel } from 'discord.js'
+import { TextChannel } from 'discord.js'
 import util from 'node:util'
 import { AutoReconnectBuilderService } from '../../services/AutoReconnectBuilderService.js'
 import { ClearMessageService } from '../../services/ClearMessageService.js'

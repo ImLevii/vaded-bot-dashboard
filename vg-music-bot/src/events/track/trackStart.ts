@@ -1,6 +1,8 @@
+import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
+import { artwork, metadata, requester, isLive } from '../../utilities/MusicFormatting.js'
 import { Manager } from '../../manager.js'
 import { ComponentType, TextChannel } from 'discord.js'
-import { EmbedBuilder } from 'discord.js'
+
 import { formatDuration } from '../../utilities/FormatDuration.js'
 import { filterSelect, playerRowOne, playerRowTwo } from '../../utilities/PlayerControlButton.js'
 import { AutoReconnectBuilderService } from '../../services/AutoReconnectBuilderService.js'
@@ -104,6 +106,7 @@ export default class {
     const language = guildModel
 
     const song = player.queue.current
+    if (!song) return
 
     if (SongNoti == SongNotiEnum.Disable) return
 
@@ -116,24 +119,22 @@ export default class {
       .addFields([
         {
           name: `${client.i18n.get(language, 'event.player', 'author_title')}`,
-          value: `${song!.author}`,
+          value: metadata(song.author),
           inline: true,
         },
         {
           name: `${client.i18n.get(language, 'event.player', 'duration_title')}`,
-          value: `${formatDuration(song!.duration)}`,
+          value: `${formatDuration(song.duration, isLive(song))}`,
           inline: true,
         },
         {
           name: `${client.i18n.get(language, 'event.player', 'request_title')}`,
-          value: `${song!.requester}`,
+          value: requester(song.requester),
           inline: true,
         },
       ])
       .setColor(client.color)
-      .setThumbnail(
-        track.artworkUrl ?? `https://img.youtube.com/vi/${track.identifier}/hqdefault.jpg`
-      )
+      .setThumbnail(artwork(track, client.user?.displayAvatarURL()))
 
     const playing_channel = (await client.channels
       .fetch(player.textId)

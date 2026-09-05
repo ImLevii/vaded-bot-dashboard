@@ -1,4 +1,6 @@
-import { EmbedBuilder, ApplicationCommandOptionType, Message } from 'discord.js'
+import { getTitle } from '../../utilities/GetTitle.js'
+import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
+import { ApplicationCommandOptionType, Message } from 'discord.js'
 import { formatDuration } from '../../utilities/FormatDuration.js'
 import { PageQueue } from '../../structures/PageQueue.js'
 import { Manager } from '../../manager.js'
@@ -176,9 +178,6 @@ export default class implements Command {
   }
 
   getTitle(client: Manager, tracks: PlaylistTrack): string {
-    if (client.config.player.AVOID_SUSPEND) return String(tracks.title)
-    else {
-      return `[${tracks.title}](${tracks.uri})`
-    }
+    return getTitle(client, tracks)
   }
 }

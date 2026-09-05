@@ -1,4 +1,5 @@
-import util from 'node:util'
+import { isUsNode } from '../../../autofix/UsNodeRegistry.js'
+import { connectUsNode } from '../../../autofix/NodeConnection.js'
 import { Manager } from '../../../manager.js'
 import Fastify from 'fastify'
 
@@ -16,14 +17,23 @@ export async function postNode(
   req: Fastify.FastifyRequest,
   res: Fastify.FastifyReply
 ) {
-  client.logger.info(
-    'LavalinkNodesRouterService',
-    `${req.method} ${req.routeOptions.url} payload=${req.body ? util.inspect(req.body) : '{}'}`
-  )
+  client.logger.info('LavalinkNodesRouterService', `${req.method} ${req.routeOptions.url}`)
 
   const data = req.body as Partial<PostNodeBody>
 
-  if (!data || !data.name || !data.host || !data.port || !data.auth) {
+  if (
+    !data ||
+    typeof data.name !== 'string' ||
+    !data.name.trim() ||
+    typeof data.host !== 'string' ||
+    !data.host ||
+    typeof data.auth !== 'string' ||
+    !data.auth ||
+    !Number.isInteger(Number(data.port)) ||
+    Number(data.port) < 1 ||
+    Number(data.port) > 65535 ||
+    (data.secure !== undefined && typeof data.secure !== 'boolean')
+  ) {
     res.code(400)
     res.send({ error: 'Missing required key (name, host, port, auth)' })
     return
@@ -35,14 +45,30 @@ export async function postNode(
     return
   }
 
-  const node = client.rainlink.nodes.add({
-    name: data.name,
-    host: data.host,
+  const candidate = {
+    name: data.name.trim(),
+    host: data.host.toLowerCase(),
     port: Number(data.port),
-    auth: data.auth,
+    pass: data.auth,
     secure: Boolean(data.secure),
-    driver: data.driver,
-  })
+    online: false,
+  }
+  if (!isUsNode(candidate) || (data.driver && data.driver !== 'lavalink@4')) {
+    return res.code(400).send({ error: 'Only reviewed USA Lavalink v4 endpoints are allowed' })
+  }
+  if (!(await connectUsNode(client, candidate))) {
+    return res.code(503).send({ error: 'USA node could not be connected' })
+  }
+  const node = client.rainlink.nodes
+    .all()
+    .find(
+      (node) =>
+        node.options.host === candidate.host &&
+        node.options.port === candidate.port &&
+        Boolean(node.options.secure) === candidate.secure
+    )!
+  if (!node)
+    return res.code(503).send({ error: 'USA node disconnected before registration completed' })
 
   res.send({
     name: node.options.name,

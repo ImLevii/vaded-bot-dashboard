@@ -14,7 +14,11 @@ import Button from '@/components/ui/Button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
-import { api, type LavalinkNodeInfo } from '@/services/api'
+import {
+    api,
+    type LavalinkNodeInfo,
+    type MusicBotServiceInfo,
+} from '@/services/api'
 
 const POLL_INTERVAL_MS = 5000
 
@@ -148,7 +152,7 @@ function AddNodeForm({
                     name: name.trim(),
                     host: host.trim(),
                     port: Number(port),
-                    auth: auth.trim(),
+                    auth,
                     secure,
                 })
                 setName('')
@@ -176,6 +180,7 @@ function AddNodeForm({
             />
             <Input
                 placeholder='Password'
+                type='password'
                 value={auth}
                 onChange={(e) => setAuth(e.target.value)}
             />
@@ -203,16 +208,38 @@ function AddNodeForm({
 
 export default function LavalinkNodesSection() {
     const [nodes, setNodes] = useState<LavalinkNodeInfo[]>([])
+    const [service, setService] = useState<MusicBotServiceInfo | null>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [adding, setAdding] = useState(false)
     const [removingName, setRemovingName] = useState<string | null>(null)
 
-    const load = useCallback(() => {
-        return api.admin.lavalink
-            .getNodes()
-            .then((res) => setNodes(res.data))
-            .catch(() => setError('Failed to load Lavalink nodes.'))
+    const load = useCallback(async () => {
+        try {
+            const [nodeResponse, serviceResponse] = await Promise.all([
+                api.admin.lavalink.getNodes(),
+                api.admin.lavalink.getService(),
+            ])
+            const info = serviceResponse.data
+            if (
+                info?.service !== 'vg-music-bot' ||
+                info.capabilities?.lavalinkRegion !== 'US' ||
+                !(info.capabilities?.musicEmbeds >= 1)
+            ) {
+                throw new Error(
+                    'The configured music bot needs the dashboard update.',
+                )
+            }
+            setNodes(nodeResponse.data)
+            setService(info)
+            setError(null)
+        } catch {
+            setNodes([])
+            setService(null)
+            setError(
+                'Could not verify the updated music bot. Check the deployed music bot and dashboard connection.',
+            )
+        }
     }, [])
 
     useEffect(() => {
@@ -282,6 +309,18 @@ export default function LavalinkNodesSection() {
                 )}
             </div>
 
+            {service && (
+                <p className='mb-4 text-sm text-vaded-text-secondary'>
+                    Music bot: {service.bot.username ?? 'Connecting'}
+                    {service.bot.id ? ` (${service.bot.id})` : ''}
+                    {' · '}
+                    {service.bot.ready
+                        ? 'Connected to Discord'
+                        : 'Connecting to Discord'}
+                    {' · USA Lavalink only'}
+                </p>
+            )}
+
             {loading && (
                 <div className='space-y-2'>
                     {[1, 2, 3].map((i) => (
@@ -294,9 +333,14 @@ export default function LavalinkNodesSection() {
 
             {!loading && !error && (
                 <div className='space-y-4'>
+                    {nodes.length > 0 && !nodes.some((node) => node.online) && (
+                        <p className='text-sm text-vaded-text-secondary'>
+                            No healthy USA Lavalink servers available.
+                        </p>
+                    )}
                     {nodes.length === 0 ? (
                         <p className='text-sm text-vaded-text-secondary'>
-                            No Lavalink nodes configured.
+                            No healthy USA Lavalink servers available.
                         </p>
                     ) : (
                         <div className='space-y-2'>
