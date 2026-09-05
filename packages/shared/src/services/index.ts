@@ -3,11 +3,7 @@ export * from './PremiumService'
 export * from './database/DatabaseService.js'
 export { afkService, type AfkStatusEntry } from './AfkService.js'
 export {
-    MusicControlService,
-    musicControlService,
-    type MusicCommand,
     type MusicCommandResult,
-    type MusicCommandType,
     type RepeatMode,
     type QueueState,
     type TrackInfo as MusicTrackInfo,

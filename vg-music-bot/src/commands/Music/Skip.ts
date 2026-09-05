@@ -1,4 +1,5 @@
-import { EmbedBuilder, Message } from 'discord.js'
+import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
+import { Message } from 'discord.js'
 import { Manager } from '../../manager.js'
 import { Accessableby, Command } from '../../structures/Command.js'
 import { CommandHandler } from '../../structures/CommandHandler.js'

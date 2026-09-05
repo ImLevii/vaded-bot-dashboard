@@ -16,7 +16,7 @@ export class RainlinkInit {
   get init(): Rainlink {
     return new Rainlink({
       library: new Library.DiscordJS(this.client),
-      nodes: this.client.config.player.NODES,
+      nodes: [], // USA eligibility and REST health are checked after Discord is ready.
       plugins: this.plugins,
       options: this.client.config.utilities.AUTOFIX_LAVALINK.enable
         ? { ...this.defaultConfig, ...this.autofixConfig }

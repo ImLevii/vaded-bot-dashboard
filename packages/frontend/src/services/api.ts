@@ -72,6 +72,34 @@ interface BackendGuild {
     canManageRbac?: boolean
 }
 
+export interface MusicBotServiceInfo {
+    service: 'vg-music-bot'
+    bot: { id: string | null; username: string | null; ready: boolean }
+    capabilities: { musicEmbeds: number; lavalinkRegion: 'US' }
+    healthyNodes: number
+    revision: string | null
+}
+
+export interface LavalinkNodeInfo {
+    name: string
+    host: string
+    port: number
+    secure: boolean
+    driver: string | null
+    online: boolean
+    state: 'connected' | 'disconnected' | 'closed' | 'unknown'
+    stats: {
+        players: number
+        playingPlayers: number
+        uptime: number
+        memoryUsed: number
+        memoryReservable: number
+        cpuCores: number
+        cpuSystemLoad: number
+        cpuLavalinkLoad: number
+    } | null
+}
+
 const mapGuild = (backendGuild: BackendGuild): Guild => {
     const { hasBot, ...rest } = backendGuild
     return {
@@ -327,6 +355,30 @@ export const api = {
                     roleCount: number | null
                 }>
             }>('/admin/guilds'),
+        lavalink: {
+            getService: () =>
+                apiClient.get<MusicBotServiceInfo>('/admin/lavalink/service'),
+            getNodes: () =>
+                apiClient.get<LavalinkNodeInfo[]>('/admin/lavalink/nodes'),
+            addNode: (node: {
+                name: string
+                host: string
+                port: number
+                auth: string
+                secure: boolean
+                driver?: string
+            }) =>
+                apiClient.post<LavalinkNodeInfo>('/admin/lavalink/nodes', node),
+            removeNode: (name: string) =>
+                apiClient.delete<{ name: string }>(
+                    `/admin/lavalink/nodes/${encodeURIComponent(name)}`,
+                ),
+            switchNode: (name: string, guildId: string) =>
+                apiClient.post<{ guildId: string; node: string }>(
+                    `/admin/lavalink/nodes/${encodeURIComponent(name)}/switch`,
+                    { guildId },
+                ),
+        },
     },
 
     trackHistory: {

@@ -167,6 +167,8 @@ services:
                 condition: service_healthy
             redis:
                 condition: service_healthy
+            vg-music-bot:
+                condition: service_started
         environment:
             <<: *common-app-env
             SENTRY_SERVICE_NAME: ${SENTRY_SERVICE_NAME:-backend}
@@ -176,12 +178,45 @@ services:
             DEVELOPER_USER_IDS: ${DEVELOPER_USER_IDS:-}
             WEBAPP_FRONTEND_URL: ${WEBAPP_FRONTEND_URL:-}
             WEBAPP_BACKEND_URL: ${WEBAPP_BACKEND_URL:-}
+            # vg-music-bot's web API — Lavalink admin panel + music proxy
+            # (see src/routes/lavalinkAdmin.ts, src/routes/music/vgMusicBotState.ts)
+            VG_MUSIC_BOT_URL: http://vg-music-bot:8080
+            VG_MUSIC_BOT_TOKEN: ${VG_MUSIC_BOT_TOKEN:?VG_MUSIC_BOT_TOKEN_required}
         networks:
             - vaded-network
             # Shared monitoring network so the homelab Prometheus
             # container can scrape /metrics on the backend without
             # exposing it on the host. See homelab PR #135.
             - vaded-monitoring
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "3"
+                tag: "{{.Name}}"
+
+    vg-music-bot:
+        <<: *medium-svc
+        image: ${IMAGE_PREFIX:-ghcr.io/imlevii/vaded}-vg-music-bot:${IMAGE_TAG:-latest}
+        build:
+            context: ./vg-music-bot
+            dockerfile: Dockerfile
+        container_name: vaded-vg-music-bot
+        env_file:
+            - .env
+        environment:
+            NODE_ENV: ${NODE_ENV:-production}
+            # Separate Discord application from `bot` — do not reuse its token.
+            DISCORD_TOKEN: ${VG_MUSIC_BOT_DISCORD_TOKEN:?VG_MUSIC_BOT_DISCORD_TOKEN_required}
+            VG_MUSIC_BOT_TOKEN: ${VG_MUSIC_BOT_TOKEN:?VG_MUSIC_BOT_TOKEN_required}
+            DATABASE_URL: postgresql://discordbot:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD_required}@postgres:5432/discordbot
+        depends_on:
+            postgres:
+                condition: service_healthy
+        volumes:
+            - vg_music_bot_data:/app/data
+        networks:
+            - vaded-network
         logging:
             driver: "json-file"
             options:
@@ -297,6 +332,7 @@ services:
 volumes:
     postgres_data:
     redis_data:
+    vg_music_bot_data:
 
 networks:
     vaded-network:

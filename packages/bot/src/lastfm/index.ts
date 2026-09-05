@@ -20,7 +20,3 @@ export type {
     LastFmPeriod,
     LastFmTrackMetadata,
 } from './lastFmApi'
-export {
-    consumeLastFmSeedSlice,
-    consumeBlendedSeedSlice,
-} from '../utils/music/autoplay/lastFmExports'

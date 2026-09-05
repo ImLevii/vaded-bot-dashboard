@@ -236,22 +236,6 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 
 CMD ["node", "packages/backend/dist/index.js"]
 
-# Production stage — music relay (colocated with the bot, e.g. on
-# panel.vaded-hosting.com). Holds the long-lived Redis pub/sub bridge and SSE
-# client registry that the dashboard's music-control API needs and that
-# can't run as a Vercel serverless function (see musicRelayServer.ts). Same
-# image contents as production-backend — it's the same compiled dist, just a
-# different entrypoint/port — kept as a separate stage so it can be deployed
-# and scaled independently of the main backend.
-FROM production-backend AS production-music-relay
-
-EXPOSE 3100
-
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD node -e "require('http').get('http://127.0.0.1:3100/api/health', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))" || exit 1
-
-CMD ["node", "packages/backend/dist/musicRelayIndex.js"]
-
 # Production stage — all-in-one (bot + backend + frontend served by backend).
 FROM node:${NODE_VERSION} AS production-all-in-one
 WORKDIR /app

@@ -1,8 +1,10 @@
-import { EmbedBuilder } from 'discord.js'
+import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
+
 import { Manager } from '../../manager.js'
 import { Accessableby, Command } from '../../structures/Command.js'
 import { CommandHandler } from '../../structures/CommandHandler.js'
 import { RainlinkPlayer } from 'rainlink'
+import { incrementAutoplayCounter } from '../../db/postgres.js'
 
 // Main code
 export default class implements Command {
@@ -48,6 +50,10 @@ export default class implements Command {
       player.data.set('source', player.queue.current?.source)
       player.data.set('author', player.queue.current?.author)
       player.data.set('title', player.queue.current?.title)
+
+      incrementAutoplayCounter(handler.guild!.id).catch((err) =>
+        client.logger.error('GuildCounterService', err)
+      )
 
       const on = new EmbedBuilder()
         .setDescription(

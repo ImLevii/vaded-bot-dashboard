@@ -1,5 +1,6 @@
+import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
 import { Manager } from '../../manager.js'
-import { TextChannel, EmbedBuilder } from 'discord.js'
+import { TextChannel } from 'discord.js'
 import { AutoReconnectBuilderService } from '../../services/AutoReconnectBuilderService.js'
 import { ClearMessageService } from '../../services/ClearMessageService.js'
 import { RainlinkPlayer, RainlinkPlayerState } from 'rainlink'

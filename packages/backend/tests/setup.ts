@@ -242,7 +242,6 @@ jest.mock('@lucky/shared/services', () => ({
     autoMessageService: { getWelcomeMessage: jest.fn() },
     serverLogService: { createLog: jest.fn() },
     embedBuilderService: {},
-    musicControlService: {},
 }))
 
 jest.mock('@lucky/shared/utils', () => ({

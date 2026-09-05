@@ -57,7 +57,7 @@ jest.mock('../../../utils/general/responseEmbeds.js', () => ({
     }),
 }))
 
-jest.mock('../../../utils/music/buttonComponents.js', () => ({
+jest.mock('../../../utils/general/leaderboardButtons.js', () => ({
     createLeaderboardPaginationButtons: (current: number, total: number) => {
         return total > 1 ? { type: 'button_row' } : null
     },

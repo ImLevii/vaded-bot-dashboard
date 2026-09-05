@@ -1,9 +1,11 @@
-import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js'
+import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
+import { ApplicationCommandOptionType } from 'discord.js'
 import { Manager } from '../../manager.js'
 import { AutoReconnectBuilderService } from '../../services/AutoReconnectBuilderService.js'
 import { Accessableby, Command } from '../../structures/Command.js'
 import { CommandHandler } from '../../structures/CommandHandler.js'
 import { RainlinkLoopMode, RainlinkPlayer } from 'rainlink'
+import { incrementRepeatCounter } from '../../db/postgres.js'
 
 export default class implements Command {
   public name = ['loop']
@@ -107,6 +109,11 @@ export default class implements Command {
       guild: handler.guild!.id,
       mode: mode,
     })
+
+    if (mode !== 'none')
+      incrementRepeatCounter(handler.guild!.id).catch((err) =>
+        client.logger.error('GuildCounterService', err)
+      )
   }
 
   async setLoop247(client: Manager, player: RainlinkPlayer, loop: string) {

@@ -1,11 +1,11 @@
-import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js'
-import { formatDuration } from '../../utilities/FormatDuration.js'
+import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
+import { queueEmbeds } from '../../utilities/QueueEmbeds.js'
+import { ApplicationCommandOptionType } from 'discord.js'
 import { PageQueue } from '../../structures/PageQueue.js'
 import { Manager } from '../../manager.js'
 import { Accessableby, Command } from '../../structures/Command.js'
 import { CommandHandler } from '../../structures/CommandHandler.js'
-import { RainlinkPlayer, RainlinkTrack } from 'rainlink'
-import { getTitle } from '../../utilities/GetTitle.js'
+import { RainlinkPlayer } from 'rainlink'
 
 // Main code
 export default class implements Command {
@@ -45,53 +45,13 @@ export default class implements Command {
 
     const player = client.rainlink.players.get(handler.guild!.id) as RainlinkPlayer
 
-    const song = player.queue.current
-    const qduration = `${formatDuration(song!.duration + player.queue.duration)}`
-    const thumbnail =
-      song?.artworkUrl ?? `https://img.youtube.com/vi/${song!.identifier}/hqdefault.jpg`
-
-    let pagesNum = Math.ceil(player.queue.length / 10)
-    if (pagesNum === 0) pagesNum = 1
-
-    const songStrings = []
-    for (let i = 0; i < player.queue.length; i++) {
-      const song = player.queue[i]
-      songStrings.push(
-        `**${i + 1}.** ${getTitle(client, song)} \`[${formatDuration(song.duration)}]\``
-      )
-    }
-
-    const pages = []
-    for (let i = 0; i < pagesNum; i++) {
-      const str = songStrings.slice(i * 10, i * 10 + 10).join('\n')
-
-      const embed = new EmbedBuilder()
-        .setAuthor({
-          name: `${client.i18n.get(handler.language, 'command.music', 'queue_author', {
-            guild: handler.guild!.name,
-          })}`,
-        })
-        .setThumbnail(thumbnail)
-        .setColor(client.color)
-        .setDescription(
-          `${client.i18n.get(handler.language, 'command.music', 'queue_description', {
-            title: getTitle(client, song!),
-            request: String(song!.requester),
-            duration: formatDuration(song!.duration),
-            rest: str == '' ? '  Nothing' : '\n' + str,
-          })}`
-        )
-        .setFooter({
-          text: `${client.i18n.get(handler.language, 'command.music', 'queue_footer', {
-            page: String(i + 1),
-            pages: String(pagesNum),
-            queue_lang: String(player.queue.length),
-            duration: qduration,
-          })}`,
-        })
-
-      pages.push(embed)
-    }
+    const { pages, duration: qduration } = queueEmbeds(
+      client,
+      player,
+      handler.language,
+      handler.guild!.name
+    )
+    const pagesNum = pages.length
 
     if (!value) {
       if (pages.length == pagesNum && player.queue.length > 10) {
@@ -124,7 +84,7 @@ export default class implements Command {
               .setColor(client.color),
           ],
         })
-      if (Number(value) > pagesNum)
+      if (!Number.isInteger(Number(value)) || Number(value) < 1 || Number(value) > pagesNum)
         return handler.editReply({
           embeds: [
             new EmbedBuilder()
@@ -136,7 +96,7 @@ export default class implements Command {
               .setColor(client.color),
           ],
         })
-      const pageNum = Number(value) == 0 ? 1 : Number(value) - 1
+      const pageNum = Number(value) - 1
       return handler.editReply({ embeds: [pages[pageNum]] })
     }
   }

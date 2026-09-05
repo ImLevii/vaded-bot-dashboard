@@ -1,4 +1,5 @@
-import { EmbedBuilder, ApplicationCommandOptionType, ChannelType } from 'discord.js'
+import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
+import { ApplicationCommandOptionType, ChannelType } from 'discord.js'
 import { Manager } from '../../manager.js'
 import { Accessableby, Command } from '../../structures/Command.js'
 import { CommandHandler } from '../../structures/CommandHandler.js'
@@ -86,9 +87,7 @@ export default class implements Command {
         .setAuthor({
           name: `${client.i18n.get(handler.language, 'event.setup', 'setup_playembed_author')}`,
         })
-        .setImage(
-          `https://cdn.discordapp.com/avatars/${client.user!.id}/${client.user!.avatar}.jpeg?size=300`
-        )
+        .setImage(client.user!.displayAvatarURL({ size: 256 }))
 
       const channel_msg = await textChannel.send({
         content: `${queueMsg}`,

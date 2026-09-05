@@ -1,3 +1,5 @@
+import { metadata } from '../../utilities/MusicFormatting.js'
+import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
 import {
   ActionRowBuilder,
   ApplicationCommandOptionType,
@@ -5,7 +7,6 @@ import {
   ButtonBuilder,
   ButtonStyle,
   ComponentType,
-  EmbedBuilder,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
 } from 'discord.js'
@@ -346,8 +347,8 @@ export default class implements Command {
       const bitrate = st.bitrate !== '?' ? `📡 ${st.bitrate}k` : ''
       const meta = [bitrate, reliability].filter(Boolean).join('  ')
       return [
-        `\`${String(idx).padStart(2, ' ')}\`  **${st.name}**`,
-        st.subtext ? `\u00a0\u00a0\u00a0\u00a0*${st.subtext}*` : '',
+        `\`${String(idx).padStart(2, ' ')}\`  **${metadata(st.name)}**`,
+        st.subtext ? `\u00a0\u00a0\u00a0\u00a0*${metadata(st.subtext, '', 160)}*` : '',
         meta ? `\u00a0\u00a0\u00a0\u00a0${meta}` : '',
       ]
         .filter(Boolean)

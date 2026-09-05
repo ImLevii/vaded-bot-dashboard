@@ -7,24 +7,17 @@ const infoLogMock = jest.fn()
 const warnLogMock = jest.fn()
 const createClientMock = jest.fn()
 const startClientMock = jest.fn()
-const createPlayerMock = jest.fn()
 const getCommandsMock = jest.fn()
 const setCommandsMock = jest.fn()
 const getContextMenusMock = jest.fn()
 const setContextMenusMock = jest.fn()
 const handleEventsMock = jest.fn()
-const initProviderHealthMock = jest.fn()
 const redisClientConnectMock = jest.fn()
 const redisClientDisconnectMock = jest.fn()
-const musicWatchdogStartMock = jest.fn()
-const musicWatchdogStopMock = jest.fn()
-const musicWatchdogStopPeriodicScanMock = jest.fn()
 const startMetricsServerMock = jest.fn()
 const stopMetricsServerMock = jest.fn().mockResolvedValue(undefined)
-const setupWebMusicHandlerMock = jest.fn().mockResolvedValue(undefined)
 const setupGuildConfigRefreshMock = jest.fn().mockResolvedValue(undefined)
 const teardownGuildConfigRefreshMock = jest.fn().mockResolvedValue(undefined)
-const stopWebMusicHandlerMock = jest.fn()
 const birthdaySchedulerStopMock = jest.fn()
 const modDigestSchedulerStopMock = jest.fn()
 const aiDevToolkitStopMock = jest.fn()
@@ -48,12 +41,6 @@ jest.mock('../../handlers/clientHandler/service', () => ({
     stopPresenceRotation: jest.fn(),
 }))
 
-jest.mock('../../handlers/player', () => ({
-    createPlayerWithHandlers: (...args: unknown[]) => createPlayerMock(...args),
-    lastPlayedTracks: new Map(),
-    recentlyPlayedTracks: [],
-}))
-
 jest.mock('../../handlers/commandsHandler', () => ({
     setCommands: (...args: unknown[]) => setCommandsMock(...args),
     setContextMenus: (...args: unknown[]) => setContextMenusMock(...args),
@@ -75,28 +62,6 @@ jest.mock('../../workers/batchJobWorker', () => ({
 jest.mock('../../handlers/eventHandler', () => ({
     __esModule: true,
     default: (...args: unknown[]) => handleEventsMock(...args),
-}))
-
-jest.mock('../../utils/music/search/providerHealth', () => ({
-    initProviderHealth: (...args: unknown[]) => initProviderHealthMock(...args),
-}))
-
-jest.mock('../../utils/music/watchdog', () => ({
-    musicWatchdogService: {
-        startOrphanSessionMonitor: (...args: unknown[]) =>
-            musicWatchdogStartMock(...args),
-        stopOrphanSessionMonitor: (...args: unknown[]) =>
-            musicWatchdogStopMock(...args),
-        stopPeriodicScan: (...args: unknown[]) =>
-            musicWatchdogStopPeriodicScanMock(...args),
-    },
-}))
-
-jest.mock('../../handlers/webMusic', () => ({
-    setupWebMusicHandler: (...args: unknown[]) =>
-        setupWebMusicHandlerMock(...args),
-    stopWebMusicHandler: (...args: unknown[]) =>
-        stopWebMusicHandlerMock(...args),
 }))
 
 jest.mock('../../handlers/guildConfig', () => ({
@@ -177,15 +142,12 @@ describe('BotInitializer', () => {
         createClientMock.mockResolvedValue({
             removeAllListeners: jest.fn(),
             destroy: jest.fn().mockResolvedValue(undefined),
-            player: undefined,
         } as unknown as CustomClient)
-        createPlayerMock.mockResolvedValue({})
         getCommandsMock.mockResolvedValue([])
         setCommandsMock.mockResolvedValue(undefined)
         getContextMenusMock.mockResolvedValue([])
         setContextMenusMock.mockResolvedValue(undefined)
         handleEventsMock.mockReturnValue(undefined)
-        initProviderHealthMock.mockResolvedValue(undefined)
         startClientMock.mockResolvedValue(undefined)
     })
 
@@ -195,7 +157,6 @@ describe('BotInitializer', () => {
 
             expect(result.success).toBe(true)
             expect(result.client).toBeDefined()
-            expect(setupWebMusicHandlerMock).toHaveBeenCalledWith(result.client)
             expect(infoLogMock).toHaveBeenCalledWith(
                 expect.objectContaining({
                     message: 'Bot initialization completed successfully',
@@ -251,22 +212,10 @@ describe('BotInitializer', () => {
             expect(result.error).toBe('Failed to create Discord client')
         })
 
-        it('returns error result when provider health init fails', async () => {
-            initProviderHealthMock.mockRejectedValue(
-                new Error('Provider health failed'),
-            )
-
-            const result = await initializer.initializeBot()
-
-            expect(result.success).toBe(false)
-            expect(result.error).toBeDefined()
-        })
-
         it('tears down client when initialization fails after client creation', async () => {
             const mockClientInstance = {
                 removeAllListeners: jest.fn(),
                 destroy: jest.fn().mockResolvedValue(undefined),
-                player: undefined,
             } as unknown as CustomClient
             createClientMock.mockResolvedValue(mockClientInstance)
             setCommandsMock.mockRejectedValue(
@@ -298,42 +247,6 @@ describe('BotInitializer', () => {
 
             // Verify stopMetricsServer was called during cleanup
             expect(stopMetricsServerMock).toHaveBeenCalled()
-        })
-
-        it('stops music watchdog when initialization fails after client creation', async () => {
-            const mockClientInstance = {
-                removeAllListeners: jest.fn(),
-                destroy: jest.fn().mockResolvedValue(undefined),
-                player: undefined,
-            } as unknown as CustomClient
-            createClientMock.mockResolvedValue(mockClientInstance)
-            setCommandsMock.mockRejectedValue(
-                new Error('Commands setup failed'),
-            )
-
-            const result = await initializer.initializeBot()
-
-            expect(result.success).toBe(false)
-
-            // Verify music watchdog monitor was stopped during cleanup
-            expect(musicWatchdogStopMock).toHaveBeenCalled()
-            // Verify client was destroyed after stopping watchdog
-            expect(mockClientInstance.removeAllListeners).toHaveBeenCalled()
-            expect(mockClientInstance.destroy).toHaveBeenCalled()
-        })
-
-        it('does not tear down if initialization fails before client creation', async () => {
-            initProviderHealthMock.mockRejectedValue(
-                new Error('Provider health failed'),
-            )
-
-            const result = await initializer.initializeBot()
-
-            expect(result.success).toBe(false)
-
-            // Verify client teardown was not called (no client was created yet)
-            expect(createClientMock).not.toHaveBeenCalled()
-            expect(initializer.getClient()).toBeNull()
         })
 
         it('initializes bot state with correct flags', async () => {
@@ -462,7 +375,6 @@ describe('BotInitializer', () => {
 
             await initializer.shutdown()
 
-            expect(stopWebMusicHandlerMock).toHaveBeenCalled()
             expect(birthdaySchedulerStopMock).toHaveBeenCalled()
             expect(modDigestSchedulerStopMock).toHaveBeenCalled()
             expect(aiDevToolkitStopMock).toHaveBeenCalled()
@@ -470,8 +382,6 @@ describe('BotInitializer', () => {
             expect(weeklyDigestStopMock).toHaveBeenCalled()
             expect(heartbeatServiceStopMock).toHaveBeenCalled()
             expect(stopTwitchServiceMock).toHaveBeenCalled()
-            expect(musicWatchdogStopMock).toHaveBeenCalled()
-            expect(musicWatchdogStopPeriodicScanMock).toHaveBeenCalled()
             expect(stopMetricsServerMock).toHaveBeenCalled()
         })
 
@@ -479,7 +389,6 @@ describe('BotInitializer', () => {
         // the rest of teardown. Drive each throw and assert: error is logged AND the
         // client is still torn down (shutdown ran to completion).
         const failingStops: Array<[string, jest.Mock]> = [
-            ['stopWebMusicHandler', stopWebMusicHandlerMock],
             ['birthdayScheduler.stop', birthdaySchedulerStopMock],
             ['modDigestSchedulerService.stop', modDigestSchedulerStopMock],
             ['aiDevToolkitService.stop', aiDevToolkitStopMock],
@@ -487,8 +396,6 @@ describe('BotInitializer', () => {
             ['weeklyDigestService.stop', weeklyDigestStopMock],
             ['heartbeatService.stop', heartbeatServiceStopMock],
             ['stopTwitchService', stopTwitchServiceMock],
-            ['stopOrphanSessionMonitor', musicWatchdogStopMock],
-            ['stopPeriodicScan', musicWatchdogStopPeriodicScanMock],
         ]
 
         it.each(failingStops)(
@@ -583,17 +490,6 @@ describe('BotInitializer', () => {
             await initializer.shutdown()
 
             expect(initializer.isBotInitialized()).toBe(false)
-        })
-    })
-
-    describe('integration: player startup', () => {
-        it('initializes bot with player successfully', async () => {
-            const mockPlayer = { type: 'player' }
-            createPlayerMock.mockResolvedValue(mockPlayer)
-
-            const result = await initializer.initializeBot()
-            expect(result.success).toBe(true)
-            expect(result.client).toBeDefined()
         })
     })
 

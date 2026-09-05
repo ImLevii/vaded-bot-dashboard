@@ -1,4 +1,5 @@
-import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js'
+import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
+import { ApplicationCommandOptionType } from 'discord.js'
 import { PageQueue } from '../../structures/PageQueue.js'
 import humanizeDuration from 'humanize-duration'
 import { Manager } from '../../manager.js'

@@ -1,5 +1,5 @@
+import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
 import {
-  EmbedBuilder,
   ApplicationCommandOptionType,
   ActionRowBuilder,
   ButtonBuilder,

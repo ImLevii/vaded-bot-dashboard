@@ -57,7 +57,7 @@ previous_notfound: '`⚠️` | No Previous song was found!'
 
 ### Queue command!
 queue_author: '💾 %{guild}'
-queue_description: "`📀` | Currently Playing:\n**%{title}** `[%{duration}]` • %{request}\n\n`💤` | Rest of Queue:**%{rest}**"
+queue_description: "`📀` | Currently Playing:\n**%{title}** `[%{duration}]` • %{request}\n\n`💤` | Rest of Queue:\n%{rest}"
 queue_footer: 'Page • %{page}/%{pages} | Songs • %{queue_lang} | Total Duration • %{duration}'
 queue_notnumber: '`⚠️` | Please provide a valid page number!'
 queue_page_notfound: '`⚠️` | There are only **%{page} Pages**!'

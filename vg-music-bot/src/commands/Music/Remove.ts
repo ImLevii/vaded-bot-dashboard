@@ -1,5 +1,6 @@
+import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
 import { ApplicationCommandOptionType, Message } from 'discord.js'
-import { EmbedBuilder } from 'discord.js'
+
 import { convertTime } from '../../utilities/ConvertTime.js'
 import { Manager } from '../../manager.js'
 import { Accessableby, Command } from '../../structures/Command.js'

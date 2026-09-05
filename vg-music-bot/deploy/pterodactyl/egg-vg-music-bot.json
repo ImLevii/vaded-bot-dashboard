@@ -1,0 +1,50 @@
+{
+  "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+  "meta": {
+    "version": "PTDL_v2",
+    "update_url": null
+  },
+  "exported_at": "2026-09-05T00:00:00+00:00",
+  "name": "Vaded Music Bot - Prebuilt Upload",
+  "author": "admin@vaded.gg",
+  "description": "Runs the dedicated vg-music-bot prebuilt package. Upload its files and preserve app.yml, .env and data. The public dashboard stays on Vercel.",
+  "features": null,
+  "docker_images": {
+    "Node.js 24": "ghcr.io/ptero-eggs/yolks:nodejs_24"
+  },
+  "file_denylist": [],
+  "startup": "node deploy/pterodactyl/start.mjs",
+  "config": {
+    "files": "{}",
+    "startup": "{\"done\":\"Server running at\"}",
+    "logs": "{}",
+    "stop": "^C"
+  },
+  "scripts": {
+    "installation": {
+      "script": "#!/bin/sh\nset -eu\nmkdir -p /mnt/server\nprintf '%s\\n' 'Upload the prebuilt vg-music-bot package and retain app.yml, .env and data before starting.'\n",
+      "container": "node:24-bookworm-slim",
+      "entrypoint": "sh"
+    }
+  },
+  "variables": [
+    {
+      "name": "Shared Music API Token",
+      "description": "Must exactly match server-side VG_MUSIC_BOT_TOKEN in Vercel. Separate from the Discord bot token.",
+      "env_variable": "VG_MUSIC_BOT_TOKEN",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string"
+    },
+    {
+      "name": "Music Discord Bot Token (optional)",
+      "description": "Optional override for the same music bot identity. Leave empty to retain the existing app.yml token.",
+      "env_variable": "VG_MUSIC_BOT_DISCORD_TOKEN",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "nullable|string"
+    }
+  ]
+}

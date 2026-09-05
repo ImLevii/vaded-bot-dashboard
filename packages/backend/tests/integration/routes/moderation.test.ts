@@ -53,7 +53,6 @@ jest.mock('@lucky/shared/services', () => ({
         logSettingsChange: jest.fn(),
     },
     embedBuilderService: {},
-    musicControlService: {},
 }))
 
 import { moderationService, serverLogService } from '@lucky/shared/services'

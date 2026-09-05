@@ -137,12 +137,6 @@ describe('service', () => {
                 error,
             })
         })
-
-        it('should set player to null initially', async () => {
-            const client = await createClient()
-
-            expect(client.player).toBeNull()
-        })
     })
 
     describe('startClient', () => {

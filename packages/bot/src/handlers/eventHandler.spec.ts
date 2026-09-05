@@ -12,9 +12,8 @@ const createUserFriendlyErrorMock = jest.fn()
 const handleMessageCreateMock = jest.fn()
 const handleMemberEventsMock = jest.fn()
 const handleAuditEventsMock = jest.fn()
-const handleExternalScrobblerMock = jest.fn()
 const handleReactionEventsMock = jest.fn()
-const handleMusicButtonInteractionMock = jest.fn()
+const handleLeaderboardPageMock = jest.fn()
 const handleButtonInteractionMock = jest.fn()
 const executeContextMenuMock = jest.fn()
 const handleMoveMessageSelectMock = jest.fn()
@@ -22,8 +21,6 @@ const errorLogMock = jest.fn()
 const infoLogMock = jest.fn()
 const debugLogMock = jest.fn()
 const captureExceptionMock = jest.fn()
-const namedSessionListMock = jest.fn()
-const cleanupGuildStateMock = jest.fn()
 const aiDevToolkitStartMock = jest.fn()
 const handleReactionRolesMock = jest.fn()
 const recordGuildJoinMock = jest.fn(async () => undefined)
@@ -54,19 +51,14 @@ jest.mock('./auditHandler', () => ({
     handleAuditEvents: (...args: unknown[]) => handleAuditEventsMock(...args),
 }))
 
-jest.mock('./externalScrobbler', () => ({
-    handleExternalScrobbler: (...args: unknown[]) =>
-        handleExternalScrobblerMock(...args),
-}))
-
 jest.mock('./reactionHandler', () => ({
     handleReactionEvents: (...args: unknown[]) =>
         handleReactionEventsMock(...args),
 }))
 
-jest.mock('./musicButtonHandler', () => ({
-    handleMusicButtonInteraction: (...args: unknown[]) =>
-        handleMusicButtonInteractionMock(...args),
+jest.mock('./leaderboardButtonHandler', () => ({
+    handleLeaderboardPage: (...args: unknown[]) =>
+        handleLeaderboardPageMock(...args),
 }))
 
 jest.mock('./commandsHandler', () => ({
@@ -92,16 +84,6 @@ jest.mock('@lucky/shared/services', () => ({
         handleButtonInteraction: (...args: unknown[]) =>
             handleButtonInteractionMock(...args),
     },
-}))
-
-jest.mock('../utils/music/namedSessions', () => ({
-    namedSessionService: {
-        list: (...args: unknown[]) => namedSessionListMock(...args),
-    },
-}))
-
-jest.mock('./player/trackNowPlaying', () => ({
-    cleanupGuildState: (...args: unknown[]) => cleanupGuildStateMock(...args),
 }))
 
 jest.mock('@lucky/shared/utils', () => ({
@@ -161,41 +143,10 @@ function getInteractionCreateHandler(
     return call?.[1] as ((interaction: Interaction) => void) | undefined
 }
 
-type AutocompleteMockOptions = {
-    guildId?: string | null
-    commandName?: string
-    subcommand?: string | null
-    focusedName?: string
-    respondMock?: jest.Mock
-}
-
-function createAutocompleteInteraction(
-    options: AutocompleteMockOptions = {},
-): Interaction {
-    const respondMock = options.respondMock ?? jest.fn()
-    return {
-        isAutocomplete: () => true,
-        isChatInputCommand: () => false,
-        guildId: options.guildId === undefined ? 'guild-1' : options.guildId,
-        commandName: options.commandName ?? 'session',
-        options: {
-            getSubcommand: jest
-                .fn()
-                .mockReturnValue(options.subcommand ?? 'restore'),
-            getFocused: jest.fn().mockReturnValue({
-                name: options.focusedName ?? 'name',
-                value: '',
-            }),
-        },
-        respond: respondMock,
-    } as unknown as Interaction
-}
-
 describe('eventHandler', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         createUserFriendlyErrorMock.mockReturnValue('Friendly error')
-        namedSessionListMock.mockResolvedValue([])
     })
 
     // Drain all pending microtasks so fire-and-forget async handlers
@@ -413,114 +364,6 @@ describe('eventHandler', () => {
         })
     })
 
-    describe('handleAutocomplete', () => {
-        async function dispatchAutocomplete(
-            interaction: Interaction,
-        ): Promise<void> {
-            const { client, onMock } = createMockClient()
-            handleEvents(client as unknown as never)
-            const handler = getInteractionCreateHandler(onMock)
-            handler?.(interaction)
-            await flushAsyncHandlers()
-        }
-
-        it('responds with session name choices for restore subcommand', async () => {
-            namedSessionListMock.mockResolvedValue([
-                { name: 'chill-vibes' },
-                { name: 'workout-mix' },
-            ])
-            const respondMock = jest.fn()
-            const interaction = createAutocompleteInteraction({
-                subcommand: 'restore',
-                respondMock,
-            })
-
-            await dispatchAutocomplete(interaction)
-
-            expect(namedSessionListMock).toHaveBeenCalledWith('guild-1')
-            expect(respondMock).toHaveBeenCalledWith([
-                { name: 'chill-vibes', value: 'chill-vibes' },
-                { name: 'workout-mix', value: 'workout-mix' },
-            ])
-        })
-
-        it('responds with session name choices for delete subcommand', async () => {
-            namedSessionListMock.mockResolvedValue([{ name: 'party' }])
-            const respondMock = jest.fn()
-            const interaction = createAutocompleteInteraction({
-                subcommand: 'delete',
-                respondMock,
-            })
-
-            await dispatchAutocomplete(interaction)
-
-            expect(respondMock).toHaveBeenCalledWith([
-                { name: 'party', value: 'party' },
-            ])
-        })
-
-        it('caps autocomplete response to the Discord limit of 25', async () => {
-            namedSessionListMock.mockResolvedValue(
-                Array.from({ length: 40 }, (_, i) => ({
-                    name: `session-${i}`,
-                })),
-            )
-            const respondMock = jest.fn()
-            const interaction = createAutocompleteInteraction({
-                respondMock,
-            })
-
-            await dispatchAutocomplete(interaction)
-
-            const choices = respondMock.mock.calls[0]?.[0] as unknown[]
-            expect(choices).toHaveLength(25)
-        })
-
-        it('responds with an empty list when guildId is missing', async () => {
-            const respondMock = jest.fn()
-            const interaction = createAutocompleteInteraction({
-                guildId: null,
-                respondMock,
-            })
-
-            await dispatchAutocomplete(interaction)
-
-            expect(respondMock).toHaveBeenCalledWith([])
-            expect(namedSessionListMock).not.toHaveBeenCalled()
-        })
-
-        it('responds with an empty list for unrelated commands', async () => {
-            const respondMock = jest.fn()
-            const interaction = createAutocompleteInteraction({
-                commandName: 'play',
-                subcommand: null,
-                respondMock,
-            })
-
-            await dispatchAutocomplete(interaction)
-
-            expect(respondMock).toHaveBeenCalledWith([])
-            expect(namedSessionListMock).not.toHaveBeenCalled()
-        })
-
-        it('logs and swallows errors raised by the session service', async () => {
-            namedSessionListMock.mockRejectedValue(new Error('redis down'))
-            const respondMock = jest.fn()
-            const interaction = createAutocompleteInteraction({
-                respondMock,
-            })
-
-            await dispatchAutocomplete(interaction)
-
-            expect(errorLogMock).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    message: 'Error handling autocomplete:',
-                    error: expect.any(Error),
-                }),
-            )
-        })
-    })
-
     describe('button interactions', () => {
         function createButtonInteraction(customId: string): Interaction {
             return {
@@ -540,125 +383,20 @@ describe('eventHandler', () => {
         }
 
         beforeEach(() => {
-            handleMusicButtonInteractionMock.mockResolvedValue(undefined)
+            handleLeaderboardPageMock.mockResolvedValue(undefined)
             handleButtonInteractionMock.mockResolvedValue(undefined)
         })
 
-        it('routes music_ buttons to handleMusicButtonInteraction', async () => {
-            await dispatchButton('music_pause_resume')
-            expect(handleMusicButtonInteractionMock).toHaveBeenCalledTimes(1)
-            expect(handleButtonInteractionMock).not.toHaveBeenCalled()
-        })
-
-        it('routes queue_page buttons to handleMusicButtonInteraction', async () => {
-            await dispatchButton('queue_page_2')
-            expect(handleMusicButtonInteractionMock).toHaveBeenCalledTimes(1)
-        })
-
-        it('routes leaderboard_page buttons to handleMusicButtonInteraction', async () => {
+        it('routes leaderboard_page buttons to handleLeaderboardPage', async () => {
             await dispatchButton('leaderboard_page_0')
-            expect(handleMusicButtonInteractionMock).toHaveBeenCalledTimes(1)
+            expect(handleLeaderboardPageMock).toHaveBeenCalledTimes(1)
+            expect(handleButtonInteractionMock).not.toHaveBeenCalled()
         })
 
         it('routes other buttons to reactionRolesService', async () => {
             await dispatchButton('reaction_role_123')
             expect(handleButtonInteractionMock).toHaveBeenCalledTimes(1)
-            expect(handleMusicButtonInteractionMock).not.toHaveBeenCalled()
-        })
-    })
-
-    describe('guild and channel cleanup', () => {
-        function getGuildDeleteHandler(
-            onMock: jest.Mock,
-        ): ((guild: unknown) => Promise<void>) | undefined {
-            const call = onMock.mock.calls.find(
-                (args) => args[0] === Events.GuildDelete,
-            )
-            return call?.[1] as ((guild: unknown) => Promise<void>) | undefined
-        }
-
-        function getChannelDeleteHandler(
-            onMock: jest.Mock,
-        ): ((channel: unknown) => void) | undefined {
-            const call = onMock.mock.calls.find(
-                (args) => args[0] === Events.ChannelDelete,
-            )
-            return call?.[1] as ((channel: unknown) => void) | undefined
-        }
-
-        describe('handleGuildDelete', () => {
-            it('calls cleanupGuildState when guild is deleted', async () => {
-                const { client, onMock } = createMockClient()
-                handleEvents(client as unknown as never)
-
-                const handler = getGuildDeleteHandler(onMock)
-                expect(handler).toBeDefined()
-
-                const mockGuild = { id: 'guild-delete-123' }
-                await handler?.(mockGuild)
-
-                expect(cleanupGuildStateMock).toHaveBeenCalledWith(
-                    'guild-delete-123',
-                )
-            })
-
-            it('handles errors during guild cleanup gracefully', async () => {
-                const { client, onMock } = createMockClient()
-                cleanupGuildStateMock.mockImplementation(() => {
-                    throw new Error('Cleanup failed')
-                })
-
-                handleEvents(client as unknown as never)
-
-                const handler = getGuildDeleteHandler(onMock)
-                const mockGuild = { id: 'guild-789' }
-
-                await handler?.(mockGuild)
-
-                expect(errorLogMock).toHaveBeenCalledWith(
-                    expect.objectContaining({
-                        message: expect.stringContaining(
-                            'Error clearing history on guild delete',
-                        ),
-                    }),
-                )
-            })
-        })
-
-        describe('handleChannelDelete', () => {
-            it('calls cleanupGuildState when text channel is deleted', () => {
-                const { client, onMock } = createMockClient()
-                handleEvents(client as unknown as never)
-
-                const handler = getChannelDeleteHandler(onMock)
-                expect(handler).toBeDefined()
-
-                const mockChannel = {
-                    guildId: 'guild-ch-123',
-                    isDMBased: () => false,
-                }
-
-                handler?.(mockChannel)
-
-                expect(cleanupGuildStateMock).toHaveBeenCalledWith(
-                    'guild-ch-123',
-                )
-            })
-
-            it('skips cleanup when channel is DM-based', () => {
-                const { client, onMock } = createMockClient()
-                handleEvents(client as unknown as never)
-
-                const handler = getChannelDeleteHandler(onMock)
-                const mockChannel = {
-                    guildId: 'guild-unused',
-                    isDMBased: () => true,
-                }
-
-                handler?.(mockChannel)
-
-                expect(cleanupGuildStateMock).not.toHaveBeenCalled()
-            })
+            expect(handleLeaderboardPageMock).not.toHaveBeenCalled()
         })
     })
 

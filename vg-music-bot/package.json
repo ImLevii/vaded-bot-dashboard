@@ -19,7 +19,8 @@
     "start:shard": "node --no-deprecation ./dist/cluster/index.js",
     "dev": "npx nodemon ./src/index.ts",
     "build:prettier": "npx prettier -w ./src",
-    "start:pm2": "npx pm2-runtime start ecosystem.config.cjs --env production"
+    "start:pm2": "npx pm2-runtime start ecosystem.config.cjs --env production",
+    "test": "node --import tsx --test tests/*.test.ts"
   },
   "repository": {
     "type": "git",
@@ -90,6 +91,7 @@
     "@types/markdown-it": "^13.0.9",
     "@types/node": "^20.16.4",
     "@types/node-cron": "^3.0.11",
+    "@types/pg": "^8.23.1",
     "@types/pidusage": "^2.0.5",
     "@types/recursive-readdir": "^2.2.4",
     "@types/voucher-code-generator": "^1.1.3",

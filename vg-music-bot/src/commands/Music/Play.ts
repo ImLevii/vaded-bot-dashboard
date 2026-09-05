@@ -1,8 +1,10 @@
+import { requester } from '../../utilities/MusicFormatting.js'
+import { getTitle } from '../../utilities/GetTitle.js'
+import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
 import {
   ApplicationCommandOptionType,
   AutocompleteInteraction,
   CommandInteraction,
-  EmbedBuilder,
   ActivityType,
 } from 'discord.js'
 import { convertTime } from '../../utilities/ConvertTime.js'
@@ -143,7 +145,7 @@ export default class implements Command {
           `${client.i18n.get(handler.language, 'command.music', 'play_track', {
             title: this.getTitle(client, result.type, tracks),
             duration: convertTime(tracks[0].duration as number),
-            request: String(tracks[0].requester),
+            request: requester(tracks[0].requester),
           })}`
         )
         .setColor(client.color)
@@ -156,7 +158,7 @@ export default class implements Command {
             title: this.getTitle(client, result.type, tracks, value),
             duration: convertTime(TotalDuration),
             songs: String(tracks.length),
-            request: String(tracks[0].requester),
+            request: requester(tracks[0].requester),
           })}`
         )
         .setColor(client.color)
@@ -167,7 +169,7 @@ export default class implements Command {
         `${client.i18n.get(handler.language, 'command.music', 'play_result', {
           title: this.getTitle(client, result.type, tracks),
           duration: convertTime(tracks[0].duration as number),
-          request: String(tracks[0].requester),
+          request: requester(tracks[0].requester),
         })}`
       )
 
@@ -196,14 +198,11 @@ export default class implements Command {
     tracks: RainlinkTrack[],
     value?: string
   ): string {
-    if (client.config.player.AVOID_SUSPEND) return tracks[0].title
-    else {
-      if (type === 'PLAYLIST') {
-        return `[${tracks[0].title}](${value})`
-      } else {
-        return `[${tracks[0].title}](${tracks[0].uri})`
-      }
-    }
+    const track = tracks[0]
+    return getTitle(
+      client,
+      type === 'PLAYLIST' && value ? { title: track?.title, uri: value } : track
+    )
   }
 
   // Autocomplete function

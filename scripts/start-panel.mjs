@@ -7,8 +7,8 @@
  * All knobs are env vars; the defaults preserve the original behavior
  * (bot + music-relay via npm scripts, restart-in-place on child exit):
  *
- *   PANEL_SERVICES        comma list of: bot, backend, music-relay
- *                         (default "bot,music-relay")
+ *   PANEL_SERVICES        comma list of: bot, backend
+ *                         (default "bot")
  *   PANEL_DIST            "true" => run the compiled dist entries directly
  *                         with node (no npm/shell wrapper, so signals and
  *                         kill() actually reach the app). Default "false"
@@ -54,20 +54,9 @@ const catalog = {
         distEntry: 'packages/backend/dist/index.js',
         readyMarker: 'Web application started on ',
     },
-    'music-relay': {
-        name: 'music-relay',
-        npmArgs: [
-            'run',
-            'start:music-relay:tsx',
-            '--workspace=packages/backend',
-        ],
-        distEntry: 'packages/backend/dist/musicRelayIndex.js',
-        // No stable ready line to key on; counts as ready once spawned.
-        readyMarker: null,
-    },
 }
 
-const requested = (process.env.PANEL_SERVICES ?? 'bot,music-relay')
+const requested = (process.env.PANEL_SERVICES ?? 'bot')
     .split(',')
     .map((name) => name.trim())
     .filter((name) => name.length > 0)

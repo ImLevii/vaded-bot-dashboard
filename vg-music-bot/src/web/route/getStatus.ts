@@ -1,7 +1,8 @@
 import util from 'node:util'
-import { User } from 'discord.js'
+import { User, VoiceChannel } from 'discord.js'
 import { Manager } from '../../manager.js'
 import Fastify from 'fastify'
+import { formatDuration } from '../../utilities/FormatDuration.js'
 
 export async function getStatus(
   client: Manager,
@@ -30,18 +31,30 @@ export async function getStatus(
 
   const song = player.queue.current
   const requester = song ? (song.requester as User) : null
+  const voiceChannel = player.voiceId
+    ? ((await client.channels.fetch(player.voiceId).catch(() => undefined)) as
+        | VoiceChannel
+        | undefined)
+    : undefined
 
   res.send({
     guildId: player.guildId,
     loop: player.loop,
     pause: player.paused,
+    volume: player.volume,
+    autoplay: player.data.get('autoplay') === true,
     member: isMemeberInVoice,
     position: player.position,
+    voiceChannelId: player.voiceId,
+    voiceChannelName: voiceChannel?.name ?? null,
     current: song
       ? {
+          id: song.identifier,
+          source: song.source,
           title: song.title,
           uri: song.uri,
           length: song.duration,
+          durationFormatted: formatDuration(song.duration),
           thumbnail: song.artworkUrl,
           author: song.author,
           requester: requester
@@ -57,9 +70,12 @@ export async function getStatus(
     queue: player.queue.map((track) => {
       const requesterQueue = track.requester as User
       return {
+        id: track.identifier,
+        source: track.source,
         title: track.title,
         uri: track.uri,
         length: track.duration,
+        durationFormatted: formatDuration(track.duration),
         thumbnail: track.artworkUrl,
         author: track.author,
         requester: requesterQueue

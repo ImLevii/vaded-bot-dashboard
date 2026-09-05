@@ -1,33 +1,5 @@
-/** Music command types supported by the queue. */
-export type MusicCommandType =
-    | 'play'
-    | 'pause'
-    | 'resume'
-    | 'skip'
-    | 'previous'
-    | 'stop'
-    | 'volume'
-    | 'shuffle'
-    | 'repeat'
-    | 'queue_move'
-    | 'queue_remove'
-    | 'queue_clear'
-    | 'import_playlist'
-    | 'seek'
-    | 'get_state'
-
 /** Repeat mode for playback. */
 export type RepeatMode = 'off' | 'track' | 'queue' | 'autoplay'
-
-/** Music command issued by a user. */
-export interface MusicCommand {
-    id: string
-    guildId: string
-    userId: string
-    type: MusicCommandType
-    data?: Record<string, unknown>
-    timestamp: number
-}
 
 /** Information about a playable track. */
 export interface TrackInfo {
@@ -98,14 +70,3 @@ export interface ImportPlaylistResult {
     source: string
     error?: string
 }
-
-export interface PendingResult {
-    resolve: (result: MusicCommandResult) => void
-    timeout: ReturnType<typeof setTimeout>
-}
-
-export const CHANNEL_COMMAND = 'music:command'
-export const CHANNEL_STATE = 'music:state'
-export const CHANNEL_RESULT = 'music:result'
-export const STATE_KEY_PREFIX = 'music:state:'
-export const STATE_TTL = 300

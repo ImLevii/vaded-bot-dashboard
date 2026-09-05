@@ -1,11 +1,6 @@
-import {
-  ButtonInteraction,
-  CacheType,
-  EmbedBuilder,
-  InteractionCollector,
-  Message,
-  User,
-} from 'discord.js'
+import { artwork, requester } from '../utilities/MusicFormatting.js'
+import { MusicEmbed as EmbedBuilder } from '../utilities/MusicEmbed.js'
+import { ButtonInteraction, CacheType, InteractionCollector, Message, User } from 'discord.js'
 import { PlayerButton } from '../@types/Button.js'
 import { Manager } from '../manager.js'
 import { formatDuration } from '../utilities/FormatDuration.js'
@@ -30,9 +25,8 @@ export default class implements PlayerButton {
     const newQueue = player.queue.shuffle()
 
     const song = newQueue.current
-    const qduration = `${formatDuration(song!.duration + player.queue.duration)}`
-    const thumbnail =
-      song?.artworkUrl ?? `https://img.youtube.com/vi/${song!.identifier}/hqdefault.jpg`
+    const qduration = `${formatDuration((song?.duration || 0) + player.queue.duration)}`
+    const thumbnail = artwork(song!, client.user?.displayAvatarURL())
 
     let pagesNum = Math.ceil(newQueue.length / 10)
     if (pagesNum === 0) pagesNum = 1
@@ -60,7 +54,7 @@ export default class implements PlayerButton {
           `${client.i18n.get(language, 'button.music', 'queue_description', {
             track: getTitle(client, song!),
             duration: formatDuration(song?.duration),
-            requester: `${song!.requester}`,
+            requester: requester(song?.requester),
             list_song: str == '' ? '  Nothing' : '\n' + str,
           })}`
         )

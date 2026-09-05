@@ -158,54 +158,10 @@ describe('presence', () => {
     })
 
     describe('getActiveMusicSessions', () => {
-        it('should return 0 when player nodes are undefined', () => {
-            const client = createMockClient({ player: null } as any)
-            expect(getActiveMusicSessions(client)).toBe(0)
-        })
-
-        it('should return 0 when cache is undefined', () => {
-            const client = createMockClient({
-                player: { nodes: {} },
-            } as any)
-            expect(getActiveMusicSessions(client)).toBe(0)
-        })
-
-        it('should count nodes with currentTrack', () => {
-            const client = createMockClient({
-                player: {
-                    nodes: {
-                        cache: {
-                            values: jest
-                                .fn()
-                                .mockReturnValue([
-                                    { currentTrack: { title: 'Song 1' } },
-                                    { currentTrack: null },
-                                    { currentTrack: { title: 'Song 2' } },
-                                ]),
-                        },
-                    },
-                },
-            } as any)
-
-            expect(getActiveMusicSessions(client)).toBe(2)
-        })
-
-        it('should return 0 when no nodes have currentTrack', () => {
-            const client = createMockClient({
-                player: {
-                    nodes: {
-                        cache: {
-                            values: jest
-                                .fn()
-                                .mockReturnValue([
-                                    { currentTrack: null },
-                                    { currentTrack: undefined },
-                                ]),
-                        },
-                    },
-                },
-            } as any)
-
+        // Music now plays through vg-music-bot, a separate process this bot
+        // has no in-process visibility into — always 0.
+        it('always returns 0', () => {
+            const client = createMockClient({} as any)
             expect(getActiveMusicSessions(client)).toBe(0)
         })
     })

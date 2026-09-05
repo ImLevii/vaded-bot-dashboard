@@ -154,22 +154,10 @@ describe('bot presence', () => {
         expect(getTotalMemberCount(client as never)).toBe(5)
     })
 
-    it('calculates active music sessions defensively', () => {
-        const client = {
-            player: {
-                nodes: {
-                    cache: {
-                        values: () => [
-                            { currentTrack: { id: '1' } },
-                            { currentTrack: null },
-                            { currentTrack: { id: '2' } },
-                        ],
-                    },
-                },
-            },
-        }
+    it('always returns 0 (music plays through a separate bot process)', () => {
+        const client = {}
 
-        expect(getActiveMusicSessions(client as never)).toBe(2)
+        expect(getActiveMusicSessions(client as never)).toBe(0)
     })
 
     it('applies and rotates presence', () => {

@@ -1,4 +1,5 @@
-import { EmbedBuilder, ApplicationCommandOptionType } from 'discord.js'
+import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
+import { ApplicationCommandOptionType } from 'discord.js'
 import id from 'voucher-code-generator'
 import { Manager } from '../../manager.js'
 import { Accessableby, Command } from '../../structures/Command.js'

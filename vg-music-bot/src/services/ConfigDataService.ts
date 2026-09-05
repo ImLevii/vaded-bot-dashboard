@@ -2,6 +2,7 @@ import { load } from 'js-yaml'
 import { YAMLParseService } from './YAMLParseService.js'
 import { config } from 'dotenv'
 import { Config } from '../@types/Config.js'
+import { musicHostingConfig } from './MusicHostingConfig.js'
 config()
 
 export class ConfigDataService {
@@ -10,6 +11,11 @@ export class ConfigDataService {
     const old_data = load(new YAMLParseService('./app.yml').execute()) as Config
 
     const raw = yaml_files
+    // A separate, explicit token prevents the dashboard app's Discord identity
+    // from accidentally replacing the music bot's existing configuration.
+    if (raw?.bot && process.env.VG_MUSIC_BOT_DISCORD_TOKEN) {
+      raw.bot.TOKEN = process.env.VG_MUSIC_BOT_DISCORD_TOKEN
+    }
     this.checkConfig(raw)
     const res = this.mergeDefault(this.defaultConfig, raw)
 
@@ -19,7 +25,9 @@ export class ConfigDataService {
 
     if (process.env.DOCKER_COMPOSE_MODE) {
       // Change lavalink data
-      const lavalink_changedata = res.player.NODES[0]
+      const lavalink_changedata =
+        res.player.NODES[0] ??
+        (res.player.NODES[0] = { name: 'node_1', host: '', port: 2333, auth: '', secure: false })
       lavalink_changedata.host = String(process.env.NODE_HOST)
       lavalink_changedata.port = Number(process.env.NODE_PORT)
       lavalink_changedata.name = 'node_1'
@@ -35,6 +43,7 @@ export class ConfigDataService {
       }
     }
 
+    res.utilities.WEB_SERVER = musicHostingConfig(res.utilities.WEB_SERVER)
     return res
   }
 
@@ -57,7 +66,10 @@ export class ConfigDataService {
       throw new Error('Config file not contains TOKEN, please check app.example.yml for example')
     if (typeof res.bot.TOKEN !== 'string')
       throw new Error('TOKEN field not in string, please check app.example.yml for example')
-    if (!res.player.NODES || res.player.NODES.length == 0)
+    if (
+      (!res.player.NODES || res.player.NODES.length == 0) &&
+      !res.utilities?.AUTOFIX_LAVALINK?.enable
+    )
       throw new Error('Config file not contains NODES, please check app.example.yml for example')
   }
 

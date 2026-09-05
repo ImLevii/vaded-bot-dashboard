@@ -1,5 +1,4 @@
 import { Client, GatewayIntentBits, REST, Routes, Collection } from 'discord.js'
-import type { Rainlink } from 'rainlink'
 import { errorLog, infoLog, debugLog } from '@lucky/shared/utils'
 import type { CustomClient } from '../../types'
 import { config } from '@lucky/shared/config'
@@ -52,7 +51,6 @@ export async function createClient(): Promise<CustomClient> {
 
         client.commands = new Collection<string, Command>()
         client.contextMenus = new Collection<string, ContextMenuCommand>()
-        client.player = null as unknown as Rainlink
 
         debugLog({ message: 'Discord client created successfully' })
         return client

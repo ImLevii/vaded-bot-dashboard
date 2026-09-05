@@ -10,6 +10,11 @@ import { getCurrentPosition } from './route/getCurrentPosition.js'
 import { PatchControl } from './route/patchControl.js'
 import { deletePlayer } from './route/deletePlayer.js'
 import { PostCreatePlayer } from './route/postCreatePlayer.js'
+import { getListeners } from './route/getListeners.js'
+import { queueMove } from './route/queueMove.js'
+import { queueImport } from './route/queueImport.js'
+import { queueRemove } from './route/queueRemove.js'
+import { queueClear } from './route/queueClear.js'
 
 export class PlayerRoute {
   constructor(protected client: Manager) {}
@@ -25,5 +30,10 @@ export class PlayerRoute {
     fastify.get('/:guildId/queue', (req, res) => getQueueStatus(this.client, req, res))
     fastify.get('/:guildId/current', (req, res) => getCurrentTrackStatus(this.client, req, res))
     fastify.get('/:guildId/member/:userId', (req, res) => getMemberStatus(this.client, req, res))
+    fastify.get('/:guildId/listeners', (req, res) => getListeners(this.client, req, res))
+    fastify.post('/:guildId/queue/move', (req, res) => queueMove(this.client, req, res))
+    fastify.post('/:guildId/queue/import', (req, res) => queueImport(this.client, req, res))
+    fastify.post('/:guildId/queue/remove', (req, res) => queueRemove(this.client, req, res))
+    fastify.post('/:guildId/queue/clear', (req, res) => queueClear(this.client, req, res))
   }
 }

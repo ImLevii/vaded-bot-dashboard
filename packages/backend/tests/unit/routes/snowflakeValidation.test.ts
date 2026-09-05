@@ -33,10 +33,6 @@ jest.mock('@lucky/shared/services', () => ({
         addReward: jest.fn().mockResolvedValue({}),
         removeReward: jest.fn().mockResolvedValue({}),
     },
-    musicControlService: {
-        getState: jest.fn().mockResolvedValue(null),
-        sendCommand: jest.fn().mockResolvedValue({ success: true }),
-    },
     guildSettingsService: {
         getGuildSettings: jest.fn().mockResolvedValue(null),
         updateGuildSettings: jest.fn().mockResolvedValue({

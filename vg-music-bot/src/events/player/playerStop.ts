@@ -1,11 +1,14 @@
+import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
+import { stopNowPlaying } from '../../utilities/NowPlayingSession.js'
 import { Manager } from '../../manager.js'
-import { EmbedBuilder, TextChannel } from 'discord.js'
+import { TextChannel } from 'discord.js'
 import { ClearMessageService } from '../../services/ClearMessageService.js'
 import { AutoReconnectBuilderService } from '../../services/AutoReconnectBuilderService.js'
 import { RainlinkPlayer } from 'rainlink'
 
 export default class {
   async execute(client: Manager, player: RainlinkPlayer) {
+    stopNowPlaying(client, player.guildId)
     if (!client.isDatabaseConnected)
       return client.logger.warn(
         'DatabaseService',

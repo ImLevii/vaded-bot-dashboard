@@ -1,12 +1,28 @@
+import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
+import { artwork, metadata, requester, isLive } from '../../utilities/MusicFormatting.js'
 import { Manager } from '../../manager.js'
 import { ComponentType, TextChannel } from 'discord.js'
-import { EmbedBuilder } from 'discord.js'
+
 import { formatDuration } from '../../utilities/FormatDuration.js'
 import { filterSelect, playerRowOne, playerRowTwo } from '../../utilities/PlayerControlButton.js'
 import { AutoReconnectBuilderService } from '../../services/AutoReconnectBuilderService.js'
 import { SongNotiEnum } from '../../database/schema/SongNoti.js'
 import { RainlinkFilterMode, RainlinkPlayer, RainlinkTrack } from 'rainlink'
 import { getTitle } from '../../utilities/GetTitle.js'
+import { randomUUID } from 'node:crypto'
+import { upsertMusicSessionSnapshot, SnapshotTrack } from '../../db/postgres.js'
+
+function toSnapshotTrack(track: RainlinkTrack): SnapshotTrack {
+  return {
+    title: track.title,
+    uri: track.uri,
+    identifier: track.identifier,
+    author: track.author,
+    duration: track.duration,
+    artworkUrl: track.artworkUrl,
+    source: track.source,
+  }
+}
 
 export default class {
   async execute(client: Manager, player: RainlinkPlayer, track: RainlinkTrack) {
@@ -69,6 +85,14 @@ export default class {
         await client.db.autoreconnect.set(`${player.guildId}.queue`, queueUri())
         await client.db.autoreconnect.set(`${player.guildId}.previous`, previousUri())
       }
+
+      upsertMusicSessionSnapshot({
+        guildId: player.guildId,
+        sessionSnapshotId: randomUUID(),
+        currentTrack: player.queue.current ? toSnapshotTrack(player.queue.current) : null,
+        upcomingTracks: [...player.queue].map(toSnapshotTrack),
+        voiceChannelId: player.voiceId,
+      }).catch((err) => client.logger.error('MusicSessionSnapshotService', err))
     }
 
     let data = await client.db.setup.get(`${channel.guild.id}`)
@@ -82,6 +106,7 @@ export default class {
     const language = guildModel
 
     const song = player.queue.current
+    if (!song) return
 
     if (SongNoti == SongNotiEnum.Disable) return
 
@@ -94,24 +119,22 @@ export default class {
       .addFields([
         {
           name: `${client.i18n.get(language, 'event.player', 'author_title')}`,
-          value: `${song!.author}`,
+          value: metadata(song.author),
           inline: true,
         },
         {
           name: `${client.i18n.get(language, 'event.player', 'duration_title')}`,
-          value: `${formatDuration(song!.duration)}`,
+          value: `${formatDuration(song.duration, isLive(song))}`,
           inline: true,
         },
         {
           name: `${client.i18n.get(language, 'event.player', 'request_title')}`,
-          value: `${song!.requester}`,
+          value: requester(song.requester),
           inline: true,
         },
       ])
       .setColor(client.color)
-      .setThumbnail(
-        track.artworkUrl ?? `https://img.youtube.com/vi/${track.identifier}/hqdefault.jpg`
-      )
+      .setThumbnail(artwork(track, client.user?.displayAvatarURL()))
 
     const playing_channel = (await client.channels
       .fetch(player.textId)

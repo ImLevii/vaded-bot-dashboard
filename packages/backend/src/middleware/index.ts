@@ -14,8 +14,10 @@ export function setupMiddleware(app: Express): void {
     const configuredOrigins = getFrontendOrigins()
     const isProduction = process.env.NODE_ENV === 'production'
 
-    // See musicRelayServer.ts's createMusicRelayApp() for why this isn't
-    // gated on NODE_ENV=production.
+    // Always behind a reverse proxy in every real deployment path (Vercel,
+    // Cloudflare Tunnel, nginx) — gating this on NODE_ENV=production broke
+    // express-rate-limit's IP resolution on hosts intentionally run with
+    // NODE_ENV=development while still sitting behind a real proxy.
     app.set('trust proxy', 1)
 
     app.use(

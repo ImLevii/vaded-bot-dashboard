@@ -1,4 +1,5 @@
-import { EmbedBuilder, ApplicationCommandOptionType, Message } from 'discord.js'
+import { MusicEmbed as EmbedBuilder } from '../../utilities/MusicEmbed.js'
+import { ApplicationCommandOptionType, Message } from 'discord.js'
 import { convertTime } from '../../utilities/ConvertTime.js'
 import { Manager } from '../../manager.js'
 import { Playlist } from '../../database/schema/Playlist.js'

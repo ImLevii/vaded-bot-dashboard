@@ -1,4 +1,5 @@
-import { EmbedBuilder, ButtonInteraction } from 'discord.js'
+import { MusicEmbed as EmbedBuilder } from '../utilities/MusicEmbed.js'
+import { ButtonInteraction } from 'discord.js'
 import { Manager } from '../manager.js'
 
 export class ReplyInteractionService {

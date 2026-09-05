@@ -5,8 +5,10 @@ import { asyncHandler } from '../../middleware/asyncHandler'
 import { validateParams } from '../../middleware/validate'
 import { guildIdParam } from '../../schemas/common'
 import { AppError } from '../../errors/AppError'
-import { musicControlService } from '@lucky/shared/services'
-import { param, buildCommand } from './helpers'
+import { vgMusicBotRequest } from '../../services/vgMusicBotClient'
+import type { MusicCommandResult } from '@lucky/shared/services'
+import { param } from './helpers'
+import { fetchQueueState } from './vgMusicBotState'
 
 const moveQueueBodySchema = z.object({
     from: z.number().int().min(0).max(9999),
@@ -30,6 +32,20 @@ function requireUserId(req: AuthenticatedRequest): string {
     return req.userId
 }
 
+function result(
+    guildId: string,
+    success: boolean,
+    error?: string,
+): MusicCommandResult {
+    return {
+        id: `cmd_${Date.now()}`,
+        guildId,
+        success,
+        error,
+        timestamp: Date.now(),
+    }
+}
+
 export function setupQueueRoutes(app: Express): void {
     app.get(
         '/api/guilds/:guildId/music/queue',
@@ -37,7 +53,7 @@ export function setupQueueRoutes(app: Express): void {
         validateParams(guildIdParam),
         asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
             const guildId = param(req.params.guildId)
-            const state = await musicControlService.getState(guildId)
+            const state = await fetchQueueState(guildId)
             res.json({
                 currentTrack: state?.currentTrack ?? null,
                 tracks: state?.tracks ?? [],
@@ -52,18 +68,24 @@ export function setupQueueRoutes(app: Express): void {
         validateParams(guildIdParam),
         asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
             const guildId = param(req.params.guildId)
-            const userId = requireUserId(req)
+            requireUserId(req)
             const body = moveQueueBodySchema.safeParse(req.body)
 
             if (!body.success) {
                 throw AppError.badRequest('From and to positions are required')
             }
 
-            const cmd = buildCommand(guildId, userId, 'queue_move', {
-                from: body.data.from,
-                to: body.data.to,
-            })
-            res.json(await musicControlService.sendCommand(cmd))
+            const upstream = await vgMusicBotRequest(
+                `/v1/players/${encodeURIComponent(guildId)}/queue/move`,
+                { method: 'POST', body: JSON.stringify(body.data) },
+            )
+            res.json(
+                result(
+                    guildId,
+                    upstream.ok,
+                    upstream.ok ? undefined : 'Move failed',
+                ),
+            )
         }),
     )
 
@@ -73,17 +95,24 @@ export function setupQueueRoutes(app: Express): void {
         validateParams(guildIdParam),
         asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
             const guildId = param(req.params.guildId)
-            const userId = requireUserId(req)
+            requireUserId(req)
             const body = removeQueueBodySchema.safeParse(req.body)
 
             if (!body.success) {
                 throw AppError.badRequest('Track index is required')
             }
 
-            const cmd = buildCommand(guildId, userId, 'queue_remove', {
-                index: body.data.index,
-            })
-            res.json(await musicControlService.sendCommand(cmd))
+            const upstream = await vgMusicBotRequest(
+                `/v1/players/${encodeURIComponent(guildId)}/queue/remove`,
+                { method: 'POST', body: JSON.stringify(body.data) },
+            )
+            res.json(
+                result(
+                    guildId,
+                    upstream.ok,
+                    upstream.ok ? undefined : 'Remove failed',
+                ),
+            )
         }),
     )
 
@@ -93,10 +122,16 @@ export function setupQueueRoutes(app: Express): void {
         validateParams(guildIdParam),
         asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
             const guildId = param(req.params.guildId)
-            const userId = requireUserId(req)
+            requireUserId(req)
+            const upstream = await vgMusicBotRequest(
+                `/v1/players/${encodeURIComponent(guildId)}/queue/clear`,
+                { method: 'POST' },
+            )
             res.json(
-                await musicControlService.sendCommand(
-                    buildCommand(guildId, userId, 'queue_clear'),
+                result(
+                    guildId,
+                    upstream.ok,
+                    upstream.ok ? undefined : 'Clear failed',
                 ),
             )
         }),
@@ -108,18 +143,27 @@ export function setupQueueRoutes(app: Express): void {
         validateParams(guildIdParam),
         asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
             const guildId = param(req.params.guildId)
-            const userId = requireUserId(req)
+            requireUserId(req)
             const body = importBodySchema.safeParse(req.body)
 
             if (!body.success) {
                 throw AppError.badRequest('Playlist URL is required')
             }
 
-            const cmd = buildCommand(guildId, userId, 'import_playlist', {
-                url: body.data.url,
-                voiceChannelId: body.data.voiceChannelId,
-            })
-            res.json(await musicControlService.sendCommand(cmd, 30000))
+            const upstream = await vgMusicBotRequest(
+                `/v1/players/${encodeURIComponent(guildId)}/queue/import`,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({ url: body.data.url }),
+                },
+            )
+            res.json(
+                result(
+                    guildId,
+                    upstream.ok,
+                    upstream.ok ? undefined : 'Import failed',
+                ),
+            )
         }),
     )
 }
